@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(pip install*)",
+      "Bash(pytest*)",
+      "Bash(python -c*)",
+      "Bash(ls*)",
+      "Bash(cd*)",
+      "Bash(cat*)"
+    ]
+  }
+}

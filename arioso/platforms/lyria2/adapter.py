@@ -62,8 +62,7 @@ class Adapter(BaseRestAdapter):
         aiplatform.init(project=project, location=location)
 
         endpoint_name = (
-            f"projects/{project}/locations/{location}/"
-            f"publishers/google/models/{model}"
+            f"projects/{project}/locations/{location}/publishers/google/models/{model}"
         )
         endpoint = aiplatform.Endpoint(endpoint_name)
         response = endpoint.predict(
@@ -135,7 +134,10 @@ class Adapter(BaseRestAdapter):
         if self._use_sdk is not False:
             try:
                 predictions = self._try_sdk_generate(
-                    body, project=project, location=location, model=model,
+                    body,
+                    project=project,
+                    location=location,
+                    model=model,
                 )
                 self._use_sdk = True
             except (ImportError, Exception):
@@ -144,7 +146,10 @@ class Adapter(BaseRestAdapter):
         # Fallback to REST
         if predictions is None:
             predictions = self._rest_generate(
-                body, project=project, location=location, model=model,
+                body,
+                project=project,
+                location=location,
+                model=model,
             )
 
         # Decode first prediction (base64-encoded WAV)

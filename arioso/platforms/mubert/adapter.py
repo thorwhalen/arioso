@@ -78,9 +78,7 @@ class Adapter(BaseRestAdapter):
         }
 
         endpoint = "/RecordTrackTTM"
-        response = self.session.post(
-            f"{self.base_url}{endpoint}", json=payload
-        )
+        response = self.session.post(f"{self.base_url}{endpoint}", json=payload)
         response.raise_for_status()
         data = response.json()
 
@@ -137,9 +135,7 @@ class Adapter(BaseRestAdapter):
             response.raise_for_status()
             data = response.json()
 
-        raise TimeoutError(
-            f"Mubert generation did not complete within {timeout}s"
-        )
+        raise TimeoutError(f"Mubert generation did not complete within {timeout}s")
 
     def _task_to_song(self, task: dict) -> Song:
         """Convert a Mubert task dict to a Song."""

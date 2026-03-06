@@ -62,9 +62,7 @@ class Adapter(BaseRestAdapter):
         if structure is not None:
             payload["structure"] = structure
 
-        response = self.session.post(
-            f"{self.base_url}/music/generate", json=payload
-        )
+        response = self.session.post(f"{self.base_url}/music/generate", json=payload)
         response.raise_for_status()
         data = response.json()
 
@@ -119,9 +117,7 @@ class Adapter(BaseRestAdapter):
         """Poll the Loudly API until audio is available."""
         start = time.time()
         while time.time() - start < timeout:
-            response = self.session.get(
-                f"{self.base_url}/music/{track_id}"
-            )
+            response = self.session.get(f"{self.base_url}/music/{track_id}")
             response.raise_for_status()
             data = response.json()
 
@@ -145,8 +141,7 @@ class Adapter(BaseRestAdapter):
 
             if status in ("failed", "error"):
                 raise RuntimeError(
-                    f"Loudly generation failed (status={status}): "
-                    f"track_id={track_id}"
+                    f"Loudly generation failed (status={status}): track_id={track_id}"
                 )
 
             time.sleep(poll_interval)

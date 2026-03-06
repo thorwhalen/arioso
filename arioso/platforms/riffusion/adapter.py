@@ -134,9 +134,7 @@ class Adapter:
         _, audio_segment = result
         import numpy as np
 
-        audio_array = np.array(audio_segment.get_array_of_samples()).astype(
-            np.float32
-        )
+        audio_array = np.array(audio_segment.get_array_of_samples()).astype(np.float32)
         # Normalize to [-1, 1]
         max_val = np.iinfo(np.int16).max
         audio_array = audio_array / max_val
@@ -263,7 +261,10 @@ def _stft(audio, *, n_fft, hop_length):
     window = np.hanning(n_fft)
     n_frames = 1 + (len(audio) - n_fft) // hop_length
     frames = np.stack(
-        [audio[i * hop_length : i * hop_length + n_fft] * window for i in range(n_frames)],
+        [
+            audio[i * hop_length : i * hop_length + n_fft] * window
+            for i in range(n_frames)
+        ],
         axis=1,
     )
     return np.fft.rfft(frames, axis=0)
@@ -284,7 +285,7 @@ def _istft(stft_matrix, *, hop_length):
         frame = np.real(np.fft.irfft(stft_matrix[:, i]))
         start = i * hop_length
         audio[start : start + n_fft] += frame * window
-        window_sum[start : start + n_fft] += window ** 2
+        window_sum[start : start + n_fft] += window**2
 
     # Normalize by window overlap
     nonzero = window_sum > 1e-8

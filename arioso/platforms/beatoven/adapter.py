@@ -60,17 +60,13 @@ class Adapter(BaseRestAdapter):
         if seed is not None:
             payload["seed"] = seed
 
-        response = self.session.post(
-            f"{self.base_url}/tracks", json=payload
-        )
+        response = self.session.post(f"{self.base_url}/tracks", json=payload)
         response.raise_for_status()
         data = response.json()
 
         track_id = data.get("track_id", data.get("id", ""))
         if not track_id:
-            raise RuntimeError(
-                f"Beatoven API did not return a track_id: {data}"
-            )
+            raise RuntimeError(f"Beatoven API did not return a track_id: {data}")
 
         if not wait_for_completion:
             return [
@@ -112,9 +108,7 @@ class Adapter(BaseRestAdapter):
         Returns:
             The audio download URL.
         """
-        response = self.session.get(
-            f"{self.base_url}/tracks/{track_id}/audio"
-        )
+        response = self.session.get(f"{self.base_url}/tracks/{track_id}/audio")
         response.raise_for_status()
         data = response.json()
         return data.get("audio_url", data.get("url", ""))
@@ -146,8 +140,7 @@ class Adapter(BaseRestAdapter):
                 ]
             if status in ("failed", "error"):
                 raise RuntimeError(
-                    f"Beatoven generation failed (status={status}): "
-                    f"track_id={track_id}"
+                    f"Beatoven generation failed (status={status}): track_id={track_id}"
                 )
             time.sleep(poll_interval)
 

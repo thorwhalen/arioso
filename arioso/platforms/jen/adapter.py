@@ -36,9 +36,7 @@ class Adapter(BaseRestAdapter):
         if continue_from:
             payload["continue_from"] = continue_from
 
-        response = self.session.post(
-            f"{self.base_url}/generate", json=payload
-        )
+        response = self.session.post(f"{self.base_url}/generate", json=payload)
         response.raise_for_status()
         data = response.json()
 

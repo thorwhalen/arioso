@@ -25,6 +25,10 @@ Repository = "https://github.com/thorwhalen/arioso"
 Documentation = "https://thorwhalen.github.io/arioso"
 
 [project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
@@ -33,6 +37,34 @@ dev = [
 docs = [
     "sphinx>=6.0",
     "sphinx-rtd-theme>=1.0",
+]
+musicgen = [
+    "audiocraft>=1.0",
+    "torch>=2.0",
+]
+musicgen-transformers = [
+    "transformers>=4.30",
+    "torch>=2.0",
+]
+sunoapi = [
+    "requests>=2.28",
+]
+elevenlabs = [
+    "requests>=2.28",
+    "ho",
+    "ju",
+]
+all-rest = [
+    "requests>=2.28",
+    "ho",
+    "ju",
+]
+all = [
+    "audiocraft>=1.0",
+    "torch>=2.0",
+    "requests>=2.28",
+    "ho",
+    "ju",
 ]
 
 [tool.ruff]

@@ -1,44 +1,80 @@
-# Arioso - Song Generation Toolkit
+# Arioso - Unified AI Music Generation Facade
 
 ## Project Purpose
 
-Arioso is an extensible Python package that aggregates tools for programmatic song
-generation. It wraps multiple music generation backends behind a unified interface,
-allowing users to swap providers without changing their workflow.
+Arioso wraps 21+ AI music generation platforms behind a unified Python interface.
+Users generate music via `arioso.generate(prompt, platform="...", **kwargs)`.
 
 ## Architecture
 
 ```
 arioso/
-├── __init__.py          # Package facade - re-exports key classes
-├── base.py              # Song dataclass + MusicGenerator protocol
-└── (future modules)     # suno.py, elevenlabs.py, musicgen.py, ...
+    __init__.py                  # Facade: generate(), list_platforms(), get_platform_info()
+    base.py                      # Song, AudioResult dataclasses; AFFORDANCES constant
+    registry.py                  # Platform auto-discovery and lazy loading
+    translation.py               # Parameter name translation via i2.Ingress
+    _util.py                     # Auth helpers, HTTP session factory
+    platforms/
+        __init__.py              # Auto-discovery hook
+        _base_adapter.py         # BaseRestAdapter with common REST patterns
+        <name>/                  # One subfolder per platform
+            __init__.py
+            config.py            # PLATFORM_CONFIG dict (required)
+            adapter.py           # Platform-specific code (optional for REST APIs)
 ```
 
-### Design Principles
+### How It Works
 
-- **Provider-agnostic base**: `base.py` defines the `Song` dataclass and
-  `MusicGenerator` protocol that all backends implement. Consumer code depends on
-  this protocol, not concrete classes.
-- **Lazy imports**: Heavy dependencies are imported inside functions/methods, not at
-  module level, so installing `arioso` doesn't require every backend's deps.
-- **Extensible via new modules**: Adding a new backend = adding a new module that
-  implements `MusicGenerator`.
+1. Each platform lives in `arioso/platforms/<name>/` with a `config.py` exporting
+   a `PLATFORM_CONFIG` dict that declares parameter mappings, auth, endpoints, etc.
+2. The registry auto-discovers platforms by scanning for these packages.
+3. When a platform is first used, its adapter is lazy-loaded.
+4. The `translation.py` module handles renaming unified affordance names to native
+   platform parameter names, with type coercion.
 
-## Key Conventions
+## Adding a New Platform
+
+See the `.claude/skills/add-platform.md` skill for step-by-step instructions.
+
+Quick summary:
+1. Create `arioso/platforms/<name>/` directory with `__init__.py`
+2. Write `config.py` exporting `PLATFORM_CONFIG` dict (copy from an existing platform)
+3. For REST APIs with sufficient config: done (auto-generated adapter)
+4. For Python libraries or complex APIs: write `adapter.py` with an `Adapter` class
+5. The `Adapter` class must have a `generate(prompt, **kwargs) -> Song` method
+6. Add tests in `tests/platforms/test_<name>.py`
+
+## Key Libraries (dependencies used internally)
+
+- **ho**: OpenAPI spec -> Python functions (`route_to_func`, `routes_to_funcs`)
+- **ju**: JSON schema parsing, OpenAPI route objects (`Routes`, `Route`)
+- **i2**: Signature manipulation (`Sig`), function wrapping (`Wrap`, `Ingress`)
+
+Source locations for reference:
+- `/Users/thorwhalen/Dropbox/py/proj/i/ho/ho/base.py`
+- `/Users/thorwhalen/Dropbox/py/proj/i/ju/ju/oas.py`
+- `/Users/thorwhalen/Dropbox/py/proj/i/i2/i2/wrapper.py`
+- `/Users/thorwhalen/Dropbox/py/proj/i/i2/i2/signatures.py`
+
+## Conventions
 
 - Python 3.10+, type hints everywhere
-- Docstrings: Google style
-- Tests in `tests/`, examples in `examples/`, scratch work in `scrap/`
-- No emojis in code or docs unless user asks
+- Google-style docstrings
+- Zero required dependencies; platform deps are lazy-imported inside methods
+- All platform parameters use unified affordance names (see `AFFORDANCES` in `base.py`)
+- No emojis in code or docs
+- Tests in `tests/`, examples in `examples/`, scratch in `scrap/`
 
-## History
+## Reference Documentation
 
-The `_failed_homegrown_sunoapi` branch contains a failed attempt at direct
-cookie-based Suno API access. It was abandoned due to hCaptcha enforcement.
-See that branch's README for a detailed post-mortem.
+`misc/docs/` contains the comprehensive 21-platform reference document mapping
+all platforms' parameters, SDKs, and capabilities. Agents should consult this
+when adding new platforms or understanding parameter mappings.
 
-## Next Steps
+## Evolving This File
 
-Implement Suno access via a paid third-party proxy (e.g., sunoapi.org) that
-handles auth and CAPTCHA on their end.
+This CLAUDE.md, along with `.claude/skills/` and `.claude/rules/`, should be
+incrementally updated as the project evolves. When you discover better patterns,
+fix bugs, or add platforms, update these files to reflect the current state.
+The `misc/docs/` folder can also be used to store notes, analysis, or documents
+that agents or the user want to reference across sessions.

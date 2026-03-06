@@ -27,9 +27,7 @@ class Adapter(BaseRestAdapter):
             from ho import route_to_func
             from ju.oas import Routes, ensure_openapi_dict
 
-            spec = ensure_openapi_dict(
-                self.config["api"]["openapi_spec_url"]
-            )
+            spec = ensure_openapi_dict(self.config["api"]["openapi_spec_url"])
             routes = Routes(spec)
             endpoint = self.config["api"]["generate_endpoint"]
             target_route = routes[endpoint["method"], endpoint["path"]]

@@ -136,15 +136,11 @@ AFFORDANCES: dict[str, Affordance] = {
     "audio_input_strength": Affordance(
         "audio_input_strength", float, "How much reference audio influences output 0-1"
     ),
-    "continue_from": Affordance(
-        "continue_from", str, "ID/URL of track to extend from"
-    ),
+    "continue_from": Affordance("continue_from", str, "ID/URL of track to extend from"),
     "continue_at": Affordance(
         "continue_at", float, "Timestamp in seconds to continue from"
     ),
-    "mask_start": Affordance(
-        "mask_start", float, "Inpainting region start in seconds"
-    ),
+    "mask_start": Affordance("mask_start", float, "Inpainting region start in seconds"),
     "mask_end": Affordance("mask_end", float, "Inpainting region end in seconds"),
     "model": Affordance("model", str, "Model version or variant"),
     "seed": Affordance("seed", int, "Random seed for reproducibility"),
@@ -157,9 +153,7 @@ AFFORDANCES: dict[str, Affordance] = {
     "batch_size": Affordance("batch_size", int, "Number of outputs per request"),
     "output_format": Affordance("output_format", str, "Desired output format"),
     "bitrate": Affordance("bitrate", int, "Audio bitrate in kbps"),
-    "prompt_weight": Affordance(
-        "prompt_weight", float, "Strength of prompt adherence"
-    ),
+    "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence"),
     "interpolation_alpha": Affordance(
         "interpolation_alpha", float, "Blend between two prompts 0-1"
     ),
@@ -168,9 +162,7 @@ AFFORDANCES: dict[str, Affordance] = {
     ),
     "voice_id": Affordance("voice_id", str, "AI singer/voice model selection"),
     "pitch_shift": Affordance("pitch_shift", int, "Pitch adjustment in semitones"),
-    "watermark": Affordance(
-        "watermark", bool, "Apply content authenticity watermark"
-    ),
+    "watermark": Affordance("watermark", bool, "Apply content authenticity watermark"),
     "extend_stride": Affordance(
         "extend_stride", float, "Overlap stride for extended generation"
     ),

@@ -179,12 +179,16 @@ def _build_egress(config: dict) -> Callable:
                 )
             else:
                 raw = (
-                    response.content if hasattr(response, "content") else bytes(response)
+                    response.content
+                    if hasattr(response, "content")
+                    else bytes(response)
                 )
                 audio = AudioResult(audio_bytes=raw, format=default_format)
             return Song(audio=audio, platform=platform_name, status="complete")
         elif returns == "url":
-            url = response if isinstance(response, str) else response.get("audio_url", "")
+            url = (
+                response if isinstance(response, str) else response.get("audio_url", "")
+            )
             audio = AudioResult(audio_url=url, format=default_format)
             return Song(audio=audio, platform=platform_name, status="complete")
         elif returns == "array":

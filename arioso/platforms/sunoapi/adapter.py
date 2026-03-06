@@ -31,9 +31,7 @@ def _check_api_error(data: dict):
     """Raise RuntimeError if the API response indicates an error."""
     if isinstance(data, dict) and data.get("code") and data["code"] != 200:
         msg = data.get("msg", "Unknown API error")
-        raise RuntimeError(
-            f"sunoapi error (code {data['code']}): {msg}"
-        )
+        raise RuntimeError(f"sunoapi error (code {data['code']}): {msg}")
 
 
 class Adapter(BaseRestAdapter):
@@ -194,8 +192,7 @@ class Adapter(BaseRestAdapter):
 
         if status_raw in _ERROR_STATUSES:
             raise RuntimeError(
-                f"sunoapi generation failed (status={status_raw}): "
-                f"taskId={task_id}"
+                f"sunoapi generation failed (status={status_raw}): taskId={task_id}"
             )
 
         suno_data = record.get("response", {}).get("sunoData", [])
@@ -278,8 +275,7 @@ class Adapter(BaseRestAdapter):
                 return songs
             time.sleep(poll_interval)
         raise TimeoutError(
-            f"sunoapi generation did not complete within {timeout}s "
-            f"(taskId={task_id})"
+            f"sunoapi generation did not complete within {timeout}s (taskId={task_id})"
         )
 
     def _parse_songs(self, data, *, title: str = "") -> list[Song]:

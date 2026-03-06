@@ -1,0 +1,97 @@
+"""Google Lyria RealTime platform configuration."""
+
+PLATFORM_CONFIG = {
+    "name": "lyria_rt",
+    "display_name": "Google Lyria RealTime",
+    "website": "https://deepmind.google/technologies/lyria/",
+    "tier": "structured",
+    "access_type": "python_lib",
+    "auth": {
+        "type": "api_key",
+        "env_var": "GOOGLE_API_KEY",
+    },
+    "dependencies": ["google-genai"],
+    "param_map": {
+        "prompt": {
+            "native_name": "text",
+            "required": True,
+        },
+        "bpm": {
+            "native_name": "bpm",
+            "min": 60,
+            "max": 200,
+        },
+        "key": {
+            "native_name": "scale",
+            "enum": [
+                "C_MAJOR", "C_MINOR",
+                "C_SHARP_MAJOR", "C_SHARP_MINOR",
+                "D_MAJOR", "D_MINOR",
+                "D_SHARP_MAJOR", "D_SHARP_MINOR",
+                "E_MAJOR", "E_MINOR",
+                "F_MAJOR", "F_MINOR",
+                "F_SHARP_MAJOR", "F_SHARP_MINOR",
+                "G_MAJOR", "G_MINOR",
+                "G_SHARP_MAJOR", "G_SHARP_MINOR",
+                "A_MAJOR", "A_MINOR",
+                "A_SHARP_MAJOR", "A_SHARP_MINOR",
+                "B_MAJOR", "B_MINOR",
+            ],
+        },
+        "energy": {
+            "native_name": "density",
+            "min": 0.0,
+            "max": 1.0,
+        },
+        "brightness": {
+            "native_name": "brightness",
+            "min": 0.0,
+            "max": 1.0,
+        },
+        "guidance": {
+            "native_name": "guidance",
+            "min": 0.0,
+            "max": 6.0,
+            "native_default": 4.0,
+        },
+        "temperature": {
+            "native_name": "temperature",
+            "min": 0.0,
+            "max": 3.0,
+            "native_default": 1.1,
+        },
+        "top_k": {
+            "native_name": "top_k",
+            "min": 1,
+            "max": 1000,
+            "native_default": 40,
+        },
+        "seed": {
+            "native_name": "seed",
+            "min": 0,
+            "max": 2100000000,
+        },
+        "prompt_weight": {
+            "native_name": "weight",
+            "adapter_handled": True,
+        },
+    },
+    "supported_affordances": [
+        "prompt",
+        "bpm",
+        "key",
+        "energy",
+        "brightness",
+        "guidance",
+        "temperature",
+        "top_k",
+        "seed",
+        "prompt_weight",
+    ],
+    "on_unsupported_param": "warn",
+    "output": {
+        "default_format": "wav",
+        "sample_rate": 48000,
+        "returns": "bytes",
+    },
+}

@@ -88,6 +88,12 @@ def _load_adapter(name: str, config: dict):
     ``Adapter`` class. If that fails, falls back to auto-generating
     a generate function from the config via the translation layer.
     """
+    # Platforms with no API get a stub adapter
+    if config.get("access_type") == "none":
+        from arioso.platforms._no_api_adapter import NoApiAdapter
+
+        return NoApiAdapter(config)
+
     try:
         adapter_module = importlib.import_module(f"arioso.platforms.{name}.adapter")
         adapter_class = getattr(adapter_module, "Adapter", None)

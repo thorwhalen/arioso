@@ -11,7 +11,7 @@ Usage::
     song = arioso.generate("epic orchestral", platform="elevenlabs", duration=30)
 
     # List available platforms
-    arioso.list_platforms()  # ['musicgen', 'sunoapi', 'elevenlabs']
+    arioso.list_platforms()  # ['musicgen', 'sunoapi', 'elevenlabs', ...]
 
     # Get platform config
     arioso.get_platform_info("musicgen")

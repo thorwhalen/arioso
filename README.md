@@ -2,8 +2,8 @@
 
 Unified Python facade for AI music generation.
 
-One interface, many backends. Arioso wraps AI music generation platforms —
-MusicGen, ElevenLabs, Suno, and more — behind a single `generate()` call.
+One interface, many backends. Arioso wraps 20 AI music generation platforms —
+from local open-source models to commercial REST APIs — behind a single `generate()` call.
 
 ## Install
 
@@ -30,18 +30,35 @@ song.audio.audio_bytes   # MP3 bytes
 
 ## Platforms
 
-Three platforms are included out of the box:
+20 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
 | Platform | Access | Auth | Install |
 |----------|--------|------|---------|
-| **MusicGen** | Local Python library | None | `pip install arioso[musicgen]` |
-| **ElevenLabs** | REST API | API key (`ELEVENLABS_API_KEY`) | `pip install arioso[elevenlabs]` |
-| **Suno** (via sunoapi.org) | REST API | Bearer token (`SUNO_API_KEY`) | `pip install arioso[sunoapi]` |
+| **MusicGen** | Local (audiocraft/transformers) | None | `pip install arioso[musicgen]` |
+| **Stable Audio Open** | Local (diffusers) | None | `pip install arioso[stable-audio]` |
+| **Harmonai** | Local (diffusers) | None | `pip install arioso[harmonai]` |
+| **Riffusion** | Local (diffusers) | None | `pip install arioso[riffusion]` |
+| **ElevenLabs** | REST API | `ELEVENLABS_API_KEY` | `pip install arioso[elevenlabs]` |
+| **Suno** (via sunoapi.org) | REST API | `SUNO_API_KEY` | `pip install arioso[sunoapi]` |
+| **Google Lyria 2** | REST (Vertex AI) | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]` |
+| **Google Lyria RT** | WebSocket (genai SDK) | `GOOGLE_API_KEY` | `pip install arioso[lyria-rt]` |
+| **Mubert** | REST API | `MUBERT_PAT` | `pip install arioso[mubert]` |
+| **Beatoven.ai** | REST API | `BEATOVEN_API_KEY` | `pip install arioso[beatoven]` |
+| **Loudly** | REST API | `LOUDLY_API_KEY` | `pip install arioso[loudly]` |
+| **Jen** | REST API | `JEN_API_KEY` | `pip install arioso[jen]` |
+| **YuE** | fal.ai / local CLI | `FAL_KEY` | `pip install arioso[yue]` |
+| **Udio** | Unofficial wrapper | `UDIO_AUTH_COOKIE` | `pip install arioso[udio]` |
+| **AIVA** | No public API | — | Config only |
+| **ACE Studio** | No public API | — | Config only |
+| **Boomy** | Enterprise API only | — | Config only |
+| **Soundraw** | Enterprise API only | — | Config only |
+| **CassetteAI** | No public API | — | Config only |
+| **Musicfy** | No public API | — | Config only |
 
 ```python
 # See what's available
 arioso.list_platforms()
-# ['elevenlabs', 'musicgen', 'sunoapi']
+# ['ace_studio', 'aiva', 'beatoven', 'boomy', 'cassetteai', 'elevenlabs', ...]
 
 # Inspect a platform's configuration
 arioso.get_platform_info("musicgen")
@@ -275,10 +292,28 @@ arioso/
     _util.py             # Auth helpers, HTTP session factory
 
     platforms/
-        _base_adapter.py # BaseRestAdapter (shared REST infrastructure)
-        musicgen/        # Local inference via audiocraft/transformers
-        sunoapi/         # REST via sunoapi.org
-        elevenlabs/      # REST with OpenAPI spec via ho
+        _base_adapter.py   # BaseRestAdapter (shared REST infrastructure)
+        _no_api_adapter.py # Stub for platforms without programmatic access
+        musicgen/          # Local inference via audiocraft/transformers
+        stable_audio/      # Local inference via diffusers
+        harmonai/          # Unconditional generation via Dance Diffusion
+        riffusion/         # Spectrogram-based via diffusers
+        elevenlabs/        # REST with OpenAPI spec via ho
+        sunoapi/           # REST via sunoapi.org
+        lyria2/            # Google Vertex AI REST
+        lyria_rt/          # Google Lyria RealTime WebSocket
+        mubert/            # Mubert REST API
+        beatoven/          # Beatoven.ai REST API
+        loudly/            # Loudly REST API
+        jen/               # Jen REST API
+        yue/               # YuE via fal.ai or local CLI
+        udio/              # Udio via unofficial wrapper
+        aiva/              # Config stub (no public API)
+        ace_studio/        # Config stub (no public API)
+        boomy/             # Config stub (no public API)
+        soundraw/          # Config stub (no public API)
+        cassetteai/        # Config stub (no public API)
+        musicfy/           # Config stub (no public API)
 ```
 
 Key design choices:

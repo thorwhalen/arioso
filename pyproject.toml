@@ -56,6 +56,44 @@ elevenlabs = [
     "ho",
     "ju",
 ]
+stable-audio = [
+    "diffusers>=0.25",
+    "torch>=2.0",
+    "transformers>=4.30",
+]
+lyria2 = [
+    "requests>=2.28",
+    "google-cloud-aiplatform>=1.38",
+]
+lyria-rt = [
+    "google-genai>=1.0",
+]
+mubert = [
+    "requests>=2.28",
+]
+beatoven = [
+    "requests>=2.28",
+]
+loudly = [
+    "requests>=2.28",
+]
+jen = [
+    "requests>=2.28",
+]
+yue = [
+    "fal-client>=0.4",
+]
+harmonai = [
+    "diffusers>=0.25",
+    "torch>=2.0",
+]
+riffusion = [
+    "diffusers>=0.25",
+    "torch>=2.0",
+]
+udio = [
+    "udio-wrapper",
+]
 all-rest = [
     "requests>=2.28",
     "ho",
@@ -67,6 +105,10 @@ all = [
     "requests>=2.28",
     "ho",
     "ju",
+    "diffusers>=0.25",
+    "transformers>=4.30",
+    "google-genai>=1.0",
+    "fal-client>=0.4",
 ]
 
 [tool.ruff]

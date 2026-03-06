@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.platforms.yue.adapter &mdash; arioso 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva.html">arioso.platforms.aiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy.html">arioso.platforms.boomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy.html">arioso.platforms.musicfy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw.html">arioso.platforms.soundraw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.platforms.yue.adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.platforms.yue.adapter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;YuE adapter supporting fal.ai REST API and local CLI backends.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a duration in seconds to an approximate number of YuE segments.</span>
+
+<span class="sd">    Each segment is roughly 30 seconds of audio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">duration</span> <span class="o">/</span> <span class="mi">30</span><span class="p">)))</span>
+
+
+<div class="viewcode-block" id="Adapter">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/yue/adapter.html#arioso.platforms.yue.adapter.Adapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;YuE adapter with dual backend support.</span>
+
+<span class="sd">    Prefers the fal.ai hosted API when ``FAL_KEY`` is set.  Falls back to</span>
+<span class="sd">    local subprocess invocation of ``infer.py`` otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine which backend to use.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAL_KEY&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">&quot;fal&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
+
+<div class="viewcode-block" id="Adapter.generate">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/yue/adapter.html#arioso.platforms.yue.adapter.Adapter.generate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m-a-p/YuE-s1-7B-anneal-en-cot&quot;</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">,</span>
+        <span class="n">repetition_penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music from genre description and lyrics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prompt: Genre/style description (mapped to ``genre_txt``).</span>
+<span class="sd">            lyrics: Lyrics text (mapped to ``lyrics_txt``).</span>
+<span class="sd">            duration: Desired length in seconds (converted to segments).</span>
+<span class="sd">            model: Stage-1 model identifier.</span>
+<span class="sd">            batch_size: Stage-2 batch size.</span>
+<span class="sd">            max_tokens: Maximum new tokens for generation.</span>
+<span class="sd">            repetition_penalty: Token repetition penalty.</span>
+<span class="sd">            audio_input: Path to a vocal track prompt file, if any.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A Song with audio_url or audio_bytes populated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_backend</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;fal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_fal</span><span class="p">(</span>
+                <span class="n">prompt</span><span class="p">,</span>
+                <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">,</span>
+                <span class="n">repetition_penalty</span><span class="o">=</span><span class="n">repetition_penalty</span><span class="p">,</span>
+                <span class="n">audio_input</span><span class="o">=</span><span class="n">audio_input</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_local</span><span class="p">(</span>
+            <span class="n">prompt</span><span class="p">,</span>
+            <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span><span class="p">,</span>
+            <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">,</span>
+            <span class="n">repetition_penalty</span><span class="o">=</span><span class="n">repetition_penalty</span><span class="p">,</span>
+            <span class="n">audio_input</span><span class="o">=</span><span class="n">audio_input</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># fal.ai backend</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_fal</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="p">,</span>
+        <span class="n">repetition_penalty</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The fal_client package is required for the fal.ai backend. &quot;</span>
+                <span class="s2">&quot;Install it with: pip install fal-client&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;genre_txt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">&quot;lyrics_txt&quot;</span><span class="p">:</span> <span class="n">lyrics</span><span class="p">,</span>
+            <span class="s2">&quot;run_n_segments&quot;</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
+            <span class="s2">&quot;stage1_model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">&quot;stage2_batch_size&quot;</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;max_new_tokens&quot;</span><span class="p">:</span> <span class="n">max_tokens</span><span class="p">,</span>
+            <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="n">repetition_penalty</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
+            <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;vocal_track_prompt_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_input</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;fal-ai/yue&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span>
+
+        <span class="n">audio_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">audio_bytes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">audio_url</span><span class="p">:</span>
+                <span class="c1"># Some fal responses nest the URL</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">audio_url</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
+                <span class="n">audio_bytes</span><span class="o">=</span><span class="n">audio_bytes</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;yue&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;fal&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                <span class="s2">&quot;segments&quot;</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Local CLI backend (subprocess)</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_local</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="p">,</span>
+        <span class="n">repetition_penalty</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span>
+
+        <span class="c1"># Write genre and lyrics to temporary files for the CLI</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">genre_f</span><span class="p">:</span>
+            <span class="n">genre_f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+            <span class="n">genre_path</span> <span class="o">=</span> <span class="n">genre_f</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">lyrics_f</span><span class="p">:</span>
+            <span class="n">lyrics_f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lyrics</span><span class="p">)</span>
+            <span class="n">lyrics_path</span> <span class="o">=</span> <span class="n">lyrics_f</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;yue_output_&quot;</span><span class="p">)</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;python&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;infer.py&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--genre_txt&quot;</span><span class="p">,</span> <span class="n">genre_path</span><span class="p">,</span>
+            <span class="s2">&quot;--lyrics_txt&quot;</span><span class="p">,</span> <span class="n">lyrics_path</span><span class="p">,</span>
+            <span class="s2">&quot;--run_n_segments&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span>
+            <span class="s2">&quot;--stage1_model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">&quot;--stage2_batch_size&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span>
+            <span class="s2">&quot;--max_new_tokens&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_tokens</span><span class="p">),</span>
+            <span class="s2">&quot;--repetition_penalty&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repetition_penalty</span><span class="p">),</span>
+            <span class="s2">&quot;--output_dir&quot;</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--vocal_track_prompt_path&quot;</span><span class="p">,</span> <span class="n">audio_input</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Local YuE inference requires the infer.py script from the &quot;</span>
+                <span class="s2">&quot;YuE repository to be available on PATH. See: &quot;</span>
+                <span class="s2">&quot;https://github.com/multimodal-art-projection/YuE&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="c1"># Find the generated audio file</span>
+        <span class="n">audio_bytes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.wav&quot;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">audio_bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">audio_bytes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;No .wav file found in YuE output directory; &quot;</span>
+                <span class="s2">&quot;generation may have failed.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_bytes</span><span class="o">=</span><span class="n">audio_bytes</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;yue&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span> <span class="k">if</span> <span class="n">audio_bytes</span> <span class="k">else</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                <span class="s2">&quot;segments&quot;</span><span class="p">:</span> <span class="n">segments</span><span class="p">,</span>
+                <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.platforms.riffusion.adapter &mdash; arioso 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva.html">arioso.platforms.aiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy.html">arioso.platforms.boomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy.html">arioso.platforms.musicfy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw.html">arioso.platforms.soundraw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.platforms.riffusion.adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.platforms.riffusion.adapter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Riffusion adapter using the riffusion library or diffusers fallback.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+
+<span class="c1"># Default spectrogram-to-audio parameters</span>
+<span class="n">_SAMPLE_RATE</span> <span class="o">=</span> <span class="mi">44100</span>
+<span class="n">_N_FFT</span> <span class="o">=</span> <span class="mi">2048</span>
+<span class="n">_HOP_LENGTH</span> <span class="o">=</span> <span class="mi">512</span>
+
+
+<div class="viewcode-block" id="Adapter">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html#arioso.platforms.riffusion.adapter.Adapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Riffusion adapter with dual backend support.</span>
+
+<span class="sd">    Tries the ``riffusion`` library first for full spectrogram-to-audio</span>
+<span class="sd">    support.  Falls back to the ``diffusers`` StableDiffusion pipeline</span>
+<span class="sd">    which generates a spectrogram image and converts it to audio via</span>
+<span class="sd">    inverse STFT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_riffusion_lib</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazy-load the pipeline.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">riffusion.riffusion_pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">RiffusionPipeline</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span> <span class="o">=</span> <span class="n">RiffusionPipeline</span><span class="o">.</span><span class="n">load_checkpoint</span><span class="p">(</span>
+                <span class="s2">&quot;riffusion/riffusion-model-v1&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_use_riffusion_lib</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">diffusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">StableDiffusionPipeline</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span> <span class="o">=</span> <span class="n">StableDiffusionPipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="s2">&quot;riffusion/riffusion-model-v1&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_use_riffusion_lib</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Adapter.generate">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html#arioso.platforms.riffusion.adapter.Adapter.generate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">guidance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">,</span>
+        <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">audio_input_strength</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate audio from a text prompt via spectrogram synthesis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prompt: Text description of desired music.</span>
+<span class="sd">            negative_prompt: Elements to avoid in generation.</span>
+<span class="sd">            seed: Random seed for reproducibility.</span>
+<span class="sd">            guidance: Classifier-free guidance scale.</span>
+<span class="sd">            num_steps: Number of diffusion inference steps.</span>
+<span class="sd">            audio_input_strength: Denoising strength (0-1).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A Song with audio_array populated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_riffusion_lib</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_riffusion_lib</span><span class="p">(</span>
+                <span class="n">prompt</span><span class="p">,</span>
+                <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+                <span class="n">num_steps</span><span class="o">=</span><span class="n">num_steps</span><span class="p">,</span>
+                <span class="n">audio_input_strength</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_diffusers</span><span class="p">(</span>
+            <span class="n">prompt</span><span class="p">,</span>
+            <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+            <span class="n">num_steps</span><span class="o">=</span><span class="n">num_steps</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># riffusion library backend</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_riffusion_lib</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">,</span>
+        <span class="n">guidance</span><span class="p">,</span>
+        <span class="n">num_steps</span><span class="p">,</span>
+        <span class="n">audio_input_strength</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+        <span class="nd">@dataclass</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">_PromptInput</span><span class="p">:</span>
+            <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">denoising</span><span class="p">:</span> <span class="nb">float</span>
+            <span class="n">guidance</span><span class="p">:</span> <span class="nb">float</span>
+
+        <span class="n">seed_val</span> <span class="o">=</span> <span class="n">seed</span> <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">42</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">_PromptInput</span><span class="p">(</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed_val</span><span class="p">,</span>
+            <span class="n">denoising</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
+            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">_PromptInput</span><span class="p">(</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">negative_prompt</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed_val</span><span class="p">,</span>
+            <span class="n">denoising</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
+            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="o">.</span><span class="n">riffuse</span><span class="p">(</span>
+            <span class="n">start</span><span class="p">,</span>
+            <span class="n">end</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">num_inference_steps</span><span class="o">=</span><span class="n">num_steps</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The riffusion pipeline returns a (image, audio_segment) tuple</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">audio_segment</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+        <span class="n">audio_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">audio_segment</span><span class="o">.</span><span class="n">get_array_of_samples</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="p">)</span>
+        <span class="c1"># Normalize to [-1, 1]</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+        <span class="n">audio_array</span> <span class="o">=</span> <span class="n">audio_array</span> <span class="o">/</span> <span class="n">max_val</span>
+
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_array</span><span class="o">=</span><span class="n">audio_array</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">_SAMPLE_RATE</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;riffusion&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;riffusion_lib&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">seed_val</span><span class="p">,</span>
+                <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+                <span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># diffusers fallback backend</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_diffusers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">,</span>
+        <span class="n">guidance</span><span class="p">,</span>
+        <span class="n">num_steps</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+        <span class="n">generator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">pipe_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">&quot;num_inference_steps&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
+            <span class="s2">&quot;guidance_scale&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+            <span class="s2">&quot;generator&quot;</span><span class="p">:</span> <span class="n">generator</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
+            <span class="n">pipe_kwargs</span><span class="p">[</span><span class="s2">&quot;negative_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="p">(</span><span class="o">**</span><span class="n">pipe_kwargs</span><span class="p">)</span>
+        <span class="n">spectrogram_image</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Convert spectrogram image to audio via inverse STFT</span>
+        <span class="n">audio_array</span> <span class="o">=</span> <span class="n">_spectrogram_image_to_audio</span><span class="p">(</span><span class="n">spectrogram_image</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_array</span><span class="o">=</span><span class="n">audio_array</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">_SAMPLE_RATE</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;riffusion&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;diffusers&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+                <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+                <span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_spectrogram_image_to_audio</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a spectrogram PIL image to a 1-D audio array.</span>
+
+<span class="sd">    This is a simplified inverse: the image is treated as a log-magnitude</span>
+<span class="sd">    spectrogram, and Griffin-Lim is used for phase reconstruction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="c1"># Convert to grayscale numpy array</span>
+    <span class="n">spec_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Flip vertically (low frequencies at bottom in the image)</span>
+    <span class="n">spec_array</span> <span class="o">=</span> <span class="n">spec_array</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="c1"># Rescale from [0, 255] to approximate dB range, then to linear</span>
+    <span class="n">spec_db</span> <span class="o">=</span> <span class="n">spec_array</span> <span class="o">/</span> <span class="mf">255.0</span> <span class="o">*</span> <span class="mf">80.0</span> <span class="o">-</span> <span class="mf">80.0</span>  <span class="c1"># range roughly [-80, 0] dB</span>
+    <span class="n">spec_linear</span> <span class="o">=</span> <span class="mf">10.0</span> <span class="o">**</span> <span class="p">(</span><span class="n">spec_db</span> <span class="o">/</span> <span class="mf">20.0</span><span class="p">)</span>
+
+    <span class="c1"># Griffin-Lim reconstruction</span>
+    <span class="n">audio</span> <span class="o">=</span> <span class="n">_griffin_lim</span><span class="p">(</span><span class="n">spec_linear</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">audio</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_griffin_lim</span><span class="p">(</span><span class="n">magnitude</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reconstruct audio from a magnitude spectrogram using Griffin-Lim.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">n_fft</span> <span class="o">=</span> <span class="p">(</span><span class="n">magnitude</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">hop_length</span> <span class="o">=</span> <span class="n">_HOP_LENGTH</span>
+
+    <span class="c1"># Random initial phase</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">magnitude</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+        <span class="n">stft</span> <span class="o">=</span> <span class="n">magnitude</span> <span class="o">*</span> <span class="n">phase</span>
+        <span class="c1"># Inverse STFT</span>
+        <span class="n">audio</span> <span class="o">=</span> <span class="n">_istft</span><span class="p">(</span><span class="n">stft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">)</span>
+        <span class="c1"># Re-analyze</span>
+        <span class="n">recon</span> <span class="o">=</span> <span class="n">_stft</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">)</span>
+        <span class="c1"># Update phase</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">recon</span><span class="p">))</span>
+
+    <span class="n">audio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">_istft</span><span class="p">(</span><span class="n">magnitude</span> <span class="o">*</span> <span class="n">phase</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">))</span>
+    <span class="c1"># Normalize</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">audio</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">max_val</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">audio</span> <span class="o">=</span> <span class="n">audio</span> <span class="o">/</span> <span class="n">max_val</span>
+    <span class="k">return</span> <span class="n">audio</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_stft</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple STFT using numpy.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">n_fft</span><span class="p">)</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="o">-</span> <span class="n">n_fft</span><span class="p">)</span> <span class="o">//</span> <span class="n">hop_length</span>
+    <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">audio</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">hop_length</span> <span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="n">hop_length</span> <span class="o">+</span> <span class="n">n_fft</span><span class="p">]</span> <span class="o">*</span> <span class="n">window</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_frames</span><span class="p">)],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_istft</span><span class="p">(</span><span class="n">stft_matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple inverse STFT using numpy.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">n_fft</span> <span class="o">=</span> <span class="p">(</span><span class="n">stft_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">n_fft</span><span class="p">)</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">n_fft</span> <span class="o">+</span> <span class="n">hop_length</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_frames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">audio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+    <span class="n">window_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_frames</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">stft_matrix</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]))</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">hop_length</span>
+        <span class="n">audio</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">n_fft</span><span class="p">]</span> <span class="o">+=</span> <span class="n">frame</span> <span class="o">*</span> <span class="n">window</span>
+        <span class="n">window_sum</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">n_fft</span><span class="p">]</span> <span class="o">+=</span> <span class="n">window</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="c1"># Normalize by window overlap</span>
+    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">window_sum</span> <span class="o">&gt;</span> <span class="mf">1e-8</span>
+    <span class="n">audio</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">/=</span> <span class="n">window_sum</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">audio</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

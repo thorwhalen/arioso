@@ -1,0 +1,4 @@
+arioso.platforms.jen.adapter
+============================
+.. automodule:: arioso.platforms.jen.adapter
+   :members:

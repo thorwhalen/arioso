@@ -1,0 +1,4 @@
+arioso.platforms.lyria_rt.config
+================================
+.. automodule:: arioso.platforms.lyria_rt.config
+   :members:

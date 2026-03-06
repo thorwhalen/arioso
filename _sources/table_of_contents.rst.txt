@@ -7,14 +7,60 @@
    module_docs/arioso/base
    module_docs/arioso/platforms
    module_docs/arioso/platforms/_base_adapter
+   module_docs/arioso/platforms/_no_api_adapter
+   module_docs/arioso/platforms/ace_studio
+   module_docs/arioso/platforms/ace_studio/config
+   module_docs/arioso/platforms/aiva
+   module_docs/arioso/platforms/aiva/config
+   module_docs/arioso/platforms/beatoven
+   module_docs/arioso/platforms/beatoven/adapter
+   module_docs/arioso/platforms/beatoven/config
+   module_docs/arioso/platforms/boomy
+   module_docs/arioso/platforms/boomy/config
+   module_docs/arioso/platforms/cassetteai
+   module_docs/arioso/platforms/cassetteai/config
    module_docs/arioso/platforms/elevenlabs
    module_docs/arioso/platforms/elevenlabs/adapter
    module_docs/arioso/platforms/elevenlabs/config
+   module_docs/arioso/platforms/harmonai
+   module_docs/arioso/platforms/harmonai/adapter
+   module_docs/arioso/platforms/harmonai/config
+   module_docs/arioso/platforms/jen
+   module_docs/arioso/platforms/jen/adapter
+   module_docs/arioso/platforms/jen/config
+   module_docs/arioso/platforms/loudly
+   module_docs/arioso/platforms/loudly/adapter
+   module_docs/arioso/platforms/loudly/config
+   module_docs/arioso/platforms/lyria2
+   module_docs/arioso/platforms/lyria2/adapter
+   module_docs/arioso/platforms/lyria2/config
+   module_docs/arioso/platforms/lyria_rt
+   module_docs/arioso/platforms/lyria_rt/adapter
+   module_docs/arioso/platforms/lyria_rt/config
+   module_docs/arioso/platforms/mubert
+   module_docs/arioso/platforms/mubert/adapter
+   module_docs/arioso/platforms/mubert/config
+   module_docs/arioso/platforms/musicfy
+   module_docs/arioso/platforms/musicfy/config
    module_docs/arioso/platforms/musicgen
    module_docs/arioso/platforms/musicgen/adapter
    module_docs/arioso/platforms/musicgen/config
+   module_docs/arioso/platforms/riffusion
+   module_docs/arioso/platforms/riffusion/adapter
+   module_docs/arioso/platforms/riffusion/config
+   module_docs/arioso/platforms/soundraw
+   module_docs/arioso/platforms/soundraw/config
+   module_docs/arioso/platforms/stable_audio
+   module_docs/arioso/platforms/stable_audio/adapter
+   module_docs/arioso/platforms/stable_audio/config
    module_docs/arioso/platforms/sunoapi
    module_docs/arioso/platforms/sunoapi/adapter
    module_docs/arioso/platforms/sunoapi/config
+   module_docs/arioso/platforms/udio
+   module_docs/arioso/platforms/udio/adapter
+   module_docs/arioso/platforms/udio/config
+   module_docs/arioso/platforms/yue
+   module_docs/arioso/platforms/yue/adapter
+   module_docs/arioso/platforms/yue/config
    module_docs/arioso/registry
    module_docs/arioso/translation

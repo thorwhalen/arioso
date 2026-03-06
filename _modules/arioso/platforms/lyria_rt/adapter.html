@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.platforms.lyria_rt.adapter &mdash; arioso 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva.html">arioso.platforms.aiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy.html">arioso.platforms.boomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy.html">arioso.platforms.musicfy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw.html">arioso.platforms.soundraw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.platforms.lyria_rt.adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.platforms.lyria_rt.adapter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Google Lyria RealTime adapter using the google-genai SDK.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+
+
+<div class="viewcode-block" id="Adapter">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html#arioso.platforms.lyria_rt.adapter.Adapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lyria RealTime adapter using streaming music sessions.</span>
+
+<span class="sd">    Creates a live music session via the ``google-genai`` SDK, sends a</span>
+<span class="sd">    prompt, collects PCM audio chunks for a configurable duration, and</span>
+<span class="sd">    returns them as a single ``Song``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a google-genai Client, raising a clear error if missing.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">google</span><span class="w"> </span><span class="kn">import</span> <span class="n">genai</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The &#39;google-genai&#39; package is required for the Lyria RealTime &quot;</span>
+                <span class="s2">&quot;adapter. Install it with:  pip install google-genai&quot;</span>
+            <span class="p">)</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_var&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGLE_API_KEY&quot;</span><span class="p">),</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">api_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;GOOGLE_API_KEY environment variable is not set. &quot;</span>
+                <span class="s2">&quot;Obtain one at https://aistudio.google.com/apikey&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">genai</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Adapter.generate">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html#arioso.platforms.lyria_rt.adapter.Adapter.generate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">bpm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">brightness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">guidance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music using a Lyria RealTime streaming session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prompt: Text description of desired music.</span>
+<span class="sd">            duration: Seconds of audio to collect from the stream.</span>
+<span class="sd">            bpm: Beats per minute (60-200).</span>
+<span class="sd">            key: Musical scale (e.g. ``&quot;C_MAJOR&quot;``).</span>
+<span class="sd">            energy: Density / energy level (0-1).</span>
+<span class="sd">            brightness: Spectral brightness (0-1).</span>
+<span class="sd">            guidance: Guidance strength (0-6).</span>
+<span class="sd">            temperature: Sampling temperature (0-3).</span>
+<span class="sd">            top_k: Top-k sampling (1-1000).</span>
+<span class="sd">            seed: Random seed for reproducibility (0-2.1B).</span>
+<span class="sd">            prompt_weight: Weight applied to the WeightedPrompt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A Song with PCM audio bytes at 48 kHz.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pcm_data</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_agenerate</span><span class="p">(</span>
+                <span class="n">prompt</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">bpm</span><span class="o">=</span><span class="n">bpm</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span>
+                <span class="n">brightness</span><span class="o">=</span><span class="n">brightness</span><span class="p">,</span>
+                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">prompt_weight</span><span class="o">=</span><span class="n">prompt_weight</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_bytes</span><span class="o">=</span><span class="n">pcm_data</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pcm&quot;</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="mi">48000</span><span class="p">,</span>
+                <span class="n">duration_seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;lyria_rt&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+                <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+                <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_agenerate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">bpm</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">brightness</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">guidance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">prompt_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Async helper that drives the live music session.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">google.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_client</span><span class="p">()</span>
+
+        <span class="c1"># Build MusicGenerationConfig</span>
+        <span class="n">gen_config_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+            <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">bpm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;bpm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpm</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy</span>
+        <span class="k">if</span> <span class="n">brightness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;brightness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="n">music_gen_config</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MusicGenerationConfig</span><span class="p">(</span><span class="o">**</span><span class="n">gen_config_kwargs</span><span class="p">)</span>
+        <span class="n">live_config</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">LiveMusicConfig</span><span class="p">(</span><span class="n">music_generation_config</span><span class="o">=</span><span class="n">music_gen_config</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">aio</span><span class="o">.</span><span class="n">live</span><span class="o">.</span><span class="n">music_sessions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;models/lyria-realtime-exp&quot;</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">live_config</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="c1"># Build and send the weighted prompt</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="n">prompt_weight</span> <span class="k">if</span> <span class="n">prompt_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1.0</span>
+            <span class="n">weighted_prompt</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">WeightedPrompt</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">set_weighted_prompts</span><span class="p">(</span><span class="n">prompts</span><span class="o">=</span><span class="p">[</span><span class="n">weighted_prompt</span><span class="p">])</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+
+            <span class="c1"># Collect PCM chunks for the requested duration</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">collected</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">bytes_per_second</span> <span class="o">=</span> <span class="mi">48000</span> <span class="o">*</span> <span class="mi">2</span>  <span class="c1"># 16-bit mono PCM at 48 kHz</span>
+            <span class="n">target_bytes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="n">bytes_per_second</span><span class="p">)</span>
+
+            <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">receive</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">server_content</span> <span class="ow">and</span> <span class="n">message</span><span class="o">.</span><span class="n">server_content</span><span class="o">.</span><span class="n">model_turn</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">server_content</span><span class="o">.</span><span class="n">model_turn</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">inline_data</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">inline_data</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">inline_data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                            <span class="n">collected</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">inline_data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">collected</span> <span class="o">&gt;=</span> <span class="n">target_bytes</span><span class="p">:</span>
+                                <span class="k">break</span>
+                <span class="k">if</span> <span class="n">collected</span> <span class="o">&gt;=</span> <span class="n">target_bytes</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

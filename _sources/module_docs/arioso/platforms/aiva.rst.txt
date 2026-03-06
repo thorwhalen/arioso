@@ -1,0 +1,4 @@
+arioso.platforms.aiva
+=====================
+.. automodule:: arioso.platforms.aiva
+   :members:

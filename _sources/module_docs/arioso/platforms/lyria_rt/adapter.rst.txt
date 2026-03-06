@@ -1,0 +1,4 @@
+arioso.platforms.lyria_rt.adapter
+=================================
+.. automodule:: arioso.platforms.lyria_rt.adapter
+   :members:

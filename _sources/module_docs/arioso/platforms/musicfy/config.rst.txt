@@ -1,0 +1,4 @@
+arioso.platforms.musicfy.config
+===============================
+.. automodule:: arioso.platforms.musicfy.config
+   :members:

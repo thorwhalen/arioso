@@ -1,0 +1,4 @@
+arioso.platforms.harmonai.adapter
+=================================
+.. automodule:: arioso.platforms.harmonai.adapter
+   :members:

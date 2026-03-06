@@ -1,0 +1,4 @@
+arioso.platforms.loudly.adapter
+===============================
+.. automodule:: arioso.platforms.loudly.adapter
+   :members:

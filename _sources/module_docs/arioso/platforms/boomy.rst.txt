@@ -1,0 +1,4 @@
+arioso.platforms.boomy
+======================
+.. automodule:: arioso.platforms.boomy
+   :members:

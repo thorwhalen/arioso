@@ -1,0 +1,4 @@
+arioso.platforms.lyria2
+=======================
+.. automodule:: arioso.platforms.lyria2
+   :members:

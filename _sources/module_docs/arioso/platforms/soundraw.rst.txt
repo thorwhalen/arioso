@@ -1,0 +1,4 @@
+arioso.platforms.soundraw
+=========================
+.. automodule:: arioso.platforms.soundraw
+   :members:

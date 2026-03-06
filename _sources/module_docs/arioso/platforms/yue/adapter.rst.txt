@@ -1,0 +1,4 @@
+arioso.platforms.yue.adapter
+============================
+.. automodule:: arioso.platforms.yue.adapter
+   :members:

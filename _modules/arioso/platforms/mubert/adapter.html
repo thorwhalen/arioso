@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.platforms.mubert.adapter &mdash; arioso 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva.html">arioso.platforms.aiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy.html">arioso.platforms.boomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy.html">arioso.platforms.musicfy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw.html">arioso.platforms.soundraw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.platforms.mubert.adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.platforms.mubert.adapter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Mubert adapter via REST API.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms._base_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRestAdapter</span>
+
+<span class="c1"># Map normalized energy float (0-1) to Mubert intensity strings</span>
+<span class="n">_ENERGY_THRESHOLDS</span> <span class="o">=</span> <span class="p">((</span><span class="mf">0.33</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.66</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_energy_to_intensity</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce a 0-1 float energy value to a Mubert intensity string.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">_ENERGY_THRESHOLDS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="s2">&quot;high&quot;</span>
+
+
+<div class="viewcode-block" id="Adapter">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/mubert/adapter.html#arioso.platforms.mubert.adapter.Adapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">(</span><span class="n">BaseRestAdapter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapter for Mubert music generation.</span>
+
+<span class="sd">    Mubert uses a two-step flow: POST to /RecordTrackTTM to start a task,</span>
+<span class="sd">    then poll until the download_link becomes available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Adapter.generate">
+<a class="viewcode-back" href="../../../../module_docs/arioso/platforms/mubert/adapter.html#arioso.platforms.mubert.adapter.Adapter.generate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+        <span class="n">bitrate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">320</span><span class="p">,</span>
+        <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music via Mubert.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prompt: Text description of desired music.</span>
+<span class="sd">            duration: Track duration in seconds (15-1500).</span>
+<span class="sd">            output_format: Output format (&#39;mp3&#39; or &#39;wav&#39;).</span>
+<span class="sd">            bitrate: Audio bitrate (128 or 320).</span>
+<span class="sd">            energy: Energy level 0-1 (coerced to low/medium/high).</span>
+<span class="sd">            wait_for_completion: If True, poll until audio is ready.</span>
+<span class="sd">            poll_interval: Seconds between status checks.</span>
+<span class="sd">            timeout: Max seconds to wait for completion.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List containing a single Song object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MUBERT_PAT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pat</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Mubert requires a personal access token. &quot;</span>
+                <span class="s2">&quot;Set the MUBERT_PAT environment variable.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pat&quot;</span><span class="p">:</span> <span class="n">pat</span><span class="p">,</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+            <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bitrate&quot;</span><span class="p">:</span> <span class="n">bitrate</span><span class="p">,</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="n">output_format</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_energy_to_intensity</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;RecordTrackTTM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">&quot;/RecordTrackTTM&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span>
+        <span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="c1"># Extract download link or task info for polling</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tasks&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="k">if</span> <span class="n">tasks</span> <span class="ow">and</span> <span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;download_link&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_task_to_song</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">wait_for_completion</span><span class="p">:</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">tasks</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">Song</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+                    <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">output_format</span><span class="p">),</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;mubert&quot;</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># Poll until download_link is available</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_for_track</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">output_format</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span>
+            <span class="n">poll_interval</span><span class="o">=</span><span class="n">poll_interval</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_poll_for_track</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">initial_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+        <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll Mubert until the download link is available.&quot;&quot;&quot;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">initial_data</span>
+
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">tasks</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tasks&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">tasks</span> <span class="ow">and</span> <span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;download_link&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_task_to_song</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
+
+            <span class="c1"># Re-request the same endpoint to check status</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/RecordTrackTTM&quot;</span><span class="p">,</span>
+                <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;RecordTrackTTM&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{}},</span>
+            <span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Mubert generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_task_to_song</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a Mubert task dict to a Song.&quot;&quot;&quot;</span>
+        <span class="n">download_link</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;download_link&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_url</span><span class="o">=</span><span class="n">download_link</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;mubert&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span> <span class="k">if</span> <span class="n">download_link</span> <span class="k">else</span> <span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

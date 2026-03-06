@@ -1,0 +1,4 @@
+arioso.platforms.riffusion.adapter
+==================================
+.. automodule:: arioso.platforms.riffusion.adapter
+   :members:

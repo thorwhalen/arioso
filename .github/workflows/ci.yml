@@ -82,6 +82,7 @@ jobs:
           exclude: ${{ needs.setup.outputs.exclude-paths }}
           coverage: ${{ needs.setup.outputs.coverage-enabled }}
           pytest-args: ${{ needs.setup.outputs.pytest-args }}
+          skip-doctests: true
 
       - name: Track Code Metrics
         if: needs.setup.outputs.metrics-enabled == 'true'

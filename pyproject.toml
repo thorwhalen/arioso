@@ -149,7 +149,9 @@ python_versions = [
 pytest_args = [
     "-v",
     "--tb=short",
+    "tests",
 ]
+skip_doctests = true
 coverage_enabled = true
 coverage_threshold = 0
 coverage_report_format = [

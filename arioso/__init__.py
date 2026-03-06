@@ -34,7 +34,7 @@ def generate(prompt: str, *, platform: str = "musicgen", **kwargs) -> Song:
 
     Example::
 
-        >>> song = generate("upbeat jazz piano", platform="musicgen", duration=10)
+        song = generate("upbeat jazz piano", platform="musicgen", duration=10)
     """
     from arioso.registry import get_platform
 

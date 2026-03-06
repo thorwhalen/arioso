@@ -1,0 +1,4 @@
+arioso.platforms.musicgen.adapter
+=================================
+.. automodule:: arioso.platforms.musicgen.adapter
+   :members:

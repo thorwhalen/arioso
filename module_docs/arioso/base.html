@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.base &mdash; arioso 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="arioso.platforms" href="platforms.html" />
+    <link rel="prev" title="arioso._util" href="_util.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_util.html">arioso._util</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">arioso.base</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.base.Affordance"><code class="docutils literal notranslate"><span class="pre">Affordance</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Affordance.name"><code class="docutils literal notranslate"><span class="pre">Affordance.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Affordance.type"><code class="docutils literal notranslate"><span class="pre">Affordance.type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Affordance.description"><code class="docutils literal notranslate"><span class="pre">Affordance.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Affordance.default"><code class="docutils literal notranslate"><span class="pre">Affordance.default</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.base.AudioResult"><code class="docutils literal notranslate"><span class="pre">AudioResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.audio_bytes"><code class="docutils literal notranslate"><span class="pre">AudioResult.audio_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.audio_url"><code class="docutils literal notranslate"><span class="pre">AudioResult.audio_url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.audio_array"><code class="docutils literal notranslate"><span class="pre">AudioResult.audio_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.sample_rate"><code class="docutils literal notranslate"><span class="pre">AudioResult.sample_rate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.format"><code class="docutils literal notranslate"><span class="pre">AudioResult.format</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.AudioResult.duration_seconds"><code class="docutils literal notranslate"><span class="pre">AudioResult.duration_seconds</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.base.Song"><code class="docutils literal notranslate"><span class="pre">Song</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.id"><code class="docutils literal notranslate"><span class="pre">Song.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.title"><code class="docutils literal notranslate"><span class="pre">Song.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.status"><code class="docutils literal notranslate"><span class="pre">Song.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.audio"><code class="docutils literal notranslate"><span class="pre">Song.audio</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.metadata"><code class="docutils literal notranslate"><span class="pre">Song.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.platform"><code class="docutils literal notranslate"><span class="pre">Song.platform</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.audio_array"><code class="docutils literal notranslate"><span class="pre">Song.audio_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.audio_bytes"><code class="docutils literal notranslate"><span class="pre">Song.audio_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.audio_url"><code class="docutils literal notranslate"><span class="pre">Song.audio_url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.error_message"><code class="docutils literal notranslate"><span class="pre">Song.error_message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.is_error"><code class="docutils literal notranslate"><span class="pre">Song.is_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.base.Song.sample_rate"><code class="docutils literal notranslate"><span class="pre">Song.sample_rate</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">arioso.base</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/arioso/base.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-arioso.base">
+<span id="arioso-base"></span><h1>arioso.base<a class="headerlink" href="#module-arioso.base" title="Link to this heading"></a></h1>
+<p>Core types and constants for arioso.</p>
+<p>Defines the unified output types (Song, AudioResult) and the canonical
+set of 40 affordance names that all platform adapters map to.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso.base.Affordance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">Affordance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/base.html#Affordance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.base.Affordance" title="Link to this definition"></a></dt>
+<dd><p>Descriptor for a unified parameter affordance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Affordance.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#arioso.base.Affordance.name" title="Link to this definition"></a></dt>
+<dd><p>Canonical parameter name used at the facade level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Affordance.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#arioso.base.Affordance.type" title="Link to this definition"></a></dt>
+<dd><p>Expected Python type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Affordance.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#arioso.base.Affordance.description" title="Link to this definition"></a></dt>
+<dd><p>Human-readable description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Affordance.default">
+<span class="sig-name descname"><span class="pre">default</span></span><a class="headerlink" href="#arioso.base.Affordance.default" title="Link to this definition"></a></dt>
+<dd><p>Default value (None means no default / required).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso.base.AudioResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">AudioResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/base.html#AudioResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.base.AudioResult" title="Link to this definition"></a></dt>
+<dd><p>Unified audio output from any music generation platform.</p>
+<p>Exactly one of audio_bytes, audio_url, or audio_array will typically
+be populated by the platform adapter. Conversion between forms can
+be done on demand by the caller.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.audio_bytes">
+<span class="sig-name descname"><span class="pre">audio_bytes</span></span><a class="headerlink" href="#arioso.base.AudioResult.audio_bytes" title="Link to this definition"></a></dt>
+<dd><p>Raw audio file bytes (MP3, WAV, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.audio_url">
+<span class="sig-name descname"><span class="pre">audio_url</span></span><a class="headerlink" href="#arioso.base.AudioResult.audio_url" title="Link to this definition"></a></dt>
+<dd><p>URL to download the audio file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.audio_array">
+<span class="sig-name descname"><span class="pre">audio_array</span></span><a class="headerlink" href="#arioso.base.AudioResult.audio_array" title="Link to this definition"></a></dt>
+<dd><p>Numpy array of audio samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.sample_rate">
+<span class="sig-name descname"><span class="pre">sample_rate</span></span><a class="headerlink" href="#arioso.base.AudioResult.sample_rate" title="Link to this definition"></a></dt>
+<dd><p>Sample rate in Hz (e.g. 44100, 32000).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.format">
+<span class="sig-name descname"><span class="pre">format</span></span><a class="headerlink" href="#arioso.base.AudioResult.format" title="Link to this definition"></a></dt>
+<dd><p>Audio format string (e.g. “mp3”, “wav”, “pcm”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.AudioResult.duration_seconds">
+<span class="sig-name descname"><span class="pre">duration_seconds</span></span><a class="headerlink" href="#arioso.base.AudioResult.duration_seconds" title="Link to this definition"></a></dt>
+<dd><p>Duration of the audio in seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso.base.Song">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">Song</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'pending'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio:</span> <span class="pre">~arioso.base.AudioResult</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/base.html#Song"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.base.Song" title="Link to this definition"></a></dt>
+<dd><p>A generated song with its metadata and audio data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#arioso.base.Song.id" title="Link to this definition"></a></dt>
+<dd><p>Provider-specific identifier for the song.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#arioso.base.Song.title" title="Link to this definition"></a></dt>
+<dd><p>Song title (may be auto-generated by the platform).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#arioso.base.Song.status" title="Link to this definition"></a></dt>
+<dd><p>Generation status: pending, generating, complete, error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.audio">
+<span class="sig-name descname"><span class="pre">audio</span></span><a class="headerlink" href="#arioso.base.Song.audio" title="Link to this definition"></a></dt>
+<dd><p>The audio output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#arioso.base.AudioResult" title="arioso.base.AudioResult">arioso.base.AudioResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#arioso.base.Song.metadata" title="Link to this definition"></a></dt>
+<dd><p>Provider-specific metadata dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.Song.platform">
+<span class="sig-name descname"><span class="pre">platform</span></span><a class="headerlink" href="#arioso.base.Song.platform" title="Link to this definition"></a></dt>
+<dd><p>Name of the platform that generated this song.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.audio_array">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">audio_array</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#arioso.base.Song.audio_array" title="Link to this definition"></a></dt>
+<dd><p>Shortcut to audio.audio_array.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.audio_bytes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">audio_bytes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#arioso.base.Song.audio_bytes" title="Link to this definition"></a></dt>
+<dd><p>Shortcut to audio.audio_bytes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.audio_url">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">audio_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arioso.base.Song.audio_url" title="Link to this definition"></a></dt>
+<dd><p>Shortcut to audio.audio_url.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.error_message">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error_message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#arioso.base.Song.error_message" title="Link to this definition"></a></dt>
+<dd><p>Extract error message from metadata, if any.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.is_error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_error</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#arioso.base.Song.is_error" title="Link to this definition"></a></dt>
+<dd><p>Check if this Song represents an error response.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.base.Song.sample_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#arioso.base.Song.sample_rate" title="Link to this definition"></a></dt>
+<dd><p>Shortcut to audio.sample_rate.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="_util.html" class="btn btn-neutral float-left" title="arioso._util" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="platforms.html" class="btn btn-neutral float-right" title="arioso.platforms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

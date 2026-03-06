@@ -1,0 +1,4 @@
+arioso
+======
+.. automodule:: arioso
+   :members:

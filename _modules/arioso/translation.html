@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.translation &mdash; arioso 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.translation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.translation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Parameter translation layer.</span>
+
+<span class="sd">Translates between the 40 unified affordance names and each platform&#39;s</span>
+<span class="sd">native parameter names, applying type coercions along the way.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+
+
+<div class="viewcode-block" id="make_kwargs_trans">
+<a class="viewcode-back" href="../../module_docs/arioso/translation.html#arioso.translation.make_kwargs_trans">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_kwargs_trans</span><span class="p">(</span>
+    <span class="n">param_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">on_unsupported</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a kwargs translation function from a platform&#39;s param_map.</span>
+
+<span class="sd">    The returned function transforms::</span>
+
+<span class="sd">        {common_name: value, ...}  -&gt;  {native_name: coerced_value, ...}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        param_map: Dict mapping common affordance names to native config</span>
+<span class="sd">            dicts.  Each value has keys: ``native_name`` (str),</span>
+<span class="sd">            ``coerce`` (optional callable), ``adapter_handled`` (optional</span>
+<span class="sd">            bool).</span>
+<span class="sd">        on_unsupported: What to do with params not in param_map.</span>
+<span class="sd">            One of &#39;warn&#39;, &#39;raise&#39;, or &#39;ignore&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A function that translates outer kwargs to inner kwargs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_trans</span><span class="p">(</span><span class="n">outer_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">inner_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">common_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">outer_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">common_name</span> <span class="ow">in</span> <span class="n">param_map</span><span class="p">:</span>
+                <span class="n">mapping</span> <span class="o">=</span> <span class="n">param_map</span><span class="p">[</span><span class="n">common_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;adapter_handled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">inner_kwargs</span><span class="p">[</span><span class="n">common_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">continue</span>
+                <span class="n">native_name</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;native_name&quot;</span><span class="p">,</span> <span class="n">common_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">native_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">coerce</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">coerce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">coerce</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">inner_kwargs</span><span class="p">[</span><span class="n">native_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">on_unsupported</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">common_name</span><span class="si">!r}</span><span class="s2"> not supported by this platform&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">on_unsupported</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">common_name</span><span class="si">!r}</span><span class="s2"> not supported, ignoring&quot;</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="c1"># &#39;ignore&#39;: silently drop</span>
+        <span class="k">return</span> <span class="n">inner_kwargs</span>
+
+    <span class="k">return</span> <span class="n">kwargs_trans</span></div>
+
+
+
+<div class="viewcode-block" id="make_generate_func">
+<a class="viewcode-back" href="../../module_docs/arioso/translation.html#arioso.translation.make_generate_func">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_generate_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a generate() callable from a platform config.</span>
+
+<span class="sd">    This is the fallback when no custom adapter.py is provided.</span>
+<span class="sd">    For REST API platforms, it builds the HTTP function from the config</span>
+<span class="sd">    and wraps it with parameter translation and output normalization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: A PLATFORM_CONFIG dict.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A callable that accepts unified affordance kwargs and returns</span>
+<span class="sd">        a Song.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param_map</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;param_map&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">on_unsupported</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;on_unsupported_param&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">)</span>
+    <span class="n">kwargs_trans_fn</span> <span class="o">=</span> <span class="n">make_kwargs_trans</span><span class="p">(</span><span class="n">param_map</span><span class="p">,</span> <span class="n">on_unsupported</span><span class="o">=</span><span class="n">on_unsupported</span><span class="p">)</span>
+
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_type&quot;</span><span class="p">,</span> <span class="s2">&quot;rest_api&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">access_type</span> <span class="o">==</span> <span class="s2">&quot;rest_api&quot;</span><span class="p">:</span>
+        <span class="n">raw_func</span> <span class="o">=</span> <span class="n">_build_rest_func</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">access_type</span> <span class="o">==</span> <span class="s2">&quot;python_lib&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Platform </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> requires an adapter.py &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for python_lib access&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Access type </span><span class="si">{</span><span class="n">access_type</span><span class="si">!r}</span><span class="s2"> not yet supported&quot;</span><span class="p">)</span>
+
+    <span class="n">egress</span> <span class="o">=</span> <span class="n">_build_egress</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">all_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+        <span class="n">native_kwargs</span> <span class="o">=</span> <span class="n">kwargs_trans_fn</span><span class="p">(</span><span class="n">all_kwargs</span><span class="p">)</span>
+        <span class="n">raw_result</span> <span class="o">=</span> <span class="n">raw_func</span><span class="p">(</span><span class="o">**</span><span class="n">native_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">egress</span><span class="p">(</span><span class="n">raw_result</span><span class="p">)</span>
+
+    <span class="n">generate</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="s2">&quot;generate&quot;</span>
+    <span class="n">generate</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.generate&quot;</span>
+    <span class="k">return</span> <span class="n">generate</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_rest_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the raw HTTP callable for a REST API platform.</span>
+
+<span class="sd">    If an OpenAPI spec URL is in the config, uses ``ho.route_to_func``</span>
+<span class="sd">    to auto-generate it. Otherwise, builds a simple requests-based</span>
+<span class="sd">    function from the endpoint config.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">api_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">openapi_url</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;openapi_spec_url&quot;</span><span class="p">)</span>
+    <span class="n">auth_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">if</span> <span class="n">openapi_url</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ho</span><span class="w"> </span><span class="kn">import</span> <span class="n">route_to_func</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ju.oas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Routes</span><span class="p">,</span> <span class="n">ensure_openapi_dict</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._util</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_auth_headers</span>
+
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">ensure_openapi_dict</span><span class="p">(</span><span class="n">openapi_url</span><span class="p">)</span>
+        <span class="n">routes</span> <span class="o">=</span> <span class="n">Routes</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generate_endpoint&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">target_route</span> <span class="o">=</span> <span class="n">routes</span><span class="p">[</span><span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">]</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">build_auth_headers</span><span class="p">(</span><span class="n">auth_config</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">route_to_func</span><span class="p">(</span>
+            <span class="n">target_route</span><span class="p">,</span>
+            <span class="n">api_config</span><span class="p">[</span><span class="s2">&quot;base_url&quot;</span><span class="p">],</span>
+            <span class="n">custom_headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Simple requests-based function</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._util</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_session</span>
+
+        <span class="n">base_url</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base_url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="n">api_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generate_endpoint&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;/generate&quot;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">session</span> <span class="o">=</span> <span class="n">make_session</span><span class="p">(</span><span class="n">auth_config</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">rest_func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span>
+
+        <span class="k">return</span> <span class="n">rest_func</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_egress</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an egress function that normalizes platform output to Song.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+
+    <span class="n">output_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">returns</span> <span class="o">=</span> <span class="n">output_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;returns&quot;</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">)</span>
+    <span class="n">default_format</span> <span class="o">=</span> <span class="n">output_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_format&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">output_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">platform_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">egress</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">returns</span> <span class="o">==</span> <span class="s2">&quot;bytes&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="n">audio</span> <span class="o">=</span> <span class="n">AudioResult</span><span class="p">(</span><span class="n">audio_bytes</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">default_format</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">audio</span> <span class="o">=</span> <span class="n">AudioResult</span><span class="p">(</span>
+                    <span class="n">audio_url</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="n">default_format</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">content</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">audio</span> <span class="o">=</span> <span class="n">AudioResult</span><span class="p">(</span><span class="n">audio_bytes</span><span class="o">=</span><span class="n">raw</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">default_format</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Song</span><span class="p">(</span><span class="n">audio</span><span class="o">=</span><span class="n">audio</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform_name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">returns</span> <span class="o">==</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">response</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">audio</span> <span class="o">=</span> <span class="n">AudioResult</span><span class="p">(</span><span class="n">audio_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">default_format</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Song</span><span class="p">(</span><span class="n">audio</span><span class="o">=</span><span class="n">audio</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform_name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">returns</span> <span class="o">==</span> <span class="s2">&quot;array&quot;</span><span class="p">:</span>
+            <span class="n">audio</span> <span class="o">=</span> <span class="n">AudioResult</span><span class="p">(</span>
+                <span class="n">audio_array</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">Song</span><span class="p">(</span><span class="n">audio</span><span class="o">=</span><span class="n">audio</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform_name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Song</span><span class="p">(</span><span class="n">platform</span><span class="o">=</span><span class="n">platform_name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">egress</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

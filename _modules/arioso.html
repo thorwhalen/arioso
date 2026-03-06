@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso &mdash; arioso 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">arioso</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Arioso - Unified facade for AI music generation platforms.</span>
+
+<span class="sd">Usage::</span>
+
+<span class="sd">    import arioso</span>
+
+<span class="sd">    # Generate with the default platform (musicgen)</span>
+<span class="sd">    song = arioso.generate(&quot;upbeat jazz piano&quot;, duration=10)</span>
+
+<span class="sd">    # Generate with a specific platform</span>
+<span class="sd">    song = arioso.generate(&quot;epic orchestral&quot;, platform=&quot;elevenlabs&quot;, duration=30)</span>
+
+<span class="sd">    # List available platforms</span>
+<span class="sd">    arioso.list_platforms()  # [&#39;musicgen&#39;, &#39;sunoapi&#39;, &#39;elevenlabs&#39;]</span>
+
+<span class="sd">    # Get platform config</span>
+<span class="sd">    arioso.get_platform_info(&quot;musicgen&quot;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Song</span><span class="p">,</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">AFFORDANCES</span>
+
+
+<div class="viewcode-block" id="generate">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.generate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;musicgen&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate music using the specified platform.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prompt: Text description of desired music.</span>
+<span class="sd">        platform: Name of the generation platform (default: &#39;musicgen&#39;).</span>
+<span class="sd">        **kwargs: Parameters using unified affordance names.</span>
+<span class="sd">            See ``arioso.base.AFFORDANCES`` for the full list.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A Song object containing the generated audio and metadata.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        song = generate(&quot;upbeat jazz piano&quot;, platform=&quot;musicgen&quot;, duration=10)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="s2">&quot;generate&quot;</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">adapter</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">adapter</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapter for </span><span class="si">{</span><span class="n">platform</span><span class="si">!r}</span><span class="s2"> is not callable&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Normalize: if adapter returns a list, return first item</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="n">Song</span><span class="p">(</span><span class="n">platform</span><span class="o">=</span><span class="n">platform</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="generate_many">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.generate_many">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_many</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;musicgen&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate music, returning all results (some platforms return multiple).</span>
+
+<span class="sd">    Same interface as :func:`generate` but always returns a list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="s2">&quot;generate&quot;</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">adapter</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">adapter</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapter for </span><span class="si">{</span><span class="n">platform</span><span class="si">!r}</span><span class="s2"> is not callable&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="list_platforms">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.list_platforms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_platforms</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return names of all available platforms.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_platforms</span> <span class="k">as</span> <span class="n">_list</span>
+
+    <span class="k">return</span> <span class="n">_list</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_platform_info">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.get_platform_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_platform_info</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get configuration info for a platform.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: Platform identifier.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The platform&#39;s PLATFORM_CONFIG dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="k">return</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="check_status">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.check_status">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_status</span><span class="p">(</span><span class="n">song</span><span class="p">:</span> <span class="n">Song</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the current status of a pending Song and return updated Songs.</span>
+
+<span class="sd">    For platforms that use async/callback-based generation (like sunoapi),</span>
+<span class="sd">    this polls the platform&#39;s status endpoint to get the latest state,</span>
+<span class="sd">    including audio URLs once generation is complete.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        song: A Song object (typically with status=&#39;pending&#39;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of updated Song objects with current status and audio URLs.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        songs = arioso.generate_many(&quot;reggae&quot;, platform=&quot;sunoapi&quot;, ...)</span>
+<span class="sd">        # ... wait a bit ...</span>
+<span class="sd">        updated = arioso.check_status(songs[0])</span>
+<span class="sd">        if updated[0].status == &quot;complete&quot;:</span>
+<span class="sd">            print(updated[0].audio_url)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">song</span><span class="o">.</span><span class="n">platform</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Song has no platform set, cannot check status&quot;</span><span class="p">)</span>
+
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="s2">&quot;get_status&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Platform </span><span class="si">{</span><span class="n">platform</span><span class="si">!r}</span><span class="s2"> does not support status checking&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">task_id</span> <span class="o">=</span> <span class="n">song</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Song has no id/taskId, cannot check status&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">adapter</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fetch_audio">
+<a class="viewcode-back" href="../module_docs/arioso.html#arioso.fetch_audio">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_audio</span><span class="p">(</span><span class="n">song</span><span class="p">:</span> <span class="n">Song</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download the audio bytes for a Song that has an audio_url.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        song: A Song with a populated audio_url (status=&#39;complete&#39;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A new Song with audio_bytes populated.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        updated = arioso.check_status(song)</span>
+<span class="sd">        if updated[0].status == &quot;complete&quot;:</span>
+<span class="sd">            song_with_audio = arioso.fetch_audio(updated[0])</span>
+<span class="sd">            # song_with_audio.audio_bytes is now the raw MP3 data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">song</span><span class="o">.</span><span class="n">platform</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Song has no platform set&quot;</span><span class="p">)</span>
+
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="s2">&quot;fetch_audio&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">adapter</span><span class="o">.</span><span class="n">fetch_audio</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
+
+    <span class="c1"># Generic fallback: download from audio_url</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">song</span><span class="o">.</span><span class="n">audio_url</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Song </span><span class="si">{</span><span class="n">song</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> has no audio_url. &quot;</span>
+            <span class="s2">&quot;Is the generation complete? Try check_status() first.&quot;</span>
+        <span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
+            <span class="n">audio_bytes</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="n">audio_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">duration_seconds</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">duration_seconds</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">platform</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

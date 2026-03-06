@@ -1,0 +1,20 @@
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   module_docs/arioso
+   module_docs/arioso/_util
+   module_docs/arioso/base
+   module_docs/arioso/platforms
+   module_docs/arioso/platforms/_base_adapter
+   module_docs/arioso/platforms/elevenlabs
+   module_docs/arioso/platforms/elevenlabs/adapter
+   module_docs/arioso/platforms/elevenlabs/config
+   module_docs/arioso/platforms/musicgen
+   module_docs/arioso/platforms/musicgen/adapter
+   module_docs/arioso/platforms/musicgen/config
+   module_docs/arioso/platforms/sunoapi
+   module_docs/arioso/platforms/sunoapi/adapter
+   module_docs/arioso/platforms/sunoapi/config
+   module_docs/arioso/registry
+   module_docs/arioso/translation

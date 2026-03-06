@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso &mdash; arioso 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="arioso._util" href="arioso/_util.html" />
+    <link rel="prev" title="Welcome to arioso’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">arioso</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.check_status"><code class="docutils literal notranslate"><span class="pre">check_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.fetch_audio"><code class="docutils literal notranslate"><span class="pre">fetch_audio()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.generate_many"><code class="docutils literal notranslate"><span class="pre">generate_many()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.get_platform_info"><code class="docutils literal notranslate"><span class="pre">get_platform_info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.list_platforms"><code class="docutils literal notranslate"><span class="pre">list_platforms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">arioso</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/module_docs/arioso.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-arioso">
+<span id="arioso"></span><h1>arioso<a class="headerlink" href="#module-arioso" title="Link to this heading"></a></h1>
+<p>Arioso - Unified facade for AI music generation platforms.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
+
+<span class="c1"># Generate with the default platform (musicgen)</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;upbeat jazz piano&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Generate with a specific platform</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;epic orchestral&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;elevenlabs&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># List available platforms</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">()</span>  <span class="c1"># [&#39;musicgen&#39;, &#39;sunoapi&#39;, &#39;elevenlabs&#39;]</span>
+
+<span class="c1"># Get platform config</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">(</span><span class="s2">&quot;musicgen&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.check_status">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">check_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/arioso.html#check_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.check_status" title="Link to this definition"></a></dt>
+<dd><p>Check the current status of a pending Song and return updated Songs.</p>
+<p>For platforms that use async/callback-based generation (like sunoapi),
+this polls the platform’s status endpoint to get the latest state,
+including audio URLs once generation is complete.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>song</strong> – A Song object (typically with status=’pending’).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of updated Song objects with current status and audio URLs.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span><span class="s2">&quot;reggae&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="c1"># ... wait a bit ...</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">audio_url</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.fetch_audio">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">fetch_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></span><a class="reference internal" href="../_modules/arioso.html#fetch_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.fetch_audio" title="Link to this definition"></a></dt>
+<dd><p>Download the audio bytes for a Song that has an audio_url.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>song</strong> – A Song with a populated audio_url (status=’complete’).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Song with audio_bytes populated.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span>
+    <span class="n">song_with_audio</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">fetch_audio</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># song_with_audio.audio_bytes is now the raw MP3 data</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.generate">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'musicgen'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></span><a class="reference internal" href="../_modules/arioso.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.generate" title="Link to this definition"></a></dt>
+<dd><p>Generate music using the specified platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> – Text description of desired music.</p></li>
+<li><p><strong>platform</strong> – Name of the generation platform (default: ‘musicgen’).</p></li>
+<li><p><strong>**kwargs</strong> – Parameters using unified affordance names.
+See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFFORDANCES</span></code> for the full list.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Song object containing the generated audio and metadata.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="s2">&quot;upbeat jazz piano&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;musicgen&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.generate_many">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">generate_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'musicgen'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/arioso.html#generate_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.generate_many" title="Link to this definition"></a></dt>
+<dd><p>Generate music, returning all results (some platforms return multiple).</p>
+<p>Same interface as <a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate()</span></code></a> but always returns a list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.get_platform_info">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">get_platform_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/arioso.html#get_platform_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.get_platform_info" title="Link to this definition"></a></dt>
+<dd><p>Get configuration info for a platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Platform identifier.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The platform’s PLATFORM_CONFIG dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.list_platforms">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">list_platforms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/arioso.html#list_platforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.list_platforms" title="Link to this definition"></a></dt>
+<dd><p>Return names of all available platforms.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to arioso’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arioso/_util.html" class="btn btn-neutral float-right" title="arioso._util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

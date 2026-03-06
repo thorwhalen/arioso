@@ -1,0 +1,4 @@
+arioso.platforms.musicgen
+=========================
+.. automodule:: arioso.platforms.musicgen
+   :members:

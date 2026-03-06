@@ -1,0 +1,4 @@
+arioso.platforms._base_adapter
+==============================
+.. automodule:: arioso.platforms._base_adapter
+   :members:

@@ -32,17 +32,23 @@ arioso/
 4. The `translation.py` module handles renaming unified affordance names to native
    platform parameter names, with type coercion.
 
+## CRITICAL: Always Verify Against Live API Docs
+
+Before adding or modifying ANY platform adapter, you MUST fetch and read the
+platform's current API documentation. Do NOT rely on local docs in `misc/docs/`
+alone — APIs change their parameter names, add required fields, deprecate
+endpoints, and switch between sync/async without notice. The live docs are the
+single source of truth. See `.claude/skills/add-platform.md` step 1 and
+`.claude/skills/update-platform.md` for the full process.
+
 ## Adding a New Platform
 
-See the `.claude/skills/add-platform.md` skill for step-by-step instructions.
+See `.claude/skills/add-platform.md` for step-by-step instructions.
 
-Quick summary:
-1. Create `arioso/platforms/<name>/` directory with `__init__.py`
-2. Write `config.py` exporting `PLATFORM_CONFIG` dict (copy from an existing platform)
-3. For REST APIs with sufficient config: done (auto-generated adapter)
-4. For Python libraries or complex APIs: write `adapter.py` with an `Adapter` class
-5. The `Adapter` class must have a `generate(prompt, **kwargs) -> Song` method
-6. Add tests in `tests/platforms/test_<name>.py`
+## Updating an Existing Platform
+
+See `.claude/skills/update-platform.md` for the process.
+Use this when an adapter returns unexpected errors or when doing maintenance.
 
 ## Key Libraries (dependencies used internally)
 
@@ -67,9 +73,10 @@ Source locations for reference:
 
 ## Reference Documentation
 
-`misc/docs/` contains the comprehensive 21-platform reference document mapping
-all platforms' parameters, SDKs, and capabilities. Agents should consult this
-when adding new platforms or understanding parameter mappings.
+`misc/docs/` contains reference documents including a 21-platform overview and
+per-platform API spec snapshots (`<name>-api-spec.md`). These are useful as a
+starting point but MAY BE OUTDATED. Always verify against live docs before
+coding (see "CRITICAL" section above).
 
 ## Evolving This File
 

@@ -54,6 +54,28 @@ class Song:
     platform: str = ""
 
     @property
+    def is_error(self) -> bool:
+        """Check if this Song represents an error response."""
+        if self.status == "error":
+            return True
+        meta_code = self.metadata.get("code") if self.metadata else None
+        if meta_code and meta_code != 200:
+            return True
+        return False
+
+    @property
+    def error_message(self) -> str:
+        """Extract error message from metadata, if any."""
+        if self.metadata:
+            msg = self.metadata.get("msg", "")
+            if msg:
+                code = self.metadata.get("code", "")
+                return f"(code {code}): {msg}" if code else msg
+        if self.status == "error":
+            return "Unknown error"
+        return ""
+
+    @property
     def audio_bytes(self) -> Optional[bytes]:
         """Shortcut to audio.audio_bytes."""
         return self.audio.audio_bytes

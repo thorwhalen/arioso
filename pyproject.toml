@@ -28,10 +28,12 @@ Documentation = "https://thorwhalen.github.io/arioso"
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "numpy",
 ]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "numpy",
     "ruff>=0.1.0",
 ]
 docs = [

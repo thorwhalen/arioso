@@ -71,6 +71,27 @@ def test_affordances_completeness():
         assert name in AFFORDANCES, f"Missing affordance: {name}"
 
 
+def test_song_is_error():
+    # Normal song is not an error
+    song = Song(status="complete")
+    assert not song.is_error
+    assert song.error_message == ""
+
+    # Status "error" is detected
+    song = Song(status="error")
+    assert song.is_error
+    assert song.error_message == "Unknown error"
+
+    # API-level error in metadata (HTTP 200 but code != 200)
+    song = Song(
+        status="pending",
+        metadata={"code": 400, "msg": "model cannot be null"},
+    )
+    assert song.is_error
+    assert "model cannot be null" in song.error_message
+    assert "400" in song.error_message
+
+
 def test_affordances_types():
     assert AFFORDANCES["prompt"].type is str
     assert AFFORDANCES["duration"].type is float

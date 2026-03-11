@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.yue.adapter &mdash; arioso 0.0.3 documentation</title>
+  <title>arioso.platforms.yue.adapter &mdash; arioso 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -331,14 +331,22 @@
         <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;python&quot;</span><span class="p">,</span>
             <span class="s2">&quot;infer.py&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--genre_txt&quot;</span><span class="p">,</span> <span class="n">genre_path</span><span class="p">,</span>
-            <span class="s2">&quot;--lyrics_txt&quot;</span><span class="p">,</span> <span class="n">lyrics_path</span><span class="p">,</span>
-            <span class="s2">&quot;--run_n_segments&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span>
-            <span class="s2">&quot;--stage1_model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;--stage2_batch_size&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span>
-            <span class="s2">&quot;--max_new_tokens&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_tokens</span><span class="p">),</span>
-            <span class="s2">&quot;--repetition_penalty&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repetition_penalty</span><span class="p">),</span>
-            <span class="s2">&quot;--output_dir&quot;</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span>
+            <span class="s2">&quot;--genre_txt&quot;</span><span class="p">,</span>
+            <span class="n">genre_path</span><span class="p">,</span>
+            <span class="s2">&quot;--lyrics_txt&quot;</span><span class="p">,</span>
+            <span class="n">lyrics_path</span><span class="p">,</span>
+            <span class="s2">&quot;--run_n_segments&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span>
+            <span class="s2">&quot;--stage1_model&quot;</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="s2">&quot;--stage2_batch_size&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span>
+            <span class="s2">&quot;--max_new_tokens&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">max_tokens</span><span class="p">),</span>
+            <span class="s2">&quot;--repetition_penalty&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">repetition_penalty</span><span class="p">),</span>
+            <span class="s2">&quot;--output_dir&quot;</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--vocal_track_prompt_path&quot;</span><span class="p">,</span> <span class="n">audio_input</span><span class="p">])</span>

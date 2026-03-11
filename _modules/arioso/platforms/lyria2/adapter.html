@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.lyria2.adapter &mdash; arioso 0.0.3 documentation</title>
+  <title>arioso.platforms.lyria2.adapter &mdash; arioso 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -202,8 +202,7 @@
         <span class="n">aiplatform</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">)</span>
 
         <span class="n">endpoint_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;projects/</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/locations/</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">/&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;publishers/google/models/</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;projects/</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/locations/</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">/publishers/google/models/</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="n">endpoint</span> <span class="o">=</span> <span class="n">aiplatform</span><span class="o">.</span><span class="n">Endpoint</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">)</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
@@ -277,7 +276,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_sdk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_sdk_generate</span><span class="p">(</span>
-                    <span class="n">body</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">body</span><span class="p">,</span>
+                    <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_use_sdk</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
@@ -286,7 +288,10 @@
         <span class="c1"># Fallback to REST</span>
         <span class="k">if</span> <span class="n">predictions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rest_generate</span><span class="p">(</span>
-                <span class="n">body</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">body</span><span class="p">,</span>
+                <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># Decode first prediction (base64-encoded WAV)</span>

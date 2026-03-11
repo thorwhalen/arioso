@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.beatoven.adapter &mdash; arioso 0.0.3 documentation</title>
+  <title>arioso.platforms.beatoven.adapter &mdash; arioso 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -202,17 +202,13 @@
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
 
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span>
-        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="n">track_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;track_id&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">track_id</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Beatoven API did not return a track_id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beatoven API did not return a track_id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
@@ -260,9 +256,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            The audio download URL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">/audio&quot;</span>
-        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">/audio&quot;</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span></div>
@@ -295,8 +289,7 @@
                 <span class="p">]</span>
             <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Beatoven generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Beatoven generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
 

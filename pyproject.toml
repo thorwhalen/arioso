@@ -14,7 +14,9 @@ keywords = []
 authors = [
     { name = "Thor Whalen" },
 ]
-dependencies = []
+dependencies = [
+    "requests>=2.28"
+]
 
 [project.license]
 text = "mit"

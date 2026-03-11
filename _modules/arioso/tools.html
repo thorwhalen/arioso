@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso.tools &mdash; arioso 0.0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/aiva.html">arioso.platforms.aiva</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/boomy.html">arioso.platforms.boomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicfy.html">arioso.platforms.musicfy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/soundraw.html">arioso.platforms.soundraw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/tools.html">arioso.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../arioso.html">arioso</a></li>
+      <li class="breadcrumb-item active">arioso.tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for arioso.tools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;High-level tools for common arioso workflows (submit, poll, download).&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Song</span>
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Defaults — override via keyword arguments or environment variables</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="n">DFLT_MAX_DURATION</span> <span class="o">=</span> <span class="mi">480</span>  <span class="c1"># 8 minutes (sunoapi limit)</span>
+<span class="n">DFLT_POLL_INTERVAL</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">DFLT_TIMEOUT</span> <span class="o">=</span> <span class="mi">600</span>
+<span class="n">DFLT_MODEL</span> <span class="o">=</span> <span class="s2">&quot;V5&quot;</span>
+<span class="n">DFLT_AUDIO_WEIGHT</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">DFLT_STYLE_WEIGHT</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">DFLT_PLATFORM</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ACCOMPY_DFLT_PLATFORM&quot;</span><span class="p">,</span> <span class="s2">&quot;sunoapi&quot;</span><span class="p">)</span> 
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Adapter resolution</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="ensure_adapter">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.ensure_adapter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_adapter</span><span class="p">(</span><span class="n">adapter</span><span class="o">=</span><span class="n">DFLT_PLATFORM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a ready-to-use platform adapter.</span>
+
+<span class="sd">    ``adapter`` can be:</span>
+
+<span class="sd">    - An existing adapter instance — returned as-is.</span>
+<span class="sd">    - A platform config dict — instantiated via its ``Adapter`` class.</span>
+<span class="sd">    - A string that is a valid platform name (e.g. ``&quot;sunoapi&quot;``) — loaded</span>
+<span class="sd">      from the arioso registry.</span>
+<span class="sd">    - ``None`` — falls back to :data:`DFLT_PLATFORM`.</span>
+
+<span class="sd">    Raises ``ValueError`` for unrecognised inputs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">adapter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">adapter</span> <span class="o">=</span> <span class="n">DFLT_PLATFORM</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">adapter</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_adapter_from_platform_name</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;adapter string must be a valid platform name, got: </span><span class="si">{</span><span class="n">adapter</span><span class="si">!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adapter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_adapter_from_config</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+
+    <span class="c1"># Assume it&#39;s already an adapter instance</span>
+    <span class="k">return</span> <span class="n">adapter</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_adapter_from_platform_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an adapter via the arioso registry.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_platform</span>
+
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">get_platform</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_adapter_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate an adapter directly from a platform config dict.&quot;&quot;&quot;</span>
+    <span class="n">_validate_platform_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">platform_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">platform_name</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Platform config must include a &#39;name&#39; key&quot;</span><span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+
+    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;arioso.platforms.</span><span class="si">{</span><span class="n">platform_name</span><span class="si">}</span><span class="s2">.adapter&quot;</span><span class="p">)</span>
+    <span class="n">adapter_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;Adapter&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">adapter_class</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_platform_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that a platform config dict has required keys.&quot;&quot;&quot;</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="s2">&quot;api&quot;</span><span class="p">}</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="n">required</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Platform config missing required keys: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got keys: </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Audio conversion</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="wav_to_mp3">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.wav_to_mp3">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wav_to_mp3</span><span class="p">(</span><span class="n">wav_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">max_duration</span><span class="o">=</span><span class="n">DFLT_MAX_DURATION</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert wav to a trimmed mp3. Returns path to a temp mp3 file.</span>
+
+<span class="sd">    The caller is responsible for deleting the temp file when done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.mp3&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="n">wav_path</span><span class="p">,</span>
+            <span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_duration</span><span class="p">),</span>
+            <span class="s2">&quot;-q:a&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Submit / poll / download</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="n">_wav_to_mp3</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">wav_to_mp3</span><span class="p">,</span> <span class="n">max_duration</span><span class="o">=</span><span class="n">DFLT_MAX_DURATION</span><span class="p">)</span>
+
+<div class="viewcode-block" id="submit_cover">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.submit_cover">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">submit_cover</span><span class="p">(</span>
+    <span class="n">source_path</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">instrumental</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">DFLT_MODEL</span><span class="p">,</span>
+    <span class="n">audio_weight</span><span class="o">=</span><span class="n">DFLT_AUDIO_WEIGHT</span><span class="p">,</span>
+    <span class="n">style_weight</span><span class="o">=</span><span class="n">DFLT_STYLE_WEIGHT</span><span class="p">,</span>
+    <span class="n">source_prep</span><span class="o">=</span><span class="n">_wav_to_mp3</span><span class="p">,</span>
+    <span class="n">adapter</span><span class="o">=</span><span class="n">DFLT_PLATFORM</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit an upload-cover job. Returns ``(task_id, source_path)``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        source_path: Path to source audio file.</span>
+<span class="sd">        source_prep: Callable ``(path) -&gt; path`` to prepare the source file</span>
+<span class="sd">            before upload (e.g. convert wav to mp3).  Defaults to</span>
+<span class="sd">            :func:`wav_to_mp3` (trimmed to *max_duration*).</span>
+<span class="sd">        adapter: Platform adapter, config dict, platform name, or ``None``.</span>
+
+<span class="sd">    The caller is responsible for cleaning up *source_path* when done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">ensure_adapter</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">source_prep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">source_prep</span><span class="p">),</span> <span class="s2">&quot;source_prep must be a callable function&quot;</span>
+        <span class="n">source_path</span> <span class="o">=</span> <span class="n">source_prep</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span>
+
+    <span class="n">songs</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">upload_cover</span><span class="p">(</span>
+        <span class="n">source_path</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+        <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">audio_weight</span><span class="o">=</span><span class="n">audio_weight</span><span class="p">,</span>
+        <span class="n">style_weight</span><span class="o">=</span><span class="n">style_weight</span><span class="p">,</span>
+        <span class="n">wait_for_completion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">task_id</span> <span class="o">=</span> <span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">return</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">source_path</span></div>
+
+
+
+<div class="viewcode-block" id="poll_status">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.poll_status">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">poll_status</span><span class="p">(</span>
+    <span class="n">task_id</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">poll_interval</span><span class="o">=</span><span class="n">DFLT_POLL_INTERVAL</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="n">DFLT_TIMEOUT</span><span class="p">,</span>
+    <span class="n">adapter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Poll until a task completes. Returns list of completed Song objects.&quot;&quot;&quot;</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">ensure_adapter</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+        <span class="n">songs</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">songs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">songs</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2">s] status: </span><span class="si">{</span><span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_songs">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.download_songs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_songs</span><span class="p">(</span>
+    <span class="n">songs</span><span class="p">,</span>
+    <span class="n">target_folder</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">name_prefix</span><span class="o">=</span><span class="s2">&quot;cover&quot;</span><span class="p">,</span>
+    <span class="n">adapter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download completed songs to *target_folder*. Returns list of saved paths.&quot;&quot;&quot;</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">ensure_adapter</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">saved</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">song</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">songs</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">out_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.mp3&quot;</span>
+        <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_folder</span><span class="p">,</span> <span class="n">out_name</span><span class="p">)</span>
+        <span class="n">song_with_audio</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">fetch_audio</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">song_with_audio</span><span class="o">.</span><span class="n">audio_bytes</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Saved: </span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> bytes)&quot;</span><span class="p">)</span>
+        <span class="n">saved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">saved</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Filename helpers</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="extract_style">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.extract_style">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_style</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse style from a filename like ``barry_{key}_{bpm}bpm_{Style}.wav``.&quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;.*?_\d+bpm_(.+)\.\w+$&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span> <span class="k">else</span> <span class="n">filename</span></div>
+
+
+
+<div class="viewcode-block" id="safe_name">
+<a class="viewcode-back" href="../../module_docs/arioso/tools.html#arioso.tools.safe_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">safe_name</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert arbitrary text to a filesystem-safe string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^\w]+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

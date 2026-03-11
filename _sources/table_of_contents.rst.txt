@@ -63,4 +63,5 @@
    module_docs/arioso/platforms/yue/adapter
    module_docs/arioso/platforms/yue/config
    module_docs/arioso/registry
+   module_docs/arioso/tools
    module_docs/arioso/translation

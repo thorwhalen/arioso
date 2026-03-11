@@ -217,9 +217,7 @@ class Adapter(BaseRestAdapter):
         if not file_url:
             file_url = data.get("data", {}).get("downloadUrl", "")
         if not file_url:
-            raise RuntimeError(
-                f"Upload succeeded but no URL returned: {data}"
-            )
+            raise RuntimeError(f"Upload succeeded but no URL returned: {data}")
         return file_url
 
     def upload_extend(

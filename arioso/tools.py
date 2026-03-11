@@ -18,7 +18,7 @@ DFLT_TIMEOUT = 600
 DFLT_MODEL = "V5"
 DFLT_AUDIO_WEIGHT = 0.5
 DFLT_STYLE_WEIGHT = 0.5
-DFLT_PLATFORM = os.getenv("ACCOMPY_DFLT_PLATFORM", "sunoapi") 
+DFLT_PLATFORM = os.getenv("ACCOMPY_DFLT_PLATFORM", "sunoapi")
 
 
 # ---------------------------------------------------------------------------
@@ -83,8 +83,7 @@ def _validate_platform_config(config: dict):
     missing = required - set(config)
     if missing:
         raise ValueError(
-            f"Platform config missing required keys: {missing}. "
-            f"Got keys: {set(config)}"
+            f"Platform config missing required keys: {missing}. Got keys: {set(config)}"
         )
 
 
@@ -102,9 +101,14 @@ def wav_to_mp3(wav_path, *, max_duration=DFLT_MAX_DURATION):
     tmp.close()
     subprocess.run(
         [
-            "ffmpeg", "-y", "-i", wav_path,
-            "-t", str(max_duration),
-            "-q:a", "2",
+            "ffmpeg",
+            "-y",
+            "-i",
+            wav_path,
+            "-t",
+            str(max_duration),
+            "-q:a",
+            "2",
             tmp.name,
         ],
         capture_output=True,
@@ -119,6 +123,7 @@ def wav_to_mp3(wav_path, *, max_duration=DFLT_MAX_DURATION):
 from functools import partial
 
 _wav_to_mp3 = partial(wav_to_mp3, max_duration=DFLT_MAX_DURATION)
+
 
 def submit_cover(
     source_path,

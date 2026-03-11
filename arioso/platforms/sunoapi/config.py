@@ -37,6 +37,8 @@ PLATFORM_CONFIG = {
         "model",
         "continue_from",
         "continue_at",
+        "audio_input",
+        "audio_input_strength",
     ],
     "on_unsupported_param": "warn",
     "output": {

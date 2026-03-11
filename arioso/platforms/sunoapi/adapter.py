@@ -2,12 +2,16 @@
 
 import os
 import time
+from pathlib import Path
 
 from arioso.base import AudioResult, Song
 from arioso.platforms._base_adapter import BaseRestAdapter
 
 # Valid model versions accepted by sunoapi.org
 SUNO_MODELS = ("V4", "V4_5", "V4_5ALL", "V4_5PLUS", "V5")
+
+# File upload base URL (separate from the generation API)
+SUNO_FILE_UPLOAD_BASE_URL = "https://sunoapiorg.redpandaai.co"
 
 # Default model, configurable via env var
 SUNO_DEFAULT_MODEL = os.environ.get("SUNO_DEFAULT_MODEL", "V4")
@@ -170,11 +174,324 @@ class Adapter(BaseRestAdapter):
             )
         ]
 
+    def upload_file(self, file_path: str) -> str:
+        """Upload a local audio file and return a public URL.
+
+        Uses the sunoapi.org file upload API. Uploaded files are temporary
+        and automatically deleted after 3 days.
+
+        Args:
+            file_path: Path to the local audio file.
+
+        Returns:
+            Public URL of the uploaded file.
+        """
+        file_path = str(file_path)
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"Audio file not found: {file_path}")
+
+        url = f"{SUNO_FILE_UPLOAD_BASE_URL}/api/file-stream-upload"
+        filename = os.path.basename(file_path)
+
+        # Use a fresh session without the default Content-Type: application/json
+        import requests
+
+        headers = dict(self.session.headers)
+        headers.pop("Content-Type", None)
+
+        with open(file_path, "rb") as f:
+            resp = requests.post(
+                url,
+                headers=headers,
+                files={"file": (filename, f)},
+                data={"fileName": filename, "uploadPath": "arioso-uploads"},
+            )
+        resp.raise_for_status()
+        data = resp.json()
+
+        if not data.get("success") and data.get("code") != 200:
+            msg = data.get("msg", "Unknown upload error")
+            raise RuntimeError(f"File upload failed: {msg}")
+
+        file_url = data.get("data", {}).get("fileUrl", "")
+        if not file_url:
+            file_url = data.get("data", {}).get("downloadUrl", "")
+        if not file_url:
+            raise RuntimeError(
+                f"Upload succeeded but no URL returned: {data}"
+            )
+        return file_url
+
+    def upload_extend(
+        self,
+        audio_source: str,
+        *,
+        style: str = "",
+        title: str = "",
+        prompt: str = "",
+        instrumental: bool = False,
+        model: str = "",
+        continue_at: float = 0,
+        callback_url: str = "",
+        negative_prompt: str = "",
+        audio_weight: float = 0,
+        style_weight: float = 0,
+        wait_for_completion: bool = False,
+        poll_interval: float = 5.0,
+        timeout: float = 300.0,
+        **kwargs,
+    ) -> list[Song]:
+        """Generate music from an uploaded audio file via upload-extend.
+
+        Uploads a local file (if a path is given) or uses a URL directly,
+        then calls the sunoapi.org upload-extend endpoint.
+
+        Args:
+            audio_source: Local file path or public URL to the source audio.
+                Max 8 minutes (1 minute for V4_5ALL model).
+            style: Genre/style tags for the generation.
+            title: Song title.
+            prompt: Lyrics or text prompt (used when instrumental=False).
+            instrumental: If True, generate without vocals.
+            model: Suno model version ({models}).
+            continue_at: Start point in seconds within the uploaded audio.
+            callback_url: Webhook URL. Defaults to SUNO_CALLBACK_URL env var.
+            negative_prompt: Styles to exclude.
+            audio_weight: How much the source audio influences output (0.0-1.0).
+            style_weight: How much the style prompt influences output (0.0-1.0).
+            wait_for_completion: If True, poll until audio is ready.
+            poll_interval: Seconds between status checks (default 5).
+            timeout: Max seconds to wait (default 300).
+
+        Returns:
+            List of Song objects.
+        """.format(models=", ".join(SUNO_MODELS))
+        model = model or SUNO_DEFAULT_MODEL
+        callback_url = callback_url or SUNO_DEFAULT_CALLBACK_URL
+
+        if not callback_url:
+            raise ValueError(
+                "sunoapi.org requires a callback URL. "
+                "Set the SUNO_CALLBACK_URL environment variable or pass "
+                "callback_url to upload_extend()."
+            )
+
+        # Determine upload URL: if it looks like a local path, upload it first
+        if os.path.isfile(audio_source):
+            upload_url = self.upload_file(audio_source)
+        elif audio_source.startswith(("http://", "https://")):
+            upload_url = audio_source
+        else:
+            raise ValueError(
+                f"audio_source must be a local file path or a URL, "
+                f"got: {audio_source!r}"
+            )
+
+        custom_mode = bool(style or title or prompt)
+
+        payload = {
+            "uploadUrl": upload_url,
+            "model": model,
+            "instrumental": instrumental,
+            "callBackUrl": callback_url,
+            "defaultParamFlag": custom_mode,
+        }
+
+        # continueAt is required by the API; default to 0 (start of audio)
+        payload["continueAt"] = continue_at or 0
+
+        if custom_mode:
+            if style:
+                payload["style"] = style
+            if title:
+                payload["title"] = title
+            if not instrumental and prompt:
+                payload["prompt"] = prompt
+
+        if negative_prompt:
+            payload["negativeTags"] = negative_prompt
+        if audio_weight:
+            payload["audioWeight"] = audio_weight
+        if style_weight:
+            payload["styleWeight"] = style_weight
+
+        endpoint = "/api/v1/generate/upload-extend"
+        response = self.session.post(f"{self.base_url}{endpoint}", json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        _check_api_error(data)
+
+        task_id = ""
+        if isinstance(data, dict):
+            inner = data.get("data")
+            if isinstance(inner, dict):
+                task_id = inner.get("taskId", "")
+            if not task_id:
+                task_id = data.get("taskId", "")
+
+        if not task_id:
+            return self._parse_songs(data, title=title)
+
+        if wait_for_completion:
+            return self._poll_for_songs(
+                task_id,
+                title=title,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+
+        return [
+            Song(
+                id=task_id,
+                title=title,
+                audio=AudioResult(format="mp3"),
+                platform="sunoapi",
+                status="pending",
+                metadata=data if isinstance(data, dict) else {"raw": data},
+            )
+        ]
+
+    def upload_cover(
+        self,
+        audio_source: str,
+        *,
+        style: str = "",
+        title: str = "",
+        prompt: str = "",
+        instrumental: bool = False,
+        model: str = "",
+        callback_url: str = "",
+        negative_prompt: str = "",
+        audio_weight: float = 0,
+        style_weight: float = 0,
+        weirdness: float = 0,
+        wait_for_completion: bool = False,
+        poll_interval: float = 5.0,
+        timeout: float = 300.0,
+        **kwargs,
+    ) -> list[Song]:
+        """Cover/transform an uploaded audio file via upload-cover.
+
+        Uploads a local file (if a path is given) or uses a URL directly,
+        then calls the sunoapi.org upload-cover endpoint to re-generate
+        the track in the specified style.
+
+        Args:
+            audio_source: Local file path or public URL to the source audio.
+                Max 8 minutes.
+            style: Genre/style tags for the cover.
+            title: Song title.
+            prompt: Lyrics or text prompt. In non-custom mode (no style/title),
+                this is the main prompt (max 500 chars).
+            instrumental: If True, generate without vocals.
+            model: Suno model version ({models}).
+            callback_url: Webhook URL. Defaults to SUNO_CALLBACK_URL env var.
+            negative_prompt: Styles to exclude.
+            audio_weight: How much the source audio influences output (0.0-1.0).
+            style_weight: How much the style prompt influences output (0.0-1.0).
+            weirdness: Creative deviation limit (0.0-1.0).
+            wait_for_completion: If True, poll until audio is ready.
+            poll_interval: Seconds between status checks (default 5).
+            timeout: Max seconds to wait (default 300).
+
+        Returns:
+            List of Song objects (typically 2 per call).
+        """.format(models=", ".join(SUNO_MODELS))
+        model = model or SUNO_DEFAULT_MODEL
+        callback_url = callback_url or SUNO_DEFAULT_CALLBACK_URL
+
+        if not callback_url:
+            raise ValueError(
+                "sunoapi.org requires a callback URL. "
+                "Set the SUNO_CALLBACK_URL environment variable or pass "
+                "callback_url to upload_cover()."
+            )
+
+        # Resolve audio source to a URL
+        if os.path.isfile(audio_source):
+            upload_url = self.upload_file(audio_source)
+        elif audio_source.startswith(("http://", "https://")):
+            upload_url = audio_source
+        else:
+            raise ValueError(
+                f"audio_source must be a local file path or a URL, "
+                f"got: {audio_source!r}"
+            )
+
+        custom_mode = bool(style or title)
+
+        payload = {
+            "uploadUrl": upload_url,
+            "model": model,
+            "instrumental": instrumental,
+            "callBackUrl": callback_url,
+            "customMode": custom_mode,
+        }
+
+        if custom_mode:
+            if style:
+                payload["style"] = style
+            if title:
+                payload["title"] = title
+            if not instrumental and prompt:
+                payload["prompt"] = prompt
+        else:
+            if prompt:
+                payload["prompt"] = prompt
+
+        if negative_prompt:
+            payload["negativeTags"] = negative_prompt
+        if audio_weight:
+            payload["audioWeight"] = audio_weight
+        if style_weight:
+            payload["styleWeight"] = style_weight
+        if weirdness:
+            payload["weirdnessConstraint"] = weirdness
+
+        endpoint = "/api/v1/generate/upload-cover"
+        response = self.session.post(f"{self.base_url}{endpoint}", json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        _check_api_error(data)
+
+        task_id = ""
+        if isinstance(data, dict):
+            inner = data.get("data")
+            if isinstance(inner, dict):
+                task_id = inner.get("taskId", "")
+            if not task_id:
+                task_id = data.get("taskId", "")
+
+        if not task_id:
+            return self._parse_songs(data, title=title)
+
+        if wait_for_completion:
+            return self._poll_for_songs(
+                task_id,
+                title=title,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+
+        return [
+            Song(
+                id=task_id,
+                title=title,
+                audio=AudioResult(format="mp3"),
+                platform="sunoapi",
+                status="pending",
+                metadata=data if isinstance(data, dict) else {"raw": data},
+            )
+        ]
+
     def get_status(self, task_id: str) -> list[Song]:
         """Check the status of a generation task and return updated Songs.
 
         Args:
-            task_id: The taskId returned from generate().
+            task_id: The taskId returned from generate(), upload_extend(),
+                or upload_cover().
 
         Returns:
             List of Song objects with current status and audio URLs
@@ -195,7 +512,7 @@ class Adapter(BaseRestAdapter):
                 f"sunoapi generation failed (status={status_raw}): taskId={task_id}"
             )
 
-        suno_data = record.get("response", {}).get("sunoData", [])
+        suno_data = (record.get("response") or {}).get("sunoData", [])
         if not suno_data:
             return [
                 Song(

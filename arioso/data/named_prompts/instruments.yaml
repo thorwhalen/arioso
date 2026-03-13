@@ -1,0 +1,73 @@
+# Instrument/synth patch name -> sonic timbre description
+# Sources: MusicCaps aspect_list, LP-MusicCaps, production knowledge
+
+# Keyboards and synths
+rhodes: "warm electric piano, bell-like attack, smooth sustain, gentle tremolo, jazz-soul character"
+wurlitzer: "bright electric piano, bark-like overtones, punchy attack, slightly gritty, vintage feel"
+moog_bass: "deep analog sub-bass, warm sawtooth, slight filter sweep, round attack, rich low harmonics"
+juno_pad: "warm detuned analog pad, chorus-drenched, lush stereo width, slow attack, dreamy sustain"
+dx7_epiano: "glassy digital electric piano, crystalline bell tones, FM synthesis character, bright attack, 80s sheen"
+tb_303: "acid squelch bass, resonant filter sweep, saw or square wave, rubbery low-end, hypnotic pattern"
+minimoog_lead: "fat analog lead, warm sawtooth, portamento glide, rich harmonics, cutting mid presence"
+prophet_pad: "lush analog polysynth, detuned voices, warm filter sweep, cinematic pad, vintage character"
+arp_odyssey: "biting analog lead, dual-oscillator detune, sharp resonance, aggressive filter, vintage edge"
+mellotron: "tape-based orchestral samples, warbled strings, lo-fi choir, vintage degradation, haunting character"
+clavinet: "funky percussive keys, bright metallic pluck, wah-wah filter, tight attack, Stevie Wonder vibe"
+hammond_organ: "warm drawbar tones, spinning Leslie speaker effect, overdriven grit, churchy sustain, bluesy growl"
+farfisa_organ: "thin buzzy organ, reedy timbre, 60s garage rock, bright and nasal, simple waveform"
+grand_piano: "rich acoustic piano, full dynamic range, resonant sustain, wooden body, concert hall depth"
+upright_piano: "intimate felt-dampened piano, warm close-mic character, slightly muted highs, honky-tonk capable"
+harpsichord: "bright plucked strings, metallic attack, no sustain, ornamental trills, Baroque character"
+
+# Guitars
+telecaster: "bright twangy clean, country sparkle, cutting midrange, single-coil bite, Nashville snap"
+stratocaster: "glassy bell-like clean, slight quack in middle position, warm neck pickup, surf-ready reverb"
+les_paul: "thick warm humbucker, fat midrange, creamy sustain, classic rock crunch, singing lead tone"
+jazzmaster: "warm offset guitar, bright jangle, surf-rock tremolo, lo-fi indie character, feedback-prone"
+acoustic_steel: "bright steel-string resonance, finger-squeaks, percussive strumming, open chord shimmer, folk warmth"
+nylon_guitar: "soft classical guitar, round fingertip attack, warm mellow tone, intimate close-mic, Spanish feel"
+twelve_string: "bright shimmering chorus, doubled octave strings, jangly chime, folk-rock sparkle, full-bodied ring"
+slide_guitar: "smooth gliding pitch, bottleneck buzz, bluesy sustain, open tuning resonance, delta blues character"
+pedal_steel: "smooth bending pitch, country weep, lush sustain, dreamy glissando, Nashville tear-drop sound"
+
+# Bass
+fender_precision: "deep round bass, warm fundamental, punchy attack, Motown thump, solid low-end foundation"
+fender_jazz_bass: "bright articulate bass, mid-range growl, two-pickup clarity, funk slap, cutting tone"
+rickenbacker_bass: "bright aggressive bass, piano-like clarity, clanky midrange, punk-prog character, treble bite"
+upright_bass: "woody acoustic bass, bowed or plucked, warm resonance, jazz walk, orchestral depth"
+synth_bass: "electronic low-end, sub-bass weight, synthesized waveform, dance music foundation, tight punch"
+
+# Drums and percussion
+808_kick: "deep sub-bass boom, long sustain, sine-wave character, trap foundation, chest-rattling low-end"
+909_kick: "punchy analog kick, tight transient, house music foundation, clicky attack, controlled decay"
+linn_drum: "dry electronic drums, 80s pop character, tight gated sound, crisp snare, Prince-style beat"
+tr_808: "analog drum machine, boomy kick, sizzling hi-hats, clap sounds, classic hip-hop and electro"
+tr_909: "analog-digital hybrid drums, punchy kick, metallic hi-hats, house and techno foundation, rave classic"
+tabla: "Indian hand drums, melodic pitch bends, complex finger patterns, resonant bass, classical rhythmic cycles"
+djembe: "deep West African drum, sharp slap tones, warm bass, hand-played dynamics, polyrhythmic patterns"
+cajon: "box drum, bass thump and snare click, acoustic percussion, flamenco and unplugged feel"
+brushed_drums: "soft swishing brushes, gentle snare texture, jazz intimacy, quiet dynamics, smooth ride cymbal"
+orchestral_percussion: "timpani rolls, crash cymbals, snare rattle, glockenspiel sparkle, concert hall dynamics"
+
+# Strings
+violin: "bright bowed string, vibrato expression, soaring melody, classical precision, emotional range"
+cello: "warm deep bowed string, rich resonance, expressive vibrato, orchestral depth, soulful melody"
+string_ensemble: "lush orchestral strings, layered bowing, wide stereo, cinematic sweep, emotional swells"
+pizzicato_strings: "plucked string staccato, bouncy rhythmic character, playful texture, delicate accents"
+erhu: "Chinese bowed string, nasal singing tone, expressive slides, pentatonic melody, silk road character"
+sitar: "buzzing sympathetic strings, meend bends, drone tanpura backdrop, Indian raga scales, meditative"
+
+# Wind and brass
+trumpet: "bright brass, clear attack, heroic melody, jazz or orchestral, piercing high register"
+flugelhorn: "warm mellow brass, rounded tone, darker than trumpet, lyrical melody, velvet texture"
+trombone: "rich slide brass, warm low register, jazzy glissando, powerful sustain, big band energy"
+french_horn: "noble warm brass, rounded mellow tone, orchestral grandeur, heroic themes, rich harmonics"
+saxophone: "warm reedy tone, expressive bends, breathy undertones, jazz character, soulful phrasing"
+clarinet: "warm woody reed, fluid legato, classical or klezmer, mellow low register, bright upper range"
+flute: "airy breathy tone, clear high melody, classical or Celtic, delicate ornaments, pure pitch"
+oboe: "nasal reedy tone, penetrating melody, pastoral character, classical elegance, precise intonation"
+harmonica: "bluesy reed organ, breath-driven bends, Delta blues or folk, raw expression, train-whistle accents"
+pan_flute: "breathy airy tone, Andean character, pentatonic melody, nature-evoking, ethereal simplicity"
+bagpipes: "droning bass pipes, bright chanter melody, Scottish or Celtic, sustained drone, powerful reeds"
+tin_whistle: "bright Irish whistle, ornamental trills, Celtic melody, clear high pitch, folk dance energy"
+didgeridoo: "deep drone, circular breathing, Aboriginal Australian, harmonic overtones, earthy resonance"

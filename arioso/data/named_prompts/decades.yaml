@@ -1,0 +1,20 @@
+# Decade/era -> production and sonic signature prompt
+# Sources: HowToPromptSuno, MusicCaps, general audio production knowledge
+
+1920s: "scratchy 78rpm recording, acoustic instruments, ragtime piano, early jazz, tinny brass, lo-fi mono, parlor sound"
+1930s: "big band swing, crooner vocals, brass section, upright bass, brushed snare, warm tube recording, mono mix"
+1940s: "wartime big band, vocal harmony groups, string arrangements, ribbon microphone warmth, mono recording, jazz inflection"
+1950s: "early rock and roll, doo-wop harmonies, stand-up bass, tape echo, simple reverb, tube amp warmth, mono to early stereo"
+1960s: "British invasion guitars, Motown bass, surf reverb, psychedelic effects, tape saturation, early stereo panning, analog warmth"
+1970s: "warm analog recording, funk bass, disco strings, prog rock keyboards, Moog synths, lush reverb, wide stereo"
+1980s: "gated reverb drums, bright analog synths, chorus-drenched guitar, punchy snare, wide stereo mix, LinnDrum machine, big hair rock"
+1990s: "grunge distortion, hip hop sampling, trip hop textures, lo-fi indie, CD-quality digital clarity, 808 bass, boom bap drums"
+2000s: "compressed loudness, Auto-Tune vocals, crunk 808s, emo guitar, pop-punk energy, Pro Tools polish, digital reverb"
+2010s: "trap hi-hats, EDM drops, minimalist pop, streaming-optimized loudness, 808 sub-bass, vocal chops, tropical house plucks"
+2020s: "bedroom pop aesthetic, lo-fi textures, hyperpop glitches, drill 808 slides, AI-assisted production, spatial audio, immersive mixing"
+
+# Broader eras
+baroque_era: "harpsichord, chamber strings, ornamental trills, contrapuntal voices, basso continuo, dance suite forms"
+classical_era: "balanced orchestration, clear melody over accompaniment, piano forte dynamics, elegant phrasing, symphonic form"
+romantic_era: "large orchestra, extreme dynamics, virtuosic passages, emotional expression, lush strings, dramatic crescendos"
+modern_era: "atonality, experimental timbre, extended techniques, electronic elements, rhythmic complexity, avant-garde approach"

@@ -15,9 +15,27 @@ Usage::
 
     # Get platform config
     arioso.get_platform_info("musicgen")
+
+    # Rich platform access via services
+    s = arioso.services.sunoapi
+    s.generate("jazz piano", duration=30)       # unified names
+    s.native_generate("jazz", genre="jazz")     # native names
+    s.upload_file("/path/to/audio.mp3")         # platform-specific
+
+    # Cross-platform slices
+    arioso.generators["sunoapi"]("jazz")
+    arioso.generators.sunoapi("jazz")
 """
 
 from arioso.base import Song, AudioResult, AFFORDANCES
+from arioso.services import ServiceCollection, SliceMapping
+
+services = ServiceCollection()
+generators = SliceMapping(services, "generate")
+native_generators = SliceMapping(services, "native_generate")
+infos = SliceMapping(services, "info")
+configs = SliceMapping(services, "config")
+adapters = SliceMapping(services, "adapter")
 
 
 def generate(prompt: str, *, platform: str = "musicgen", **kwargs) -> Song:

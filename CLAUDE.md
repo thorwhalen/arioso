@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-Arioso wraps 21+ AI music generation platforms behind a unified Python interface.
+Arioso wraps 14 AI music generation platforms behind a unified Python interface.
 Users generate music via `arioso.generate(prompt, platform="...", **kwargs)`.
 
 ## Architecture
@@ -21,6 +21,7 @@ arioso/
             __init__.py
             config.py            # PLATFORM_CONFIG dict (required)
             adapter.py           # Platform-specific code (optional for REST APIs)
+            <NAME>_REFERENCE.md  # API + prompt engineering reference (for humans & AI agents)
 ```
 
 ### How It Works
@@ -73,10 +74,11 @@ Source locations for reference:
 
 ## Reference Documentation
 
-`misc/docs/` contains reference documents including a 21-platform overview and
+`misc/docs/` contains reference documents including a multi-platform overview and
 per-platform API spec snapshots (`<name>-api-spec.md`). These are useful as a
 starting point but MAY BE OUTDATED. Always verify against live docs before
-coding (see "CRITICAL" section above).
+coding (see "CRITICAL" section above). Each platform also has a
+`<platform>/REFERENCE.md` with detailed API and prompt engineering documentation.
 
 ## Evolving This File
 

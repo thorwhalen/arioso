@@ -1,0 +1,41 @@
+# Use-case / context / scene name -> sonic description
+# Sources: MusicSmith guide, AudioCaps, Envato Elements AI Music guide
+
+# Everyday scenes
+coffee_shop: "gentle acoustic guitar, soft jazz piano, warm bass, relaxed tempo, ambient cafe noise, intimate mix"
+dinner_party: "smooth jazz, bossa nova guitar, soft drums, warm upright bass, elegant atmosphere, muted dynamics"
+morning_routine: "bright acoustic guitar, gentle tempo, optimistic melody, light percussion, fresh open feeling"
+rainy_day: "soft piano, gentle rain texture, melancholic minor key, slow tempo, warm ambient pads"
+road_trip: "upbeat indie rock, driving rhythm, open road feel, jangly guitars, sing-along chorus, windows-down energy"
+workout: "high-energy EDM, driving beat, 140+ BPM, aggressive bass drops, motivational build, relentless momentum"
+yoga: "ambient pads, gentle singing bowls, slow drone, nature sounds, peaceful flute, meditative stillness"
+study: "lo-fi hip hop beats, soft piano loops, vinyl crackle, gentle tempo, minimal distractions, focus-friendly"
+spa: "gentle nature sounds, soft pads, bamboo flute, slow tempo, crystal bowls, deeply relaxing atmosphere"
+beach: "tropical guitar, reggae rhythm, steel drums, ocean ambience, warm bass, sun-drenched groove"
+
+# Media and content
+podcast_intro: "clean modern pop, upbeat tempo, short loop-friendly, bright synths, professional energy"
+youtube_background: "upbeat acoustic pop, clean production, non-distracting, positive energy, royalty-free feel"
+corporate_presentation: "clean uplifting pop, motivational build, modern production, positive energy, professional polish"
+product_launch: "cinematic build, epic drums, modern hybrid orchestral, futuristic synths, triumphant payoff"
+fashion_runway: "minimal deep house, sleek bass, cool attitude, modern electronic groove, sophisticated edge"
+wedding_first_dance: "romantic ballad, gentle strings, soft piano, warm vocals, tender tempo, emotional swell"
+birthday_party: "fun upbeat pop, celebratory energy, bright instrumentation, danceable groove, joyful feeling"
+
+# Film and game scenes
+chase_scene: "fast tempo, driving percussion, staccato strings, rising tension, dissonant accents, urgent rhythm"
+horror: "dissonant strings, low drone, sudden stingers, eerie silence, unsettling textures, creeping bass"
+romance_scene: "lush strings, gentle piano, warm reverb, tender melody, intimate dynamics, close-mic breathing"
+space_exploration: "vast ambient pads, ethereal synths, slow cosmic evolution, deep sub frequencies, sci-fi wonder"
+medieval_fantasy: "lute and harp, modal melody, bodhran drum, Celtic flute, tavern atmosphere, ancient feel"
+cyberpunk: "dark synthwave, industrial bass, neon-lit arpeggios, dystopian atmosphere, glitchy percussion"
+western: "twangy guitar, harmonica, sparse arrangement, desert atmosphere, galloping rhythm, whistled melody"
+underwater: "muffled low-pass filter, slow bubbling textures, deep bass, reverb-heavy, aquatic atmosphere"
+epic_battle: "massive orchestral, pounding war drums, aggressive brass, choir chants, thunderous percussion, heroic theme"
+mystery_detective: "jazzy piano, muted trumpet, subtle tension, noir atmosphere, brushed drums, dark sophistication"
+
+# Emotional occasions
+graduation: "uplifting orchestral, triumphant brass, building drums, emotional strings, achievement feel"
+memorial: "gentle piano, soft strings, reflective mood, slow tempo, solemn dignity, quiet reverence"
+celebration: "bright brass fanfare, driving dance beat, confetti energy, joyful group energy, party atmosphere"
+lullaby: "music box melody, very gentle dynamics, slow rocking tempo, warm soft pads, soothing repetition"

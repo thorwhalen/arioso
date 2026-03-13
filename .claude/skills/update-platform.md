@@ -55,6 +55,12 @@ Apply changes to match the live API:
 If `misc/docs/<name>-api-spec.md` exists, update it. If not, create it with
 a summary of the current API for future reference.
 
+Also update the platform's `<NAME>_REFERENCE.md` file in its directory:
+- Update the `Last updated` date
+- Verify the Prompt Engineering section is still accurate
+- Update API details if endpoints/parameters changed
+- Add any new prompt engineering insights discovered
+
 ## Common Pitfalls
 
 - **APIs that return HTTP 200 for errors**: Many music APIs (sunoapi, etc.)

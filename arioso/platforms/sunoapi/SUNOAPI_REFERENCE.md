@@ -1,7 +1,141 @@
 # Suno API Reference (sunoapi.org)
 
-> Complete REST API reference for [sunoapi.org](https://sunoapi.org/).
+> Complete REST API reference for [sunoapi.org](https://sunoapi.org/), a third-party
+> API wrapper for [Suno](https://suno.com/) — the leading AI music generation platform.
 > Source documentation: [docs.sunoapi.org](https://docs.sunoapi.org/)
+
+**Last updated: 2026-03-13**
+
+---
+
+## Prompt Engineering
+
+[Suno](https://suno.com/) (accessed here via [sunoapi.org](https://sunoapi.org/),
+which provides a REST API to Suno's generation capabilities) has two input modes
+that handle prompts differently:
+
+### Simple Mode vs Custom Mode
+
+- **Simple mode** (`customMode: false`): The `prompt` field is a free-text description of the desired music. Suno interprets the text holistically to determine genre, mood, lyrics, and style.
+- **Custom mode** (`customMode: true`): Triggered when `lyrics`, `genre`/`style`, or `title` are provided. In this mode, `prompt` becomes the **lyrics** field and `style` is a separate tag-based genre descriptor.
+
+### Style/Genre Tags (the `style` field in Custom Mode)
+
+The `style` field accepts comma-separated genre and style descriptors. This is the primary way to control the musical output in custom mode.
+
+**Effective tag format:** Comma-separated list of descriptors, ordered from most to least important.
+
+**Examples:**
+- `"indie folk, acoustic, warm, nostalgic"`
+- `"trap, dark, 808 bass, aggressive, Atlanta"`
+- `"90s alternative rock, grunge, distorted guitars, melancholic"`
+- `"jazz fusion, complex harmonies, upbeat, brass section"`
+
+**Tag categories that work well:**
+- **Genre/subgenre:** pop, rock, jazz, hip-hop, electronic, R&B, folk, country, metal, ambient, classical, lo-fi, reggae, blues, funk, soul, punk, grunge, disco, house, techno, trap, drill
+- **Era/decade:** 60s, 70s, 80s, 90s, 2000s, retro, modern, vintage
+- **Mood/emotion:** upbeat, melancholic, aggressive, calm, dark, bright, euphoric, haunting, romantic, bittersweet, triumphant, anxious, dreamy
+- **Instrumentation:** acoustic guitar, electric guitar, piano, synth, 808 bass, strings, brass, woodwinds, drums, percussion, organ, harp, violin, cello
+- **Vocal descriptors:** male vocals, female vocals, choir, falsetto, raspy, smooth, breathy, powerful, whispered, spoken word, harmonies
+- **Production:** lo-fi, hi-fi, polished, raw, reverb-heavy, dry, compressed, spacious, analog, crisp, distorted, clean
+
+### Structure Metatags (in Lyrics/Prompt)
+
+Suno supports structure metatags within lyrics to control song form:
+
+- `[Verse]`, `[Verse 1]`, `[Verse 2]` -- verse sections
+- `[Chorus]` -- chorus sections
+- `[Pre-Chorus]` -- pre-chorus transition
+- `[Bridge]` -- bridge section
+- `[Outro]` -- ending section
+- `[Intro]` -- instrumental intro
+- `[Instrumental]`, `[Interlude]` -- non-vocal sections
+- `[Break]` -- a musical break
+- `[Hook]` -- hook section
+- `[Rap]`, `[Spoken Word]` -- spoken/rap sections
+
+**Example lyrics with metatags:**
+```
+[Verse 1]
+Walking through the city rain
+Neon lights reflect the pain
+
+[Pre-Chorus]
+But something's changing in the air
+
+[Chorus]
+We rise above the noise tonight
+Stars are burning ever bright
+
+[Verse 2]
+Morning comes with golden haze
+Lost in wonder, lost in praise
+
+[Chorus]
+We rise above the noise tonight
+Stars are burning ever bright
+
+[Outro]
+(Fade out with humming)
+```
+
+### Vocal Tags (in Lyrics)
+
+Suno recognizes vocal style and delivery tags within lyrics:
+
+**Delivery:** `[Whisper]`, `[Spoken Word]`, `[Rap]`, `[Belting]`, `[Falsetto]`, `[Crooning]`, `[Operatic]`, `[Scat]`, `[Growl]`
+
+**Voice character:** `[Male Vocal]`, `[Female Vocal]`, `[Duet]`, `[Choir]`, `[Boy]`, `[Girl]`, `[Harmonies]`
+
+**Vocal effects:** `[Reverb]`, `[Delay]`, `[AutoTune]`, `[No AutoTune]`, `[Distorted Vocals]`, `[Vocoder]`, `[Telephone Effect]`
+
+**Inline delivery cues** (parenthetical, within lyrics text):
+- `(whispered)`, `(shouted)`, `(spoken)` -- delivery modifiers
+- `(fade out)`, `(building)` -- dynamic cues
+- `(guitar solo)`, `(drum fill)` -- instrumental cues
+
+### Sound Effect Tags (in Lyrics)
+
+Placed inline for ambient or transitional effects:
+- `[Birds Chirping]`, `[Rain]`, `[Thunder]`, `[Ocean Waves]`
+- `[Applause]`, `[Cheering]`, `[Clapping]`
+- `[Silence]`, `[Wind Blowing]`
+
+### Tips for Better Results
+
+1. **Structure tags are [10x more powerful](https://musicsmith.ai/blog/ai-music-generation-prompts-best-practices) than style tags.** Always include `[Verse]`, `[Chorus]`, etc. in lyrics.
+2. **Front-load important tags.** The first 20-30 words of the style field have the most impact.
+3. **Be specific with genre:** "90s Seattle grunge" beats "rock". Combine genre + era for precision.
+4. **Limit instruments to 2-4.** More than 4 confuses the model and produces inconsistent results.
+5. **Limit genres to 1-2.** Two-genre fusion works (e.g., "Lo-fi Hip Hop, Jazz"); three+ typically fails.
+6. **Use comma-separated tags, not prose.** Suno parses `"80s Synth Pop, Female Vocal, Breathy, Romantic"` better than a full sentence describing the same thing.
+7. **Use negative tags:** The `negativeTags` parameter excludes unwanted styles (e.g., "autotune, EDM").
+8. **Match lyrics to style:** Lyrics should fit the rhythm and syllable patterns of the chosen genre.
+9. **Duration awareness:** V4 supports up to 4 min, V4_5+ supports up to 8 min. Longer songs need more structural metatags.
+10. **Avoid artist names:** Content policy blocks them. Use [name-free style descriptors](https://www.arxiv.org/pdf/2509.00654) (genre + mood + instrumentation + production style) instead.
+11. **Instrumental tracks:** Set `instrumental: true` AND omit lyrics for best results.
+12. **Style Boost endpoint:** Use `POST /api/v1/style/generate` to expand brief style descriptions into richer ones.
+13. **Regenerate before rewriting.** Generate 3-5 times with the same prompt before changing it -- results vary significantly between runs.
+
+### Character Limits
+
+| Parameter | V4 | V4_5 / V4_5PLUS / V5 | V4_5ALL |
+|-----------|----|-----------------------|---------|
+| `prompt` (lyrics) | 3,000 chars | 5,000 chars | 5,000 chars |
+| `style` | 200 chars | 1,000 chars | 1,000 chars |
+| `title` | 80 chars | 100 chars | 80 chars |
+
+### Links
+
+- [Suno Tags Complete Reference](https://musci.io/blog/suno-tags) (musci.io) — exhaustive taxonomy of structure, voice, instrument, mood, genre, and style tags
+- [HookGenius Suno Style Tags Guide](https://hookgenius.app/learn/suno-style-tags-guide/) — 300+ searchable, copy-ready tags
+- [SunoMetaTagCreator](https://sunometatagcreator.com/metatags-guide) — interactive tag builder with 1000+ tags and drag-and-drop interface
+- [Suno Help Center](https://help.suno.com/) — official Suno documentation
+- [Suno/Udio Scraped Prompts Analysis](https://arxiv.org/abs/2509.11824) ([GitHub](https://github.com/mister-magpie/aims_prompts)) — empirical study of 100K+ real prompts from Suno and Udio (May–Oct 2024)
+- [Data-Driven Analysis of Text-Conditioned AI-Generated Music](https://arxiv.org/abs/2509.11824) (KTH, 2024) — statistical analysis of prompt distributions and genre/tag co-occurrence patterns across 101,953 songs
+- [SunoCaps Dataset](https://www.sciencedirect.com/science/article/pii/S2352340924007078) — 256 prompt-output pairs with expert annotations for prompt alignment evaluation
+- [OpenMusicPrompt](https://openmusicprompt.com/) — prompt expansion tool supporting Suno, Udio, and Stable Audio
+- [MusicSmith Best Practices](https://musicsmith.ai/blog/ai-music-generation-prompts-best-practices) — cross-platform prompt engineering guide with 20+ examples
 
 ---
 
@@ -177,16 +311,6 @@ Error response format:
 - Generated video files are retained for **15 days**.
 - Uploaded files via Base64 upload auto-delete after **3 days**.
 - Vocal separation URLs are valid for **14 days**.
-
-### Character Limits by Model
-
-| Parameter | V4 | V4_5 / V4_5PLUS / V5 | V4_5ALL |
-|-----------|----|-----------------------|---------|
-| `prompt` | 3,000 chars | 5,000 chars | 5,000 chars |
-| `style` | 200 chars | 1,000 chars | 1,000 chars |
-| `title` | 80 chars | 100 chars | 80 chars |
-
----
 
 ## Endpoints
 

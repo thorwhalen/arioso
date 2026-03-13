@@ -1,0 +1,45 @@
+# Mood/emotion name -> sonic description prompt
+# Sources: GEMS emotion scales, MTG-Jamendo mood tags, Russell's circumplex model
+
+# Core emotions
+happy: "bright major key, fast tempo, staccato rhythms, light instrumentation, bouncy groove, uplifting melody"
+sad: "slow tempo, minor key, soft dynamics, descending melody, sparse arrangement, sustained reverb"
+angry: "fast tempo, dissonant harmony, aggressive percussion, distorted timbres, loud dynamics, sharp attacks"
+peaceful: "slow tempo, consonant harmony, soft dynamics, gentle pads, sustained tones, wide reverb space"
+anxious: "unstable rhythm, dissonant intervals, tremolo strings, rising tension, restless bass movement"
+nostalgic: "warm midrange, gentle tempo, analog warmth, soft reverb tails, bittersweet melody, lo-fi texture"
+romantic: "lush strings, warm harmonies, gentle tempo, breathy vocals, soft piano, intimate close-mic feel"
+melancholic: "minor key, slow tempo, sustained notes, gentle dynamics, sparse piano, distant reverb, somber strings"
+euphoric: "major key, fast tempo, bright synths, rising builds, wide stereo, soaring lead, four-on-the-floor kick"
+mysterious: "ambiguous tonality, sparse arrangement, eerie textures, reverb-heavy, unexpected intervals, dark pads"
+
+# GEMS-derived emotions
+amazement: "grand orchestral swells, wide dynamic range, unexpected harmonic shifts, shimmering textures, awe-inspiring builds"
+solemnity: "slow stately tempo, organ-like timbres, deep bass, reverberant space, dignified brass, chorale-style harmony"
+tenderness: "gentle acoustic guitar, soft dynamics, warm mid frequencies, delicate melody, close-mic intimacy, lullaby feel"
+calmness: "very slow tempo, drone-like pads, minimal rhythm, consonant intervals, nature-evoking textures, ambient wash"
+power: "driving rhythm, heavy drums, distorted bass, anthemic melody, loud dynamics, full-spectrum energy"
+joyful_activation: "fast upbeat tempo, bright timbres, syncopated rhythm, major key, energetic percussion, handclaps"
+tension: "building tempo, dissonant clusters, tremolo effects, crescendo dynamics, unresolved harmony, staccato stabs"
+
+# Atmospheric moods
+dreamy: "reverb-drenched pads, slow tempo, soft shimmer, detuned textures, floaty melody, ambient wash"
+dark: "low-frequency emphasis, minor key, distorted textures, sparse arrangement, shadowy reverb, ominous bass"
+ethereal: "high-frequency shimmer, airy pads, distant reverb, delicate arpeggios, whispered textures, celestial feel"
+intense: "driving tempo, heavy compression, dense arrangement, loud dynamics, layered instrumentation, relentless energy"
+playful: "bouncy rhythm, staccato notes, bright timbres, syncopated pattern, quirky sounds, major key melody"
+haunting: "sparse arrangement, eerie reverb, distant vocals, minor key, sustained tones, ghostly atmosphere"
+triumphant: "brass fanfare, driving drums, major key resolution, building dynamics, grand orchestral, victorious melody"
+bittersweet: "major-minor shifts, gentle tempo, warm analog tone, wistful melody, gentle strings, soft resolution"
+contemplative: "sparse piano, gentle dynamics, unhurried tempo, open intervals, reflective mood, natural reverb"
+aggressive: "fast tempo, distorted guitars, pounding drums, dense low-end, screaming leads, relentless intensity"
+serene: "soft pads, consonant harmony, very gentle dynamics, slow evolution, nature textures, wide open space"
+epic: "massive orchestral layers, thunderous percussion, soaring melody, wide dynamic range, cinematic builds"
+whimsical: "quirky instrumentation, unexpected melodic turns, light staccato, toy-like timbres, playful tempo changes"
+sultry: "slow groove, warm bass, breathy textures, jazzy chords, smoky atmosphere, intimate mix space"
+energetic: "fast tempo, driving beat, bright timbres, syncopated rhythm, punchy bass, high-energy dynamics"
+gloomy: "very slow tempo, deep minor key, murky textures, muffled highs, heavy reverb, descending patterns"
+uplifting: "rising melody, major key progressions, brightening dynamics, building energy, hopeful chord movement"
+soothing: "gentle repetition, soft timbres, consonant intervals, lullaby-like melody, warm low-mid frequencies"
+rebellious: "distorted guitars, driving punk rhythm, aggressive vocal energy, raw production, anti-establishment attitude"
+cinematic: "wide stereo field, orchestral dynamics, dramatic builds, sweeping strings, timpani hits, film score grandeur"

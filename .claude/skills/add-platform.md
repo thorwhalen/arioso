@@ -35,7 +35,8 @@ failure mode is coding against stale or assumed API specs.
 Check `misc/docs/` for any existing documentation about this platform.
 If `misc/docs/AI music generation tools - a unified API reference for 21 platforms.md`
 covers this platform, compare it against the live docs fetched in step 1.
-Note any discrepancies — the live docs are authoritative.
+Note any discrepancies — the live docs are authoritative. Also check if existing
+platforms have a `REFERENCE.md` in their directory that may be relevant.
 
 ### 3. Determine access type
    - `rest_api`: Platform has a REST API (self-serve or unofficial)
@@ -104,14 +105,30 @@ PLATFORM_CONFIG = {
    - **Defaults**: Use env vars for configurable defaults (model, callback URLs, etc.)
      following the pattern `<PLATFORM>_DEFAULT_<PARAM>`.
 
-### 8. Write `__init__.py`
+### 8. Write a `<NAME>_REFERENCE.md`
+
+Create a comprehensive reference document in the platform directory. Follow the
+format of existing reference files (e.g., `sunoapi/SUNOAPI_REFERENCE.md`):
+
+- Add `Last updated: <date>` near the top
+- Include a **Prompt Engineering** section near the top with:
+  - Optimal prompt structure/format for this platform
+  - Tag-based vs natural language guidance
+  - Effective vocabulary (genres, moods, instruments, production terms)
+  - Guidance/cfg_scale advice
+  - Concrete prompt examples
+  - Links to external prompt guides if available
+- Full API specification (endpoints, parameters, auth, response format)
+- Links to official docs, papers, GitHub repos
+
+### 9. Write `__init__.py`
 ```python
 """<Platform> platform for arioso."""
 from arioso.platforms.<name>.config import PLATFORM_CONFIG
 platform_config = PLATFORM_CONFIG
 ```
 
-### 9. Add tests in `tests/platforms/test_<name>.py`
+### 10. Add tests in `tests/platforms/test_<name>.py`
 
 Include tests for:
 - Config structure and values
@@ -120,7 +137,7 @@ Include tests for:
 - Default parameter population
 - Required parameter validation
 
-### 10. Add optional deps in `pyproject.toml`
+### 11. Add optional deps in `pyproject.toml`
 
-### 11. Verify
+### 12. Verify
 Run `pytest` and test that `arioso.list_platforms()` includes the new platform.

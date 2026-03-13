@@ -2,7 +2,7 @@
 
 Unified Python facade for AI music generation.
 
-One interface, many backends. Arioso wraps 20 AI music generation platforms —
+One interface, many backends. Arioso wraps 14 AI music generation platforms —
 from local open-source models to commercial REST APIs — behind a single `generate()` call.
 
 ## Install
@@ -30,7 +30,7 @@ song.audio.audio_bytes   # MP3 bytes
 
 ## Platforms
 
-20 platforms are included, spanning local models, REST APIs, and SDK-based services:
+14 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
 | Platform | Access | Auth | Install |
 |----------|--------|------|---------|
@@ -48,17 +48,11 @@ song.audio.audio_bytes   # MP3 bytes
 | **Jen** | REST API | `JEN_API_KEY` | `pip install arioso[jen]` |
 | **YuE** | fal.ai / local CLI | `FAL_KEY` | `pip install arioso[yue]` |
 | **Udio** | Unofficial wrapper | `UDIO_AUTH_COOKIE` | `pip install arioso[udio]` |
-| **AIVA** | No public API | — | Config only |
-| **ACE Studio** | No public API | — | Config only |
-| **Boomy** | Enterprise API only | — | Config only |
-| **Soundraw** | Enterprise API only | — | Config only |
-| **CassetteAI** | No public API | — | Config only |
-| **Musicfy** | No public API | — | Config only |
 
 ```python
 # See what's available
 arioso.list_platforms()
-# ['ace_studio', 'aiva', 'beatoven', 'boomy', 'cassetteai', 'elevenlabs', ...]
+# ['beatoven', 'elevenlabs', 'harmonai', 'jen', 'loudly', 'lyria2', ...]
 
 # Inspect a platform's configuration
 arioso.get_platform_info("musicgen")
@@ -281,6 +275,68 @@ from arioso.registry import register_platform
 register_platform("custom", my_config_dict, my_adapter_instance)
 ```
 
+## Platforms Without Public APIs
+
+The following platforms were considered during the design of arioso's unified
+parameter vocabulary and affordance system, but do not have public APIs (nor a
+reliable third-party API wrapper). They are listed here for completeness.
+
+| Platform | Website | What It Does | Affordances Considered |
+|----------|---------|-------------|----------------------|
+| **AIVA** | [aiva.ai](https://aiva.ai) | Orchestral AI composition. Desktop/web DAW with 250+ style presets, direct BPM/key/instrument control. | genre, bpm, key, instruments, duration |
+| **ACE Studio** | [acestudio.ai](https://acestudio.ai) | AI vocal synthesis DAW plugin. 140+ voice models for singing voice generation. | voice_id, lyrics, instruments |
+| **Boomy** | [boomy.com](https://boomy.com) | AI song creation with Auto Vocal and streaming platform distribution. Enterprise-only API. | prompt, voice_id, instrumental |
+| **Soundraw** | [soundraw.io](https://soundraw.io) | AI music generation for content creators. Enterprise B2B API only ($11/mo consumer web app). | genre, duration, energy |
+| **CassetteAI** | [cassetteai.com](https://cassetteai.com) | Prompt-based music generation. Web-only, no known API. | prompt, duration |
+| **Musicfy** | [musicfy.lol](https://musicfy.lol) | AI music generation with voice cloning and pitch shifting. Web-only, no known API. | prompt, voice_id, pitch_shift |
+
+## Research & Background
+
+Arioso's design is informed by extensive research into the AI music generation
+landscape. Two reference documents in [`misc/docs/`](misc/docs/) provide the
+full background:
+
+### Platform comparison and API landscape
+
+[**AI Music Generation Tools: A Unified API Reference for 21 Platforms**](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md)
+maps the full union of capabilities across every tool we investigated. Highlights:
+
+- [General characteristics comparison](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#1-general-characteristics-comparison) —
+  pricing, API availability, max length, sample rate, vocal support, and quality tier for 18 tools
+- [Documentation and integration links](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#2-documentation-and-integration-links) —
+  docs URLs, OpenAPI specs, Python/JS SDKs, and MCP servers per platform
+- [Feature affordance matrix](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#3-feature-affordance-matrix) —
+  which platforms support text prompts, negative prompts, lyrics, audio conditioning, melody conditioning, duration, BPM, key, genre tags, energy, instruments, and more
+- [Unified affordance mapping](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#4-unified-affordance-mapping-for-façade-design) —
+  the 40 common parameter names that arioso exposes, with native parameter names per platform
+- [Complete API parameter catalogs](misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#5-complete-api-parameter-catalogs-for-key-tools) —
+  full endpoint and parameter documentation for Suno, ElevenLabs, MusicGen, Lyria RealTime, Stable Audio Open, and YuE
+
+### Prompt engineering across platforms
+
+[**Prompt Engineering for Music AI Generation: A Resource Guide**](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md)
+compiles 78 resources (papers, datasets, tools, taxonomies, and guides) covering
+how to write effective prompts for text-to-music systems. Key sections:
+
+- [Papers on prompt engineering techniques](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#a-papers-directly-addressing-prompt-engineering-for-music-generation) —
+  chain-of-thought prompting, prompt tuning, user studies, and structured prompting strategies
+- [Model architecture and text encoders](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#b-model-architecture-papers-revealing-how-text-prompts-are-processed) —
+  how T5, CLAP, FLAN-T5, and MuLan encoders determine which prompt styles work best
+- [Text-audio alignment models](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#c-text-audio-alignment-models-defining-the-prompt-embedding-space) —
+  CLAP, MuLan, LAION-CLAP, and how they shape the vocabulary space
+- [CFG and parameter interactions](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#d-how-numerical-parameters-interact-with-text-prompts) —
+  how guidance scale, temperature, and other parameters interact with text prompts
+- [Captioning datasets defining vocabulary](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#e-music-captioning-datasets-defining-the-vocabulary-space) —
+  MusicCaps, LP-MusicCaps, MusicBench, and 11 other datasets that trained these models
+- [Vocabulary and taxonomy resources](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#f-vocabulary-taxonomy-and-terminology-resources) —
+  AudioSet ontology, Music Ontology, Cyanite AI taxonomy
+- [Platform-specific prompt guides](misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#i-platform-specific-prompt-guides-and-prompt-builder-tools) —
+  official and community guides for Stable Audio, Udio, Lyria, Suno, ElevenLabs, and more
+
+Each platform also has a `<PLATFORM>_REFERENCE.md` in its directory under
+`arioso/platforms/` with platform-specific prompt engineering guidance, API
+details, and links to further reading.
+
 ## Architecture
 
 ```
@@ -293,7 +349,6 @@ arioso/
 
     platforms/
         _base_adapter.py   # BaseRestAdapter (shared REST infrastructure)
-        _no_api_adapter.py # Stub for platforms without programmatic access
         musicgen/          # Local inference via audiocraft/transformers
         stable_audio/      # Local inference via diffusers
         harmonai/          # Unconditional generation via Dance Diffusion
@@ -308,12 +363,6 @@ arioso/
         jen/               # Jen REST API
         yue/               # YuE via fal.ai or local CLI
         udio/              # Udio via unofficial wrapper
-        aiva/              # Config stub (no public API)
-        ace_studio/        # Config stub (no public API)
-        boomy/             # Config stub (no public API)
-        soundraw/          # Config stub (no public API)
-        cassetteai/        # Config stub (no public API)
-        musicfy/           # Config stub (no public API)
 ```
 
 Key design choices:

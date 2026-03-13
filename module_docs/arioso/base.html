@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.base &mdash; arioso 0.0.6 documentation</title>
+  <title>arioso.base &mdash; arioso 0.0.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../_static/documentation_options.js?v=bbaf98b3"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -24,7 +24,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="arioso.platforms" href="platforms.html" />
+    <link rel="next" title="arioso.named_prompts" href="named_prompts.html" />
     <link rel="prev" title="arioso._util" href="_util.html" /> 
 </head>
 
@@ -85,20 +85,12 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="named_prompts.html">arioso.named_prompts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">arioso.platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/_no_api_adapter.html">arioso.platforms._no_api_adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/ace_studio.html">arioso.platforms.ace_studio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/ace_studio/config.html">arioso.platforms.ace_studio.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/aiva.html">arioso.platforms.aiva</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/aiva/config.html">arioso.platforms.aiva.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/beatoven.html">arioso.platforms.beatoven</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/boomy.html">arioso.platforms.boomy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/boomy/config.html">arioso.platforms.boomy.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/cassetteai.html">arioso.platforms.cassetteai</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/cassetteai/config.html">arioso.platforms.cassetteai.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
@@ -120,16 +112,12 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms/mubert.html">arioso.platforms.mubert</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/musicfy.html">arioso.platforms.musicfy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/musicfy/config.html">arioso.platforms.musicfy.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/musicgen.html">arioso.platforms.musicgen</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/riffusion.html">arioso.platforms.riffusion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/soundraw.html">arioso.platforms.soundraw</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platforms/soundraw/config.html">arioso.platforms.soundraw.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
@@ -143,6 +131,7 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms/yue/config.html">arioso.platforms.yue.config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">arioso.services</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">arioso.tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation.html">arioso.translation</a></li>
 </ul>
@@ -416,7 +405,7 @@ be done on demand by the caller.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="_util.html" class="btn btn-neutral float-left" title="arioso._util" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="platforms.html" class="btn btn-neutral float-right" title="arioso.platforms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="named_prompts.html" class="btn btn-neutral float-right" title="arioso.named_prompts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -1,4 +1,0 @@
-arioso.platforms.cassetteai
-===========================
-.. automodule:: arioso.platforms.cassetteai
-   :members:

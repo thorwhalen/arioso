@@ -1,4 +1,0 @@
-arioso.platforms.ace_studio.config
-==================================
-.. automodule:: arioso.platforms.ace_studio.config
-   :members:

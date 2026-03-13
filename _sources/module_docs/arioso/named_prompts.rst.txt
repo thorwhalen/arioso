@@ -1,0 +1,4 @@
+arioso.named_prompts
+====================
+.. automodule:: arioso.named_prompts
+   :members:

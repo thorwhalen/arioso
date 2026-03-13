@@ -1,4 +1,0 @@
-arioso.platforms.aiva.config
-============================
-.. automodule:: arioso.platforms.aiva.config
-   :members:

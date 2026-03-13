@@ -1,4 +1,0 @@
-arioso.platforms._no_api_adapter
-================================
-.. automodule:: arioso.platforms._no_api_adapter
-   :members:

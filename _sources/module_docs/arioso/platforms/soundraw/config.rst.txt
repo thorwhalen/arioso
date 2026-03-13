@@ -1,4 +1,0 @@
-arioso.platforms.soundraw.config
-================================
-.. automodule:: arioso.platforms.soundraw.config
-   :members:

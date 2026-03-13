@@ -88,9 +88,7 @@ class ServiceCollection(Mapping):
 
     def _get_handle(self, name: str) -> "ServiceHandle":
         if name not in self._names:
-            raise KeyError(
-                f"Unknown platform: {name!r}. Known: {self._names}"
-            )
+            raise KeyError(f"Unknown platform: {name!r}. Known: {self._names}")
         if name not in self._handles:
             self._handles[name] = ServiceHandle(name)
         return self._handles[name]
@@ -154,16 +152,13 @@ class ServiceHandle(Mapping):
         if callable(adapter):
             return adapter
         raise TypeError(
-            f"Adapter for {self._name!r} is not callable and has no "
-            f"generate method"
+            f"Adapter for {self._name!r} is not callable and has no generate method"
         )
 
     @functools.cached_property
     def generate(self):
         """Generate with unified affordance names, validated and translated."""
-        return _make_validated_generate(
-            self.native_generate, self.config, self._name
-        )
+        return _make_validated_generate(self.native_generate, self.config, self._name)
 
     # -- Mapping protocol ---------------------------------------------------
 
@@ -175,8 +170,7 @@ class ServiceHandle(Mapping):
         if hasattr(adapter, key) and not key.startswith("_"):
             return getattr(adapter, key)
         raise KeyError(
-            f"No resource {key!r} on platform {self._name!r}. "
-            f"Available: {list(self)}"
+            f"No resource {key!r} on platform {self._name!r}. Available: {list(self)}"
         )
 
     def __iter__(self):
@@ -201,8 +195,7 @@ class ServiceHandle(Mapping):
         if hasattr(adapter, name):
             return getattr(adapter, name)
         raise AttributeError(
-            f"Platform {self._name!r} has no method {name!r}. "
-            f"Available: {list(self)}"
+            f"Platform {self._name!r} has no method {name!r}. Available: {list(self)}"
         )
 
     def __dir__(self):
@@ -252,9 +245,7 @@ class SliceMapping(Mapping):
         try:
             return self[name]
         except KeyError:
-            raise AttributeError(
-                f"No platform named {name!r}"
-            ) from None
+            raise AttributeError(f"No platform named {name!r}") from None
 
     def __iter__(self):
         return iter(self._collection)

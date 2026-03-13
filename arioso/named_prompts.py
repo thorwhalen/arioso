@@ -39,16 +39,17 @@ from typing import (
 # Paths
 # ---------------------------------------------------------------------------
 
-_STARTER_DATA_DIR = Path(__file__).parent / 'data' / 'named_prompts'
+_STARTER_DATA_DIR = Path(__file__).parent / "data" / "named_prompts"
 
 
 def _user_data_dir(*, ensure_exists: bool = True) -> Path:
     """Return the user data directory for named prompts."""
     from config2py import get_app_data_folder
 
-    folder = Path(
-        get_app_data_folder('arioso', ensure_exists=ensure_exists)
-    ) / 'named_prompts'
+    folder = (
+        Path(get_app_data_folder("arioso", ensure_exists=ensure_exists))
+        / "named_prompts"
+    )
     if ensure_exists:
         folder.mkdir(parents=True, exist_ok=True)
     return folder
@@ -76,7 +77,7 @@ def _dump_yaml(data: Dict[str, str], path: Path) -> None:
     import yaml
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w') as fh:
+    with open(path, "w") as fh:
         yaml.dump(
             data,
             fh,
@@ -103,10 +104,10 @@ def _make_yaml_store(root_dir: Path, *, writable: bool = False):
 
     store_cls = wrap_kvs(
         base_cls,
-        name='YamlPromptStore',
+        name="YamlPromptStore",
         # key transform: 'artists' <-> 'artists.yaml'
-        key_of_id=lambda _id: _id.removesuffix('.yaml'),
-        id_of_key=lambda k: k if k.endswith('.yaml') else f'{k}.yaml',
+        key_of_id=lambda _id: _id.removesuffix(".yaml"),
+        id_of_key=lambda k: k if k.endswith(".yaml") else f"{k}.yaml",
         # value transform: YAML text <-> dict
         obj_of_data=lambda data: _yaml_text_to_dict(data),
         data_of_obj=lambda obj: _dict_to_yaml_text(obj),
@@ -143,7 +144,7 @@ def _dict_to_yaml_text(d: Dict[str, str]) -> str:
 class _ReadOnlyMapping(Mapping):
     """A thin read-only wrapper around a mutable mapping."""
 
-    __slots__ = ('_store',)
+    __slots__ = ("_store",)
 
     def __init__(self, store):
         self._store = store
@@ -158,7 +159,7 @@ class _ReadOnlyMapping(Mapping):
         return len(self._store)
 
     def __repr__(self):
-        return f'{type(self).__name__}({list(self)})'
+        return f"{type(self).__name__}({list(self)})"
 
 
 # ---------------------------------------------------------------------------
@@ -172,7 +173,7 @@ class _MergedCategoryMapping(Mapping):
     User entries take precedence over starter entries.
     """
 
-    __slots__ = ('_starter', '_user')
+    __slots__ = ("_starter", "_user")
 
     def __init__(
         self,
@@ -203,23 +204,19 @@ class _MergedCategoryMapping(Mapping):
         return key in self._user or key in self._starter
 
     def __getattr__(self, name: str) -> str:
-        if name.startswith('_'):
+        if name.startswith("_"):
             raise AttributeError(name)
         try:
             return self[name]
         except KeyError:
-            raise AttributeError(
-                f'No prompt named {name!r} in this category'
-            )
+            raise AttributeError(f"No prompt named {name!r} in this category")
 
     def __dir__(self):
-        return list(super().__dir__()) + [
-            k for k in self if k.isidentifier()
-        ]
+        return list(super().__dir__()) + [k for k in self if k.isidentifier()]
 
     def __repr__(self) -> str:
         n = len(self)
-        return f'PromptCategory({n} entries)'
+        return f"PromptCategory({n} entries)"
 
 
 # ---------------------------------------------------------------------------
@@ -258,9 +255,7 @@ class NamedPrompts(Mapping):
     def _get_category(self, category: str) -> _MergedCategoryMapping:
         if category not in self._cache:
             starter = (
-                self._starter_store[category]
-                if category in self._starter_store
-                else {}
+                self._starter_store[category] if category in self._starter_store else {}
             )
             user = {}
             if self._user_store is not None and category in self._user_store:
@@ -314,14 +309,14 @@ class NamedPrompts(Mapping):
     # -- Attribute access (for tab-completion) -----------------------------
 
     def __getattr__(self, name: str):
-        if name.startswith('_'):
+        if name.startswith("_"):
             raise AttributeError(name)
         try:
             return self._get_category(name)
         except KeyError:
             raise AttributeError(
-                f'{type(self).__name__!r} has no category {name!r}. '
-                f'Available: {self.categories}'
+                f"{type(self).__name__!r} has no category {name!r}. "
+                f"Available: {self.categories}"
             )
 
     def __dir__(self):
@@ -349,8 +344,8 @@ class NamedPrompts(Mapping):
             for name, prompt in self._get_category(cat).items():
                 if name in result and warn_collisions and seen_in[name] != cat:
                     warnings.warn(
-                        f'Name {name!r} appears in both {seen_in[name]!r} '
-                        f'and {cat!r}; using the one from {cat!r}.',
+                        f"Name {name!r} appears in both {seen_in[name]!r} "
+                        f"and {cat!r}; using the one from {cat!r}.",
                         stacklevel=2,
                     )
                 seen_in.setdefault(name, cat)
@@ -360,11 +355,8 @@ class NamedPrompts(Mapping):
     # -- Display -----------------------------------------------------------
 
     def __repr__(self) -> str:
-        cats = ', '.join(
-            f'{c}({len(self._get_category(c))})'
-            for c in self.categories
-        )
-        return f'NamedPrompts({cats})'
+        cats = ", ".join(f"{c}({len(self._get_category(c))})" for c in self.categories)
+        return f"NamedPrompts({cats})"
 
 
 # ---------------------------------------------------------------------------
@@ -407,8 +399,8 @@ def add_prompt(
             starter_data = starter_store[category]
             if name in starter_data:
                 warnings.warn(
-                    f'{name!r} already exists in starter data for {category!r}. '
-                    f'Your entry will take precedence over the built-in one.',
+                    f"{name!r} already exists in starter data for {category!r}. "
+                    f"Your entry will take precedence over the built-in one.",
                     stacklevel=2,
                 )
 
@@ -424,24 +416,22 @@ def remove_prompt(category: str, name: str) -> None:
     """
     user_dir = _user_data_dir(ensure_exists=False)
     if not user_dir.exists():
-        raise KeyError(f'No user data exists for category {category!r}')
+        raise KeyError(f"No user data exists for category {category!r}")
 
     user_store = _make_yaml_store(user_dir, writable=True)
     if category not in user_store:
-        raise KeyError(f'No user data for category {category!r}')
+        raise KeyError(f"No user data for category {category!r}")
 
     cat_data = dict(user_store[category])
     if name not in cat_data:
-        raise KeyError(
-            f'{name!r} not found in user data for {category!r}'
-        )
+        raise KeyError(f"{name!r} not found in user data for {category!r}")
 
     del cat_data[name]
     if cat_data:
         user_store[category] = cat_data
     else:
         # Remove the empty file
-        yaml_path = user_dir / f'{category}.yaml'
+        yaml_path = user_dir / f"{category}.yaml"
         if yaml_path.exists():
             yaml_path.unlink()
 
@@ -507,6 +497,6 @@ def get_named_prompts() -> NamedPrompts:
 
 # Lazy attribute for ``from arioso.named_prompts import named_prompts``
 def __getattr__(name: str):
-    if name == 'named_prompts':
+    if name == "named_prompts":
         return get_named_prompts()
-    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

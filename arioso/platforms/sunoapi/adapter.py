@@ -50,7 +50,39 @@ class Adapter(BaseRestAdapter):
 
     After calling generate(), use get_status() to poll for results, or
     use generate() with wait_for_completion=True to block until audio is ready.
+
+    All generation requests and status polls are automatically recorded in a
+    local task store (``SunoTasks``).  Access it via the ``tasks`` property::
+
+        adapter = Adapter(config)
+        adapter.tasks                # SunoTasks Mapping
+        adapter.tasks.last(10)       # last 10 tasks
+        adapter.tasks.failed()       # all failed tasks
     """
+
+    def __init__(self, config: dict, *, task_store=None):
+        super().__init__(config)
+        self._task_store = task_store  # lazy-init if None
+
+    @property
+    def tasks(self):
+        """Local task store (``SunoTasks`` Mapping) for recorded requests."""
+        if self._task_store is None:
+            from arioso.platforms.sunoapi.task_store import SunoTasks
+            self._task_store = SunoTasks()
+        return self._task_store
+
+    def _record_task(self, task_id, *, operation, request_params, status="PENDING", response=None):
+        """Save a new task record to the local store."""
+        from arioso.platforms.sunoapi.task_store import _make_record
+        record = _make_record(
+            task_id,
+            operation=operation,
+            request_params=request_params,
+            status=status,
+            response=response,
+        )
+        self.tasks.save(record)
 
     def generate(
         self,
@@ -153,6 +185,13 @@ class Adapter(BaseRestAdapter):
 
         if not task_id:
             return self._parse_songs(data, title=title)
+
+        self._record_task(
+            task_id,
+            operation="generate",
+            request_params=payload,
+            response=data if isinstance(data, dict) else {"raw": data},
+        )
 
         if wait_for_completion:
             return self._poll_for_songs(
@@ -331,6 +370,13 @@ class Adapter(BaseRestAdapter):
         if not task_id:
             return self._parse_songs(data, title=title)
 
+        self._record_task(
+            task_id,
+            operation="upload_extend",
+            request_params=payload,
+            response=data if isinstance(data, dict) else {"raw": data},
+        )
+
         if wait_for_completion:
             return self._poll_for_songs(
                 task_id,
@@ -465,6 +511,13 @@ class Adapter(BaseRestAdapter):
         if not task_id:
             return self._parse_songs(data, title=title)
 
+        self._record_task(
+            task_id,
+            operation="upload_cover",
+            request_params=payload,
+            response=data if isinstance(data, dict) else {"raw": data},
+        )
+
         if wait_for_completion:
             return self._poll_for_songs(
                 task_id,
@@ -504,6 +557,10 @@ class Adapter(BaseRestAdapter):
 
         record = data.get("data", {})
         status_raw = record.get("status", "PENDING")
+
+        # Update local task store if this task is tracked
+        if task_id in self.tasks:
+            self.tasks.update(task_id, status=status_raw, response=record)
 
         if status_raw in _ERROR_STATUSES:
             raise RuntimeError(

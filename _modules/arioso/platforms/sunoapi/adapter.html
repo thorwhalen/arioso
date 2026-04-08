@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.8 documentation</title>
+  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html">arioso.platforms.sunoapi.task_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
@@ -180,7 +181,39 @@
 
 <span class="sd">    After calling generate(), use get_status() to poll for results, or</span>
 <span class="sd">    use generate() with wait_for_completion=True to block until audio is ready.</span>
+
+<span class="sd">    All generation requests and status polls are automatically recorded in a</span>
+<span class="sd">    local task store (``SunoTasks``).  Access it via the ``tasks`` property::</span>
+
+<span class="sd">        adapter = Adapter(config)</span>
+<span class="sd">        adapter.tasks                # SunoTasks Mapping</span>
+<span class="sd">        adapter.tasks.last(10)       # last 10 tasks</span>
+<span class="sd">        adapter.tasks.failed()       # all failed tasks</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task_store</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="o">=</span> <span class="n">task_store</span>  <span class="c1"># lazy-init if None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Local task store (``SunoTasks`` Mapping) for recorded requests.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">SunoTasks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="o">=</span> <span class="n">SunoTasks</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">request_params</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;PENDING&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save a new task record to the local store.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_record</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">_make_record</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="n">operation</span><span class="p">,</span>
+            <span class="n">request_params</span><span class="o">=</span><span class="n">request_params</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -283,6 +316,13 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;generate&quot;</span><span class="p">,</span>
+            <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_for_songs</span><span class="p">(</span>
@@ -464,6 +504,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;upload_extend&quot;</span><span class="p">,</span>
+            <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_for_songs</span><span class="p">(</span>
                 <span class="n">task_id</span><span class="p">,</span>
@@ -598,6 +645,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
+            <span class="n">task_id</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;upload_cover&quot;</span><span class="p">,</span>
+            <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_for_songs</span><span class="p">(</span>
                 <span class="n">task_id</span><span class="p">,</span>
@@ -639,6 +693,10 @@
 
         <span class="n">record</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">status_raw</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;PENDING&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update local task store if this task is tracked</span>
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status_raw</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">status_raw</span> <span class="ow">in</span> <span class="n">_ERROR_STATUSES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>

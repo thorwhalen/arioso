@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; arioso 0.0.8 documentation</title>
+  <title>Index &mdash; arioso 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=53b53b71"></script>
+      <script src="_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/task_store.html">arioso.platforms.sunoapi.task_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
@@ -482,6 +483,13 @@
 </li>
       </ul></li>
       <li>
+    arioso.platforms.sunoapi.task_store
+
+      <ul>
+        <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#module-arioso.platforms.sunoapi.task_store">module</a>
+</li>
+      </ul></li>
+      <li>
     arioso.platforms.udio
 
       <ul>
@@ -637,6 +645,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.failed">failed() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
       <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio">fetch_audio() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
 
       <ul>
@@ -726,6 +736,10 @@
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.last">last() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/arioso.html#arioso.list_platforms">list_platforms() (in module arioso)</a>
 
@@ -835,6 +849,8 @@
 </li>
         <li><a href="module_docs/arioso/platforms/sunoapi/config.html#module-arioso.platforms.sunoapi.config">arioso.platforms.sunoapi.config</a>
 </li>
+        <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#module-arioso.platforms.sunoapi.task_store">arioso.platforms.sunoapi.task_store</a>
+</li>
         <li><a href="module_docs/arioso/platforms/udio.html#module-arioso.platforms.udio">arioso.platforms.udio</a>
 </li>
         <li><a href="module_docs/arioso/platforms/udio/adapter.html#module-arioso.platforms.udio.adapter">arioso.platforms.udio.adapter</a>
@@ -876,10 +892,12 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.platform">platform (arioso.base.Song attribute)</a>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.pending">pending() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/arioso/base.html#arioso.base.Song.platform">platform (arioso.base.Song attribute)</a>
+</li>
       <li><a href="module_docs/arioso/tools.html#arioso.tools.poll_status">poll_status() (in module arioso.tools)</a>
 </li>
   </ul></td>
@@ -908,13 +926,17 @@
         <li><a href="module_docs/arioso/base.html#arioso.base.Song.sample_rate">(arioso.base.Song property)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.save">save() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
       <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.search">search() (in module arioso.named_prompts)</a>
 </li>
       <li><a href="module_docs/arioso/services.html#arioso.services.ServiceCollection">ServiceCollection (class in arioso.services)</a>
 </li>
+      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle">ServiceHandle (class in arioso.services)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle">ServiceHandle (class in arioso.services)</a>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.since">since() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
       <li><a href="module_docs/arioso/services.html#arioso.services.SliceMapping">SliceMapping (class in arioso.services)</a>
 </li>
@@ -922,7 +944,13 @@
 </li>
       <li><a href="module_docs/arioso/base.html#arioso.base.Song.status">status (arioso.base.Song attribute)</a>
 </li>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.status">status() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
       <li><a href="module_docs/arioso/tools.html#arioso.tools.submit_cover">submit_cover() (in module arioso.tools)</a>
+</li>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.succeeded">succeeded() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">SunoTasks (class in arioso.platforms.sunoapi.task_store)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -930,10 +958,12 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.title">title (arioso.base.Song attribute)</a>
+      <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.tasks">tasks (arioso.platforms.sunoapi.adapter.Adapter property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/arioso/base.html#arioso.base.Song.title">title (arioso.base.Song attribute)</a>
+</li>
       <li><a href="module_docs/arioso/base.html#arioso.base.Affordance.type">type (arioso.base.Affordance attribute)</a>
 </li>
   </ul></td>
@@ -941,6 +971,10 @@
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.update">update() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.upload_file">upload_file() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
 </li>

@@ -44,6 +44,7 @@
    module_docs/arioso/platforms/sunoapi
    module_docs/arioso/platforms/sunoapi/adapter
    module_docs/arioso/platforms/sunoapi/config
+   module_docs/arioso/platforms/sunoapi/task_store
    module_docs/arioso/platforms/udio
    module_docs/arioso/platforms/udio/adapter
    module_docs/arioso/platforms/udio/config

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.8 documentation</title>
+  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -93,12 +93,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#arioso.platforms.sunoapi.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio"><code class="docutils literal notranslate"><span class="pre">Adapter.fetch_audio()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#arioso.platforms.sunoapi.adapter.Adapter.get_status"><code class="docutils literal notranslate"><span class="pre">Adapter.get_status()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso.platforms.sunoapi.adapter.Adapter.tasks"><code class="docutils literal notranslate"><span class="pre">Adapter.tasks</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#arioso.platforms.sunoapi.adapter.Adapter.upload_file"><code class="docutils literal notranslate"><span class="pre">Adapter.upload_file()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="task_store.html">arioso.platforms.sunoapi.task_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../udio.html">arioso.platforms.udio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../udio/adapter.html">arioso.platforms.udio.adapter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../udio/config.html">arioso.platforms.udio.config</a></li>
@@ -140,7 +142,7 @@
 <p>Suno adapter via sunoapi.org REST API.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.sunoapi.adapter.Adapter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arioso.platforms.sunoapi.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/arioso/platforms/sunoapi/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.sunoapi.adapter.Adapter" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">arioso.platforms.sunoapi.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/arioso/platforms/sunoapi/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.sunoapi.adapter.Adapter" title="Link to this definition"></a></dt>
 <dd><p>Adapter for Suno music generation via sunoapi.org.</p>
 <p>Handles the distinction between simple generation (prompt only)
 and custom generation (with lyrics/style via customMode).</p>
@@ -149,6 +151,14 @@ and POSTs results to your callBackUrl when generation completes.
 Set the SUNO_CALLBACK_URL env var or pass callback_url to generate().</p>
 <p>After calling generate(), use get_status() to poll for results, or
 use generate() with wait_for_completion=True to block until audio is ready.</p>
+<p>All generation requests and status polls are automatically recorded in a
+local task store (<code class="docutils literal notranslate"><span class="pre">SunoTasks</span></code>).  Access it via the <code class="docutils literal notranslate"><span class="pre">tasks</span></code> property:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adapter</span> <span class="o">=</span> <span class="n">Adapter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">adapter</span><span class="o">.</span><span class="n">tasks</span>                <span class="c1"># SunoTasks Mapping</span>
+<span class="n">adapter</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">last</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>       <span class="c1"># last 10 tasks</span>
+<span class="n">adapter</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">failed</span><span class="p">()</span>       <span class="c1"># all failed tasks</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="arioso.platforms.sunoapi.adapter.Adapter.fetch_audio">
 <span class="sig-name descname"><span class="pre">fetch_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></span><a class="reference internal" href="../../../../_modules/arioso/platforms/sunoapi/adapter.html#Adapter.fetch_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio" title="Link to this definition"></a></dt>
@@ -177,6 +187,12 @@ or upload_cover().</p>
 (if generation is complete).</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.platforms.sunoapi.adapter.Adapter.tasks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tasks</span></span><a class="headerlink" href="#arioso.platforms.sunoapi.adapter.Adapter.tasks" title="Link to this definition"></a></dt>
+<dd><p>Local task store (<code class="docutils literal notranslate"><span class="pre">SunoTasks</span></code> Mapping) for recorded requests.</p>
 </dd></dl>
 
 <dl class="py method">

@@ -80,12 +80,16 @@ class Adapter(BaseRestAdapter):
         """Local task store (``SunoTasks`` Mapping) for recorded requests."""
         if self._task_store is None:
             from arioso.platforms.sunoapi.task_store import SunoTasks
+
             self._task_store = SunoTasks()
         return self._task_store
 
-    def _record_task(self, task_id, *, operation, request_params, status="PENDING", response=None):
+    def _record_task(
+        self, task_id, *, operation, request_params, status="PENDING", response=None
+    ):
         """Save a new task record to the local store."""
         from arioso.platforms.sunoapi.task_store import _make_record
+
         record = _make_record(
             task_id,
             operation=operation,

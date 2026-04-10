@@ -36,6 +36,7 @@ from typing import Any, Iterator
 # Task record helpers
 # ---------------------------------------------------------------------------
 
+
 def _now_iso() -> str:
     """Return current UTC time as ISO-8601 string."""
     return datetime.now(timezone.utc).isoformat()
@@ -74,11 +75,14 @@ def _update_record(record: dict, *, status: str = "", response: dict | None = No
 # Data directory
 # ---------------------------------------------------------------------------
 
+
 def _default_data_dir(*, ensure_exists: bool = True) -> Path:
     """Return ``~/.local/share/arioso/suno_tasks``."""
     from config2py import get_app_data_folder
 
-    folder = Path(get_app_data_folder("arioso", ensure_exists=ensure_exists)) / "suno_tasks"
+    folder = (
+        Path(get_app_data_folder("arioso", ensure_exists=ensure_exists)) / "suno_tasks"
+    )
     if ensure_exists:
         folder.mkdir(parents=True, exist_ok=True)
     return folder
@@ -87,6 +91,7 @@ def _default_data_dir(*, ensure_exists: bool = True) -> Path:
 # ---------------------------------------------------------------------------
 # Filtered view
 # ---------------------------------------------------------------------------
+
 
 class _FilteredTaskView(Mapping):
     """A read-only, lazily-evaluated filtered view over task records.
@@ -103,10 +108,7 @@ class _FilteredTaskView(Mapping):
     # -- internal: resolve matching keys (sorted newest-first) ---------------
 
     def _matching_keys(self) -> list[str]:
-        keys = [
-            k for k in self._parent
-            if self._predicate(self._parent[k])
-        ]
+        keys = [k for k in self._parent if self._predicate(self._parent[k])]
         # Sort newest-first by created_at (ISO strings sort lexicographically)
         keys.sort(key=lambda k: self._parent[k].get("created_at", ""), reverse=True)
         if self._limit:
@@ -132,6 +134,7 @@ class _FilteredTaskView(Mapping):
 # ---------------------------------------------------------------------------
 # Main store
 # ---------------------------------------------------------------------------
+
 
 class SunoTasks(Mapping):
     """A ``Mapping[str, dict]`` of Suno task records persisted as JSON files.
@@ -211,7 +214,8 @@ class SunoTasks(Mapping):
         """Return tasks matching *status_value* (case-insensitive)."""
         target = status_value.upper()
         return _FilteredTaskView(
-            self, predicate=lambda r: r.get("status", "").upper() == target,
+            self,
+            predicate=lambda r: r.get("status", "").upper() == target,
         )
 
     def failed(self) -> _FilteredTaskView:

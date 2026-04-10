@@ -10,15 +10,23 @@ from arioso.platforms._base_adapter import BaseRestAdapter
 # Valid model versions accepted by sunoapi.org
 SUNO_MODELS = ("V4", "V4_5", "V4_5ALL", "V4_5PLUS", "V5")
 
-# File upload base URL (separate from the generation API)
-SUNO_FILE_UPLOAD_BASE_URL = "https://sunoapiorg.redpandaai.co"
+# File upload base URL (separate from the generation API).
+# Configurable via env var in case the provider changes domains again.
+SUNO_FILE_UPLOAD_BASE_URL = os.environ.get(
+    "SUNO_FILE_UPLOAD_BASE_URL", "https://sunoapiorg.riftrunnerai.com"
+)
 
 # Default model, configurable via env var
 SUNO_DEFAULT_MODEL = os.environ.get("SUNO_DEFAULT_MODEL", "V4")
 
 # Default callback URL, configurable via env var.
-# Required by the API -- set SUNO_CALLBACK_URL to a reachable webhook URL.
-SUNO_DEFAULT_CALLBACK_URL = os.environ.get("SUNO_CALLBACK_URL", "")
+# The upload-extend and upload-cover endpoints require a callBackUrl field,
+# but polling via record-info works regardless of whether the URL is reachable.
+# We default to a no-op placeholder so the API works out of the box when
+# using wait_for_completion=True (polling mode).  Override with a real webhook
+# URL via the SUNO_CALLBACK_URL env var if you want push notifications.
+_NOOP_CALLBACK_URL = "https://localhost/noop-callback"
+SUNO_DEFAULT_CALLBACK_URL = os.environ.get("SUNO_CALLBACK_URL", _NOOP_CALLBACK_URL)
 
 # Status values returned by the record-info endpoint
 _COMPLETE_STATUSES = {"SUCCESS"}
@@ -46,7 +54,10 @@ class Adapter(BaseRestAdapter):
 
     The sunoapi.org API is callback-based: it returns a taskId immediately
     and POSTs results to your callBackUrl when generation completes.
-    Set the SUNO_CALLBACK_URL env var or pass callback_url to generate().
+    A no-op placeholder callback URL is used by default, so polling via
+    ``get_status()`` (or ``wait_for_completion=True``) works out of the box.
+    Set the SUNO_CALLBACK_URL env var to a real webhook if you want push
+    notifications.
 
     After calling generate(), use get_status() to poll for results, or
     use generate() with wait_for_completion=True to block until audio is ready.
@@ -117,8 +128,9 @@ class Adapter(BaseRestAdapter):
                 Defaults to SUNO_DEFAULT_MODEL env var, or 'V4'.
             continue_from: Clip ID to extend from.
             continue_at: Timestamp in seconds to continue from.
-            callback_url: Webhook URL for completion notification (required
-                by the API). Defaults to SUNO_CALLBACK_URL env var.
+            callback_url: Webhook URL for completion notification.
+                Defaults to SUNO_CALLBACK_URL env var, or a no-op
+                placeholder (polling still works).
             negative_prompt: Styles to exclude (negativeTags).
             wait_for_completion: If True, poll until audio is ready (or
                 timeout). If False (default), return pending Songs immediately.
@@ -130,13 +142,6 @@ class Adapter(BaseRestAdapter):
         """.format(models=", ".join(SUNO_MODELS))
         model = model or SUNO_DEFAULT_MODEL
         callback_url = callback_url or SUNO_DEFAULT_CALLBACK_URL
-
-        if not callback_url:
-            raise ValueError(
-                "sunoapi.org requires a callback URL. "
-                "Set the SUNO_CALLBACK_URL environment variable or pass "
-                "callback_url='https://your-server.com/webhook' to generate()."
-            )
 
         # Determine if we need customMode (lyrics, genre, or title provided)
         custom_mode = bool(lyrics or genre or title)
@@ -306,13 +311,6 @@ class Adapter(BaseRestAdapter):
         model = model or SUNO_DEFAULT_MODEL
         callback_url = callback_url or SUNO_DEFAULT_CALLBACK_URL
 
-        if not callback_url:
-            raise ValueError(
-                "sunoapi.org requires a callback URL. "
-                "Set the SUNO_CALLBACK_URL environment variable or pass "
-                "callback_url to upload_extend()."
-            )
-
         # Determine upload URL: if it looks like a local path, upload it first
         if os.path.isfile(audio_source):
             upload_url = self.upload_file(audio_source)
@@ -444,13 +442,6 @@ class Adapter(BaseRestAdapter):
         """.format(models=", ".join(SUNO_MODELS))
         model = model or SUNO_DEFAULT_MODEL
         callback_url = callback_url or SUNO_DEFAULT_CALLBACK_URL
-
-        if not callback_url:
-            raise ValueError(
-                "sunoapi.org requires a callback URL. "
-                "Set the SUNO_CALLBACK_URL environment variable or pass "
-                "callback_url to upload_cover()."
-            )
 
         # Resolve audio source to a URL
         if os.path.isfile(audio_source):

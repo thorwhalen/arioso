@@ -20,12 +20,12 @@ import arioso
 song = arioso.generate("upbeat jazz piano")
 
 # The result is a Song object with audio data
-song.audio.audio_array   # numpy array (for local models)
-song.audio.sample_rate   # e.g. 32000
+song.audio.audio_array  # numpy array (for local models)
+song.audio.sample_rate  # e.g. 32000
 
 # Use a different platform
 song = arioso.generate("epic orchestral soundtrack", platform="elevenlabs", duration=30)
-song.audio.audio_bytes   # MP3 bytes
+song.audio.audio_bytes  # MP3 bytes
 ```
 
 ## Platforms
@@ -118,13 +118,13 @@ the platform supports — unsupported ones are warned about and ignored.
 
 ```python
 song = arioso.generate(
-    "ambient soundscape",           # prompt (required)
+    "ambient soundscape",  # prompt (required)
     platform="musicgen",
-    duration=15,                    # seconds
-    temperature=1.2,                # sampling randomness
-    top_k=250,                      # top-k sampling
-    guidance=3.0,                   # classifier-free guidance
-    seed=42,                        # reproducibility
+    duration=15,  # seconds
+    temperature=1.2,  # sampling randomness
+    top_k=250,  # top-k sampling
+    guidance=3.0,  # classifier-free guidance
+    seed=42,  # reproducibility
 )
 ```
 
@@ -161,22 +161,22 @@ Every call returns a `Song` object:
 ```python
 song = arioso.generate("jazz piano", platform="musicgen")
 
-song.status           # 'complete'
-song.platform         # 'musicgen'
-song.title            # ''
-song.metadata         # {'model': 'facebook/musicgen-small', ...}
+song.status  # 'complete'
+song.platform  # 'musicgen'
+song.title  # ''
+song.metadata  # {'model': 'facebook/musicgen-small', ...}
 
 # Audio is in song.audio (an AudioResult)
-song.audio.audio_array    # numpy array (local models)
-song.audio.audio_bytes    # raw bytes (REST APIs)
-song.audio.audio_url      # URL string (Suno)
-song.audio.sample_rate    # e.g. 32000
-song.audio.format         # 'wav', 'mp3', etc.
+song.audio.audio_array  # numpy array (local models)
+song.audio.audio_bytes  # raw bytes (REST APIs)
+song.audio.audio_url  # URL string (Suno)
+song.audio.sample_rate  # e.g. 32000
+song.audio.format  # 'wav', 'mp3', etc.
 
 # Shortcuts
-song.audio_array          # same as song.audio.audio_array
-song.audio_bytes          # same as song.audio.audio_bytes
-song.sample_rate          # same as song.audio.sample_rate
+song.audio_array  # same as song.audio.audio_array
+song.audio_bytes  # same as song.audio.audio_bytes
+song.sample_rate  # same as song.audio.sample_rate
 ```
 
 Use `generate_many()` when you want all results (some platforms return multiple):
@@ -211,26 +211,21 @@ PLATFORM_CONFIG = {
     "website": "https://myplatform.com",
     "tier": "simple",
     "access_type": "rest_api",
-
     "auth": {
         "type": "bearer_token",
         "env_var": "MYPLATFORM_API_KEY",
     },
-
     "param_map": {
         "prompt": {"native_name": "text", "required": True},
         "duration": {"native_name": "length_seconds"},
     },
-
     "supported_affordances": ["prompt", "duration"],
     "on_unsupported_param": "warn",
-
     "output": {
         "default_format": "mp3",
         "sample_rate": 44100,
         "returns": "bytes",
     },
-
     "api": {
         "base_url": "https://api.myplatform.com",
         "generate_endpoint": {"method": "post", "path": "/v1/generate"},
@@ -249,6 +244,7 @@ For platforms that are Python libraries rather than REST APIs, add an `adapter.p
 
 from arioso.base import Song, AudioResult
 
+
 class Adapter:
     def __init__(self, config):
         self.config = config
@@ -256,6 +252,7 @@ class Adapter:
     def generate(self, prompt, *, duration=10, **kwargs):
         # Your generation logic here
         from some_library import generate_audio
+
         audio = generate_audio(prompt, length=duration)
 
         return Song(

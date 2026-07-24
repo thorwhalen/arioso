@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.9 documentation</title>
+  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,9 +14,9 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=f7cdbf68"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -139,15 +139,23 @@
 <span class="c1"># Valid model versions accepted by sunoapi.org</span>
 <span class="n">SUNO_MODELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;V4&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5PLUS&quot;</span><span class="p">,</span> <span class="s2">&quot;V5&quot;</span><span class="p">)</span>
 
-<span class="c1"># File upload base URL (separate from the generation API)</span>
-<span class="n">SUNO_FILE_UPLOAD_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://sunoapiorg.redpandaai.co&quot;</span>
+<span class="c1"># File upload base URL (separate from the generation API).</span>
+<span class="c1"># Configurable via env var in case the provider changes domains again.</span>
+<span class="n">SUNO_FILE_UPLOAD_BASE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;SUNO_FILE_UPLOAD_BASE_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;https://sunoapiorg.riftrunnerai.com&quot;</span>
+<span class="p">)</span>
 
 <span class="c1"># Default model, configurable via env var</span>
 <span class="n">SUNO_DEFAULT_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUNO_DEFAULT_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;V4&quot;</span><span class="p">)</span>
 
 <span class="c1"># Default callback URL, configurable via env var.</span>
-<span class="c1"># Required by the API -- set SUNO_CALLBACK_URL to a reachable webhook URL.</span>
-<span class="n">SUNO_DEFAULT_CALLBACK_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUNO_CALLBACK_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="c1"># The upload-extend and upload-cover endpoints require a callBackUrl field,</span>
+<span class="c1"># but polling via record-info works regardless of whether the URL is reachable.</span>
+<span class="c1"># We default to a no-op placeholder so the API works out of the box when</span>
+<span class="c1"># using wait_for_completion=True (polling mode).  Override with a real webhook</span>
+<span class="c1"># URL via the SUNO_CALLBACK_URL env var if you want push notifications.</span>
+<span class="n">_NOOP_CALLBACK_URL</span> <span class="o">=</span> <span class="s2">&quot;https://localhost/noop-callback&quot;</span>
+<span class="n">SUNO_DEFAULT_CALLBACK_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUNO_CALLBACK_URL&quot;</span><span class="p">,</span> <span class="n">_NOOP_CALLBACK_URL</span><span class="p">)</span>
 
 <span class="c1"># Status values returned by the record-info endpoint</span>
 <span class="n">_COMPLETE_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">}</span>
@@ -177,7 +185,10 @@
 
 <span class="sd">    The sunoapi.org API is callback-based: it returns a taskId immediately</span>
 <span class="sd">    and POSTs results to your callBackUrl when generation completes.</span>
-<span class="sd">    Set the SUNO_CALLBACK_URL env var or pass callback_url to generate().</span>
+<span class="sd">    A no-op placeholder callback URL is used by default, so polling via</span>
+<span class="sd">    ``get_status()`` (or ``wait_for_completion=True``) works out of the box.</span>
+<span class="sd">    Set the SUNO_CALLBACK_URL env var to a real webhook if you want push</span>
+<span class="sd">    notifications.</span>
 
 <span class="sd">    After calling generate(), use get_status() to poll for results, or</span>
 <span class="sd">    use generate() with wait_for_completion=True to block until audio is ready.</span>
@@ -200,12 +211,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Local task store (``SunoTasks`` Mapping) for recorded requests.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">SunoTasks</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="o">=</span> <span class="n">SunoTasks</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_record_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">request_params</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;PENDING&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record_task</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">request_params</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;PENDING&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save a new task record to the local store.&quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_record</span>
+
         <span class="n">record</span> <span class="o">=</span> <span class="n">_make_record</span><span class="p">(</span>
             <span class="n">task_id</span><span class="p">,</span>
             <span class="n">operation</span><span class="o">=</span><span class="n">operation</span><span class="p">,</span>
@@ -248,8 +263,9 @@
 <span class="sd">                Defaults to SUNO_DEFAULT_MODEL env var, or &#39;V4&#39;.</span>
 <span class="sd">            continue_from: Clip ID to extend from.</span>
 <span class="sd">            continue_at: Timestamp in seconds to continue from.</span>
-<span class="sd">            callback_url: Webhook URL for completion notification (required</span>
-<span class="sd">                by the API). Defaults to SUNO_CALLBACK_URL env var.</span>
+<span class="sd">            callback_url: Webhook URL for completion notification.</span>
+<span class="sd">                Defaults to SUNO_CALLBACK_URL env var, or a no-op</span>
+<span class="sd">                placeholder (polling still works).</span>
 <span class="sd">            negative_prompt: Styles to exclude (negativeTags).</span>
 <span class="sd">            wait_for_completion: If True, poll until audio is ready (or</span>
 <span class="sd">                timeout). If False (default), return pending Songs immediately.</span>
@@ -261,13 +277,6 @@
 <span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">callback_url</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;sunoapi.org requires a callback URL. &quot;</span>
-                <span class="s2">&quot;Set the SUNO_CALLBACK_URL environment variable or pass &quot;</span>
-                <span class="s2">&quot;callback_url=&#39;https://your-server.com/webhook&#39; to generate().&quot;</span>
-            <span class="p">)</span>
 
         <span class="c1"># Determine if we need customMode (lyrics, genre, or title provided)</span>
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
@@ -440,13 +449,6 @@
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">callback_url</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;sunoapi.org requires a callback URL. &quot;</span>
-                <span class="s2">&quot;Set the SUNO_CALLBACK_URL environment variable or pass &quot;</span>
-                <span class="s2">&quot;callback_url to upload_extend().&quot;</span>
-            <span class="p">)</span>
-
         <span class="c1"># Determine upload URL: if it looks like a local path, upload it first</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">audio_source</span><span class="p">):</span>
             <span class="n">upload_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">audio_source</span><span class="p">)</span>
@@ -578,13 +580,6 @@
 <span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">callback_url</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;sunoapi.org requires a callback URL. &quot;</span>
-                <span class="s2">&quot;Set the SUNO_CALLBACK_URL environment variable or pass &quot;</span>
-                <span class="s2">&quot;callback_url to upload_cover().&quot;</span>
-            <span class="p">)</span>
 
         <span class="c1"># Resolve audio source to a URL</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">audio_source</span><span class="p">):</span>
@@ -824,7 +819,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.task_store &mdash; arioso 0.0.9 documentation</title>
+  <title>arioso.platforms.sunoapi.task_store &mdash; arioso 0.0.10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,9 +14,9 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=f7cdbf68"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -165,6 +165,7 @@
 <span class="c1"># Task record helpers</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_now_iso</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return current UTC time as ISO-8601 string.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
@@ -203,11 +204,14 @@
 <span class="c1"># Data directory</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_data_dir</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``~/.local/share/arioso/suno_tasks``.&quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">config2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_app_data_folder</span>
 
-    <span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">&quot;arioso&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span> <span class="o">/</span> <span class="s2">&quot;suno_tasks&quot;</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">&quot;arioso&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span> <span class="o">/</span> <span class="s2">&quot;suno_tasks&quot;</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">ensure_exists</span><span class="p">:</span>
         <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">folder</span>
@@ -216,6 +220,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># Filtered view</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_FilteredTaskView</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A read-only, lazily-evaluated filtered view over task records.</span>
@@ -232,10 +237,7 @@
     <span class="c1"># -- internal: resolve matching keys (sorted newest-first) ---------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_matching_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predicate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-        <span class="p">]</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predicate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">])]</span>
         <span class="c1"># Sort newest-first by created_at (ISO strings sort lexicographically)</span>
         <span class="n">keys</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">:</span>
@@ -261,6 +263,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># Main store</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="SunoTasks">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">[docs]</a>
@@ -356,7 +359,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return tasks matching *status_value* (case-insensitive).&quot;&quot;&quot;</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">status_value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">_FilteredTaskView</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">target</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">target</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -406,7 +410,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

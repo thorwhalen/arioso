@@ -145,15 +145,29 @@ def test_sunoapi_api_error_raises(mock_make_session):
         adapter.generate("test prompt", callback_url=CALLBACK_URL)
 
 
-def test_sunoapi_missing_callback_url_raises():
-    """Should raise ValueError when no callback URL is provided."""
-    adapter = Adapter.__new__(Adapter)
-    adapter.config = PLATFORM_CONFIG
-    adapter.base_url = "https://api.sunoapi.org"
-    adapter.session = MagicMock()
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_missing_callback_url_falls_back_to_noop(mock_make_session):
+    """An empty callback URL is not an error: it falls back to the no-op default
+    so polling mode (``wait_for_completion``) works out of the box. A real webhook
+    is opt-in via the ``SUNO_CALLBACK_URL`` env var. See the adapter's
+    ``_NOOP_CALLBACK_URL`` / ``SUNO_DEFAULT_CALLBACK_URL``.
+    """
+    from arioso.platforms.sunoapi.adapter import SUNO_DEFAULT_CALLBACK_URL
 
-    with pytest.raises(ValueError, match="callback URL"):
-        adapter.generate("test prompt", callback_url="")
+    mock_session = MagicMock()
+    mock_response = MagicMock()
+    mock_response.json.return_value = [
+        {"id": "s1", "title": "T", "audio_url": "https://cdn.sunoapi.org/s1.mp3"},
+    ]
+    mock_session.post.return_value = mock_response
+    mock_make_session.return_value = mock_session
+
+    adapter = Adapter(PLATFORM_CONFIG)
+    songs = adapter.generate("test prompt", callback_url="")
+
+    assert len(songs) == 1
+    payload = mock_session.post.call_args[1]["json"]
+    assert payload["callBackUrl"] == SUNO_DEFAULT_CALLBACK_URL
 
 
 def test_suno_models_tuple():

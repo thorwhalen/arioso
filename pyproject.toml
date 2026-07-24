@@ -10,9 +10,26 @@ version = "0.0.10"
 description = "Make tunes"
 readme = "README.md"
 requires-python = ">=3.10"
-keywords = []
+license = "MIT"
+keywords = [
+    "music",
+    "music-generation",
+    "ai",
+    "audio",
+    "suno",
+    "text-to-music",
+]
 authors = [
     { name = "Thor Whalen" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
     "requests>=2.28",
@@ -20,9 +37,6 @@ dependencies = [
     "dol>=0.0.1",
     "config2py>=0.0.1",
 ]
-
-[project.license]
-text = "mit"
 
 [project.urls]
 Homepage = "https://github.com/thorwhalen/arioso"

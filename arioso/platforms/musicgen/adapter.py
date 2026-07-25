@@ -1,6 +1,13 @@
-"""MusicGen adapter using audiocraft (preferred) or transformers."""
+"""MusicGen adapter using audiocraft (preferred) or transformers.
+
+Supports text-to-music generation and, via ``facebook/musicgen-melody``,
+melody-conditioned generation (the ``melody`` affordance / ``arioso.enhance``
+stage): the output follows the pitch contour of an input audio while taking its
+style from the text prompt.
+"""
 
 from arioso.base import AudioResult, Song
+from arioso._audio import to_audio_ref
 
 
 class Adapter:
@@ -27,11 +34,19 @@ class Adapter:
             self._model_name = model_variant
             self._use_transformers = False
         except ImportError:
-            from transformers import AutoProcessor, MusicgenForConditionalGeneration
+            from transformers import AutoProcessor
 
-            self._model = MusicgenForConditionalGeneration.from_pretrained(
-                model_variant
-            )
+            # Melody variants need the melody-specific model class.
+            if "melody" in model_variant:
+                from transformers import (
+                    MusicgenMelodyForConditionalGeneration as _ModelClass,
+                )
+            else:
+                from transformers import (
+                    MusicgenForConditionalGeneration as _ModelClass,
+                )
+
+            self._model = _ModelClass.from_pretrained(model_variant)
             self._processor = AutoProcessor.from_pretrained(model_variant)
             self._model_name = model_variant
             self._use_transformers = True
@@ -46,9 +61,10 @@ class Adapter:
         top_p: float = 0.0,
         guidance: float = 3.0,
         model: str = "facebook/musicgen-small",
+        melody=None,
         **kwargs,
     ) -> Song:
-        """Generate music from a text prompt.
+        """Generate music from a text prompt, optionally following a melody.
 
         Args:
             prompt: Text description of desired music.
@@ -57,12 +73,40 @@ class Adapter:
             top_k: Top-k sampling parameter.
             top_p: Top-p nucleus sampling.
             guidance: Classifier-free guidance scale.
-            model: Model variant name (e.g. 'facebook/musicgen-small').
+            model: Model variant name (e.g. 'facebook/musicgen-small'). When a
+                ``melody`` is supplied and ``model`` isn't already a melody
+                variant, it is switched to ``facebook/musicgen-melody``.
+            melody: Optional input audio whose pitch contour the output follows
+                (a Song/AudioResult/bytes/path/(array, sample_rate)/waveform).
+                This is the ``arioso.enhance`` path for musicgen.
 
         Returns:
             A Song with audio_array populated.
         """
+        if melody is not None and "melody" not in model:
+            model = "facebook/musicgen-melody"
         self._ensure_model(model)
+
+        if melody is not None:
+            if self._use_transformers:
+                return self._generate_transformers_melody(
+                    prompt,
+                    melody,
+                    duration=duration,
+                    temperature=temperature,
+                    top_k=top_k,
+                    top_p=top_p,
+                    guidance=guidance,
+                )
+            return self._generate_audiocraft_melody(
+                prompt,
+                melody,
+                duration=duration,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                guidance=guidance,
+            )
 
         if self._use_transformers:
             return self._generate_transformers(
@@ -142,4 +186,85 @@ class Adapter:
             platform="musicgen",
             status="complete",
             metadata={"model": self._model_name, "temperature": temperature},
+        )
+
+    def _generate_audiocraft_melody(
+        self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
+    ) -> Song:
+        self._model.set_generation_params(
+            use_sampling=True,
+            top_k=top_k,
+            top_p=top_p,
+            temperature=temperature,
+            duration=duration,
+            cfg_coef=guidance,
+        )
+        ref = to_audio_ref(melody)
+        melody_wav = ref.as_waveform()  # (channels, frames)
+        # generate_with_chroma wants (batch, channels, frames)
+        wav = self._model.generate_with_chroma(
+            [prompt], melody_wav[None], ref.sample_rate
+        )
+        audio_array = wav[0].cpu().numpy()
+        sample_rate = self._model.sample_rate
+
+        return Song(
+            audio=AudioResult(
+                audio_array=audio_array,
+                sample_rate=sample_rate,
+                format="wav",
+                duration_seconds=duration,
+            ),
+            platform="musicgen",
+            status="complete",
+            metadata={
+                "model": self._model_name,
+                "temperature": temperature,
+                "melody_conditioned": True,
+            },
+        )
+
+    def _generate_transformers_melody(
+        self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
+    ) -> Song:
+        import torch
+
+        ref = to_audio_ref(melody)
+        inputs = self._processor(
+            audio=ref.as_array(),
+            sampling_rate=ref.sample_rate,
+            text=[prompt],
+            padding=True,
+            return_tensors="pt",
+        )
+        max_new_tokens = int(duration * 50)
+
+        with torch.no_grad():
+            audio_values = self._model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature,
+                do_sample=True,
+                top_k=top_k,
+                top_p=top_p if top_p > 0 else None,
+                guidance_scale=guidance,
+            )
+
+        audio_array = audio_values[0, 0].cpu().numpy()
+        sample_rate = self._model.config.audio_encoder.sampling_rate
+
+        return Song(
+            audio=AudioResult(
+                audio_array=audio_array,
+                sample_rate=sample_rate,
+                format="wav",
+                duration_seconds=duration,
+            ),
+            platform="musicgen",
+            status="complete",
+            metadata={
+                "model": self._model_name,
+                "temperature": temperature,
+                "melody_conditioned": True,
+            },
         )

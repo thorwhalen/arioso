@@ -1,6 +1,6 @@
 """Parameter translation layer.
 
-Translates between the 40 unified affordance names and each platform's
+Translates between the unified affordance names and each platform's
 native parameter names, applying type coercions along the way.
 """
 

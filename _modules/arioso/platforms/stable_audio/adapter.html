@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.stable_audio.adapter &mdash; arioso 0.0.10 documentation</title>
+  <title>arioso.platforms.stable_audio.adapter &mdash; arioso 0.0.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -47,6 +47,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_audio.html">arioso._audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/_util.html">arioso._util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/base.html">arioso.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../module_docs/arioso/named_prompts.html">arioso.named_prompts</a></li>
@@ -129,7 +130,10 @@
   <h1>Source code for arioso.platforms.stable_audio.adapter</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Stable Audio Open adapter using HuggingFace Diffusers.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_audio_ref</span>
 
 
 <div class="viewcode-block" id="Adapter">
@@ -169,9 +173,11 @@
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">sampler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dpmpp-3m-sde&quot;</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">audio_input_strength</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate audio from a text prompt.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate audio from a text prompt, optionally conditioned on input audio.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Text description of desired audio.</span>
@@ -182,20 +188,28 @@
 <span class="sd">            seed: Random seed for reproducibility.</span>
 <span class="sd">            batch_size: Number of waveforms to generate.</span>
 <span class="sd">            sampler: Sampler type for the diffusion process.</span>
+<span class="sd">            audio_input: Optional input audio to condition on (audio-to-audio):</span>
+<span class="sd">                a Song/AudioResult/bytes/path/(array, sample_rate)/NumPy waveform.</span>
+<span class="sd">                Passed to the pipeline as ``initial_audio_waveforms`` -- i.e. the</span>
+<span class="sd">                model continues/initializes from this audio.</span>
+<span class="sd">            audio_input_strength: Accepted for API symmetry but **ignored** --</span>
+<span class="sd">                the diffusers ``StableAudioPipeline`` exposes no denoise/strength</span>
+<span class="sd">                control (that is a stable-audio-tools/ComfyUI feature). A warning</span>
+<span class="sd">                is emitted if a value is passed alongside ``audio_input``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A Song with audio_array populated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">()</span>
 
         <span class="n">generator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
             <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="o">.</span><span class="n">device</span>
             <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="p">(</span>
+        <span class="n">call_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
             <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
             <span class="n">audio_end_in_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
@@ -203,6 +217,23 @@
             <span class="n">num_waveforms_per_prompt</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">audio_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">audio_input_strength</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;stable_audio (diffusers StableAudioPipeline) has no &quot;</span>
+                    <span class="s2">&quot;strength/denoise control; &#39;audio_input_strength&#39; is &quot;</span>
+                    <span class="s2">&quot;ignored. The input audio is used as the initial waveform &quot;</span>
+                    <span class="s2">&quot;(continuation/init), not a strength-blended remix.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span>
+            <span class="n">waveform</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">as_waveform</span><span class="p">()</span>  <span class="c1"># (channels, frames)</span>
+            <span class="c1"># pipeline wants (batch, channels, frames)</span>
+            <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">&quot;initial_audio_waveforms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">call_kwargs</span><span class="p">[</span><span class="s2">&quot;initial_audio_sampling_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">sample_rate</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="p">(</span><span class="o">**</span><span class="n">call_kwargs</span><span class="p">)</span>
 
         <span class="n">audio_array</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">audios</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sample_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipe</span><span class="o">.</span><span class="n">vae</span><span class="o">.</span><span class="n">sampling_rate</span>
@@ -216,7 +247,12 @@
             <span class="p">),</span>
             <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;stable_audio&quot;</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span> <span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span> <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">},</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+                <span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
+                <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+                <span class="s2">&quot;audio_to_audio&quot;</span><span class="p">:</span> <span class="n">audio_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span></div>
 </div>
 

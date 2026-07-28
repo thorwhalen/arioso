@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arioso._audio &mdash; arioso 0.0.12 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="arioso._util" href="_util.html" />
+    <link rel="prev" title="arioso" href="../arioso.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            arioso
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../arioso.html">arioso</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">arioso._audio</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arioso._audio.AudioRef"><code class="docutils literal notranslate"><span class="pre">AudioRef</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arioso._audio.AudioRef.as_array"><code class="docutils literal notranslate"><span class="pre">AudioRef.as_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso._audio.AudioRef.as_path"><code class="docutils literal notranslate"><span class="pre">AudioRef.as_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso._audio.AudioRef.as_waveform"><code class="docutils literal notranslate"><span class="pre">AudioRef.as_waveform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso._audio.AudioRef.cleanup"><code class="docutils literal notranslate"><span class="pre">AudioRef.cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arioso._audio.AudioRef.sample_rate"><code class="docutils literal notranslate"><span class="pre">AudioRef.sample_rate</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso._audio.to_audio_ref"><code class="docutils literal notranslate"><span class="pre">to_audio_ref()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_util.html">arioso._util</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">arioso.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="named_prompts.html">arioso.named_prompts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">arioso.platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/jen/config.html">arioso.platforms.jen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/sunoapi/task_store.html">arioso.platforms.sunoapi.task_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/udio/config.html">arioso.platforms.udio.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/yue.html">arioso.platforms.yue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms/yue/config.html">arioso.platforms.yue.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">arioso.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">arioso.services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">arioso.tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation.html">arioso.translation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">arioso</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">arioso._audio</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/arioso/_audio.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-arioso._audio">
+<span id="arioso-audio"></span><h1>arioso._audio<a class="headerlink" href="#module-arioso._audio" title="Link to this heading"></a></h1>
+<p>Audio-input normalization for the enhance / audio-conditioning stage.</p>
+<p>The facade’s <a class="reference internal" href="../arioso.html#arioso.enhance" title="arioso.enhance"><code class="xref py py-func docutils literal notranslate"><span class="pre">arioso.enhance()</span></code></a> and the audio-accepting adapters
+(<code class="docutils literal notranslate"><span class="pre">stable_audio</span></code>, <code class="docutils literal notranslate"><span class="pre">musicgen</span></code> melody, <code class="docutils literal notranslate"><span class="pre">udio</span></code> …) each want the input audio in
+a slightly different concrete form – a file path, a NumPy waveform, or a torch
+tensor. This module is the single ingress: <a class="reference internal" href="#arioso._audio.to_audio_ref" title="arioso._audio.to_audio_ref"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_audio_ref()</span></code></a> accepts any of
+the forms a caller is likely to have and returns an <a class="reference internal" href="#arioso._audio.AudioRef" title="arioso._audio.AudioRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioRef</span></code></a> whose lazy
+accessors produce whichever form an adapter needs.</p>
+<p>Accepted inputs (see <a class="reference internal" href="#arioso._audio.to_audio_ref" title="arioso._audio.to_audio_ref"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_audio_ref()</span></code></a>):</p>
+<ul class="simple">
+<li><p>a generated <a class="reference internal" href="base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a> or <a class="reference internal" href="base.html#arioso.base.AudioResult" title="arioso.base.AudioResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioResult</span></code></a></p></li>
+<li><p>raw encoded audio <code class="docutils literal notranslate"><span class="pre">bytes</span></code> (e.g. MP3/WAV file contents)</p></li>
+<li><p>a filesystem path as <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></p></li>
+<li><p>a NumPy waveform paired with its rate as <code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code></p></li>
+<li><p>a bare NumPy waveform (sample rate must then be supplied out of band)</p></li>
+</ul>
+<p>All heavy dependencies (<code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">soundfile</span></code>, <code class="docutils literal notranslate"><span class="pre">torch</span></code>) are imported lazily,
+so <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">arioso</span></code> never requires them; a precise <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> is raised
+only if a conversion that needs one is actually requested.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso._audio.</span></span><span class="sig-name descname"><span class="pre">AudioRef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/_audio.html#AudioRef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.AudioRef" title="Link to this definition"></a></dt>
+<dd><p>A lazy, format-agnostic handle to a piece of audio.</p>
+<p>Construct it via <a class="reference internal" href="#arioso._audio.to_audio_ref" title="arioso._audio.to_audio_ref"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_audio_ref()</span></code></a> rather than directly. Exactly one of
+<code class="docutils literal notranslate"><span class="pre">path</span></code> / <code class="docutils literal notranslate"><span class="pre">data</span></code> / <code class="docutils literal notranslate"><span class="pre">array</span></code> describes the source; <a class="reference internal" href="#arioso._audio.AudioRef.sample_rate" title="arioso._audio.AudioRef.sample_rate"><code class="xref py py-attr docutils literal notranslate"><span class="pre">sample_rate</span></code></a> is
+known immediately for array/tuple sources and decoded on demand otherwise.
+The accessors (<a class="reference internal" href="#arioso._audio.AudioRef.as_array" title="arioso._audio.AudioRef.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_array()</span></code></a>, <a class="reference internal" href="#arioso._audio.AudioRef.as_path" title="arioso._audio.AudioRef.as_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_path()</span></code></a>, <a class="reference internal" href="#arioso._audio.AudioRef.as_waveform" title="arioso._audio.AudioRef.as_waveform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_waveform()</span></code></a>)
+produce the requested concrete form, converting (and caching) as needed.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef.as_array">
+<span class="sig-name descname"><span class="pre">as_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/_audio.html#AudioRef.as_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.AudioRef.as_array" title="Link to this definition"></a></dt>
+<dd><p>Return the waveform as a NumPy array (shape <code class="docutils literal notranslate"><span class="pre">(frames,</span> <span class="pre">channels)</span></code>).</p>
+<p>Decodes <code class="docutils literal notranslate"><span class="pre">path</span></code> / <code class="docutils literal notranslate"><span class="pre">data</span></code> via <code class="xref py py-mod docutils literal notranslate"><span class="pre">soundfile</span></code> on first call and caches
+the result (and the discovered sample rate).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef.as_path">
+<span class="sig-name descname"><span class="pre">as_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.wav'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/arioso/_audio.html#AudioRef.as_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.AudioRef.as_path" title="Link to this definition"></a></dt>
+<dd><p>Return a filesystem path to the audio (writing a temp WAV if needed).</p>
+<p>Adapters that shell out or upload a file (e.g. <code class="docutils literal notranslate"><span class="pre">udio</span></code>, <code class="docutils literal notranslate"><span class="pre">yue</span></code>) use
+this. A temp file created here is tracked and removed by <a class="reference internal" href="#arioso._audio.AudioRef.cleanup" title="arioso._audio.AudioRef.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cleanup()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef.as_waveform">
+<span class="sig-name descname"><span class="pre">as_waveform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arioso/_audio.html#AudioRef.as_waveform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.AudioRef.as_waveform" title="Link to this definition"></a></dt>
+<dd><p>Return the audio as a torch tensor of shape <code class="docutils literal notranslate"><span class="pre">(channels,</span> <span class="pre">frames)</span></code>.</p>
+<p>This is the form neural backends want (<code class="docutils literal notranslate"><span class="pre">stable_audio</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">initial_audio_waveforms</span></code>, <code class="docutils literal notranslate"><span class="pre">musicgen</span></code> melody chroma). Mono audio is
+returned as <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">frames)</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/arioso/_audio.html#AudioRef.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.AudioRef.cleanup" title="Link to this definition"></a></dt>
+<dd><p>Remove any temp file this ref created via <a class="reference internal" href="#arioso._audio.AudioRef.as_path" title="arioso._audio.AudioRef.as_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_path()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso._audio.AudioRef.sample_rate">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sample_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#arioso._audio.AudioRef.sample_rate" title="Link to this definition"></a></dt>
+<dd><p>The audio sample rate in Hz (decoding a header if necessary).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso._audio.to_audio_ref">
+<span class="sig-prename descclassname"><span class="pre">arioso._audio.</span></span><span class="sig-name descname"><span class="pre">to_audio_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#arioso._audio.AudioRef" title="arioso._audio.AudioRef"><span class="pre">AudioRef</span></a></span></span><a class="reference internal" href="../../_modules/arioso/_audio.html#to_audio_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso._audio.to_audio_ref" title="Link to this definition"></a></dt>
+<dd><p>Normalize any supported audio input into an <a class="reference internal" href="#arioso._audio.AudioRef" title="arioso._audio.AudioRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioRef</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – One of an <a class="reference internal" href="#arioso._audio.AudioRef" title="arioso._audio.AudioRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioRef</span></code></a> (returned as-is), a
+<a class="reference internal" href="base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>, an <a class="reference internal" href="base.html#arioso.base.AudioResult" title="arioso.base.AudioResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioResult</span></code></a>,
+raw encoded <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, a <code class="docutils literal notranslate"><span class="pre">str</span></code>/<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> file path, an
+<code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code> pair, or a bare NumPy waveform array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <a class="reference internal" href="#arioso._audio.AudioRef" title="arioso._audio.AudioRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioRef</span></code></a> wrapping the input.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TypeError</strong> – If <em>value</em> is not a supported audio input form.</p></li>
+<li><p><strong>ValueError</strong> – If a <code class="docutils literal notranslate"><span class="pre">Song</span></code>/<code class="docutils literal notranslate"><span class="pre">AudioResult</span></code> carries only a remote
+    <code class="docutils literal notranslate"><span class="pre">audio_url</span></code> (fetch it first with <a class="reference internal" href="../arioso.html#arioso.fetch_audio" title="arioso.fetch_audio"><code class="xref py py-func docutils literal notranslate"><span class="pre">arioso.fetch_audio()</span></code></a>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../arioso.html" class="btn btn-neutral float-left" title="arioso" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="_util.html" class="btn btn-neutral float-right" title="arioso._util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

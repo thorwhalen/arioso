@@ -1,0 +1,4 @@
+arioso._audio
+=============
+.. automodule:: arioso._audio
+   :members:

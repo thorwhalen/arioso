@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.base &mdash; arioso 0.0.10 documentation</title>
+  <title>arioso.base &mdash; arioso 0.0.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -47,6 +47,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso.html">arioso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/_audio.html">arioso._audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/_util.html">arioso._util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/base.html">arioso.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/arioso/named_prompts.html">arioso.named_prompts</a></li>
@@ -130,7 +131,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;Core types and constants for arioso.</span>
 
 <span class="sd">Defines the unified output types (Song, AudioResult) and the canonical</span>
-<span class="sd">set of 40 affordance names that all platform adapters map to.</span>
+<span class="sd">set of affordance names that all platform adapters map to.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
@@ -270,9 +271,28 @@
     <span class="s2">&quot;instrumental&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;instrumental&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Force instrumental-only output&quot;</span><span class="p">),</span>
     <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Song title&quot;</span><span class="p">),</span>
     <span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">&quot;Song section structure&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;audio_input&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;audio_input&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s2">&quot;Reference audio for conditioning&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;audio_input&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">&quot;audio_input&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="p">,</span>
+        <span class="s2">&quot;Input audio to transform/continue (audio-to-audio). Accepts a Song, &quot;</span>
+        <span class="s2">&quot;AudioResult, bytes, file path, (array, sample_rate) pair, or NumPy &quot;</span>
+        <span class="s2">&quot;waveform -- normalized by arioso._audio.to_audio_ref&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
     <span class="s2">&quot;audio_input_strength&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
         <span class="s2">&quot;audio_input_strength&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;How much reference audio influences output 0-1&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;melody&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">&quot;melody&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="p">,</span>
+        <span class="s2">&quot;Melodic contour to condition on (e.g. MusicGen-melody chroma). Same &quot;</span>
+        <span class="s2">&quot;accepted forms as audio_input; used as a tune to follow, not full &quot;</span>
+        <span class="s2">&quot;audio-to-audio&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;reference_audio&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">&quot;reference_audio&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="p">,</span>
+        <span class="s2">&quot;Style/timbre reference audio (guides sound/production without &quot;</span>
+        <span class="s2">&quot;reproducing the take). Same accepted forms as audio_input&quot;</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="s2">&quot;continue_from&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;continue_from&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;ID/URL of track to extend from&quot;</span><span class="p">),</span>
     <span class="s2">&quot;continue_at&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>

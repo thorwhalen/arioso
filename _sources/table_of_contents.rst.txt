@@ -3,6 +3,7 @@
    :caption: Contents:
 
    module_docs/arioso
+   module_docs/arioso/_audio
    module_docs/arioso/_util
    module_docs/arioso/base
    module_docs/arioso/named_prompts

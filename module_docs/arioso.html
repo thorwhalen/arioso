@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso &mdash; arioso 0.0.10 documentation</title>
+  <title>arioso &mdash; arioso 0.0.12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../_static/documentation_options.js?v=3bbcec59"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -24,7 +24,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="arioso._util" href="arioso/_util.html" />
+    <link rel="next" title="arioso._audio" href="arioso/_audio.html" />
     <link rel="prev" title="Welcome to arioso’s documentation!" href="../index.html" /> 
 </head>
 
@@ -50,14 +50,18 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">arioso</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES"><code class="docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.check_status"><code class="docutils literal notranslate"><span class="pre">check_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.enhance"><code class="docutils literal notranslate"><span class="pre">enhance()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.fetch_audio"><code class="docutils literal notranslate"><span class="pre">fetch_audio()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.generate_many"><code class="docutils literal notranslate"><span class="pre">generate_many()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.get_platform_info"><code class="docutils literal notranslate"><span class="pre">get_platform_info()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#arioso.list_platforms"><code class="docutils literal notranslate"><span class="pre">list_platforms()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arioso.supports_audio_input"><code class="docutils literal notranslate"><span class="pre">supports_audio_input()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="arioso/_audio.html">arioso._audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arioso/_util.html">arioso._util</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arioso/base.html">arioso.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arioso/named_prompts.html">arioso.named_prompts</a></li>
@@ -165,6 +169,14 @@
 <span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.AUDIO_INPUT_AFFORDANCES">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('audio_input',</span> <span class="pre">'melody',</span> <span class="pre">'reference_audio')</span></span><a class="headerlink" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="Link to this definition"></a></dt>
+<dd><p>Affordances that carry caller-supplied <em>input</em> audio (used by <a class="reference internal" href="#arioso.enhance" title="arioso.enhance"><code class="xref py py-func docutils literal notranslate"><span class="pre">enhance()</span></code></a>).
+Distinct from clip-extension affordances like <code class="docutils literal notranslate"><span class="pre">continue_from</span></code> (which
+reference a prior generation by id/URL rather than uploaded audio).</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="arioso.check_status">
 <span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">check_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/arioso.html#check_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.check_status" title="Link to this definition"></a></dt>
@@ -186,6 +198,43 @@ including audio URLs once generation is complete.</p>
 <span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">audio_url</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.enhance">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">enhance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'stable_audio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><span class="pre">Song</span></a></span></span><a class="reference internal" href="../_modules/arioso.html#enhance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.enhance" title="Link to this definition"></a></dt>
+<dd><p>Transform existing audio into AI-enhanced audio (pipeline stage 3-&gt;4).</p>
+<p>Progressive-disclosure sugar over <a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate()</span></code></a>: routes <em>audio</em> into the
+platform’s audio-conditioning affordance and generates. This is the entry
+point for the “rendered MIDI audio -&gt; AI-enhanced audio” step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>audio</strong> – The input audio to transform – a <a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>,
+<a class="reference internal" href="arioso/base.html#arioso.base.AudioResult" title="arioso.base.AudioResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioResult</span></code></a>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, a file path, an
+<code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code> pair, or a NumPy waveform (normalized by
+<code class="docutils literal notranslate"><span class="pre">arioso._audio.to_audio_ref</span></code>).</p></li>
+<li><p><strong>prompt</strong> – Optional text guiding the transformation.</p></li>
+<li><p><strong>platform</strong> – An audio-capable platform (default <code class="docutils literal notranslate"><span class="pre">'stable_audio'</span></code>); verify
+with <a class="reference internal" href="#arioso.supports_audio_input" title="arioso.supports_audio_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">supports_audio_input()</span></code></a>.</p></li>
+<li><p><strong>strength</strong> – How much the input audio influences the output (0-1), where the
+platform supports it. (Note: <code class="docutils literal notranslate"><span class="pre">stable_audio</span></code> via diffusers has no
+strength knob and will warn if one is passed.)</p></li>
+<li><p><strong>as</strong> – Which affordance to route <em>audio</em> into – <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> (default; picks
+<code class="docutils literal notranslate"><span class="pre">audio_input</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">melody</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) or an explicit
+affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a>.</p></li>
+<li><p><strong>**kwargs</strong> – Further unified affordance parameters (duration, seed, …).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="arioso/base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a> with the enhanced audio.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rendered</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># a Song from a score2audio render</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="s2">&quot;warm analog studio band&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -261,6 +310,20 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 <dd><p>Return names of all available platforms.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.supports_audio_input">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">supports_audio_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/arioso.html#supports_audio_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.supports_audio_input" title="Link to this definition"></a></dt>
+<dd><p>Whether <em>platform</em> can condition on caller-supplied input audio.</p>
+<p>Returns True if the platform declares any of
+<a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a> (<code class="docutils literal notranslate"><span class="pre">audio_input</span></code> / <code class="docutils literal notranslate"><span class="pre">melody</span></code> /
+<code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) in its config’s <code class="docutils literal notranslate"><span class="pre">supported_affordances</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">&quot;stable_audio&quot;</span><span class="p">)</span>  <span class="c1"># True</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">&quot;mubert&quot;</span><span class="p">)</span>        <span class="c1"># False</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
 
@@ -268,7 +331,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to arioso’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="arioso/_util.html" class="btn btn-neutral float-right" title="arioso._util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="arioso/_audio.html" class="btn btn-neutral float-right" title="arioso._audio" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

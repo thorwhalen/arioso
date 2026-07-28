@@ -28,6 +28,36 @@ song = arioso.generate("epic orchestral soundtrack", platform="elevenlabs", dura
 song.audio.audio_bytes  # MP3 bytes
 ```
 
+## Enhance existing audio (audio-to-audio)
+
+Beyond text-to-music, arioso can transform audio you already have -- e.g. turn a
+plain synthesized/"MIDI" render into something richer, or re-generate music that
+follows an input melody. This is the `enhance()` entry point:
+
+```python
+import arioso
+
+rendered = ...  # a Song, a file path, bytes, an (array, sample_rate) pair, or a numpy waveform
+
+# Audio-to-audio: continue/transform the input (Stable Audio Open, local)
+better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
+
+# Melody-conditioned: keep the tune, take the style from the prompt (MusicGen-melody)
+variation = arioso.enhance(rendered, "energetic EDM", platform="musicgen")
+
+# Discover which platforms accept input audio
+arioso.supports_audio_input("stable_audio")   # True
+arioso.supports_audio_input("mubert")         # False
+```
+
+`enhance(audio, prompt='', *, platform='stable_audio', strength=None, as_='auto')`
+routes your audio into the platform's audio-conditioning affordance
+(`audio_input`, `melody`, or `reference_audio`) and generates. Input audio is
+accepted in any form a `Song`/`AudioResult`/`bytes`/path/`(array, sample_rate)`/
+numpy-waveform can take (normalized internally). Note that `stable_audio` via
+diffusers uses the input as an initial waveform (continuation/init) and has no
+`strength` knob (a value passed there is ignored with a warning).
+
 ## Platforms
 
 14 platforms are included, spanning local models, REST APIs, and SDK-based services:
@@ -128,7 +158,7 @@ song = arioso.generate(
 )
 ```
 
-The full set of 40 unified parameter names:
+The full set of unified parameter names (42):
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -339,7 +369,7 @@ details, and links to further reading.
 ```
 arioso/
     __init__.py          # Facade: generate(), list_platforms()
-    base.py              # Song, AudioResult, AFFORDANCES (40 unified params)
+    base.py              # Song, AudioResult, AFFORDANCES (42 unified params)
     registry.py          # Auto-discovery, lazy loading, manual registration
     translation.py       # Parameter renaming & coercion (common -> native)
     _util.py             # Auth helpers, HTTP session factory

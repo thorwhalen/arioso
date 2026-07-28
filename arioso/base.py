@@ -1,7 +1,7 @@
 """Core types and constants for arioso.
 
 Defines the unified output types (Song, AudioResult) and the canonical
-set of 40 affordance names that all platform adapters map to.
+set of affordance names that all platform adapters map to.
 """
 
 from typing import Optional, Any
@@ -132,9 +132,28 @@ AFFORDANCES: dict[str, Affordance] = {
     "instrumental": Affordance("instrumental", bool, "Force instrumental-only output"),
     "title": Affordance("title", str, "Song title"),
     "structure": Affordance("structure", list, "Song section structure"),
-    "audio_input": Affordance("audio_input", bytes, "Reference audio for conditioning"),
+    "audio_input": Affordance(
+        "audio_input",
+        object,
+        "Input audio to transform/continue (audio-to-audio). Accepts a Song, "
+        "AudioResult, bytes, file path, (array, sample_rate) pair, or NumPy "
+        "waveform -- normalized by arioso._audio.to_audio_ref",
+    ),
     "audio_input_strength": Affordance(
         "audio_input_strength", float, "How much reference audio influences output 0-1"
+    ),
+    "melody": Affordance(
+        "melody",
+        object,
+        "Melodic contour to condition on (e.g. MusicGen-melody chroma). Same "
+        "accepted forms as audio_input; used as a tune to follow, not full "
+        "audio-to-audio",
+    ),
+    "reference_audio": Affordance(
+        "reference_audio",
+        object,
+        "Style/timbre reference audio (guides sound/production without "
+        "reproducing the take). Same accepted forms as audio_input",
     ),
     "continue_from": Affordance("continue_from", str, "ID/URL of track to extend from"),
     "continue_at": Affordance(

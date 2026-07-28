@@ -25,6 +25,10 @@ PLATFORM_CONFIG = {
             "native_name": "batch_size",
             "adapter_handled": True,
         },
+        "melody": {
+            "native_name": "melody",
+            "adapter_handled": True,
+        },
     },
     "supported_affordances": [
         "prompt",
@@ -36,6 +40,7 @@ PLATFORM_CONFIG = {
         "model",
         "batch_size",
         "extend_stride",
+        "melody",
     ],
     "on_unsupported_param": "warn",
     "output": {

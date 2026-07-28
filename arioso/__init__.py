@@ -94,6 +94,107 @@ def generate_many(prompt: str, *, platform: str = "musicgen", **kwargs) -> list[
     return [result]
 
 
+#: Affordances that carry caller-supplied *input* audio (used by :func:`enhance`).
+#: Distinct from clip-extension affordances like ``continue_from`` (which
+#: reference a prior generation by id/URL rather than uploaded audio).
+AUDIO_INPUT_AFFORDANCES = ("audio_input", "melody", "reference_audio")
+
+
+def supports_audio_input(platform: str) -> bool:
+    """Whether *platform* can condition on caller-supplied input audio.
+
+    Returns True if the platform declares any of
+    :data:`AUDIO_INPUT_AFFORDANCES` (``audio_input`` / ``melody`` /
+    ``reference_audio``) in its config's ``supported_affordances``.
+
+    Example::
+
+        arioso.supports_audio_input("stable_audio")  # True
+        arioso.supports_audio_input("mubert")        # False
+    """
+    try:
+        config = get_platform_info(platform)
+    except Exception:
+        return False
+    supported = set(config.get("supported_affordances", []))
+    return any(a in supported for a in AUDIO_INPUT_AFFORDANCES)
+
+
+def _audio_affordance_for(platform: str, prefer: str = "auto") -> str:
+    """Pick which audio-carrying affordance to route input audio into.
+
+    ``prefer='auto'`` selects the first supported of
+    :data:`AUDIO_INPUT_AFFORDANCES`; otherwise validates the explicit choice.
+    """
+    config = get_platform_info(platform)
+    supported = set(config.get("supported_affordances", []))
+    if prefer != "auto":
+        if prefer not in AUDIO_INPUT_AFFORDANCES:
+            raise ValueError(
+                f"as_={prefer!r} must be one of {AUDIO_INPUT_AFFORDANCES} or 'auto'"
+            )
+        if prefer not in supported:
+            raise ValueError(
+                f"Platform {platform!r} does not support the {prefer!r} affordance"
+            )
+        return prefer
+    for aff in AUDIO_INPUT_AFFORDANCES:
+        if aff in supported:
+            return aff
+    raise ValueError(
+        f"Platform {platform!r} does not accept input audio. Check with "
+        f"arioso.supports_audio_input(platform); audio-capable platforms "
+        f"include 'stable_audio' and 'musicgen'."
+    )
+
+
+def enhance(
+    audio,
+    prompt: str = "",
+    *,
+    platform: str = "stable_audio",
+    strength: float = None,
+    as_: str = "auto",
+    **kwargs,
+) -> Song:
+    """Transform existing audio into AI-enhanced audio (pipeline stage 3->4).
+
+    Progressive-disclosure sugar over :func:`generate`: routes *audio* into the
+    platform's audio-conditioning affordance and generates. This is the entry
+    point for the "rendered MIDI audio -> AI-enhanced audio" step.
+
+    Args:
+        audio: The input audio to transform -- a :class:`~arioso.base.Song`,
+            :class:`~arioso.base.AudioResult`, ``bytes``, a file path, an
+            ``(array, sample_rate)`` pair, or a NumPy waveform (normalized by
+            ``arioso._audio.to_audio_ref``).
+        prompt: Optional text guiding the transformation.
+        platform: An audio-capable platform (default ``'stable_audio'``); verify
+            with :func:`supports_audio_input`.
+        strength: How much the input audio influences the output (0-1), where the
+            platform supports it. (Note: ``stable_audio`` via diffusers has no
+            strength knob and will warn if one is passed.)
+        as_: Which affordance to route *audio* into -- ``'auto'`` (default; picks
+            ``audio_input`` > ``melody`` > ``reference_audio``) or an explicit
+            affordance name from :data:`AUDIO_INPUT_AFFORDANCES`.
+        **kwargs: Further unified affordance parameters (duration, seed, ...).
+
+    Returns:
+        A :class:`~arioso.base.Song` with the enhanced audio.
+
+    Example::
+
+        rendered = ...  # a Song from a score2audio render
+        better = arioso.enhance(rendered, "warm analog studio band")
+    """
+    affordance = _audio_affordance_for(platform, as_)
+    call_kwargs = dict(kwargs)
+    call_kwargs[affordance] = audio
+    if strength is not None:
+        call_kwargs["audio_input_strength"] = strength
+    return generate(prompt, platform=platform, **call_kwargs)
+
+
 def list_platforms() -> list[str]:
     """Return names of all available platforms."""
     from arioso.registry import list_platforms as _list

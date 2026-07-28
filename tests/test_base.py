@@ -64,10 +64,13 @@ def test_affordance_frozen():
 
 
 def test_affordances_completeness():
-    # Should have all 40 affordances
-    assert len(AFFORDANCES) == 40
+    # 40 original affordances + the enhance-stage additions (melody, reference_audio)
+    assert len(AFFORDANCES) == 42
     # Key ones must exist
     for name in ["prompt", "duration", "lyrics", "instrumental", "seed", "guidance"]:
+        assert name in AFFORDANCES, f"Missing affordance: {name}"
+    # Enhance-stage (audio-conditioning) affordances
+    for name in ["audio_input", "audio_input_strength", "melody", "reference_audio"]:
         assert name in AFFORDANCES, f"Missing affordance: {name}"
 
 

@@ -37,7 +37,9 @@ follows an input melody. This is the `enhance()` entry point:
 ```python
 import arioso
 
-rendered = ...  # a Song, a file path, bytes, an (array, sample_rate) pair, or a numpy waveform
+rendered = (
+    ...
+)  # a Song, a file path, bytes, an (array, sample_rate) pair, or a numpy waveform
 
 # Audio-to-audio: continue/transform the input (Stable Audio Open, local)
 better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
@@ -46,8 +48,8 @@ better = arioso.enhance(rendered, "warm analog studio band", platform="stable_au
 variation = arioso.enhance(rendered, "energetic EDM", platform="musicgen")
 
 # Discover which platforms accept input audio
-arioso.supports_audio_input("stable_audio")   # True
-arioso.supports_audio_input("mubert")         # False
+arioso.supports_audio_input("stable_audio")  # True
+arioso.supports_audio_input("mubert")  # False
 ```
 
 `enhance(audio, prompt='', *, platform='stable_audio', strength=None, as_='auto')`

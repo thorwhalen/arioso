@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.base &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.base &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,11 +128,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.base</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Core types and constants for arioso.</span>
+<span></span><span class="sd">"""Core types and constants for arioso.</span>
 
 <span class="sd">Defines the unified output types (Song, AudioResult) and the canonical</span>
 <span class="sd">set of affordance names that all platform adapters map to.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
@@ -142,7 +142,7 @@
 <a class="viewcode-back" href="../../module_docs/arioso/base.html#arioso.base.AudioResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified audio output from any music generation platform.</span>
+<span class="w">    </span><span class="sd">"""Unified audio output from any music generation platform.</span>
 
 <span class="sd">    Exactly one of audio_bytes, audio_url, or audio_array will typically</span>
 <span class="sd">    be populated by the platform adapter. Conversion between forms can</span>
@@ -153,15 +153,15 @@
 <span class="sd">        audio_url: URL to download the audio file.</span>
 <span class="sd">        audio_array: Numpy array of audio samples.</span>
 <span class="sd">        sample_rate: Sample rate in Hz (e.g. 44100, 32000).</span>
-<span class="sd">        format: Audio format string (e.g. &quot;mp3&quot;, &quot;wav&quot;, &quot;pcm&quot;).</span>
+<span class="sd">        format: Audio format string (e.g. "mp3", "wav", "pcm").</span>
 <span class="sd">        duration_seconds: Duration of the audio in seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">audio_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">audio_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">audio_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">audio_array</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">duration_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 
 
@@ -170,7 +170,7 @@
 <a class="viewcode-back" href="../../module_docs/arioso/base.html#arioso.base.Song">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Song</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A generated song with its metadata and audio data.</span>
+<span class="w">    </span><span class="sd">"""A generated song with its metadata and audio data.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        id: Provider-specific identifier for the song.</span>
@@ -179,55 +179,55 @@
 <span class="sd">        audio: The audio output.</span>
 <span class="sd">        metadata: Provider-specific metadata dict.</span>
 <span class="sd">        platform: Name of the platform that generated this song.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pending&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"pending"</span>
     <span class="n">audio</span><span class="p">:</span> <span class="n">AudioResult</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">)</span>
     <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this Song represents an error response.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Check if this Song represents an error response."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"error"</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="n">meta_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">meta_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">meta_code</span> <span class="ow">and</span> <span class="n">meta_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">error_message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract error message from metadata, if any.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Extract error message from metadata, if any."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msg&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"msg"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
-                <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(code </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">code</span> <span class="k">else</span> <span class="n">msg</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Unknown error&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">"(code </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">code</span> <span class="k">else</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"error"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">"Unknown error"</span>
+        <span class="k">return</span> <span class="s2">""</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">audio_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut to audio.audio_bytes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Shortcut to audio.audio_bytes."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">audio_bytes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">audio_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut to audio.audio_url.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Shortcut to audio.audio_url."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">audio_url</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">audio_array</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut to audio.audio_array.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Shortcut to audio.audio_array."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">audio_array</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shortcut to audio.sample_rate.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Shortcut to audio.sample_rate."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">sample_rate</span></div>
 
 
@@ -241,14 +241,14 @@
 <a class="viewcode-back" href="../../module_docs/arioso/base.html#arioso.base.Affordance">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Affordance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Descriptor for a unified parameter affordance.</span>
+<span class="w">    </span><span class="sd">"""Descriptor for a unified parameter affordance.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name: Canonical parameter name used at the facade level.</span>
 <span class="sd">        type: Expected Python type.</span>
 <span class="sd">        description: Human-readable description.</span>
 <span class="sd">        default: Default value (None means no default / required).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="nb">type</span><span class="p">:</span> <span class="nb">type</span>
@@ -258,77 +258,77 @@
 
 
 <span class="n">AFFORDANCES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Affordance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Text description of desired music&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;negative_prompt&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;negative_prompt&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Elements to avoid&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;lyrics&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;lyrics&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Custom lyrics text&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Output length in seconds&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;bpm&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;bpm&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Beats per minute&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Musical key (e.g. &quot;C major&quot;)&#39;</span><span class="p">),</span>
-    <span class="s2">&quot;genre&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;genre&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Genre tag or category&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Energy/intensity level 0-1&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;brightness&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Spectral brightness 0-1&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;instruments&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">&quot;Instrument selection&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;instrumental&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;instrumental&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Force instrumental-only output&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Song title&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">&quot;Song section structure&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;audio_input&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;audio_input&quot;</span><span class="p">,</span>
+    <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Text description of desired music"</span><span class="p">),</span>
+    <span class="s2">"negative_prompt"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"negative_prompt"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Elements to avoid"</span><span class="p">),</span>
+    <span class="s2">"lyrics"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"lyrics"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Custom lyrics text"</span><span class="p">),</span>
+    <span class="s2">"duration"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Output length in seconds"</span><span class="p">),</span>
+    <span class="s2">"bpm"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"bpm"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Beats per minute"</span><span class="p">),</span>
+    <span class="s2">"key"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"key"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">'Musical key (e.g. "C major")'</span><span class="p">),</span>
+    <span class="s2">"genre"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"genre"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Genre tag or category"</span><span class="p">),</span>
+    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"energy"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Energy/intensity level 0-1"</span><span class="p">),</span>
+    <span class="s2">"brightness"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"brightness"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Spectral brightness 0-1"</span><span class="p">),</span>
+    <span class="s2">"instruments"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">"Instrument selection"</span><span class="p">),</span>
+    <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"instrumental"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Force instrumental-only output"</span><span class="p">),</span>
+    <span class="s2">"title"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Song title"</span><span class="p">),</span>
+    <span class="s2">"structure"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"structure"</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">"Song section structure"</span><span class="p">),</span>
+    <span class="s2">"audio_input"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"audio_input"</span><span class="p">,</span>
         <span class="nb">object</span><span class="p">,</span>
-        <span class="s2">&quot;Input audio to transform/continue (audio-to-audio). Accepts a Song, &quot;</span>
-        <span class="s2">&quot;AudioResult, bytes, file path, (array, sample_rate) pair, or NumPy &quot;</span>
-        <span class="s2">&quot;waveform -- normalized by arioso._audio.to_audio_ref&quot;</span><span class="p">,</span>
+        <span class="s2">"Input audio to transform/continue (audio-to-audio). Accepts a Song, "</span>
+        <span class="s2">"AudioResult, bytes, file path, (array, sample_rate) pair, or NumPy "</span>
+        <span class="s2">"waveform -- normalized by arioso._audio.to_audio_ref"</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="s2">&quot;audio_input_strength&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;audio_input_strength&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;How much reference audio influences output 0-1&quot;</span>
+    <span class="s2">"audio_input_strength"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"audio_input_strength"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"How much reference audio influences output 0-1"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;melody&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;melody&quot;</span><span class="p">,</span>
+    <span class="s2">"melody"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"melody"</span><span class="p">,</span>
         <span class="nb">object</span><span class="p">,</span>
-        <span class="s2">&quot;Melodic contour to condition on (e.g. MusicGen-melody chroma). Same &quot;</span>
-        <span class="s2">&quot;accepted forms as audio_input; used as a tune to follow, not full &quot;</span>
-        <span class="s2">&quot;audio-to-audio&quot;</span><span class="p">,</span>
+        <span class="s2">"Melodic contour to condition on (e.g. MusicGen-melody chroma). Same "</span>
+        <span class="s2">"accepted forms as audio_input; used as a tune to follow, not full "</span>
+        <span class="s2">"audio-to-audio"</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="s2">&quot;reference_audio&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;reference_audio&quot;</span><span class="p">,</span>
+    <span class="s2">"reference_audio"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"reference_audio"</span><span class="p">,</span>
         <span class="nb">object</span><span class="p">,</span>
-        <span class="s2">&quot;Style/timbre reference audio (guides sound/production without &quot;</span>
-        <span class="s2">&quot;reproducing the take). Same accepted forms as audio_input&quot;</span><span class="p">,</span>
+        <span class="s2">"Style/timbre reference audio (guides sound/production without "</span>
+        <span class="s2">"reproducing the take). Same accepted forms as audio_input"</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="s2">&quot;continue_from&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;continue_from&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;ID/URL of track to extend from&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;continue_at&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;continue_at&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Timestamp in seconds to continue from&quot;</span>
+    <span class="s2">"continue_from"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"continue_from"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"ID/URL of track to extend from"</span><span class="p">),</span>
+    <span class="s2">"continue_at"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"continue_at"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Timestamp in seconds to continue from"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;mask_start&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;mask_start&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Inpainting region start in seconds&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;mask_end&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;mask_end&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Inpainting region end in seconds&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Model version or variant&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Random seed for reproducibility&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;guidance&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Classifier-free guidance scale&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Sampling randomness&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;top_k&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Top-k sampling parameter&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;top_p&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Top-p (nucleus) sampling&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;num_steps&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Number of inference/diffusion steps&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;sampler&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;sampler&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Sampling algorithm for diffusion&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Number of outputs per request&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;output_format&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;output_format&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Desired output format&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;bitrate&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;bitrate&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Audio bitrate in kbps&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;prompt_weight&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;prompt_weight&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Strength of prompt adherence&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;interpolation_alpha&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;interpolation_alpha&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Blend between two prompts 0-1&quot;</span>
+    <span class="s2">"mask_start"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"mask_start"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Inpainting region start in seconds"</span><span class="p">),</span>
+    <span class="s2">"mask_end"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"mask_end"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Inpainting region end in seconds"</span><span class="p">),</span>
+    <span class="s2">"model"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"model"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Model version or variant"</span><span class="p">),</span>
+    <span class="s2">"seed"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"seed"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Random seed for reproducibility"</span><span class="p">),</span>
+    <span class="s2">"guidance"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"guidance"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Classifier-free guidance scale"</span><span class="p">),</span>
+    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Sampling randomness"</span><span class="p">),</span>
+    <span class="s2">"top_k"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"top_k"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Top-k sampling parameter"</span><span class="p">),</span>
+    <span class="s2">"top_p"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"top_p"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Top-p (nucleus) sampling"</span><span class="p">),</span>
+    <span class="s2">"num_steps"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"num_steps"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Number of inference/diffusion steps"</span><span class="p">),</span>
+    <span class="s2">"sampler"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Sampling algorithm for diffusion"</span><span class="p">),</span>
+    <span class="s2">"batch_size"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"batch_size"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Number of outputs per request"</span><span class="p">),</span>
+    <span class="s2">"output_format"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"output_format"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Desired output format"</span><span class="p">),</span>
+    <span class="s2">"bitrate"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"bitrate"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Audio bitrate in kbps"</span><span class="p">),</span>
+    <span class="s2">"prompt_weight"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"prompt_weight"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Strength of prompt adherence"</span><span class="p">),</span>
+    <span class="s2">"interpolation_alpha"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"interpolation_alpha"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Blend between two prompts 0-1"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;wait_for_completion&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;wait_for_completion&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Block until audio is ready&quot;</span>
+    <span class="s2">"wait_for_completion"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"wait_for_completion"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Block until audio is ready"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;voice_id&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;voice_id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;AI singer/voice model selection&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;pitch_shift&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;pitch_shift&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Pitch adjustment in semitones&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;watermark&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;watermark&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Apply content authenticity watermark&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;extend_stride&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;extend_stride&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Overlap stride for extended generation&quot;</span>
+    <span class="s2">"voice_id"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"voice_id"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"AI singer/voice model selection"</span><span class="p">),</span>
+    <span class="s2">"pitch_shift"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"pitch_shift"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Pitch adjustment in semitones"</span><span class="p">),</span>
+    <span class="s2">"watermark"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"watermark"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Apply content authenticity watermark"</span><span class="p">),</span>
+    <span class="s2">"extend_stride"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"extend_stride"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Overlap stride for extended generation"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;Max generated tokens&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Penalize repeated patterns&quot;</span>
+    <span class="s2">"max_tokens"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"max_tokens"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Max generated tokens"</span><span class="p">),</span>
+    <span class="s2">"repetition_penalty"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"repetition_penalty"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Penalize repeated patterns"</span>
     <span class="p">),</span>
-    <span class="s2">&quot;looping&quot;</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">&quot;looping&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Generate loopable audio&quot;</span><span class="p">),</span>
+    <span class="s2">"looping"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"looping"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Generate loopable audio"</span><span class="p">),</span>
 <span class="p">}</span>
 </pre></div>
 

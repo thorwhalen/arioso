@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms._base_adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms._base_adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms._base_adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Base adapter class for REST API platforms.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Base adapter class for REST API platforms."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
@@ -138,16 +138,16 @@
 <div class="viewcode-block" id="BaseRestAdapter">
 <a class="viewcode-back" href="../../../module_docs/arioso/platforms/_base_adapter.html#arioso.platforms._base_adapter.BaseRestAdapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseRestAdapter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class providing common infrastructure for REST API adapters.</span>
+<span class="w">    </span><span class="sd">"""Base class providing common infrastructure for REST API adapters.</span>
 
 <span class="sd">    Subclasses get a pre-configured ``requests.Session`` with auth</span>
 <span class="sd">    headers and a polling helper for async generation endpoints.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base_url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">make_session</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"api"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"base_url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">make_session</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"auth"</span><span class="p">,</span> <span class="p">{}))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_poll_until_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -155,10 +155,10 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="n">status_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span>
-        <span class="n">complete_value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+        <span class="n">status_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"status"</span><span class="p">,</span>
+        <span class="n">complete_value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"complete"</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll a status endpoint until completion or timeout.</span>
+<span class="w">        </span><span class="sd">"""Poll a status endpoint until completion or timeout.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            check_url: URL to GET for status updates.</span>
@@ -172,7 +172,7 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            TimeoutError: If generation does not complete in time.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
             <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check_url</span><span class="p">)</span>
@@ -181,7 +181,7 @@
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">status_key</span><span class="p">)</span> <span class="o">==</span> <span class="n">complete_value</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">data</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span></div>
 
 </pre></div>
 

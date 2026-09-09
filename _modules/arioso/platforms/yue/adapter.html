@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.yue.adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.yue.adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.yue.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;YuE adapter supporting fal.ai REST API and local CLI backends.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""YuE adapter supporting fal.ai REST API and local CLI backends."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -137,34 +137,34 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a duration in seconds to an approximate number of YuE segments.</span>
+<span class="w">    </span><span class="sd">"""Convert a duration in seconds to an approximate number of YuE segments.</span>
 
 <span class="sd">    Each segment is roughly 30 seconds of audio.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">duration</span> <span class="o">/</span> <span class="mi">30</span><span class="p">)))</span>
 
 
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/yue/adapter.html#arioso.platforms.yue.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;YuE adapter with dual backend support.</span>
+<span class="w">    </span><span class="sd">"""YuE adapter with dual backend support.</span>
 
 <span class="sd">    Prefers the fal.ai hosted API when ``FAL_KEY`` is set.  Falls back to</span>
 <span class="sd">    local subprocess invocation of ``infer.py`` otherwise.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine which backend to use.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Determine which backend to use."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAL_KEY&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">&quot;fal&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FAL_KEY"</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">"fal"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="s2">"local"</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
 
 <div class="viewcode-block" id="Adapter.generate">
@@ -173,16 +173,16 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m-a-p/YuE-s1-7B-anneal-en-cot&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"m-a-p/YuE-s1-7B-anneal-en-cot"</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
         <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">,</span>
         <span class="n">repetition_penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
-        <span class="n">audio_input</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music from genre description and lyrics.</span>
+<span class="w">        </span><span class="sd">"""Generate music from genre description and lyrics.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Genre/style description (mapped to ``genre_txt``).</span>
@@ -196,9 +196,9 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A Song with audio_url or audio_bytes populated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_backend</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;fal&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">"fal"</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_fal</span><span class="p">(</span>
                 <span class="n">prompt</span><span class="p">,</span>
                 <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span><span class="p">,</span>
@@ -241,46 +241,46 @@
             <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;The fal_client package is required for the fal.ai backend. &quot;</span>
-                <span class="s2">&quot;Install it with: pip install fal-client&quot;</span>
+                <span class="s2">"The fal_client package is required for the fal.ai backend. "</span>
+                <span class="s2">"Install it with: pip install fal-client"</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
         <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;genre_txt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
-            <span class="s2">&quot;lyrics_txt&quot;</span><span class="p">:</span> <span class="n">lyrics</span><span class="p">,</span>
-            <span class="s2">&quot;run_n_segments&quot;</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
-            <span class="s2">&quot;stage1_model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;stage2_batch_size&quot;</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span>
-            <span class="s2">&quot;max_new_tokens&quot;</span><span class="p">:</span> <span class="n">max_tokens</span><span class="p">,</span>
-            <span class="s2">&quot;repetition_penalty&quot;</span><span class="p">:</span> <span class="n">repetition_penalty</span><span class="p">,</span>
+            <span class="s2">"genre_txt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">"lyrics_txt"</span><span class="p">:</span> <span class="n">lyrics</span><span class="p">,</span>
+            <span class="s2">"run_n_segments"</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
+            <span class="s2">"stage1_model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">"stage2_batch_size"</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">"max_new_tokens"</span><span class="p">:</span> <span class="n">max_tokens</span><span class="p">,</span>
+            <span class="s2">"repetition_penalty"</span><span class="p">:</span> <span class="n">repetition_penalty</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
-            <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;vocal_track_prompt_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_input</span>
+            <span class="n">arguments</span><span class="p">[</span><span class="s2">"vocal_track_prompt_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_input</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;fal-ai/yue&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">"fal-ai/yue"</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span>
 
-        <span class="n">audio_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">audio_url</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="n">audio_bytes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio_url"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">audio_url</span><span class="p">:</span>
                 <span class="c1"># Some fal responses nest the URL</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output"</span><span class="p">,</span> <span class="p">{})</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">audio_url</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">audio_url</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
             <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                 <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
                 <span class="n">audio_bytes</span><span class="o">=</span><span class="n">audio_bytes</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">"wav"</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;yue&quot;</span><span class="p">,</span>
-            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">"yue"</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">,</span>
             <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;fal&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-                <span class="s2">&quot;segments&quot;</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
+                <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"fal"</span><span class="p">,</span>
+                <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                <span class="s2">"segments"</span><span class="p">:</span> <span class="n">_duration_to_segments</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
 
@@ -307,77 +307,77 @@
 
         <span class="c1"># Write genre and lyrics to temporary files for the CLI</span>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">".txt"</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">genre_f</span><span class="p">:</span>
             <span class="n">genre_f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
             <span class="n">genre_path</span> <span class="o">=</span> <span class="n">genre_f</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">".txt"</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">lyrics_f</span><span class="p">:</span>
             <span class="n">lyrics_f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">lyrics</span><span class="p">)</span>
             <span class="n">lyrics_path</span> <span class="o">=</span> <span class="n">lyrics_f</span><span class="o">.</span><span class="n">name</span>
 
-        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;yue_output_&quot;</span><span class="p">)</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"yue_output_"</span><span class="p">)</span>
 
         <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;python&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;infer.py&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--genre_txt&quot;</span><span class="p">,</span>
+            <span class="s2">"python"</span><span class="p">,</span>
+            <span class="s2">"infer.py"</span><span class="p">,</span>
+            <span class="s2">"--genre_txt"</span><span class="p">,</span>
             <span class="n">genre_path</span><span class="p">,</span>
-            <span class="s2">&quot;--lyrics_txt&quot;</span><span class="p">,</span>
+            <span class="s2">"--lyrics_txt"</span><span class="p">,</span>
             <span class="n">lyrics_path</span><span class="p">,</span>
-            <span class="s2">&quot;--run_n_segments&quot;</span><span class="p">,</span>
+            <span class="s2">"--run_n_segments"</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span>
-            <span class="s2">&quot;--stage1_model&quot;</span><span class="p">,</span>
+            <span class="s2">"--stage1_model"</span><span class="p">,</span>
             <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;--stage2_batch_size&quot;</span><span class="p">,</span>
+            <span class="s2">"--stage2_batch_size"</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span>
-            <span class="s2">&quot;--max_new_tokens&quot;</span><span class="p">,</span>
+            <span class="s2">"--max_new_tokens"</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">max_tokens</span><span class="p">),</span>
-            <span class="s2">&quot;--repetition_penalty&quot;</span><span class="p">,</span>
+            <span class="s2">"--repetition_penalty"</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">repetition_penalty</span><span class="p">),</span>
-            <span class="s2">&quot;--output_dir&quot;</span><span class="p">,</span>
+            <span class="s2">"--output_dir"</span><span class="p">,</span>
             <span class="n">output_dir</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
-            <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--vocal_track_prompt_path&quot;</span><span class="p">,</span> <span class="n">audio_input</span><span class="p">])</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">"--vocal_track_prompt_path"</span><span class="p">,</span> <span class="n">audio_input</span><span class="p">])</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Local YuE inference requires the infer.py script from the &quot;</span>
-                <span class="s2">&quot;YuE repository to be available on PATH. See: &quot;</span>
-                <span class="s2">&quot;https://github.com/multimodal-art-projection/YuE&quot;</span>
+                <span class="s2">"Local YuE inference requires the infer.py script from the "</span>
+                <span class="s2">"YuE repository to be available on PATH. See: "</span>
+                <span class="s2">"https://github.com/multimodal-art-projection/YuE"</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
         <span class="c1"># Find the generated audio file</span>
         <span class="n">audio_bytes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.wav&quot;</span><span class="p">):</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".wav"</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">audio_bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                 <span class="k">break</span>
 
         <span class="k">if</span> <span class="n">audio_bytes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;No .wav file found in YuE output directory; &quot;</span>
-                <span class="s2">&quot;generation may have failed.&quot;</span>
+                <span class="s2">"No .wav file found in YuE output directory; "</span>
+                <span class="s2">"generation may have failed."</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
             <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                 <span class="n">audio_bytes</span><span class="o">=</span><span class="n">audio_bytes</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;wav&quot;</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">"wav"</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;yue&quot;</span><span class="p">,</span>
-            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span> <span class="k">if</span> <span class="n">audio_bytes</span> <span class="k">else</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">"yue"</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span> <span class="k">if</span> <span class="n">audio_bytes</span> <span class="k">else</span> <span class="s2">"error"</span><span class="p">,</span>
             <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-                <span class="s2">&quot;segments&quot;</span><span class="p">:</span> <span class="n">segments</span><span class="p">,</span>
-                <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span>
+                <span class="s2">"backend"</span><span class="p">:</span> <span class="s2">"local"</span><span class="p">,</span>
+                <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                <span class="s2">"segments"</span><span class="p">:</span> <span class="n">segments</span><span class="p">,</span>
+                <span class="s2">"output_dir"</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span></div>
 

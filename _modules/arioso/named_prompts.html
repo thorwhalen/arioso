@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.named_prompts &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.named_prompts &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.named_prompts</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Named prompts: a ledger of (name, prompt_text) pairs organized by category.</span>
+<span></span><span class="sd">"""Named prompts: a ledger of (name, prompt_text) pairs organized by category.</span>
 
 <span class="sd">Provides a system for looking up sonic descriptions by name (artist, mood, genre,</span>
 <span class="sd">instrument, etc.) to help users craft prompts for AI music generation without using</span>
@@ -143,13 +143,13 @@
 <span class="sd">Usage::</span>
 
 <span class="sd">    &gt;&gt;&gt; from arioso.named_prompts import named_prompts, search</span>
-<span class="sd">    &gt;&gt;&gt; named_prompts.artists[&#39;billie_eilish&#39;]  # attribute access by category</span>
-<span class="sd">    &#39;...&#39;</span>
-<span class="sd">    &gt;&gt;&gt; named_prompts[&#39;artists&#39;, &#39;billie_eilish&#39;]  # flat key access</span>
-<span class="sd">    &#39;...&#39;</span>
-<span class="sd">    &gt;&gt;&gt; results = search(&#39;jazz&#39;)  # search across all categories</span>
+<span class="sd">    &gt;&gt;&gt; named_prompts.artists['billie_eilish']  # attribute access by category</span>
+<span class="sd">    '...'</span>
+<span class="sd">    &gt;&gt;&gt; named_prompts['artists', 'billie_eilish']  # flat key access</span>
+<span class="sd">    '...'</span>
+<span class="sd">    &gt;&gt;&gt; results = search('jazz')  # search across all categories</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -169,16 +169,16 @@
 <span class="c1"># Paths</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
-<span class="n">_STARTER_DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;named_prompts&quot;</span>
+<span class="n">_STARTER_DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"named_prompts"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_user_data_dir</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the user data directory for named prompts.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the user data directory for named prompts."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">config2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_app_data_folder</span>
 
     <span class="n">folder</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">&quot;arioso&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span>
-        <span class="o">/</span> <span class="s2">&quot;named_prompts&quot;</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">"arioso"</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span>
+        <span class="o">/</span> <span class="s2">"named_prompts"</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">ensure_exists</span><span class="p">:</span>
         <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -191,7 +191,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_load_yaml</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a YAML file as a dict of {name: prompt_text}.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Load a YAML file as a dict of {name: prompt_text}."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
@@ -203,11 +203,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dump_yaml</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a dict of {name: prompt_text} to a YAML file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Write a dict of {name: prompt_text} to a YAML file."""</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
     <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
         <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span>
             <span class="n">fh</span><span class="p">,</span>
@@ -223,21 +223,21 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_yaml_store</span><span class="p">(</span><span class="n">root_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">writable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a dol store that maps ``category`` keys to ``{name: prompt}`` dicts.</span>
+<span class="w">    </span><span class="sd">"""Create a dol store that maps ``category`` keys to ``{name: prompt}`` dicts.</span>
 
 <span class="sd">    The store reads/writes YAML files in *root_dir*, one file per category.</span>
 <span class="sd">    Keys are category names (without ``.yaml`` extension); values are dicts.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_kvs</span><span class="p">,</span> <span class="n">TextFiles</span>
 
     <span class="n">base_cls</span> <span class="o">=</span> <span class="n">TextFiles</span>
 
     <span class="n">store_cls</span> <span class="o">=</span> <span class="n">wrap_kvs</span><span class="p">(</span>
         <span class="n">base_cls</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;YamlPromptStore&quot;</span><span class="p">,</span>
-        <span class="c1"># key transform: &#39;artists&#39; &lt;-&gt; &#39;artists.yaml&#39;</span>
-        <span class="n">key_of_id</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_id</span><span class="p">:</span> <span class="n">_id</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">&quot;.yaml&quot;</span><span class="p">),</span>
-        <span class="n">id_of_key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">k</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.yaml&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"YamlPromptStore"</span><span class="p">,</span>
+        <span class="c1"># key transform: 'artists' &lt;-&gt; 'artists.yaml'</span>
+        <span class="n">key_of_id</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_id</span><span class="p">:</span> <span class="n">_id</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">".yaml"</span><span class="p">),</span>
+        <span class="n">id_of_key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">k</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".yaml"</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.yaml"</span><span class="p">,</span>
         <span class="c1"># value transform: YAML text &lt;-&gt; dict</span>
         <span class="n">obj_of_data</span><span class="o">=</span><span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="n">_yaml_text_to_dict</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
         <span class="n">data_of_obj</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_dict_to_yaml_text</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span>
@@ -272,9 +272,9 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_ReadOnlyMapping</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A thin read-only wrapper around a mutable mapping.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A thin read-only wrapper around a mutable mapping."""</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_store&quot;</span><span class="p">,)</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_store"</span><span class="p">,)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_store</span> <span class="o">=</span> <span class="n">store</span>
@@ -289,7 +289,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_store</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
 
 
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -298,12 +298,12 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_MergedCategoryMapping</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A read-only view of a single category that merges starter and user dicts.</span>
+<span class="w">    </span><span class="sd">"""A read-only view of a single category that merges starter and user dicts.</span>
 
 <span class="sd">    User entries take precedence over starter entries.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_starter&quot;</span><span class="p">,</span> <span class="s2">&quot;_user&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_starter"</span><span class="p">,</span> <span class="s2">"_user"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -334,19 +334,19 @@
         <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_starter</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No prompt named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in this category&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No prompt named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in this category"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">()]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;PromptCategory(</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> entries)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"PromptCategory(</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> entries)"</span>
 
 
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -357,21 +357,21 @@
 <div class="viewcode-block" id="NamedPrompts">
 <a class="viewcode-back" href="../../module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NamedPrompts</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two-level mapping of ``(category, name) -&gt; prompt_text``.</span>
+<span class="w">    </span><span class="sd">"""Two-level mapping of ``(category, name) -&gt; prompt_text``.</span>
 
 <span class="sd">    Supports both hierarchical and flat access::</span>
 
 <span class="sd">        np = NamedPrompts()</span>
-<span class="sd">        np.artists[&#39;billie_eilish&#39;]     # attribute access to a category</span>
-<span class="sd">        np[&#39;artists&#39;][&#39;billie_eilish&#39;]  # dict-style</span>
-<span class="sd">        np[&#39;artists&#39;, &#39;billie_eilish&#39;]  # flat tuple key</span>
+<span class="sd">        np.artists['billie_eilish']     # attribute access to a category</span>
+<span class="sd">        np['artists']['billie_eilish']  # dict-style</span>
+<span class="sd">        np['artists', 'billie_eilish']  # flat tuple key</span>
 
 <span class="sd">    Categories are auto-discovered from YAML files in the starter and user dirs.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        include_user_data: Whether to layer user data on top of starter data.</span>
 <span class="sd">            Defaults to ``True``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_user_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_starter_store</span> <span class="o">=</span> <span class="n">_make_yaml_store</span><span class="p">(</span><span class="n">_STARTER_DATA_DIR</span><span class="p">,</span> <span class="n">writable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -399,7 +399,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all available category names.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return all available category names."""</span>
         <span class="n">cats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_starter_store</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cats</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_store</span><span class="p">)</span>
@@ -408,11 +408,11 @@
     <span class="c1"># -- Mapping interface -------------------------------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a category dict or a specific prompt.</span>
+<span class="w">        </span><span class="sd">"""Get a category dict or a specific prompt.</span>
 
-<span class="sd">        ``np[&#39;artists&#39;]`` returns the merged category mapping.</span>
-<span class="sd">        ``np[&#39;artists&#39;, &#39;billie_eilish&#39;]`` returns the prompt string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        ``np['artists']`` returns the merged category mapping.</span>
+<span class="sd">        ``np['artists', 'billie_eilish']`` returns the prompt string.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">key</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">category</span><span class="p">)[</span><span class="n">name</span><span class="p">]</span>
@@ -441,14 +441,14 @@
     <span class="c1"># -- Attribute access (for tab-completion) -----------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no category </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Available: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no category </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. "</span>
+                <span class="sa">f</span><span class="s2">"Available: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -459,7 +459,7 @@
 <div class="viewcode-block" id="NamedPrompts.flat">
 <a class="viewcode-back" href="../../module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts.flat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">flat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a flat dict of ``{(category, name): prompt_text}``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a flat dict of ``{(category, name): prompt_text}``."""</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -470,19 +470,19 @@
 <div class="viewcode-block" id="NamedPrompts.flat_names">
 <a class="viewcode-back" href="../../module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts.flat_names">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">flat_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">warn_collisions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a flat dict of ``{name: prompt_text}``, ignoring categories.</span>
+<span class="w">        </span><span class="sd">"""Return a flat dict of ``{name: prompt_text}``, ignoring categories.</span>
 
 <span class="sd">        If the same name appears in multiple categories, the last one wins</span>
 <span class="sd">        and a warning is issued (unless ``warn_collisions=False``).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">seen_in</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># name -&gt; first category</span>
         <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">warn_collisions</span> <span class="ow">and</span> <span class="n">seen_in</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="n">cat</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Name </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> appears in both </span><span class="si">{</span><span class="n">seen_in</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;and </span><span class="si">{</span><span class="n">cat</span><span class="si">!r}</span><span class="s2">; using the one from </span><span class="si">{</span><span class="n">cat</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"Name </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> appears in both </span><span class="si">{</span><span class="n">seen_in</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> "</span>
+                        <span class="sa">f</span><span class="s2">"and </span><span class="si">{</span><span class="n">cat</span><span class="si">!r}</span><span class="s2">; using the one from </span><span class="si">{</span><span class="n">cat</span><span class="si">!r}</span><span class="s2">."</span><span class="p">,</span>
                         <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="n">seen_in</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">cat</span><span class="p">)</span>
@@ -493,8 +493,8 @@
     <span class="c1"># -- Display -----------------------------------------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">cats</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">c</span><span class="p">))</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;NamedPrompts(</span><span class="si">{</span><span class="n">cats</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+        <span class="n">cats</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_category</span><span class="p">(</span><span class="n">c</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"NamedPrompts(</span><span class="si">{</span><span class="n">cats</span><span class="si">}</span><span class="s2">)"</span></div>
 
 
 
@@ -512,18 +512,18 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">confirm_override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add or update a prompt in the user&#39;s data.</span>
+<span class="w">    </span><span class="sd">"""Add or update a prompt in the user's data.</span>
 
 <span class="sd">    If the name already exists in either user or starter data and</span>
 <span class="sd">    ``confirm_override`` is True, a confirmation prompt is printed on the</span>
 <span class="sd">    first collision.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        category: The category to add to (e.g. &#39;artists&#39;, &#39;moods&#39;).</span>
+<span class="sd">        category: The category to add to (e.g. 'artists', 'moods').</span>
 <span class="sd">        name: The identifier for this prompt.</span>
 <span class="sd">        prompt_text: The sonic description / prompt text.</span>
 <span class="sd">        confirm_override: If True, warn when overriding an existing entry.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">user_dir</span> <span class="o">=</span> <span class="n">_user_data_dir</span><span class="p">(</span><span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">user_store</span> <span class="o">=</span> <span class="n">_make_yaml_store</span><span class="p">(</span><span class="n">user_dir</span><span class="p">,</span> <span class="n">writable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -540,8 +540,8 @@
             <span class="n">starter_data</span> <span class="o">=</span> <span class="n">starter_store</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">starter_data</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> already exists in starter data for </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Your entry will take precedence over the built-in one.&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> already exists in starter data for </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">. "</span>
+                    <span class="sa">f</span><span class="s2">"Your entry will take precedence over the built-in one."</span><span class="p">,</span>
                     <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                 <span class="p">)</span>
 
@@ -553,29 +553,29 @@
 <div class="viewcode-block" id="remove_prompt">
 <a class="viewcode-back" href="../../module_docs/arioso/named_prompts.html#arioso.named_prompts.remove_prompt">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_prompt</span><span class="p">(</span><span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove a prompt from the user&#39;s data.</span>
+<span class="w">    </span><span class="sd">"""Remove a prompt from the user's data.</span>
 
 <span class="sd">    This only removes from user data. Starter data entries cannot be removed</span>
 <span class="sd">    (but can be overridden via ``add_prompt``).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">user_dir</span> <span class="o">=</span> <span class="n">_user_data_dir</span><span class="p">(</span><span class="n">ensure_exists</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">user_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No user data exists for category </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No user data exists for category </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">user_store</span> <span class="o">=</span> <span class="n">_make_yaml_store</span><span class="p">(</span><span class="n">user_dir</span><span class="p">,</span> <span class="n">writable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_store</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No user data for category </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No user data for category </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">cat_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">user_store</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cat_data</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not found in user data for </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not found in user data for </span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">del</span> <span class="n">cat_data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">cat_data</span><span class="p">:</span>
         <span class="n">user_store</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat_data</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Remove the empty file</span>
-        <span class="n">yaml_path</span> <span class="o">=</span> <span class="n">user_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+        <span class="n">yaml_path</span> <span class="o">=</span> <span class="n">user_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">.yaml"</span>
         <span class="k">if</span> <span class="n">yaml_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">yaml_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
 
@@ -595,7 +595,7 @@
     <span class="n">search_prompts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">search_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for prompts matching a query string.</span>
+<span class="w">    </span><span class="sd">"""Search for prompts matching a query string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        query: Case-insensitive substring to search for.</span>
@@ -605,7 +605,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict of ``{(category, name): prompt_text}`` for all matches.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">np</span> <span class="o">=</span> <span class="n">NamedPrompts</span><span class="p">()</span>
     <span class="n">query_lower</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -638,7 +638,7 @@
 <div class="viewcode-block" id="get_named_prompts">
 <a class="viewcode-back" href="../../module_docs/arioso/named_prompts.html#arioso.named_prompts.get_named_prompts">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_named_prompts</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NamedPrompts</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a module-level singleton ``NamedPrompts`` instance.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return a module-level singleton ``NamedPrompts`` instance."""</span>
     <span class="k">global</span> <span class="n">_named_prompts</span>
     <span class="k">if</span> <span class="n">_named_prompts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_named_prompts</span> <span class="o">=</span> <span class="n">NamedPrompts</span><span class="p">()</span>
@@ -648,9 +648,9 @@
 
 <span class="c1"># Lazy attribute for ``from arioso.named_prompts import named_prompts``</span>
 <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;named_prompts&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"named_prompts"</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">get_named_prompts</span><span class="p">()</span>
-    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 
            </div>

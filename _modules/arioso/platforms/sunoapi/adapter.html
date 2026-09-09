@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.sunoapi.adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.sunoapi.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Suno adapter via sunoapi.org REST API.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Suno adapter via sunoapi.org REST API."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
@@ -138,16 +138,16 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms._base_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRestAdapter</span>
 
 <span class="c1"># Valid model versions accepted by sunoapi.org</span>
-<span class="n">SUNO_MODELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;V4&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;V4_5PLUS&quot;</span><span class="p">,</span> <span class="s2">&quot;V5&quot;</span><span class="p">)</span>
+<span class="n">SUNO_MODELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"V4"</span><span class="p">,</span> <span class="s2">"V4_5"</span><span class="p">,</span> <span class="s2">"V4_5ALL"</span><span class="p">,</span> <span class="s2">"V4_5PLUS"</span><span class="p">,</span> <span class="s2">"V5"</span><span class="p">)</span>
 
 <span class="c1"># File upload base URL (separate from the generation API).</span>
 <span class="c1"># Configurable via env var in case the provider changes domains again.</span>
 <span class="n">SUNO_FILE_UPLOAD_BASE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-    <span class="s2">&quot;SUNO_FILE_UPLOAD_BASE_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;https://sunoapiorg.riftrunnerai.com&quot;</span>
+    <span class="s2">"SUNO_FILE_UPLOAD_BASE_URL"</span><span class="p">,</span> <span class="s2">"https://sunoapiorg.riftrunnerai.com"</span>
 <span class="p">)</span>
 
 <span class="c1"># Default model, configurable via env var</span>
-<span class="n">SUNO_DEFAULT_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUNO_DEFAULT_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;V4&quot;</span><span class="p">)</span>
+<span class="n">SUNO_DEFAULT_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SUNO_DEFAULT_MODEL"</span><span class="p">,</span> <span class="s2">"V4"</span><span class="p">)</span>
 
 <span class="c1"># Default callback URL, configurable via env var.</span>
 <span class="c1"># The upload-extend and upload-cover endpoints require a callBackUrl field,</span>
@@ -155,31 +155,31 @@
 <span class="c1"># We default to a no-op placeholder so the API works out of the box when</span>
 <span class="c1"># using wait_for_completion=True (polling mode).  Override with a real webhook</span>
 <span class="c1"># URL via the SUNO_CALLBACK_URL env var if you want push notifications.</span>
-<span class="n">_NOOP_CALLBACK_URL</span> <span class="o">=</span> <span class="s2">&quot;https://localhost/noop-callback&quot;</span>
-<span class="n">SUNO_DEFAULT_CALLBACK_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUNO_CALLBACK_URL&quot;</span><span class="p">,</span> <span class="n">_NOOP_CALLBACK_URL</span><span class="p">)</span>
+<span class="n">_NOOP_CALLBACK_URL</span> <span class="o">=</span> <span class="s2">"https://localhost/noop-callback"</span>
+<span class="n">SUNO_DEFAULT_CALLBACK_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"SUNO_CALLBACK_URL"</span><span class="p">,</span> <span class="n">_NOOP_CALLBACK_URL</span><span class="p">)</span>
 
 <span class="c1"># Status values returned by the record-info endpoint</span>
-<span class="n">_COMPLETE_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">}</span>
+<span class="n">_COMPLETE_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"SUCCESS"</span><span class="p">}</span>
 <span class="n">_ERROR_STATUSES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;CREATE_TASK_FAILED&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;GENERATE_AUDIO_FAILED&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SENSITIVE_WORD_ERROR&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CALLBACK_EXCEPTION&quot;</span><span class="p">,</span>
+    <span class="s2">"CREATE_TASK_FAILED"</span><span class="p">,</span>
+    <span class="s2">"GENERATE_AUDIO_FAILED"</span><span class="p">,</span>
+    <span class="s2">"SENSITIVE_WORD_ERROR"</span><span class="p">,</span>
+    <span class="s2">"CALLBACK_EXCEPTION"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">_PARTIAL_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;TEXT_SUCCESS&quot;</span><span class="p">,</span> <span class="s2">&quot;FIRST_SUCCESS&quot;</span><span class="p">}</span>
+<span class="n">_PARTIAL_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"TEXT_SUCCESS"</span><span class="p">,</span> <span class="s2">"FIRST_SUCCESS"</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise RuntimeError if the API response indicates an error.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msg&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown API error&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sunoapi error (code </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Raise RuntimeError if the API response indicates an error."""</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s2">"code"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"msg"</span><span class="p">,</span> <span class="s2">"Unknown API error"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sunoapi error (code </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'code'</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">(</span><span class="n">BaseRestAdapter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapter for Suno music generation via sunoapi.org.</span>
+<span class="w">    </span><span class="sd">"""Adapter for Suno music generation via sunoapi.org.</span>
 
 <span class="sd">    Handles the distinction between simple generation (prompt only)</span>
 <span class="sd">    and custom generation (with lyrics/style via customMode).</span>
@@ -201,7 +201,7 @@
 <span class="sd">        adapter.tasks                # SunoTasks Mapping</span>
 <span class="sd">        adapter.tasks.last(10)       # last 10 tasks</span>
 <span class="sd">        adapter.tasks.failed()       # all failed tasks</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task_store</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -209,7 +209,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Local task store (``SunoTasks`` Mapping) for recorded requests.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Local task store (``SunoTasks`` Mapping) for recorded requests."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">SunoTasks</span>
 
@@ -217,9 +217,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_store</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_record_task</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">request_params</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;PENDING&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">request_params</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"PENDING"</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save a new task record to the local store.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save a new task record to the local store."""</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.task_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_record</span>
 
         <span class="n">record</span> <span class="o">=</span> <span class="n">_make_record</span><span class="p">(</span>
@@ -235,21 +235,21 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">genre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">genre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">instrumental</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">continue_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">continue_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">continue_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music via sunoapi.org.</span>
+<span class="w">        </span><span class="sd">"""Generate music via sunoapi.org.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Text description of desired music. In simple mode, this</span>
@@ -261,7 +261,7 @@
 <span class="sd">            title: Song title (used in customMode).</span>
 <span class="sd">            instrumental: If True, generate without vocals.</span>
 <span class="sd">            model: Suno model version. Valid: {models}.</span>
-<span class="sd">                Defaults to SUNO_DEFAULT_MODEL env var, or &#39;V4&#39;.</span>
+<span class="sd">                Defaults to SUNO_DEFAULT_MODEL env var, or 'V4'.</span>
 <span class="sd">            continue_from: Clip ID to extend from.</span>
 <span class="sd">            continue_at: Timestamp in seconds to continue from.</span>
 <span class="sd">            callback_url: Webhook URL for completion notification.</span>
@@ -275,7 +275,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List of Song objects (typically 2 per call).</span>
-<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
+<span class="sd">        """</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
 
@@ -283,55 +283,55 @@
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
 
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;instrumental&quot;</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
-            <span class="s2">&quot;callBackUrl&quot;</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
-            <span class="s2">&quot;customMode&quot;</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
+            <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
+            <span class="s2">"callBackUrl"</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
+            <span class="s2">"customMode"</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">custom_mode</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">prompt</span>
             <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span> <span class="ow">and</span> <span class="n">lyrics</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lyrics</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">lyrics</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">instrumental</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
 
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;negativeTags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"negativeTags"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
 
         <span class="k">if</span> <span class="n">continue_from</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;continue_clip_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_from</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"continue_clip_id"</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_from</span>
             <span class="k">if</span> <span class="n">continue_at</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;continue_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"continue_at"</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span>
 
-        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">&quot;/api/v1/generate&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">"/api/v1/generate"</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="n">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="c1"># The API returns a taskId; songs arrive via callback or polling.</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
             <span class="n">task_id</span><span class="p">,</span>
-            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;generate&quot;</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">"generate"</span><span class="p">,</span>
             <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
-            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
@@ -347,17 +347,17 @@
             <span class="n">Song</span><span class="p">(</span>
                 <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">),</span>
-                <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">),</span>
+                <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="p">]</span>
 
 <div class="viewcode-block" id="Adapter.upload_file">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.upload_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">upload_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Upload a local audio file and return a public URL.</span>
+<span class="w">        </span><span class="sd">"""Upload a local audio file and return a public URL.</span>
 
 <span class="sd">        Uses the sunoapi.org file upload API. Uploaded files are temporary</span>
 <span class="sd">        and automatically deleted after 3 days.</span>
@@ -367,39 +367,39 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Public URL of the uploaded file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Audio file not found: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Audio file not found: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SUNO_FILE_UPLOAD_BASE_URL</span><span class="si">}</span><span class="s2">/api/file-stream-upload&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">SUNO_FILE_UPLOAD_BASE_URL</span><span class="si">}</span><span class="s2">/api/file-stream-upload"</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 
         <span class="c1"># Use a fresh session without the default Content-Type: application/json</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
         <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-        <span class="n">headers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">headers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"Content-Type"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
                 <span class="n">url</span><span class="p">,</span>
                 <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
-                <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">f</span><span class="p">)},</span>
-                <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fileName&quot;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;uploadPath&quot;</span><span class="p">:</span> <span class="s2">&quot;arioso-uploads&quot;</span><span class="p">},</span>
+                <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s2">"file"</span><span class="p">:</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">f</span><span class="p">)},</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"fileName"</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">"uploadPath"</span><span class="p">:</span> <span class="s2">"arioso-uploads"</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;success&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;msg&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown upload error&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File upload failed: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"success"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"msg"</span><span class="p">,</span> <span class="s2">"Unknown upload error"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"File upload failed: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">file_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fileUrl&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">file_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fileUrl"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">file_url</span><span class="p">:</span>
-            <span class="n">file_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;downloadUrl&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"downloadUrl"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">file_url</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Upload succeeded but no URL returned: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Upload succeeded but no URL returned: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">file_url</span></div>
 
 
@@ -407,14 +407,14 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">audio_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">instrumental</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">continue_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">audio_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">style_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -422,7 +422,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music from an uploaded audio file via upload-extend.</span>
+<span class="w">        </span><span class="sd">"""Generate music from an uploaded audio file via upload-extend.</span>
 
 <span class="sd">        Uploads a local file (if a path is given) or uses a URL directly,</span>
 <span class="sd">        then calls the sunoapi.org upload-extend endpoint.</span>
@@ -446,72 +446,72 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List of Song objects.</span>
-<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
+<span class="sd">        """</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
 
         <span class="c1"># Determine upload URL: if it looks like a local path, upload it first</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">audio_source</span><span class="p">):</span>
             <span class="n">upload_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">audio_source</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">audio_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="n">audio_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"http://"</span><span class="p">,</span> <span class="s2">"https://"</span><span class="p">)):</span>
             <span class="n">upload_url</span> <span class="o">=</span> <span class="n">audio_source</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;audio_source must be a local file path or a URL, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"audio_source must be a local file path or a URL, "</span>
+                <span class="sa">f</span><span class="s2">"got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span>
 
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;uploadUrl&quot;</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;instrumental&quot;</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
-            <span class="s2">&quot;callBackUrl&quot;</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
-            <span class="s2">&quot;defaultParamFlag&quot;</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
+            <span class="s2">"uploadUrl"</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
+            <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
+            <span class="s2">"callBackUrl"</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
+            <span class="s2">"defaultParamFlag"</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># continueAt is required by the API; default to 0 (start of audio)</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;continueAt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span> <span class="ow">or</span> <span class="mi">0</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">"continueAt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span> <span class="ow">or</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="n">custom_mode</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
             <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span> <span class="ow">and</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
 
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;negativeTags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"negativeTags"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
         <span class="k">if</span> <span class="n">audio_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;audioWeight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"audioWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_weight</span>
         <span class="k">if</span> <span class="n">style_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;styleWeight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"styleWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_weight</span>
 
-        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">&quot;/api/v1/generate/upload-extend&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">"/api/v1/generate/upload-extend"</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="n">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
             <span class="n">task_id</span><span class="p">,</span>
-            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;upload_extend&quot;</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">"upload_extend"</span><span class="p">,</span>
             <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
-            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
@@ -526,10 +526,10 @@
             <span class="n">Song</span><span class="p">(</span>
                 <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">),</span>
-                <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">),</span>
+                <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="p">]</span>
 
@@ -537,13 +537,13 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">audio_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">instrumental</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">audio_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">style_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">weirdness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -552,7 +552,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cover/transform an uploaded audio file via upload-cover.</span>
+<span class="w">        </span><span class="sd">"""Cover/transform an uploaded audio file via upload-cover.</span>
 
 <span class="sd">        Uploads a local file (if a path is given) or uses a URL directly,</span>
 <span class="sd">        then calls the sunoapi.org upload-cover endpoint to re-generate</span>
@@ -578,74 +578,74 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List of Song objects (typically 2 per call).</span>
-<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
+<span class="sd">        """</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SUNO_MODELS</span><span class="p">))</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_MODEL</span>
         <span class="n">callback_url</span> <span class="o">=</span> <span class="n">callback_url</span> <span class="ow">or</span> <span class="n">SUNO_DEFAULT_CALLBACK_URL</span>
 
         <span class="c1"># Resolve audio source to a URL</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">audio_source</span><span class="p">):</span>
             <span class="n">upload_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">audio_source</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">audio_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;https://&quot;</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="n">audio_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"http://"</span><span class="p">,</span> <span class="s2">"https://"</span><span class="p">)):</span>
             <span class="n">upload_url</span> <span class="o">=</span> <span class="n">audio_source</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;audio_source must be a local file path or a URL, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"audio_source must be a local file path or a URL, "</span>
+                <span class="sa">f</span><span class="s2">"got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
 
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;uploadUrl&quot;</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">&quot;instrumental&quot;</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
-            <span class="s2">&quot;callBackUrl&quot;</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
-            <span class="s2">&quot;customMode&quot;</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
+            <span class="s2">"uploadUrl"</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
+            <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+            <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
+            <span class="s2">"callBackUrl"</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
+            <span class="s2">"customMode"</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">custom_mode</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
             <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span> <span class="ow">and</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
 
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;negativeTags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"negativeTags"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
         <span class="k">if</span> <span class="n">audio_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;audioWeight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"audioWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_weight</span>
         <span class="k">if</span> <span class="n">style_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;styleWeight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"styleWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_weight</span>
         <span class="k">if</span> <span class="n">weirdness</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;weirdnessConstraint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weirdness</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"weirdnessConstraint"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weirdness</span>
 
-        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">&quot;/api/v1/generate/upload-cover&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">"/api/v1/generate/upload-cover"</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="n">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="s2">""</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
-                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;taskId&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"taskId"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_songs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_task</span><span class="p">(</span>
             <span class="n">task_id</span><span class="p">,</span>
-            <span class="n">operation</span><span class="o">=</span><span class="s2">&quot;upload_cover&quot;</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="s2">"upload_cover"</span><span class="p">,</span>
             <span class="n">request_params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
-            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+            <span class="n">response</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">wait_for_completion</span><span class="p">:</span>
@@ -660,17 +660,17 @@
             <span class="n">Song</span><span class="p">(</span>
                 <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">),</span>
-                <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
+                <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">),</span>
+                <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"raw"</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="p">]</span>
 
 <div class="viewcode-block" id="Adapter.get_status">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.get_status">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the status of a generation task and return updated Songs.</span>
+<span class="w">        </span><span class="sd">"""Check the status of a generation task and return updated Songs.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            task_id: The taskId returned from generate(), upload_extend(),</span>
@@ -679,16 +679,16 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            List of Song objects with current status and audio URLs</span>
 <span class="sd">            (if generation is complete).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/api/v1/generate/record-info&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;taskId&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">})</span>
+<span class="sd">        """</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/api/v1/generate/record-info"</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">"taskId"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">})</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="n">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">record</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">status_raw</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;PENDING&quot;</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">status_raw</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">"PENDING"</span><span class="p">)</span>
 
         <span class="c1"># Update local task store if this task is tracked</span>
         <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
@@ -696,36 +696,36 @@
 
         <span class="k">if</span> <span class="n">status_raw</span> <span class="ow">in</span> <span class="n">_ERROR_STATUSES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;sunoapi generation failed (status=</span><span class="si">{</span><span class="n">status_raw</span><span class="si">}</span><span class="s2">): taskId=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"sunoapi generation failed (status=</span><span class="si">{</span><span class="n">status_raw</span><span class="si">}</span><span class="s2">): taskId=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="n">suno_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sunoData&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">suno_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"response"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sunoData"</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">suno_data</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="n">Song</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span> <span class="k">if</span> <span class="n">status_raw</span> <span class="o">==</span> <span class="s2">&quot;PENDING&quot;</span> <span class="k">else</span> <span class="s2">&quot;generating&quot;</span><span class="p">,</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span> <span class="k">if</span> <span class="n">status_raw</span> <span class="o">==</span> <span class="s2">"PENDING"</span> <span class="k">else</span> <span class="s2">"generating"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">record</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
 
         <span class="n">songs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">suno_data</span><span class="p">:</span>
-            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audioUrl&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">stream_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;streamAudioUrl&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audioUrl"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">stream_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"streamAudioUrl"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="n">is_complete</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">audio_url</span><span class="p">)</span>
             <span class="n">songs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">Song</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span>
-                    <span class="n">title</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
                     <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                         <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span> <span class="ow">or</span> <span class="n">stream_url</span><span class="p">,</span>
-                        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
-                        <span class="n">duration_seconds</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">,</span>
+                        <span class="n">duration_seconds</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
                     <span class="p">),</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span> <span class="k">if</span> <span class="n">is_complete</span> <span class="k">else</span> <span class="s2">&quot;generating&quot;</span><span class="p">,</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span> <span class="k">if</span> <span class="n">is_complete</span> <span class="k">else</span> <span class="s2">"generating"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -735,19 +735,19 @@
 <div class="viewcode-block" id="Adapter.fetch_audio">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fetch_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">song</span><span class="p">:</span> <span class="n">Song</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the audio bytes for a Song that has an audio_url.</span>
+<span class="w">        </span><span class="sd">"""Download the audio bytes for a Song that has an audio_url.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            song: A Song object with a populated audio_url.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A new Song with audio_bytes populated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">song</span><span class="o">.</span><span class="n">audio_url</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Song </span><span class="si">{</span><span class="n">song</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> has no audio_url. &quot;</span>
-                <span class="s2">&quot;Check status with get_status() first.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Song </span><span class="si">{</span><span class="n">song</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> has no audio_url. "</span>
+                <span class="s2">"Check status with get_status() first."</span>
             <span class="p">)</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
@@ -757,7 +757,7 @@
             <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                 <span class="n">audio_bytes</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
                 <span class="n">audio_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">format</span> <span class="ow">or</span> <span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">format</span> <span class="ow">or</span> <span class="s2">"mp3"</span><span class="p">,</span>
                 <span class="n">duration_seconds</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">duration_seconds</span><span class="p">,</span>
                 <span class="n">sample_rate</span><span class="o">=</span><span class="n">song</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
             <span class="p">),</span>
@@ -771,41 +771,41 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll get_status until completion or timeout.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Poll get_status until completion or timeout."""</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
             <span class="n">songs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">songs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"complete"</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">songs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">songs</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;sunoapi generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s (taskId=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">"sunoapi generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s (taskId=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">)"</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_songs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse Song objects from an API response.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_songs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Parse Song objects from an API response."""</span>
         <span class="n">songs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">items</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">data</span><span class="p">])</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">[</span><span class="n">data</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">continue</span>
-            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audioUrl&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio_url"</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audioUrl"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
             <span class="n">songs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">Song</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-                    <span class="n">title</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
                     <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                         <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
-                        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span> <span class="k">if</span> <span class="n">audio_url</span> <span class="k">else</span> <span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span> <span class="k">if</span> <span class="n">audio_url</span> <span class="k">else</span> <span class="s2">"pending"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>

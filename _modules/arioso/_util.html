@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso._util &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso._util &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso._util</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Internal utilities for arioso: auth helpers, HTTP session factory.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Internal utilities for arioso: auth helpers, HTTP session factory."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
@@ -136,25 +136,25 @@
 <div class="viewcode-block" id="build_auth_headers">
 <a class="viewcode-back" href="../../module_docs/arioso/_util.html#arioso._util.build_auth_headers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_auth_headers</span><span class="p">(</span><span class="n">auth_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build HTTP headers for authentication from a platform auth config.</span>
+<span class="w">    </span><span class="sd">"""Build HTTP headers for authentication from a platform auth config.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        auth_config: Dict with keys &#39;type&#39;, &#39;env_var&#39;, and optionally</span>
-<span class="sd">            &#39;header_name&#39;. Supported types: &#39;api_key&#39;, &#39;bearer_token&#39;, &#39;none&#39;.</span>
+<span class="sd">        auth_config: Dict with keys 'type', 'env_var', and optionally</span>
+<span class="sd">            'header_name'. Supported types: 'api_key', 'bearer_token', 'none'.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict of HTTP headers to include in requests.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">auth_type</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="n">auth_type</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
-    <span class="n">env_var</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_var&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_var</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">&quot;api_key&quot;</span><span class="p">:</span>
-        <span class="n">header_name</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;header_name&quot;</span><span class="p">,</span> <span class="s2">&quot;Authorization&quot;</span><span class="p">)</span>
+    <span class="n">env_var</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"env_var"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_var</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">"api_key"</span><span class="p">:</span>
+        <span class="n">header_name</span> <span class="o">=</span> <span class="n">auth_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"header_name"</span><span class="p">,</span> <span class="s2">"Authorization"</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">header_name</span><span class="p">:</span> <span class="n">key</span><span class="p">}</span>
-    <span class="k">elif</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">&quot;bearer_token&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="n">auth_type</span> <span class="o">==</span> <span class="s2">"bearer_token"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"Authorization"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Bearer </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
     <span class="k">return</span> <span class="p">{}</span></div>
 
 
@@ -162,20 +162,20 @@
 <div class="viewcode-block" id="make_session">
 <a class="viewcode-back" href="../../module_docs/arioso/_util.html#arioso._util.make_session">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_session</span><span class="p">(</span><span class="n">auth_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a requests.Session with auth headers pre-configured.</span>
+<span class="w">    </span><span class="sd">"""Create a requests.Session with auth headers pre-configured.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        auth_config: Platform auth config dict.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A requests.Session instance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
     <span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="n">build_auth_headers</span><span class="p">(</span><span class="n">auth_config</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-    <span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/json&quot;</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"Content-Type"</span><span class="p">,</span> <span class="s2">"application/json"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">session</span></div>
 
 </pre></div>

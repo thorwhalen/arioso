@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.services &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.services &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -151,24 +151,24 @@ signature), and raw (the adapter instance).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># Browse platforms</span>
-<span class="nb">list</span><span class="p">(</span><span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>              <span class="c1"># [&#39;sunoapi&#39;, &#39;musicgen&#39;, ...]</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>              <span class="c1"># ['sunoapi', 'musicgen', ...]</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">sunoapi</span>        <span class="c1"># ServiceHandle</span>
 
-<span class="c1"># Browse a platform&#39;s resources</span>
-<span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                            <span class="c1"># [&#39;generate&#39;, &#39;native_generate&#39;, ...]</span>
+<span class="c1"># Browse a platform's resources</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                            <span class="c1"># ['generate', 'native_generate', ...]</span>
 
 <span class="c1"># Unified generate (affordance names, validated)</span>
-<span class="n">song</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;jazz piano&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"jazz piano"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
-<span class="c1"># Native generate (adapter&#39;s own parameter names)</span>
-<span class="n">songs</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">native_generate</span><span class="p">(</span><span class="s2">&quot;jazz piano&quot;</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;jazz&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;V4&quot;</span><span class="p">)</span>
+<span class="c1"># Native generate (adapter's own parameter names)</span>
+<span class="n">songs</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">native_generate</span><span class="p">(</span><span class="s2">"jazz piano"</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s2">"jazz"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"V4"</span><span class="p">)</span>
 
 <span class="c1"># Platform-specific methods</span>
-<span class="n">url</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">&quot;/path/to/audio.mp3&quot;</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">"/path/to/audio.mp3"</span><span class="p">)</span>
 
 <span class="c1"># Cross-platform slices</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">](</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="s2">"sunoapi"</span><span class="p">](</span><span class="s2">"jazz"</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">"jazz"</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py class">

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso._audio &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso._audio &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,9 +128,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso._audio</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Audio-input normalization for the enhance / audio-conditioning stage.</span>
+<span></span><span class="sd">"""Audio-input normalization for the enhance / audio-conditioning stage.</span>
 
-<span class="sd">The facade&#39;s :func:`arioso.enhance` and the audio-accepting adapters</span>
+<span class="sd">The facade's :func:`arioso.enhance` and the audio-accepting adapters</span>
 <span class="sd">(``stable_audio``, ``musicgen`` melody, ``udio`` …) each want the input audio in</span>
 <span class="sd">a slightly different concrete form -- a file path, a NumPy waveform, or a torch</span>
 <span class="sd">tensor. This module is the single ingress: :func:`to_audio_ref` accepts any of</span>
@@ -148,7 +148,7 @@
 <span class="sd">All heavy dependencies (``numpy``, ``soundfile``, ``torch``) are imported lazily,</span>
 <span class="sd">so ``import arioso`` never requires them; a precise ``ImportError`` is raised</span>
 <span class="sd">only if a conversion that needs one is actually requested.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -160,9 +160,9 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_is_ndarray</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;True if *value* is a NumPy ndarray, without importing numpy eagerly.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""True if *value* is a NumPy ndarray, without importing numpy eagerly."""</span>
     <span class="n">typ</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">!=</span> <span class="s2">&quot;numpy&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">!=</span> <span class="s2">"numpy"</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -175,14 +175,14 @@
 <div class="viewcode-block" id="AudioRef">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.AudioRef">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AudioRef</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A lazy, format-agnostic handle to a piece of audio.</span>
+<span class="w">    </span><span class="sd">"""A lazy, format-agnostic handle to a piece of audio.</span>
 
 <span class="sd">    Construct it via :func:`to_audio_ref` rather than directly. Exactly one of</span>
 <span class="sd">    ``path`` / ``data`` / ``array`` describes the source; :attr:`sample_rate` is</span>
 <span class="sd">    known immediately for array/tuple sources and decoded on demand otherwise.</span>
 <span class="sd">    The accessors (:meth:`as_array`, :meth:`as_path`, :meth:`as_waveform`)</span>
 <span class="sd">    produce the requested concrete form, converting (and caching) as needed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -201,7 +201,7 @@
     <span class="c1"># -- sample rate -------------------------------------------------------</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The audio sample rate in Hz (decoding a header if necessary).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The audio sample rate in Hz (decoding a header if necessary)."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -209,35 +209,35 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;sample_rate is unknown for this audio input. Pass audio as &quot;</span>
-            <span class="s2">&quot;(array, sample_rate), a file path, encoded bytes, or a Song/&quot;</span>
-            <span class="s2">&quot;AudioResult that carries a sample_rate.&quot;</span>
+            <span class="s2">"sample_rate is unknown for this audio input. Pass audio as "</span>
+            <span class="s2">"(array, sample_rate), a file path, encoded bytes, or a Song/"</span>
+            <span class="s2">"AudioResult that carries a sample_rate."</span>
         <span class="p">)</span>
 
     <span class="c1"># -- concrete forms ----------------------------------------------------</span>
 <div class="viewcode-block" id="AudioRef.as_array">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_array">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">as_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the waveform as a NumPy array (shape ``(frames, channels)``).</span>
+<span class="w">        </span><span class="sd">"""Return the waveform as a NumPy array (shape ``(frames, channels)``).</span>
 
 <span class="sd">        Decodes ``path`` / ``data`` via :mod:`soundfile` on first call and caches</span>
 <span class="sd">        the result (and the discovered sample rate).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: no cover - exercised only w/o soundfile</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;Decoding audio from a path or bytes needs &#39;soundfile&#39; &quot;</span>
-                <span class="s2">&quot;(pip install soundfile).&quot;</span>
+                <span class="s2">"Decoding audio from a path or bytes needs 'soundfile' "</span>
+                <span class="s2">"(pip install soundfile)."</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">array</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">array</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">),</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover - unreachable given constructor invariants</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AudioRef has no audio source to read.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioRef has no audio source to read."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_array</span> <span class="o">=</span> <span class="n">array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">array</span></div>
@@ -245,26 +245,26 @@
 
 <div class="viewcode-block" id="AudioRef.as_path">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_path">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">as_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.wav&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a filesystem path to the audio (writing a temp WAV if needed).</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">".wav"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return a filesystem path to the audio (writing a temp WAV if needed).</span>
 
 <span class="sd">        Adapters that shell out or upload a file (e.g. ``udio``, ``yue``) use</span>
 <span class="sd">        this. A temp file created here is tracked and removed by :meth:`cleanup`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
         <span class="n">fd</span><span class="p">,</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
             <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                    <span class="s2">&quot;Writing a waveform array to a file needs &#39;soundfile&#39; &quot;</span>
-                    <span class="s2">&quot;(pip install soundfile).&quot;</span>
+                    <span class="s2">"Writing a waveform array to a file needs 'soundfile' "</span>
+                    <span class="s2">"(pip install soundfile)."</span>
                 <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
             <span class="n">sf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_path</span> <span class="o">=</span> <span class="n">tmp</span>
@@ -274,17 +274,17 @@
 <div class="viewcode-block" id="AudioRef.as_waveform">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_waveform">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">as_waveform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the audio as a torch tensor of shape ``(channels, frames)``.</span>
+<span class="w">        </span><span class="sd">"""Return the audio as a torch tensor of shape ``(channels, frames)``.</span>
 
-<span class="sd">        This is the form neural backends want (``stable_audio``&#39;s</span>
+<span class="sd">        This is the form neural backends want (``stable_audio``'s</span>
 <span class="sd">        ``initial_audio_waveforms``, ``musicgen`` melody chroma). Mono audio is</span>
 <span class="sd">        returned as ``(1, frames)``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: no cover - exercised only w/o torch</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;Building a waveform tensor needs &#39;torch&#39; (pip install torch).&quot;</span>
+                <span class="s2">"Building a waveform tensor needs 'torch' (pip install torch)."</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
@@ -300,7 +300,7 @@
 <div class="viewcode-block" id="AudioRef.cleanup">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.AudioRef.cleanup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove any temp file this ref created via :meth:`as_path`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Remove any temp file this ref created via :meth:`as_path`."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_path</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_path</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_path</span><span class="p">)</span>
@@ -313,7 +313,7 @@
 <div class="viewcode-block" id="to_audio_ref">
 <a class="viewcode-back" href="../../module_docs/arioso/_audio.html#arioso._audio.to_audio_ref">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_audio_ref</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioRef</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize any supported audio input into an :class:`AudioRef`.</span>
+<span class="w">    </span><span class="sd">"""Normalize any supported audio input into an :class:`AudioRef`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: One of an :class:`AudioRef` (returned as-is), a</span>
@@ -328,7 +328,7 @@
 <span class="sd">        TypeError: If *value* is not a supported audio input form.</span>
 <span class="sd">        ValueError: If a ``Song``/``AudioResult`` carries only a remote</span>
 <span class="sd">            ``audio_url`` (fetch it first with :func:`arioso.fetch_audio`).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">AudioRef</span><span class="p">):</span>
@@ -346,10 +346,10 @@
             <span class="k">return</span> <span class="n">AudioRef</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">audio_bytes</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">audio_url</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;This audio is only a remote URL. Download it first with &quot;</span>
-                <span class="s2">&quot;arioso.fetch_audio(song), then pass the result to enhance().&quot;</span>
+                <span class="s2">"This audio is only a remote URL. Download it first with "</span>
+                <span class="s2">"arioso.fetch_audio(song), then pass the result to enhance()."</span>
             <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AudioResult carries no audio (array/bytes/url all empty).&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"AudioResult carries no audio (array/bytes/url all empty)."</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">AudioRef</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">bytes</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
@@ -366,9 +366,9 @@
         <span class="k">return</span> <span class="n">AudioRef</span><span class="p">(</span><span class="n">array</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Unsupported audio input type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">. Pass a Song, &quot;</span>
-        <span class="s2">&quot;AudioResult, bytes, a file path, an (array, sample_rate) pair, or a &quot;</span>
-        <span class="s2">&quot;NumPy waveform array.&quot;</span>
+        <span class="sa">f</span><span class="s2">"Unsupported audio input type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">. Pass a Song, "</span>
+        <span class="s2">"AudioResult, bytes, a file path, an (array, sample_rate) pair, or a "</span>
+        <span class="s2">"NumPy waveform array."</span>
     <span class="p">)</span></div>
 
 </pre></div>

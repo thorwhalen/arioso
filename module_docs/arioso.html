@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -147,26 +147,26 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># Generate with the default platform (musicgen)</span>
-<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;upbeat jazz piano&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"upbeat jazz piano"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Generate with a specific platform</span>
-<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;epic orchestral&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;elevenlabs&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"epic orchestral"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"elevenlabs"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># List available platforms</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">()</span>  <span class="c1"># [&#39;musicgen&#39;, &#39;sunoapi&#39;, &#39;elevenlabs&#39;, ...]</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">()</span>  <span class="c1"># ['musicgen', 'sunoapi', 'elevenlabs', ...]</span>
 
 <span class="c1"># Get platform config</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">(</span><span class="s2">&quot;musicgen&quot;</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">(</span><span class="s2">"musicgen"</span><span class="p">)</span>
 
 <span class="c1"># Rich platform access via services</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">sunoapi</span>
-<span class="n">s</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;jazz piano&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>       <span class="c1"># unified names</span>
-<span class="n">s</span><span class="o">.</span><span class="n">native_generate</span><span class="p">(</span><span class="s2">&quot;jazz&quot;</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>     <span class="c1"># native names</span>
-<span class="n">s</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">&quot;/path/to/audio.mp3&quot;</span><span class="p">)</span>         <span class="c1"># platform-specific</span>
+<span class="n">s</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"jazz piano"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>       <span class="c1"># unified names</span>
+<span class="n">s</span><span class="o">.</span><span class="n">native_generate</span><span class="p">(</span><span class="s2">"jazz"</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s2">"jazz"</span><span class="p">)</span>     <span class="c1"># native names</span>
+<span class="n">s</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">"/path/to/audio.mp3"</span><span class="p">)</span>         <span class="c1"># platform-specific</span>
 
 <span class="c1"># Cross-platform slices</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">](</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">&quot;jazz&quot;</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="s2">"sunoapi"</span><span class="p">](</span><span class="s2">"jazz"</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">"jazz"</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py data">
@@ -193,10 +193,10 @@ including audio URLs once generation is complete.</p>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span><span class="s2">&quot;reggae&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;sunoapi&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span><span class="s2">"reggae"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 <span class="c1"># ... wait a bit ...</span>
 <span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">audio_url</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -234,7 +234,7 @@ affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFF
 </dl>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rendered</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># a Song from a score2audio render</span>
-<span class="n">better</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="s2">&quot;warm analog studio band&quot;</span><span class="p">)</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="s2">"warm analog studio band"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -253,7 +253,7 @@ affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFF
 </dl>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
     <span class="n">song_with_audio</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">fetch_audio</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="c1"># song_with_audio.audio_bytes is now the raw MP3 data</span>
 </pre></div>
@@ -278,7 +278,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="s2">&quot;upbeat jazz piano&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;musicgen&quot;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="s2">"upbeat jazz piano"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -318,8 +318,8 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 <a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a> (<code class="docutils literal notranslate"><span class="pre">audio_input</span></code> / <code class="docutils literal notranslate"><span class="pre">melody</span></code> /
 <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) in its config’s <code class="docutils literal notranslate"><span class="pre">supported_affordances</span></code>.</p>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">&quot;stable_audio&quot;</span><span class="p">)</span>  <span class="c1"># True</span>
-<span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">&quot;mubert&quot;</span><span class="p">)</span>        <span class="c1"># False</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"stable_audio"</span><span class="p">)</span>  <span class="c1"># True</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"mubert"</span><span class="p">)</span>        <span class="c1"># False</span>
 </pre></div>
 </div>
 </dd></dl>

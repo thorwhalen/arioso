@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.sunoapi.task_store &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.sunoapi.task_store &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,11 +128,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.sunoapi.task_store</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Local task store for Suno API requests.</span>
+<span></span><span class="sd">"""Local task store for Suno API requests.</span>
 
 <span class="sd">Provides a ``collections.abc.Mapping`` interface over locally-persisted task</span>
 <span class="sd">records, so you can list, filter, and retrieve past Suno generation requests</span>
-<span class="sd">without depending on a (non-existent) &quot;list all&quot; API endpoint.</span>
+<span class="sd">without depending on a (non-existent) "list all" API endpoint.</span>
 
 <span class="sd">Each task is stored as a JSON file keyed by ``taskId``.  The store records</span>
 <span class="sd">request parameters, status, timestamps, and the full API response.</span>
@@ -142,17 +142,17 @@
 <span class="sd">    from arioso.platforms.sunoapi.task_store import SunoTasks</span>
 
 <span class="sd">    tasks = SunoTasks()           # uses default data dir</span>
-<span class="sd">    tasks[&#39;5c79...be8e&#39;]          # get one task record</span>
+<span class="sd">    tasks['5c79...be8e']          # get one task record</span>
 <span class="sd">    list(tasks)                   # all task IDs</span>
 <span class="sd">    len(tasks)                    # how many tasks</span>
 
 <span class="sd">    # Filtered views (return new Mapping objects):</span>
 <span class="sd">    tasks.last(20)                # last 20 by creation time</span>
 <span class="sd">    tasks.since(hours=24)         # created in last 24 hours</span>
-<span class="sd">    tasks.status(&#39;SUCCESS&#39;)       # only successful tasks</span>
-<span class="sd">    tasks.status(&#39;PENDING&#39;)       # only pending tasks</span>
+<span class="sd">    tasks.status('SUCCESS')       # only successful tasks</span>
+<span class="sd">    tasks.status('PENDING')       # only pending tasks</span>
 <span class="sd">    tasks.failed()                # all failed tasks</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
@@ -168,37 +168,37 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_now_iso</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return current UTC time as ISO-8601 string.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return current UTC time as ISO-8601 string."""</span>
     <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_record</span><span class="p">(</span>
     <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">request_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PENDING&quot;</span><span class="p">,</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"PENDING"</span><span class="p">,</span>
     <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a fresh task record dict.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Create a fresh task record dict."""</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-        <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span>
-        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
-        <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">_now_iso</span><span class="p">(),</span>
-        <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="n">_now_iso</span><span class="p">(),</span>
-        <span class="s2">&quot;request_params&quot;</span><span class="p">:</span> <span class="n">request_params</span> <span class="ow">or</span> <span class="p">{},</span>
-        <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="n">response</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
+        <span class="s2">"operation"</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span>
+        <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+        <span class="s2">"created_at"</span><span class="p">:</span> <span class="n">_now_iso</span><span class="p">(),</span>
+        <span class="s2">"updated_at"</span><span class="p">:</span> <span class="n">_now_iso</span><span class="p">(),</span>
+        <span class="s2">"request_params"</span><span class="p">:</span> <span class="n">request_params</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="s2">"response"</span><span class="p">:</span> <span class="n">response</span> <span class="ow">or</span> <span class="p">{},</span>
     <span class="p">}</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_update_record</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mutate *record* in place with new status/response and bump updated_at.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_record</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Mutate *record* in place with new status/response and bump updated_at."""</span>
     <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
-        <span class="n">record</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="n">record</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span>
     <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">record</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
-    <span class="n">record</span><span class="p">[</span><span class="s2">&quot;updated_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_now_iso</span><span class="p">()</span>
+        <span class="n">record</span><span class="p">[</span><span class="s2">"response"</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+    <span class="n">record</span><span class="p">[</span><span class="s2">"updated_at"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_now_iso</span><span class="p">()</span>
 
 
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -207,11 +207,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_data_dir</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``~/.local/share/arioso/suno_tasks``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return ``~/.local/share/arioso/suno_tasks``."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">config2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_app_data_folder</span>
 
     <span class="n">folder</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">&quot;arioso&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span> <span class="o">/</span> <span class="s2">&quot;suno_tasks&quot;</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">get_app_data_folder</span><span class="p">(</span><span class="s2">"arioso"</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="n">ensure_exists</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"suno_tasks"</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">ensure_exists</span><span class="p">:</span>
         <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -224,13 +224,13 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_FilteredTaskView</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A read-only, lazily-evaluated filtered view over task records.</span>
+<span class="w">    </span><span class="sd">"""A read-only, lazily-evaluated filtered view over task records.</span>
 
 <span class="sd">    Iterates the parent store and keeps only records satisfying *predicate*.</span>
 <span class="sd">    Optionally limits the result count via *limit*.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;SunoTasks&quot;</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">"SunoTasks"</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="o">=</span> <span class="n">parent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predicate</span> <span class="o">=</span> <span class="n">predicate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="n">limit</span>
@@ -240,7 +240,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_matching_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predicate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">])]</span>
         <span class="c1"># Sort newest-first by created_at (ISO strings sort lexicographically)</span>
-        <span class="n">keys</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"created_at"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">:</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">keys</span>
@@ -258,7 +258,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;SunoTasks filtered view (</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> tasks)&gt;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;SunoTasks filtered view (</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> tasks)&gt;"</span>
 
 
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -269,7 +269,7 @@
 <div class="viewcode-block" id="SunoTasks">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SunoTasks</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A ``Mapping[str, dict]`` of Suno task records persisted as JSON files.</span>
+<span class="w">    </span><span class="sd">"""A ``Mapping[str, dict]`` of Suno task records persisted as JSON files.</span>
 
 <span class="sd">    Keys are task IDs, values are task-record dicts with fields::</span>
 
@@ -277,7 +277,7 @@
 <span class="sd">        request_params, response</span>
 
 <span class="sd">    The store is backed by individual ``.json`` files in *root_dir*.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">root_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -294,32 +294,32 @@
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.json&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.json"</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">p</span><span class="o">.</span><span class="n">stem</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.json&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.json"</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path_for</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SunoTasks(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span><span class="si">!r}</span><span class="s2">, n=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"SunoTasks(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">)</span><span class="si">!r}</span><span class="s2">, n=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
 
     <span class="c1"># -- Write operations (used by the adapter, not by the user) -------------</span>
 
 <div class="viewcode-block" id="SunoTasks.save">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.save">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Persist a task record (create or overwrite).&quot;&quot;&quot;</span>
-        <span class="n">task_id</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">"""Persist a task record (create or overwrite)."""</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">"task_id"</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path_for</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="SunoTasks.update">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update an existing record&#39;s status and/or response.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Update an existing record's status and/or response."""</span>
         <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>  <span class="c1"># raises KeyError if missing</span>
         <span class="n">_update_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
@@ -330,19 +330,19 @@
 <div class="viewcode-block" id="SunoTasks.last">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.last">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">last</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a view of the most recent *n* tasks (newest first).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a view of the most recent *n* tasks (newest first)."""</span>
         <span class="k">return</span> <span class="n">_FilteredTaskView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">n</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SunoTasks.since">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.since">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">since</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return tasks created within the last *hours* + *minutes*.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return tasks created within the last *hours* + *minutes*."""</span>
         <span class="n">total_seconds</span> <span class="o">=</span> <span class="n">hours</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">minutes</span> <span class="o">*</span> <span class="mi">60</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">-</span> <span class="n">total_seconds</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_recent</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
-            <span class="n">ts</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"created_at"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ts</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">try</span><span class="p">:</span>
@@ -357,50 +357,50 @@
 <div class="viewcode-block" id="SunoTasks.status">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.status">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return tasks matching *status_value* (case-insensitive).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return tasks matching *status_value* (case-insensitive)."""</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">status_value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">_FilteredTaskView</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">target</span><span class="p">,</span>
+            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">target</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SunoTasks.failed">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.failed">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all tasks with an error status.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return all tasks with an error status."""</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ERROR_STATUSES</span>
 
         <span class="k">return</span> <span class="n">_FilteredTaskView</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_ERROR_STATUSES</span><span class="p">,</span>
+            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_ERROR_STATUSES</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SunoTasks.pending">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.pending">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pending</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all tasks that are still pending or in progress.&quot;&quot;&quot;</span>
-        <span class="n">_in_progress</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;PENDING&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT_SUCCESS&quot;</span><span class="p">,</span> <span class="s2">&quot;FIRST_SUCCESS&quot;</span><span class="p">}</span>
+<span class="w">        </span><span class="sd">"""Return all tasks that are still pending or in progress."""</span>
+        <span class="n">_in_progress</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"PENDING"</span><span class="p">,</span> <span class="s2">"TEXT_SUCCESS"</span><span class="p">,</span> <span class="s2">"FIRST_SUCCESS"</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">_FilteredTaskView</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_in_progress</span><span class="p">,</span>
+            <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">_in_progress</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SunoTasks.succeeded">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.succeeded">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">succeeded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_FilteredTaskView</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all tasks that completed successfully.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">)</span></div>
+<span class="w">        </span><span class="sd">"""Return all tasks that completed successfully."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="s2">"SUCCESS"</span><span class="p">)</span></div>
 
 
     <span class="c1"># -- Helpers -------------------------------------------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_path_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-        <span class="c1"># Sanitize: replace characters that aren&#39;t safe in filenames</span>
-        <span class="n">safe</span> <span class="o">=</span> <span class="n">task_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe</span><span class="si">}</span><span class="s2">.json&quot;</span></div>
+        <span class="c1"># Sanitize: replace characters that aren't safe in filenames</span>
+        <span class="n">safe</span> <span class="o">=</span> <span class="n">task_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">safe</span><span class="si">}</span><span class="s2">.json"</span></div>
 
 </pre></div>
 

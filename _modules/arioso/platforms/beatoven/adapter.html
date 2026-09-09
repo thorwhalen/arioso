@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.beatoven.adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.beatoven.adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.beatoven.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Beatoven.ai adapter via REST API.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Beatoven.ai adapter via REST API."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
@@ -139,13 +139,13 @@
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">(</span><span class="n">BaseRestAdapter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapter for Beatoven.ai music generation.</span>
+<span class="w">    </span><span class="sd">"""Adapter for Beatoven.ai music generation.</span>
 
 <span class="sd">    Beatoven uses a three-step flow:</span>
 <span class="sd">    1. POST /tracks to create a track and get a track_id.</span>
-<span class="sd">    2. Poll GET /tracks/{track_id} until status is &#39;composed&#39;.</span>
+<span class="sd">    2. Poll GET /tracks/{track_id} until status is 'composed'.</span>
 <span class="sd">    3. GET /tracks/{track_id}/audio to retrieve the download URL.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Adapter.generate">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.generate">[docs]</a>
@@ -154,7 +154,7 @@
         <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">guidance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
         <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
@@ -164,7 +164,7 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music via Beatoven.ai.</span>
+<span class="w">        </span><span class="sd">"""Generate music via Beatoven.ai.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Text description of desired music.</span>
@@ -180,35 +180,35 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List containing a single Song object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
-            <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
-            <span class="s2">&quot;creativity&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
-            <span class="s2">&quot;refinement&quot;</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
-            <span class="s2">&quot;ENABLE_LOOPING&quot;</span><span class="p">:</span> <span class="n">looping</span><span class="p">,</span>
+            <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">"duration"</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+            <span class="s2">"creativity"</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+            <span class="s2">"refinement"</span><span class="p">:</span> <span class="n">num_steps</span><span class="p">,</span>
+            <span class="s2">"ENABLE_LOOPING"</span><span class="p">:</span> <span class="n">looping</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;negative_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"negative_prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
 
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-        <span class="n">track_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;track_id&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">track_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"track_id"</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">track_id</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beatoven API did not return a track_id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Beatoven API did not return a track_id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="n">Song</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="n">track_id</span><span class="p">,</span>
-                    <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">),</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;beatoven&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+                    <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">),</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"beatoven"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
@@ -223,35 +223,35 @@
 <div class="viewcode-block" id="Adapter.get_status">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_status">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">track_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the generation status of a track.</span>
+<span class="w">        </span><span class="sd">"""Check the generation status of a track.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            track_id: The track ID returned from generate().</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Status string from the API (e.g. &#39;composing&#39;, &#39;composed&#39;).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="sd">            Status string from the API (e.g. 'composing', 'composed').</span>
+<span class="sd">        """</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Adapter.get_audio_url">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_audio_url">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_audio_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">track_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the audio download URL for a completed track.</span>
+<span class="w">        </span><span class="sd">"""Retrieve the audio download URL for a completed track.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            track_id: The track ID of a composed track.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The audio download URL.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">/audio&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/tracks/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">/audio"</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio_url"</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_poll_and_fetch</span><span class="p">(</span>
@@ -261,33 +261,33 @@
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll until composed, then fetch the audio URL.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Poll until composed, then fetch the audio URL."""</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
             <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="n">track_id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;composed&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">"composed"</span><span class="p">:</span>
                 <span class="n">audio_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_audio_url</span><span class="p">(</span><span class="n">track_id</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">[</span>
                     <span class="n">Song</span><span class="p">(</span>
                         <span class="nb">id</span><span class="o">=</span><span class="n">track_id</span><span class="p">,</span>
                         <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                             <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
-                            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                            <span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">,</span>
                             <span class="n">sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
                         <span class="p">),</span>
-                        <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;beatoven&quot;</span><span class="p">,</span>
-                        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+                        <span class="n">platform</span><span class="o">=</span><span class="s2">"beatoven"</span><span class="p">,</span>
+                        <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">]</span>
-            <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Beatoven generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Beatoven generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Beatoven generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">"Beatoven generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s "</span>
+            <span class="sa">f</span><span class="s2">"(track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">)"</span>
         <span class="p">)</span></div>
 
 </pre></div>

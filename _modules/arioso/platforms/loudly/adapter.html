@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.loudly.adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.loudly.adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.loudly.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Loudly adapter via REST API.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Loudly adapter via REST API."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
@@ -139,11 +139,11 @@
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/loudly/adapter.html#arioso.platforms.loudly.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">(</span><span class="n">BaseRestAdapter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapter for Loudly music generation.</span>
+<span class="w">    </span><span class="sd">"""Adapter for Loudly music generation.</span>
 
 <span class="sd">    Loudly may return the audio URL directly or require polling,</span>
 <span class="sd">    depending on the generation complexity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Adapter.generate">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/loudly/adapter.html#arioso.platforms.loudly.adapter.Adapter.generate">[docs]</a>
@@ -152,9 +152,9 @@
         <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-        <span class="n">genre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">genre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">bpm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">instruments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">structure</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -163,14 +163,14 @@
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music via Loudly.</span>
+<span class="w">        </span><span class="sd">"""Generate music via Loudly.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Text description of desired music.</span>
 <span class="sd">            duration: Track duration in seconds.</span>
 <span class="sd">            genre: Genre tag (50+ options available).</span>
 <span class="sd">            bpm: Tempo in beats per minute.</span>
-<span class="sd">            key: Musical key (e.g. &#39;C major&#39;).</span>
+<span class="sd">            key: Musical key (e.g. 'C major').</span>
 <span class="sd">            energy: Energy level (0-1).</span>
 <span class="sd">            instruments: List of instruments (up to 7).</span>
 <span class="sd">            structure: Song section structure.</span>
@@ -180,57 +180,57 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List containing a single Song object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">duration</span><span class="p">}</span>
+<span class="sd">        """</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">:</span> <span class="n">duration</span><span class="p">}</span>
 
         <span class="k">if</span> <span class="n">genre</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;genre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"genre"</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span>
         <span class="k">if</span> <span class="n">bpm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;tempo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpm</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"tempo"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpm</span>
         <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
         <span class="k">if</span> <span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"energy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy</span>
         <span class="k">if</span> <span class="n">instruments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;instruments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instruments</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"instruments"</span><span class="p">]</span> <span class="o">=</span> <span class="n">instruments</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">structure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"structure"</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure</span>
 
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/music/generate&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/music/generate"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
         <span class="c1"># If audio_url is directly available, return immediately</span>
-        <span class="n">audio_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">audio_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio_url"</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">audio_url</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="n">Song</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
                     <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                         <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
-                        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">,</span>
                         <span class="n">sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;loudly&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"loudly"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
 
         <span class="c1"># Otherwise, poll for completion</span>
-        <span class="n">track_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;track_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">track_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"track_id"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">track_id</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Loudly API did not return audio_url or track id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Loudly API did not return audio_url or track id: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">wait_for_completion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="n">Song</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="n">track_id</span><span class="p">,</span>
-                    <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">),</span>
-                    <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;loudly&quot;</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+                    <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">),</span>
+                    <span class="n">platform</span><span class="o">=</span><span class="s2">"loudly"</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">]</span>
@@ -249,15 +249,15 @@
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Song</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll the Loudly API until audio is available.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Poll the Loudly API until audio is available."""</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/music/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/music/</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
-            <span class="n">status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">audio_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio_url"</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">audio_url</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[</span>
@@ -265,25 +265,25 @@
                         <span class="nb">id</span><span class="o">=</span><span class="n">track_id</span><span class="p">,</span>
                         <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                             <span class="n">audio_url</span><span class="o">=</span><span class="n">audio_url</span><span class="p">,</span>
-                            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span>
+                            <span class="nb">format</span><span class="o">=</span><span class="s2">"mp3"</span><span class="p">,</span>
                             <span class="n">sample_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
                         <span class="p">),</span>
-                        <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;loudly&quot;</span><span class="p">,</span>
-                        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+                        <span class="n">platform</span><span class="o">=</span><span class="s2">"loudly"</span><span class="p">,</span>
+                        <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">,</span>
                         <span class="n">metadata</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Loudly generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Loudly generation failed (status=</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
 
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Loudly generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">"Loudly generation did not complete within </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s "</span>
+            <span class="sa">f</span><span class="s2">"(track_id=</span><span class="si">{</span><span class="n">track_id</span><span class="si">}</span><span class="s2">)"</span>
         <span class="p">)</span></div>
 
 </pre></div>

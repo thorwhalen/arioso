@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>arioso.platforms.lyria_rt.adapter &mdash; arioso 0.0.12 documentation</title>
+  <title>arioso.platforms.lyria_rt.adapter &mdash; arioso 0.0.13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=3bbcec59"></script>
+      <script src="../../../../_static/documentation_options.js?v=9fc46840"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -128,7 +128,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for arioso.platforms.lyria_rt.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Google Lyria RealTime adapter using the google-genai SDK.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Google Lyria RealTime adapter using the google-genai SDK."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -139,32 +139,32 @@
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../module_docs/arioso/platforms/lyria_rt/adapter.html#arioso.platforms.lyria_rt.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lyria RealTime adapter using streaming music sessions.</span>
+<span class="w">    </span><span class="sd">"""Lyria RealTime adapter using streaming music sessions.</span>
 
 <span class="sd">    Creates a live music session via the ``google-genai`` SDK, sends a</span>
 <span class="sd">    prompt, collects PCM audio chunks for a configurable duration, and</span>
 <span class="sd">    returns them as a single ``Song``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a google-genai Client, raising a clear error if missing.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Create a google-genai Client, raising a clear error if missing."""</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">google</span><span class="w"> </span><span class="kn">import</span> <span class="n">genai</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;The &#39;google-genai&#39; package is required for the Lyria RealTime &quot;</span>
-                <span class="s2">&quot;adapter. Install it with:  pip install google-genai&quot;</span>
+                <span class="s2">"The 'google-genai' package is required for the Lyria RealTime "</span>
+                <span class="s2">"adapter. Install it with:  pip install google-genai"</span>
             <span class="p">)</span>
         <span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_var&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGLE_API_KEY&quot;</span><span class="p">),</span> <span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"auth"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"env_var"</span><span class="p">,</span> <span class="s2">"GOOGLE_API_KEY"</span><span class="p">),</span> <span class="s2">""</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">api_key</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;GOOGLE_API_KEY environment variable is not set. &quot;</span>
-                <span class="s2">&quot;Obtain one at https://aistudio.google.com/apikey&quot;</span>
+                <span class="s2">"GOOGLE_API_KEY environment variable is not set. "</span>
+                <span class="s2">"Obtain one at https://aistudio.google.com/apikey"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">genai</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
 
@@ -186,13 +186,13 @@
         <span class="n">prompt_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate music using a Lyria RealTime streaming session.</span>
+<span class="w">        </span><span class="sd">"""Generate music using a Lyria RealTime streaming session.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prompt: Text description of desired music.</span>
 <span class="sd">            duration: Seconds of audio to collect from the stream.</span>
 <span class="sd">            bpm: Beats per minute (60-200).</span>
-<span class="sd">            key: Musical scale (e.g. ``&quot;C_MAJOR&quot;``).</span>
+<span class="sd">            key: Musical scale (e.g. ``"C_MAJOR"``).</span>
 <span class="sd">            energy: Density / energy level (0-1).</span>
 <span class="sd">            brightness: Spectral brightness (0-1).</span>
 <span class="sd">            guidance: Guidance strength (0-6).</span>
@@ -203,7 +203,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A Song with PCM audio bytes at 48 kHz.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">pcm_data</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_agenerate</span><span class="p">(</span>
                 <span class="n">prompt</span><span class="p">,</span>
@@ -222,16 +222,16 @@
         <span class="k">return</span> <span class="n">Song</span><span class="p">(</span>
             <span class="n">audio</span><span class="o">=</span><span class="n">AudioResult</span><span class="p">(</span>
                 <span class="n">audio_bytes</span><span class="o">=</span><span class="n">pcm_data</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pcm&quot;</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">"pcm"</span><span class="p">,</span>
                 <span class="n">sample_rate</span><span class="o">=</span><span class="mi">48000</span><span class="p">,</span>
                 <span class="n">duration_seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;lyria_rt&quot;</span><span class="p">,</span>
-            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+            <span class="n">platform</span><span class="o">=</span><span class="s2">"lyria_rt"</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"complete"</span><span class="p">,</span>
             <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
-                <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
-                <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
+                <span class="s2">"guidance"</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+                <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+                <span class="s2">"top_k"</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span></div>
 
@@ -251,33 +251,33 @@
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">prompt_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Async helper that drives the live music session.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Async helper that drives the live music session."""</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">google.genai</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
 
         <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_client</span><span class="p">()</span>
 
         <span class="c1"># Build MusicGenerationConfig</span>
         <span class="n">gen_config_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;guidance&quot;</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
-            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
-            <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
+            <span class="s2">"guidance"</span><span class="p">:</span> <span class="n">guidance</span><span class="p">,</span>
+            <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+            <span class="s2">"top_k"</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">bpm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;bpm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpm</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">"bpm"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpm</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
         <span class="k">if</span> <span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">"density"</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy</span>
         <span class="k">if</span> <span class="n">brightness</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;brightness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">"brightness"</span><span class="p">]</span> <span class="o">=</span> <span class="n">brightness</span>
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
+            <span class="n">gen_config_kwargs</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
 
         <span class="n">music_gen_config</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MusicGenerationConfig</span><span class="p">(</span><span class="o">**</span><span class="n">gen_config_kwargs</span><span class="p">)</span>
         <span class="n">live_config</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">LiveMusicConfig</span><span class="p">(</span><span class="n">music_generation_config</span><span class="o">=</span><span class="n">music_gen_config</span><span class="p">)</span>
 
         <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">aio</span><span class="o">.</span><span class="n">live</span><span class="o">.</span><span class="n">music_sessions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;models/lyria-realtime-exp&quot;</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">"models/lyria-realtime-exp"</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">live_config</span><span class="p">,</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
             <span class="c1"># Build and send the weighted prompt</span>
@@ -303,7 +303,7 @@
                 <span class="k">if</span> <span class="n">collected</span> <span class="o">&gt;=</span> <span class="n">target_bytes</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span></div>
 
 </pre></div>
 

@@ -1,3 +1,18 @@
+---
+name: add-platform
+description: >-
+  Add support for a new AI music generation platform (backend) to the `arioso`
+  package: create `arioso/platforms/<name>/` with its `PLATFORM_CONFIG`,
+  param_map and adapter, and register it. Use when working IN the arioso repo
+  and the ask is "add <service> to arioso", "support <music API>", "wire up a
+  new music backend", "arioso doesn't have <platform> yet". Starts by fetching
+  the platform's LIVE API docs — coding against remembered or cached specs is
+  the usual failure. Maintainer skill; for generating music with arioso, use
+  the `arioso` skill instead.
+metadata:
+  audience: developers
+---
+
 # Skill: Add a New Platform to Arioso
 
 ## When to Use

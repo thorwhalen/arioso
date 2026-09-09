@@ -137,6 +137,7 @@ packages = ["arioso"]
 include = [
     "arioso/**/*.py",
     "arioso/data/**/*.yaml",
+    "arioso/data/**/*.md",
 ]
 
 [tool.ruff]

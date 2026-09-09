@@ -1,3 +1,17 @@
+---
+name: update-platform
+description: >-
+  Refresh an existing platform adapter in the `arioso` package against the
+  vendor's current live API — renamed or newly-required parameters, changed
+  enum values, moved endpoints, sync-to-async switches. Use when working IN the
+  arioso repo and an adapter returns unexpected errors, when the ask is "update
+  the Suno/ElevenLabs/Udio adapter", "the API changed", "refresh <platform>",
+  or as a periodic maintenance pass. Maintainer skill; for generating music
+  with arioso, use the `arioso` skill instead.
+metadata:
+  audience: developers
+---
+
 # Skill: Update an Existing Platform Adapter
 
 ## When to Use

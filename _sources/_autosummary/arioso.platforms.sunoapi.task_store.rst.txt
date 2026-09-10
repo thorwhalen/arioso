@@ -1,0 +1,12 @@
+arioso.platforms.sunoapi.task\_store
+====================================
+
+.. automodule:: arioso.platforms.sunoapi.task_store
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SunoTasks
+   

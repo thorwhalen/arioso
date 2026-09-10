@@ -1,0 +1,12 @@
+arioso.platforms.loudly.adapter
+===============================
+
+.. automodule:: arioso.platforms.loudly.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

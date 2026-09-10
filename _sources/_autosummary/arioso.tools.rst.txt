@@ -1,0 +1,18 @@
+arioso.tools
+============
+
+.. automodule:: arioso.tools
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      download_songs
+      ensure_adapter
+      extract_style
+      poll_status
+      safe_name
+      submit_cover
+      wav_to_mp3
+   

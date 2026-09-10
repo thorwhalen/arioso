@@ -1,0 +1,12 @@
+arioso.platforms.udio.adapter
+=============================
+
+.. automodule:: arioso.platforms.udio.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

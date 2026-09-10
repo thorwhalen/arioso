@@ -1,0 +1,65 @@
+# arioso
+
+> Make tunes
+
+
+## Pages
+
+- [arioso](index.html.md): Unified Python facade for AI music generation.
+- [API reference](api.html.md): | [`arioso`](_autosummary/arioso.html.md#module-arioso)   | Arioso - Unified facade for AI music gen...
+- [arioso](_autosummary/arioso.html.md): Arioso - Unified facade for AI music generation platforms.
+- [arioso.base](_autosummary/arioso.base.html.md): Core types and constants for arioso.
+- [arioso.named_prompts](_autosummary/arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
+- [arioso.platforms](_autosummary/arioso.platforms.html.md): Platform packages for arioso.
+- [arioso.platforms.beatoven](_autosummary/arioso.platforms.beatoven.html.md): Beatoven.ai platform for arioso.
+- [arioso.platforms.beatoven.adapter](_autosummary/arioso.platforms.beatoven.adapter.html.md): Beatoven.ai adapter via REST API.
+- [arioso.platforms.beatoven.config](_autosummary/arioso.platforms.beatoven.config.html.md): Beatoven.ai platform configuration.
+- [arioso.platforms.elevenlabs](_autosummary/arioso.platforms.elevenlabs.html.md): ElevenLabs Music platform for arioso.
+- [arioso.platforms.elevenlabs.adapter](_autosummary/arioso.platforms.elevenlabs.adapter.html.md): ElevenLabs Music adapter.
+- [arioso.platforms.elevenlabs.config](_autosummary/arioso.platforms.elevenlabs.config.html.md): ElevenLabs Music platform configuration.
+- [arioso.platforms.harmonai](_autosummary/arioso.platforms.harmonai.html.md): Harmonai (Dance Diffusion) platform for arioso.
+- [arioso.platforms.harmonai.adapter](_autosummary/arioso.platforms.harmonai.adapter.html.md): Harmonai (Dance Diffusion) adapter using diffusers.
+- [arioso.platforms.harmonai.config](_autosummary/arioso.platforms.harmonai.config.html.md): Harmonai (Dance Diffusion) platform configuration.
+- [arioso.platforms.jen](_autosummary/arioso.platforms.jen.html.md): Jen platform for arioso.
+- [arioso.platforms.jen.adapter](_autosummary/arioso.platforms.jen.adapter.html.md): Jen adapter via REST API.
+- [arioso.platforms.jen.config](_autosummary/arioso.platforms.jen.config.html.md): Jen platform configuration.
+- [arioso.platforms.loudly](_autosummary/arioso.platforms.loudly.html.md): Loudly platform for arioso.
+- [arioso.platforms.loudly.adapter](_autosummary/arioso.platforms.loudly.adapter.html.md): Loudly adapter via REST API.
+- [arioso.platforms.loudly.config](_autosummary/arioso.platforms.loudly.config.html.md): Loudly platform configuration.
+- [arioso.platforms.lyria2](_autosummary/arioso.platforms.lyria2.html.md): Google Lyria 2 platform for arioso.
+- [arioso.platforms.lyria2.adapter](_autosummary/arioso.platforms.lyria2.adapter.html.md): Google Lyria 2 adapter.
+- [arioso.platforms.lyria2.config](_autosummary/arioso.platforms.lyria2.config.html.md): Google Lyria 2 platform configuration.
+- [arioso.platforms.lyria_rt](_autosummary/arioso.platforms.lyria_rt.html.md): Google Lyria RealTime platform for arioso.
+- [arioso.platforms.lyria_rt.adapter](_autosummary/arioso.platforms.lyria_rt.adapter.html.md): Google Lyria RealTime adapter using the google-genai SDK.
+- [arioso.platforms.lyria_rt.config](_autosummary/arioso.platforms.lyria_rt.config.html.md): Google Lyria RealTime platform configuration.
+- [arioso.platforms.mubert](_autosummary/arioso.platforms.mubert.html.md): Mubert platform for arioso.
+- [arioso.platforms.mubert.adapter](_autosummary/arioso.platforms.mubert.adapter.html.md): Mubert adapter via REST API.
+- [arioso.platforms.mubert.config](_autosummary/arioso.platforms.mubert.config.html.md): Mubert platform configuration.
+- [arioso.platforms.musicgen](_autosummary/arioso.platforms.musicgen.html.md): MusicGen platform for arioso.
+- [arioso.platforms.musicgen.adapter](_autosummary/arioso.platforms.musicgen.adapter.html.md): MusicGen adapter using audiocraft (preferred) or transformers.
+- [arioso.platforms.musicgen.config](_autosummary/arioso.platforms.musicgen.config.html.md): MusicGen platform configuration.
+- [arioso.platforms.riffusion](_autosummary/arioso.platforms.riffusion.html.md): Riffusion platform for arioso.
+- [arioso.platforms.riffusion.adapter](_autosummary/arioso.platforms.riffusion.adapter.html.md): Riffusion adapter using the riffusion library or diffusers fallback.
+- [arioso.platforms.riffusion.config](_autosummary/arioso.platforms.riffusion.config.html.md): Riffusion platform configuration.
+- [arioso.platforms.stable_audio](_autosummary/arioso.platforms.stable_audio.html.md): Stable Audio Open platform for arioso.
+- [arioso.platforms.stable_audio.adapter](_autosummary/arioso.platforms.stable_audio.adapter.html.md): Stable Audio Open adapter using HuggingFace Diffusers.
+- [arioso.platforms.stable_audio.config](_autosummary/arioso.platforms.stable_audio.config.html.md): Stable Audio Open platform configuration.
+- [arioso.platforms.sunoapi](_autosummary/arioso.platforms.sunoapi.html.md): Suno platform (via sunoapi.org) for arioso.
+- [arioso.platforms.sunoapi.adapter](_autosummary/arioso.platforms.sunoapi.adapter.html.md): Suno adapter via sunoapi.org REST API.
+- [arioso.platforms.sunoapi.config](_autosummary/arioso.platforms.sunoapi.config.html.md): Suno (via sunoapi.org) platform configuration.
+- [arioso.platforms.sunoapi.task_store](_autosummary/arioso.platforms.sunoapi.task_store.html.md): Local task store for Suno API requests.
+- [arioso.platforms.udio](_autosummary/arioso.platforms.udio.html.md): Udio platform (via UdioWrapper) for arioso.
+- [arioso.platforms.udio.adapter](_autosummary/arioso.platforms.udio.adapter.html.md): Udio adapter via udio-wrapper (unofficial).
+- [arioso.platforms.udio.config](_autosummary/arioso.platforms.udio.config.html.md): Udio platform configuration (via udio-wrapper).
+- [arioso.platforms.yue](_autosummary/arioso.platforms.yue.html.md): YuE platform for arioso.
+- [arioso.platforms.yue.adapter](_autosummary/arioso.platforms.yue.adapter.html.md): YuE adapter supporting fal.ai REST API and local CLI backends.
+- [arioso.platforms.yue.config](_autosummary/arioso.platforms.yue.config.html.md): YuE platform configuration.
+- [arioso.registry](_autosummary/arioso.registry.html.md): Platform registry with auto-discovery and lazy loading.
+- [arioso.services](_autosummary/arioso.services.html.md): Lazy mapping of platform names to `ServiceHandle` objects.
+- [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
+- [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
+- [For AI agents](ai-agents.html.md): `arioso` ships artifacts for coding agents alongside its code. This page lists
+
+---
+
+For more comprehensive documentation, see [arioso.md](arioso.md)

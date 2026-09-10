@@ -1,0 +1,12 @@
+arioso.platforms.beatoven.adapter
+=================================
+
+.. automodule:: arioso.platforms.beatoven.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

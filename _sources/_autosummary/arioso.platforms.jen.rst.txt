@@ -1,0 +1,14 @@
+arioso.platforms.jen
+====================
+
+.. automodule:: arioso.platforms.jen
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

@@ -1,0 +1,14 @@
+arioso.platforms.musicgen
+=========================
+
+.. automodule:: arioso.platforms.musicgen
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

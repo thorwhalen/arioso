@@ -1,0 +1,21 @@
+arioso.named\_prompts
+=====================
+
+.. automodule:: arioso.named_prompts
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_prompt
+      get_named_prompts
+      remove_prompt
+      search
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      NamedPrompts
+   

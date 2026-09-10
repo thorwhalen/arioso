@@ -1,4 +1,0 @@
-arioso.platforms.stable_audio.adapter
-=====================================
-.. automodule:: arioso.platforms.stable_audio.adapter
-   :members:

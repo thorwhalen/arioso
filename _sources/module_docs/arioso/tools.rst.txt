@@ -1,4 +1,0 @@
-arioso.tools
-============
-.. automodule:: arioso.tools
-   :members:

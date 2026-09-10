@@ -1,0 +1,6 @@
+arioso.services
+===============
+
+.. currentmodule:: arioso
+
+.. autodata:: services

@@ -1,0 +1,15 @@
+arioso.registry
+===============
+
+.. automodule:: arioso.registry
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      discover_platforms
+      get_platform
+      list_platforms
+      register_platform
+   

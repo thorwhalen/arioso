@@ -1,0 +1,14 @@
+arioso.platforms.riffusion
+==========================
+
+.. automodule:: arioso.platforms.riffusion
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

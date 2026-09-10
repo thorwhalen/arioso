@@ -1,4 +1,0 @@
-arioso.platforms.mubert.adapter
-===============================
-.. automodule:: arioso.platforms.mubert.adapter
-   :members:

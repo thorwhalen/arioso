@@ -1,0 +1,12 @@
+arioso.platforms.yue.adapter
+============================
+
+.. automodule:: arioso.platforms.yue.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

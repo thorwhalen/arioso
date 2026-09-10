@@ -1,4 +1,0 @@
-arioso.platforms.sunoapi.adapter
-================================
-.. automodule:: arioso.platforms.sunoapi.adapter
-   :members:

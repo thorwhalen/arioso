@@ -1,4 +1,0 @@
-arioso.platforms.beatoven.adapter
-=================================
-.. automodule:: arioso.platforms.beatoven.adapter
-   :members:

@@ -1,136 +1,693 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; arioso 0.0.13 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="alternate" type="text/markdown" href="genindex.html.md">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+    <title>Index &#8212; arioso</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/epythet.css?v=3baad687" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="_static/documentation_options.js?v=544df88d"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.14" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
 
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=9fc46840"></script>
-      <script src="_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
-</head>
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="index.html" class="icon icon-home">
-            arioso
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso.html">arioso</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/_audio.html">arioso._audio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/_util.html">arioso._util</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/base.html">arioso.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/named_prompts.html">arioso.named_prompts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms.html">arioso.platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/_base_adapter.html">arioso.platforms._base_adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/beatoven.html">arioso.platforms.beatoven</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/beatoven/adapter.html">arioso.platforms.beatoven.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/beatoven/config.html">arioso.platforms.beatoven.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/elevenlabs.html">arioso.platforms.elevenlabs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/elevenlabs/adapter.html">arioso.platforms.elevenlabs.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/elevenlabs/config.html">arioso.platforms.elevenlabs.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/harmonai.html">arioso.platforms.harmonai</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/harmonai/adapter.html">arioso.platforms.harmonai.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/harmonai/config.html">arioso.platforms.harmonai.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/jen.html">arioso.platforms.jen</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/jen/adapter.html">arioso.platforms.jen.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/jen/config.html">arioso.platforms.jen.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/loudly.html">arioso.platforms.loudly</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/loudly/adapter.html">arioso.platforms.loudly.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/loudly/config.html">arioso.platforms.loudly.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria2.html">arioso.platforms.lyria2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria2/adapter.html">arioso.platforms.lyria2.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria2/config.html">arioso.platforms.lyria2.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria_rt.html">arioso.platforms.lyria_rt</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria_rt/adapter.html">arioso.platforms.lyria_rt.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/lyria_rt/config.html">arioso.platforms.lyria_rt.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/mubert.html">arioso.platforms.mubert</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/mubert/adapter.html">arioso.platforms.mubert.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/mubert/config.html">arioso.platforms.mubert.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/musicgen.html">arioso.platforms.musicgen</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/musicgen/adapter.html">arioso.platforms.musicgen.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/musicgen/config.html">arioso.platforms.musicgen.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/riffusion.html">arioso.platforms.riffusion</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/riffusion/adapter.html">arioso.platforms.riffusion.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/riffusion/config.html">arioso.platforms.riffusion.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/stable_audio.html">arioso.platforms.stable_audio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/stable_audio/adapter.html">arioso.platforms.stable_audio.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/stable_audio/config.html">arioso.platforms.stable_audio.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi.html">arioso.platforms.sunoapi</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/adapter.html">arioso.platforms.sunoapi.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/config.html">arioso.platforms.sunoapi.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/sunoapi/task_store.html">arioso.platforms.sunoapi.task_store</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio.html">arioso.platforms.udio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio/adapter.html">arioso.platforms.udio.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/udio/config.html">arioso.platforms.udio.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/yue.html">arioso.platforms.yue</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/yue/adapter.html">arioso.platforms.yue.adapter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/platforms/yue/config.html">arioso.platforms.yue.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/registry.html">arioso.registry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/services.html">arioso.services</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/tools.html">arioso.tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/arioso/translation.html">arioso.translation</a></li>
-</ul>
 
-        </div>
-      </div>
-    </nav>
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">arioso</a>
-      </nav>
+  
+    
+  
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Index</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">arioso</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
   </ul>
-  <hr/>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
 
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
- | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
@@ -151,222 +708,199 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle.adapter">adapter (arioso.services.ServiceHandle property)</a>
-</li>
-      <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter">Adapter (class in arioso.platforms.beatoven.adapter)</a>
+      <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#arioso.platforms.beatoven.adapter.Adapter">Adapter (class in arioso.platforms.beatoven.adapter)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/adapter.html#arioso.platforms.elevenlabs.adapter.Adapter">(class in arioso.platforms.elevenlabs.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.adapter.html#arioso.platforms.elevenlabs.adapter.Adapter">(class in arioso.platforms.elevenlabs.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/harmonai/adapter.html#arioso.platforms.harmonai.adapter.Adapter">(class in arioso.platforms.harmonai.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.adapter.html#arioso.platforms.harmonai.adapter.Adapter">(class in arioso.platforms.harmonai.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/jen/adapter.html#arioso.platforms.jen.adapter.Adapter">(class in arioso.platforms.jen.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.jen.adapter.html#arioso.platforms.jen.adapter.Adapter">(class in arioso.platforms.jen.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/loudly/adapter.html#arioso.platforms.loudly.adapter.Adapter">(class in arioso.platforms.loudly.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.adapter.html#arioso.platforms.loudly.adapter.Adapter">(class in arioso.platforms.loudly.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria2/adapter.html#arioso.platforms.lyria2.adapter.Adapter">(class in arioso.platforms.lyria2.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.adapter.html#arioso.platforms.lyria2.adapter.Adapter">(class in arioso.platforms.lyria2.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/adapter.html#arioso.platforms.lyria_rt.adapter.Adapter">(class in arioso.platforms.lyria_rt.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.adapter.html#arioso.platforms.lyria_rt.adapter.Adapter">(class in arioso.platforms.lyria_rt.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/mubert/adapter.html#arioso.platforms.mubert.adapter.Adapter">(class in arioso.platforms.mubert.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.adapter.html#arioso.platforms.mubert.adapter.Adapter">(class in arioso.platforms.mubert.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/musicgen/adapter.html#arioso.platforms.musicgen.adapter.Adapter">(class in arioso.platforms.musicgen.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter">(class in arioso.platforms.musicgen.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/riffusion/adapter.html#arioso.platforms.riffusion.adapter.Adapter">(class in arioso.platforms.riffusion.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.adapter.html#arioso.platforms.riffusion.adapter.Adapter">(class in arioso.platforms.riffusion.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/stable_audio/adapter.html#arioso.platforms.stable_audio.adapter.Adapter">(class in arioso.platforms.stable_audio.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.adapter.html#arioso.platforms.stable_audio.adapter.Adapter">(class in arioso.platforms.stable_audio.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter">(class in arioso.platforms.sunoapi.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter">(class in arioso.platforms.sunoapi.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/udio/adapter.html#arioso.platforms.udio.adapter.Adapter">(class in arioso.platforms.udio.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.udio.adapter.html#arioso.platforms.udio.adapter.Adapter">(class in arioso.platforms.udio.adapter)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/yue/adapter.html#arioso.platforms.yue.adapter.Adapter">(class in arioso.platforms.yue.adapter)</a>
+        <li><a href="_autosummary/arioso.platforms.yue.adapter.html#arioso.platforms.yue.adapter.Adapter">(class in arioso.platforms.yue.adapter)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.add_prompt">add_prompt() (in module arioso.named_prompts)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.add_prompt">add_prompt() (in module arioso.named_prompts)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Affordance">Affordance (class in arioso.base)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance">Affordance (class in arioso.base)</a>
 </li>
       <li>
     arioso
 
       <ul>
-        <li><a href="module_docs/arioso.html#module-arioso">module</a>
-</li>
-      </ul></li>
-      <li>
-    arioso._audio
-
-      <ul>
-        <li><a href="module_docs/arioso/_audio.html#module-arioso._audio">module</a>
-</li>
-      </ul></li>
-      <li>
-    arioso._util
-
-      <ul>
-        <li><a href="module_docs/arioso/_util.html#module-arioso._util">module</a>
+        <li><a href="_autosummary/arioso.html#module-arioso">module</a>
 </li>
       </ul></li>
       <li>
     arioso.base
 
       <ul>
-        <li><a href="module_docs/arioso/base.html#module-arioso.base">module</a>
+        <li><a href="_autosummary/arioso.base.html#module-arioso.base">module</a>
 </li>
       </ul></li>
       <li>
     arioso.named_prompts
 
       <ul>
-        <li><a href="module_docs/arioso/named_prompts.html#module-arioso.named_prompts">module</a>
+        <li><a href="_autosummary/arioso.named_prompts.html#module-arioso.named_prompts">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms
 
       <ul>
-        <li><a href="module_docs/arioso/platforms.html#module-arioso.platforms">module</a>
-</li>
-      </ul></li>
-      <li>
-    arioso.platforms._base_adapter
-
-      <ul>
-        <li><a href="module_docs/arioso/platforms/_base_adapter.html#module-arioso.platforms._base_adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.html#module-arioso.platforms">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.beatoven
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/beatoven.html#module-arioso.platforms.beatoven">module</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.html#module-arioso.platforms.beatoven">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.beatoven.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#module-arioso.platforms.beatoven.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#module-arioso.platforms.beatoven.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.beatoven.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/beatoven/config.html#module-arioso.platforms.beatoven.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.config.html#module-arioso.platforms.beatoven.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.elevenlabs
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/elevenlabs.html#module-arioso.platforms.elevenlabs">module</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.html#module-arioso.platforms.elevenlabs">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.elevenlabs.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/adapter.html#module-arioso.platforms.elevenlabs.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.adapter.html#module-arioso.platforms.elevenlabs.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.elevenlabs.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/config.html#module-arioso.platforms.elevenlabs.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.config.html#module-arioso.platforms.elevenlabs.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.harmonai
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/harmonai.html#module-arioso.platforms.harmonai">module</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.html#module-arioso.platforms.harmonai">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.harmonai.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/harmonai/adapter.html#module-arioso.platforms.harmonai.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.adapter.html#module-arioso.platforms.harmonai.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.harmonai.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/harmonai/config.html#module-arioso.platforms.harmonai.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.config.html#module-arioso.platforms.harmonai.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.jen
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/jen.html#module-arioso.platforms.jen">module</a>
+        <li><a href="_autosummary/arioso.platforms.jen.html#module-arioso.platforms.jen">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.jen.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/jen/adapter.html#module-arioso.platforms.jen.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.jen.adapter.html#module-arioso.platforms.jen.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.jen.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/jen/config.html#module-arioso.platforms.jen.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.jen.config.html#module-arioso.platforms.jen.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.loudly
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/loudly.html#module-arioso.platforms.loudly">module</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.html#module-arioso.platforms.loudly">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.loudly.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/loudly/adapter.html#module-arioso.platforms.loudly.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.adapter.html#module-arioso.platforms.loudly.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.loudly.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/loudly/config.html#module-arioso.platforms.loudly.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.config.html#module-arioso.platforms.loudly.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.lyria2
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria2.html#module-arioso.platforms.lyria2">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.html#module-arioso.platforms.lyria2">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.lyria2.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria2/adapter.html#module-arioso.platforms.lyria2.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.adapter.html#module-arioso.platforms.lyria2.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.lyria2.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria2/config.html#module-arioso.platforms.lyria2.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.config.html#module-arioso.platforms.lyria2.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.lyria_rt
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria_rt.html#module-arioso.platforms.lyria_rt">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.html#module-arioso.platforms.lyria_rt">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -375,241 +909,214 @@
     arioso.platforms.lyria_rt.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/adapter.html#module-arioso.platforms.lyria_rt.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.adapter.html#module-arioso.platforms.lyria_rt.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.lyria_rt.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/config.html#module-arioso.platforms.lyria_rt.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.config.html#module-arioso.platforms.lyria_rt.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.mubert
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/mubert.html#module-arioso.platforms.mubert">module</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.html#module-arioso.platforms.mubert">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.mubert.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/mubert/adapter.html#module-arioso.platforms.mubert.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.adapter.html#module-arioso.platforms.mubert.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.mubert.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/mubert/config.html#module-arioso.platforms.mubert.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.config.html#module-arioso.platforms.mubert.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.musicgen
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/musicgen.html#module-arioso.platforms.musicgen">module</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.html#module-arioso.platforms.musicgen">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.musicgen.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/musicgen/adapter.html#module-arioso.platforms.musicgen.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.adapter.html#module-arioso.platforms.musicgen.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.musicgen.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/musicgen/config.html#module-arioso.platforms.musicgen.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.config.html#module-arioso.platforms.musicgen.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.riffusion
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/riffusion.html#module-arioso.platforms.riffusion">module</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.html#module-arioso.platforms.riffusion">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.riffusion.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/riffusion/adapter.html#module-arioso.platforms.riffusion.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.adapter.html#module-arioso.platforms.riffusion.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.riffusion.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/riffusion/config.html#module-arioso.platforms.riffusion.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.config.html#module-arioso.platforms.riffusion.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.stable_audio
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/stable_audio.html#module-arioso.platforms.stable_audio">module</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.html#module-arioso.platforms.stable_audio">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.stable_audio.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/stable_audio/adapter.html#module-arioso.platforms.stable_audio.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.adapter.html#module-arioso.platforms.stable_audio.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.stable_audio.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/stable_audio/config.html#module-arioso.platforms.stable_audio.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.config.html#module-arioso.platforms.stable_audio.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.sunoapi
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/sunoapi.html#module-arioso.platforms.sunoapi">module</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.html#module-arioso.platforms.sunoapi">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.sunoapi.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#module-arioso.platforms.sunoapi.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#module-arioso.platforms.sunoapi.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.sunoapi.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/sunoapi/config.html#module-arioso.platforms.sunoapi.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.config.html#module-arioso.platforms.sunoapi.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.sunoapi.task_store
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#module-arioso.platforms.sunoapi.task_store">module</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#module-arioso.platforms.sunoapi.task_store">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.udio
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/udio.html#module-arioso.platforms.udio">module</a>
+        <li><a href="_autosummary/arioso.platforms.udio.html#module-arioso.platforms.udio">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.udio.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/udio/adapter.html#module-arioso.platforms.udio.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.udio.adapter.html#module-arioso.platforms.udio.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.udio.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/udio/config.html#module-arioso.platforms.udio.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.udio.config.html#module-arioso.platforms.udio.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.yue
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/yue.html#module-arioso.platforms.yue">module</a>
+        <li><a href="_autosummary/arioso.platforms.yue.html#module-arioso.platforms.yue">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.yue.adapter
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/yue/adapter.html#module-arioso.platforms.yue.adapter">module</a>
+        <li><a href="_autosummary/arioso.platforms.yue.adapter.html#module-arioso.platforms.yue.adapter">module</a>
 </li>
       </ul></li>
       <li>
     arioso.platforms.yue.config
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/yue/config.html#module-arioso.platforms.yue.config">module</a>
+        <li><a href="_autosummary/arioso.platforms.yue.config.html#module-arioso.platforms.yue.config">module</a>
 </li>
       </ul></li>
       <li>
     arioso.registry
 
       <ul>
-        <li><a href="module_docs/arioso/registry.html#module-arioso.registry">module</a>
-</li>
-      </ul></li>
-      <li>
-    arioso.services
-
-      <ul>
-        <li><a href="module_docs/arioso/services.html#module-arioso.services">module</a>
+        <li><a href="_autosummary/arioso.registry.html#module-arioso.registry">module</a>
 </li>
       </ul></li>
       <li>
     arioso.tools
 
       <ul>
-        <li><a href="module_docs/arioso/tools.html#module-arioso.tools">module</a>
+        <li><a href="_autosummary/arioso.tools.html#module-arioso.tools">module</a>
 </li>
       </ul></li>
       <li>
     arioso.translation
 
       <ul>
-        <li><a href="module_docs/arioso/translation.html#module-arioso.translation">module</a>
+        <li><a href="_autosummary/arioso.translation.html#module-arioso.translation">module</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_array">as_array() (arioso._audio.AudioRef method)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.audio">audio (arioso.base.Song attribute)</a>
 </li>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_path">as_path() (arioso._audio.AudioRef method)</a>
-</li>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef.as_waveform">as_waveform() (arioso._audio.AudioRef method)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.audio">audio (arioso.base.Song attribute)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.audio_array">audio_array (arioso.base.AudioResult attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.audio_array">audio_array (arioso.base.AudioResult attribute)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/base.html#arioso.base.Song.audio_array">(arioso.base.Song property)</a>
+        <li><a href="_autosummary/arioso.base.html#arioso.base.Song.audio_array">(arioso.base.Song property)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.audio_bytes">audio_bytes (arioso.base.AudioResult attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.audio_bytes">audio_bytes (arioso.base.AudioResult attribute)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/base.html#arioso.base.Song.audio_bytes">(arioso.base.Song property)</a>
+        <li><a href="_autosummary/arioso.base.html#arioso.base.Song.audio_bytes">(arioso.base.Song property)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso.html#arioso.AUDIO_INPUT_AFFORDANCES">AUDIO_INPUT_AFFORDANCES (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.AUDIO_INPUT_AFFORDANCES">AUDIO_INPUT_AFFORDANCES (in module arioso)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.audio_url">audio_url (arioso.base.AudioResult attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.audio_url">audio_url (arioso.base.AudioResult attribute)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/base.html#arioso.base.Song.audio_url">(arioso.base.Song property)</a>
+        <li><a href="_autosummary/arioso.base.html#arioso.base.Song.audio_url">(arioso.base.Song property)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef">AudioRef (class in arioso._audio)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult">AudioResult (class in arioso.base)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="B">B</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/_base_adapter.html#arioso.platforms._base_adapter.BaseRestAdapter">BaseRestAdapter (class in arioso.platforms._base_adapter)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/_util.html#arioso._util.build_auth_headers">build_auth_headers() (in module arioso._util)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult">AudioResult (class in arioso.base)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -617,15 +1124,11 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts.categories">categories (arioso.named_prompts.NamedPrompts property)</a>
-</li>
-      <li><a href="module_docs/arioso.html#arioso.check_status">check_status() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts.categories">categories (arioso.named_prompts.NamedPrompts property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef.cleanup">cleanup() (arioso._audio.AudioRef method)</a>
-</li>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle.config">config (arioso.services.ServiceHandle property)</a>
+      <li><a href="_autosummary/arioso.html#arioso.check_status">check_status() (in module arioso)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -633,17 +1136,17 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Affordance.default">default (arioso.base.Affordance attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance.default">default (arioso.base.Affordance attribute)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Affordance.description">description (arioso.base.Affordance attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance.description">description (arioso.base.Affordance attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/registry.html#arioso.registry.discover_platforms">discover_platforms() (in module arioso.registry)</a>
+      <li><a href="_autosummary/arioso.registry.html#arioso.registry.discover_platforms">discover_platforms() (in module arioso.registry)</a>
 </li>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.download_songs">download_songs() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.download_songs">download_songs() (in module arioso.tools)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.duration_seconds">duration_seconds (arioso.base.AudioResult attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.duration_seconds">duration_seconds (arioso.base.AudioResult attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -651,15 +1154,15 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso.html#arioso.enhance">enhance() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.enhance">enhance() (in module arioso)</a>
 </li>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.ensure_adapter">ensure_adapter() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.ensure_adapter">ensure_adapter() (in module arioso.tools)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.error_message">error_message (arioso.base.Song property)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.error_message">error_message (arioso.base.Song property)</a>
 </li>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.extract_style">extract_style() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.extract_style">extract_style() (in module arioso.tools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -667,21 +1170,21 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.failed">failed() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.failed">failed() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
-      <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio">fetch_audio() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio">fetch_audio() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
 
       <ul>
-        <li><a href="module_docs/arioso.html#arioso.fetch_audio">(in module arioso)</a>
+        <li><a href="_autosummary/arioso.html#arioso.fetch_audio">(in module arioso)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts.flat">flat() (arioso.named_prompts.NamedPrompts method)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts.flat">flat() (arioso.named_prompts.NamedPrompts method)</a>
 </li>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts.flat_names">flat_names() (arioso.named_prompts.NamedPrompts method)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts.flat_names">flat_names() (arioso.named_prompts.NamedPrompts method)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.format">format (arioso.base.AudioResult attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.format">format (arioso.base.AudioResult attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -689,54 +1192,52 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle.generate">generate (arioso.services.ServiceHandle property)</a>
-</li>
-      <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.generate">generate() (arioso.platforms.beatoven.adapter.Adapter method)</a>
+      <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#arioso.platforms.beatoven.adapter.Adapter.generate">generate() (arioso.platforms.beatoven.adapter.Adapter method)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/adapter.html#arioso.platforms.elevenlabs.adapter.Adapter.generate">(arioso.platforms.elevenlabs.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.adapter.html#arioso.platforms.elevenlabs.adapter.Adapter.generate">(arioso.platforms.elevenlabs.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/harmonai/adapter.html#arioso.platforms.harmonai.adapter.Adapter.generate">(arioso.platforms.harmonai.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.adapter.html#arioso.platforms.harmonai.adapter.Adapter.generate">(arioso.platforms.harmonai.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/jen/adapter.html#arioso.platforms.jen.adapter.Adapter.generate">(arioso.platforms.jen.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.jen.adapter.html#arioso.platforms.jen.adapter.Adapter.generate">(arioso.platforms.jen.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/loudly/adapter.html#arioso.platforms.loudly.adapter.Adapter.generate">(arioso.platforms.loudly.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.adapter.html#arioso.platforms.loudly.adapter.Adapter.generate">(arioso.platforms.loudly.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria2/adapter.html#arioso.platforms.lyria2.adapter.Adapter.generate">(arioso.platforms.lyria2.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.adapter.html#arioso.platforms.lyria2.adapter.Adapter.generate">(arioso.platforms.lyria2.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/adapter.html#arioso.platforms.lyria_rt.adapter.Adapter.generate">(arioso.platforms.lyria_rt.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.adapter.html#arioso.platforms.lyria_rt.adapter.Adapter.generate">(arioso.platforms.lyria_rt.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/mubert/adapter.html#arioso.platforms.mubert.adapter.Adapter.generate">(arioso.platforms.mubert.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.adapter.html#arioso.platforms.mubert.adapter.Adapter.generate">(arioso.platforms.mubert.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/musicgen/adapter.html#arioso.platforms.musicgen.adapter.Adapter.generate">(arioso.platforms.musicgen.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter.generate">(arioso.platforms.musicgen.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/riffusion/adapter.html#arioso.platforms.riffusion.adapter.Adapter.generate">(arioso.platforms.riffusion.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.adapter.html#arioso.platforms.riffusion.adapter.Adapter.generate">(arioso.platforms.riffusion.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/stable_audio/adapter.html#arioso.platforms.stable_audio.adapter.Adapter.generate">(arioso.platforms.stable_audio.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.adapter.html#arioso.platforms.stable_audio.adapter.Adapter.generate">(arioso.platforms.stable_audio.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/udio/adapter.html#arioso.platforms.udio.adapter.Adapter.generate">(arioso.platforms.udio.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.udio.adapter.html#arioso.platforms.udio.adapter.Adapter.generate">(arioso.platforms.udio.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/yue/adapter.html#arioso.platforms.yue.adapter.Adapter.generate">(arioso.platforms.yue.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.yue.adapter.html#arioso.platforms.yue.adapter.Adapter.generate">(arioso.platforms.yue.adapter.Adapter method)</a>
 </li>
-        <li><a href="module_docs/arioso.html#arioso.generate">(in module arioso)</a>
+        <li><a href="_autosummary/arioso.html#arioso.generate">(in module arioso)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso.html#arioso.generate_many">generate_many() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.generate_many">generate_many() (in module arioso)</a>
 </li>
-      <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_audio_url">get_audio_url() (arioso.platforms.beatoven.adapter.Adapter method)</a>
+      <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_audio_url">get_audio_url() (arioso.platforms.beatoven.adapter.Adapter method)</a>
 </li>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.get_named_prompts">get_named_prompts() (in module arioso.named_prompts)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.get_named_prompts">get_named_prompts() (in module arioso.named_prompts)</a>
 </li>
-      <li><a href="module_docs/arioso/registry.html#arioso.registry.get_platform">get_platform() (in module arioso.registry)</a>
+      <li><a href="_autosummary/arioso.registry.html#arioso.registry.get_platform">get_platform() (in module arioso.registry)</a>
 </li>
-      <li><a href="module_docs/arioso.html#arioso.get_platform_info">get_platform_info() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.get_platform_info">get_platform_info() (in module arioso)</a>
 </li>
-      <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_status">get_status() (arioso.platforms.beatoven.adapter.Adapter method)</a>
+      <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#arioso.platforms.beatoven.adapter.Adapter.get_status">get_status() (arioso.platforms.beatoven.adapter.Adapter method)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.get_status">(arioso.platforms.sunoapi.adapter.Adapter method)</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter.get_status">(arioso.platforms.sunoapi.adapter.Adapter method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -745,13 +1246,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.id">id (arioso.base.Song attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.id">id (arioso.base.Song attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle.info">info (arioso.services.ServiceHandle property)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.is_error">is_error (arioso.base.Song property)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.is_error">is_error (arioso.base.Song property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -759,14 +1258,14 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.last">last() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.last">last() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso.html#arioso.list_platforms">list_platforms() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.list_platforms">list_platforms() (in module arioso)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/registry.html#arioso.registry.list_platforms">(in module arioso.registry)</a>
+        <li><a href="_autosummary/arioso.registry.html#arioso.registry.list_platforms">(in module arioso.registry)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -775,125 +1274,115 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/translation.html#arioso.translation.make_generate_func">make_generate_func() (in module arioso.translation)</a>
+      <li><a href="_autosummary/arioso.translation.html#arioso.translation.make_generate_func">make_generate_func() (in module arioso.translation)</a>
 </li>
-      <li><a href="module_docs/arioso/translation.html#arioso.translation.make_kwargs_trans">make_kwargs_trans() (in module arioso.translation)</a>
+      <li><a href="_autosummary/arioso.translation.html#arioso.translation.make_kwargs_trans">make_kwargs_trans() (in module arioso.translation)</a>
 </li>
-      <li><a href="module_docs/arioso/_util.html#arioso._util.make_session">make_session() (in module arioso._util)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.metadata">metadata (arioso.base.Song attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.metadata">metadata (arioso.base.Song attribute)</a>
 </li>
       <li>
     module
 
       <ul>
-        <li><a href="module_docs/arioso.html#module-arioso">arioso</a>
+        <li><a href="_autosummary/arioso.html#module-arioso">arioso</a>
 </li>
-        <li><a href="module_docs/arioso/_audio.html#module-arioso._audio">arioso._audio</a>
+        <li><a href="_autosummary/arioso.base.html#module-arioso.base">arioso.base</a>
 </li>
-        <li><a href="module_docs/arioso/_util.html#module-arioso._util">arioso._util</a>
+        <li><a href="_autosummary/arioso.named_prompts.html#module-arioso.named_prompts">arioso.named_prompts</a>
 </li>
-        <li><a href="module_docs/arioso/base.html#module-arioso.base">arioso.base</a>
+        <li><a href="_autosummary/arioso.platforms.html#module-arioso.platforms">arioso.platforms</a>
 </li>
-        <li><a href="module_docs/arioso/named_prompts.html#module-arioso.named_prompts">arioso.named_prompts</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.html#module-arioso.platforms.beatoven">arioso.platforms.beatoven</a>
 </li>
-        <li><a href="module_docs/arioso/platforms.html#module-arioso.platforms">arioso.platforms</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.adapter.html#module-arioso.platforms.beatoven.adapter">arioso.platforms.beatoven.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/_base_adapter.html#module-arioso.platforms._base_adapter">arioso.platforms._base_adapter</a>
+        <li><a href="_autosummary/arioso.platforms.beatoven.config.html#module-arioso.platforms.beatoven.config">arioso.platforms.beatoven.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/beatoven.html#module-arioso.platforms.beatoven">arioso.platforms.beatoven</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.html#module-arioso.platforms.elevenlabs">arioso.platforms.elevenlabs</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/beatoven/adapter.html#module-arioso.platforms.beatoven.adapter">arioso.platforms.beatoven.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.adapter.html#module-arioso.platforms.elevenlabs.adapter">arioso.platforms.elevenlabs.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/beatoven/config.html#module-arioso.platforms.beatoven.config">arioso.platforms.beatoven.config</a>
+        <li><a href="_autosummary/arioso.platforms.elevenlabs.config.html#module-arioso.platforms.elevenlabs.config">arioso.platforms.elevenlabs.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/elevenlabs.html#module-arioso.platforms.elevenlabs">arioso.platforms.elevenlabs</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.html#module-arioso.platforms.harmonai">arioso.platforms.harmonai</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/adapter.html#module-arioso.platforms.elevenlabs.adapter">arioso.platforms.elevenlabs.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.adapter.html#module-arioso.platforms.harmonai.adapter">arioso.platforms.harmonai.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/elevenlabs/config.html#module-arioso.platforms.elevenlabs.config">arioso.platforms.elevenlabs.config</a>
+        <li><a href="_autosummary/arioso.platforms.harmonai.config.html#module-arioso.platforms.harmonai.config">arioso.platforms.harmonai.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/harmonai.html#module-arioso.platforms.harmonai">arioso.platforms.harmonai</a>
+        <li><a href="_autosummary/arioso.platforms.jen.html#module-arioso.platforms.jen">arioso.platforms.jen</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/harmonai/adapter.html#module-arioso.platforms.harmonai.adapter">arioso.platforms.harmonai.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.jen.adapter.html#module-arioso.platforms.jen.adapter">arioso.platforms.jen.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/harmonai/config.html#module-arioso.platforms.harmonai.config">arioso.platforms.harmonai.config</a>
+        <li><a href="_autosummary/arioso.platforms.jen.config.html#module-arioso.platforms.jen.config">arioso.platforms.jen.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/jen.html#module-arioso.platforms.jen">arioso.platforms.jen</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.html#module-arioso.platforms.loudly">arioso.platforms.loudly</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/jen/adapter.html#module-arioso.platforms.jen.adapter">arioso.platforms.jen.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.adapter.html#module-arioso.platforms.loudly.adapter">arioso.platforms.loudly.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/jen/config.html#module-arioso.platforms.jen.config">arioso.platforms.jen.config</a>
+        <li><a href="_autosummary/arioso.platforms.loudly.config.html#module-arioso.platforms.loudly.config">arioso.platforms.loudly.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/loudly.html#module-arioso.platforms.loudly">arioso.platforms.loudly</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.html#module-arioso.platforms.lyria2">arioso.platforms.lyria2</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/loudly/adapter.html#module-arioso.platforms.loudly.adapter">arioso.platforms.loudly.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.adapter.html#module-arioso.platforms.lyria2.adapter">arioso.platforms.lyria2.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/loudly/config.html#module-arioso.platforms.loudly.config">arioso.platforms.loudly.config</a>
+        <li><a href="_autosummary/arioso.platforms.lyria2.config.html#module-arioso.platforms.lyria2.config">arioso.platforms.lyria2.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria2.html#module-arioso.platforms.lyria2">arioso.platforms.lyria2</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.html#module-arioso.platforms.lyria_rt">arioso.platforms.lyria_rt</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria2/adapter.html#module-arioso.platforms.lyria2.adapter">arioso.platforms.lyria2.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.adapter.html#module-arioso.platforms.lyria_rt.adapter">arioso.platforms.lyria_rt.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria2/config.html#module-arioso.platforms.lyria2.config">arioso.platforms.lyria2.config</a>
+        <li><a href="_autosummary/arioso.platforms.lyria_rt.config.html#module-arioso.platforms.lyria_rt.config">arioso.platforms.lyria_rt.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria_rt.html#module-arioso.platforms.lyria_rt">arioso.platforms.lyria_rt</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.html#module-arioso.platforms.mubert">arioso.platforms.mubert</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/adapter.html#module-arioso.platforms.lyria_rt.adapter">arioso.platforms.lyria_rt.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.adapter.html#module-arioso.platforms.mubert.adapter">arioso.platforms.mubert.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/lyria_rt/config.html#module-arioso.platforms.lyria_rt.config">arioso.platforms.lyria_rt.config</a>
+        <li><a href="_autosummary/arioso.platforms.mubert.config.html#module-arioso.platforms.mubert.config">arioso.platforms.mubert.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/mubert.html#module-arioso.platforms.mubert">arioso.platforms.mubert</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.html#module-arioso.platforms.musicgen">arioso.platforms.musicgen</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/mubert/adapter.html#module-arioso.platforms.mubert.adapter">arioso.platforms.mubert.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.adapter.html#module-arioso.platforms.musicgen.adapter">arioso.platforms.musicgen.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/mubert/config.html#module-arioso.platforms.mubert.config">arioso.platforms.mubert.config</a>
+        <li><a href="_autosummary/arioso.platforms.musicgen.config.html#module-arioso.platforms.musicgen.config">arioso.platforms.musicgen.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/musicgen.html#module-arioso.platforms.musicgen">arioso.platforms.musicgen</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.html#module-arioso.platforms.riffusion">arioso.platforms.riffusion</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/musicgen/adapter.html#module-arioso.platforms.musicgen.adapter">arioso.platforms.musicgen.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.adapter.html#module-arioso.platforms.riffusion.adapter">arioso.platforms.riffusion.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/musicgen/config.html#module-arioso.platforms.musicgen.config">arioso.platforms.musicgen.config</a>
+        <li><a href="_autosummary/arioso.platforms.riffusion.config.html#module-arioso.platforms.riffusion.config">arioso.platforms.riffusion.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/riffusion.html#module-arioso.platforms.riffusion">arioso.platforms.riffusion</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.html#module-arioso.platforms.stable_audio">arioso.platforms.stable_audio</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/riffusion/adapter.html#module-arioso.platforms.riffusion.adapter">arioso.platforms.riffusion.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.adapter.html#module-arioso.platforms.stable_audio.adapter">arioso.platforms.stable_audio.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/riffusion/config.html#module-arioso.platforms.riffusion.config">arioso.platforms.riffusion.config</a>
+        <li><a href="_autosummary/arioso.platforms.stable_audio.config.html#module-arioso.platforms.stable_audio.config">arioso.platforms.stable_audio.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/stable_audio.html#module-arioso.platforms.stable_audio">arioso.platforms.stable_audio</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.html#module-arioso.platforms.sunoapi">arioso.platforms.sunoapi</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/stable_audio/adapter.html#module-arioso.platforms.stable_audio.adapter">arioso.platforms.stable_audio.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#module-arioso.platforms.sunoapi.adapter">arioso.platforms.sunoapi.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/stable_audio/config.html#module-arioso.platforms.stable_audio.config">arioso.platforms.stable_audio.config</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.config.html#module-arioso.platforms.sunoapi.config">arioso.platforms.sunoapi.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/sunoapi.html#module-arioso.platforms.sunoapi">arioso.platforms.sunoapi</a>
+        <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#module-arioso.platforms.sunoapi.task_store">arioso.platforms.sunoapi.task_store</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#module-arioso.platforms.sunoapi.adapter">arioso.platforms.sunoapi.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.udio.html#module-arioso.platforms.udio">arioso.platforms.udio</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/sunoapi/config.html#module-arioso.platforms.sunoapi.config">arioso.platforms.sunoapi.config</a>
+        <li><a href="_autosummary/arioso.platforms.udio.adapter.html#module-arioso.platforms.udio.adapter">arioso.platforms.udio.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#module-arioso.platforms.sunoapi.task_store">arioso.platforms.sunoapi.task_store</a>
+        <li><a href="_autosummary/arioso.platforms.udio.config.html#module-arioso.platforms.udio.config">arioso.platforms.udio.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/udio.html#module-arioso.platforms.udio">arioso.platforms.udio</a>
+        <li><a href="_autosummary/arioso.platforms.yue.html#module-arioso.platforms.yue">arioso.platforms.yue</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/udio/adapter.html#module-arioso.platforms.udio.adapter">arioso.platforms.udio.adapter</a>
+        <li><a href="_autosummary/arioso.platforms.yue.adapter.html#module-arioso.platforms.yue.adapter">arioso.platforms.yue.adapter</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/udio/config.html#module-arioso.platforms.udio.config">arioso.platforms.udio.config</a>
+        <li><a href="_autosummary/arioso.platforms.yue.config.html#module-arioso.platforms.yue.config">arioso.platforms.yue.config</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/yue.html#module-arioso.platforms.yue">arioso.platforms.yue</a>
+        <li><a href="_autosummary/arioso.registry.html#module-arioso.registry">arioso.registry</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/yue/adapter.html#module-arioso.platforms.yue.adapter">arioso.platforms.yue.adapter</a>
+        <li><a href="_autosummary/arioso.tools.html#module-arioso.tools">arioso.tools</a>
 </li>
-        <li><a href="module_docs/arioso/platforms/yue/config.html#module-arioso.platforms.yue.config">arioso.platforms.yue.config</a>
-</li>
-        <li><a href="module_docs/arioso/registry.html#module-arioso.registry">arioso.registry</a>
-</li>
-        <li><a href="module_docs/arioso/services.html#module-arioso.services">arioso.services</a>
-</li>
-        <li><a href="module_docs/arioso/tools.html#module-arioso.tools">arioso.tools</a>
-</li>
-        <li><a href="module_docs/arioso/translation.html#module-arioso.translation">arioso.translation</a>
+        <li><a href="_autosummary/arioso.translation.html#module-arioso.translation">arioso.translation</a>
 </li>
       </ul></li>
   </ul></td>
@@ -902,13 +1391,11 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Affordance.name">name (arioso.base.Affordance attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance.name">name (arioso.base.Affordance attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.NamedPrompts">NamedPrompts (class in arioso.named_prompts)</a>
-</li>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle.native_generate">native_generate (arioso.services.ServiceHandle property)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts">NamedPrompts (class in arioso.named_prompts)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -916,13 +1403,13 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.pending">pending() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.pending">pending() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.platform">platform (arioso.base.Song attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.platform">platform (arioso.base.Song attribute)</a>
 </li>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.poll_status">poll_status() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.poll_status">poll_status() (in module arioso.tools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -930,11 +1417,11 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/registry.html#arioso.registry.register_platform">register_platform() (in module arioso.registry)</a>
+      <li><a href="_autosummary/arioso.registry.html#arioso.registry.register_platform">register_platform() (in module arioso.registry)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.remove_prompt">remove_prompt() (in module arioso.named_prompts)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.remove_prompt">remove_prompt() (in module arioso.named_prompts)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -942,43 +1429,37 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.safe_name">safe_name() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.safe_name">safe_name() (in module arioso.tools)</a>
 </li>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.AudioRef.sample_rate">sample_rate (arioso._audio.AudioRef property)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.sample_rate">sample_rate (arioso.base.AudioResult attribute)</a>
 
       <ul>
-        <li><a href="module_docs/arioso/base.html#arioso.base.AudioResult.sample_rate">(arioso.base.AudioResult attribute)</a>
-</li>
-        <li><a href="module_docs/arioso/base.html#arioso.base.Song.sample_rate">(arioso.base.Song property)</a>
+        <li><a href="_autosummary/arioso.base.html#arioso.base.Song.sample_rate">(arioso.base.Song property)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.save">save() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.save">save() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
-      <li><a href="module_docs/arioso/named_prompts.html#arioso.named_prompts.search">search() (in module arioso.named_prompts)</a>
+      <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.search">search() (in module arioso.named_prompts)</a>
 </li>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceCollection">ServiceCollection (class in arioso.services)</a>
+      <li><a href="_autosummary/arioso.services.html#arioso.services">services (in module arioso)</a>
 </li>
-      <li><a href="module_docs/arioso/services.html#arioso.services.ServiceHandle">ServiceHandle (class in arioso.services)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.since">since() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.since">since() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song">Song (class in arioso.base)</a>
 </li>
-      <li><a href="module_docs/arioso/services.html#arioso.services.SliceMapping">SliceMapping (class in arioso.services)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.status">status (arioso.base.Song attribute)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song">Song (class in arioso.base)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.status">status() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.status">status (arioso.base.Song attribute)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.submit_cover">submit_cover() (in module arioso.tools)</a>
 </li>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.status">status() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.succeeded">succeeded() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.submit_cover">submit_cover() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">SunoTasks (class in arioso.platforms.sunoapi.task_store)</a>
 </li>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.succeeded">succeeded() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
-</li>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">SunoTasks (class in arioso.platforms.sunoapi.task_store)</a>
-</li>
-      <li><a href="module_docs/arioso.html#arioso.supports_audio_input">supports_audio_input() (in module arioso)</a>
+      <li><a href="_autosummary/arioso.html#arioso.supports_audio_input">supports_audio_input() (in module arioso)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -986,15 +1467,13 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.tasks">tasks (arioso.platforms.sunoapi.adapter.Adapter property)</a>
-</li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Song.title">title (arioso.base.Song attribute)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter.tasks">tasks (arioso.platforms.sunoapi.adapter.Adapter property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/_audio.html#arioso._audio.to_audio_ref">to_audio_ref() (in module arioso._audio)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Song.title">title (arioso.base.Song attribute)</a>
 </li>
-      <li><a href="module_docs/arioso/base.html#arioso.base.Affordance.type">type (arioso.base.Affordance attribute)</a>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance.type">type (arioso.base.Affordance attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1002,11 +1481,11 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.update">update() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks.update">update() (arioso.platforms.sunoapi.task_store.SunoTasks method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/platforms/sunoapi/adapter.html#arioso.platforms.sunoapi.adapter.Adapter.upload_file">upload_file() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
+      <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter.upload_file">upload_file() (arioso.platforms.sunoapi.adapter.Adapter method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1014,38 +1493,60 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/arioso/tools.html#arioso.tools.wav_to_mp3">wav_to_mp3() (in module arioso.tools)</a>
+      <li><a href="_autosummary/arioso.tools.html#arioso.tools.wav_to_mp3">wav_to_mp3() (in module arioso.tools)</a>
 </li>
   </ul></td>
 </tr></table>
 
 
 
-           </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p></p>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
   </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
 
-</footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  </footer>
+  </body>
 </html>

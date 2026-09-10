@@ -1,0 +1,15 @@
+arioso.platforms.sunoapi
+========================
+
+.. automodule:: arioso.platforms.sunoapi
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config
+   task_store

@@ -1,4 +1,0 @@
-arioso.services
-===============
-.. automodule:: arioso.services
-   :members:

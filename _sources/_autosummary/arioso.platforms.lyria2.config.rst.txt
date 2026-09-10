@@ -1,0 +1,6 @@
+arioso.platforms.lyria2.config
+==============================
+
+.. automodule:: arioso.platforms.lyria2.config
+
+   

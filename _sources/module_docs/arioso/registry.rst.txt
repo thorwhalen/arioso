@@ -1,4 +1,0 @@
-arioso.registry
-===============
-.. automodule:: arioso.registry
-   :members:

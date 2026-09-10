@@ -1,0 +1,14 @@
+arioso.platforms.mubert
+=======================
+
+.. automodule:: arioso.platforms.mubert
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

@@ -1,0 +1,12 @@
+arioso.platforms.sunoapi.adapter
+================================
+
+.. automodule:: arioso.platforms.sunoapi.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

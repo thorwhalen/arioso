@@ -1,0 +1,12 @@
+arioso.platforms.musicgen.adapter
+=================================
+
+.. automodule:: arioso.platforms.musicgen.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

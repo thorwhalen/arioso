@@ -1,4 +1,0 @@
-arioso.platforms.yue
-====================
-.. automodule:: arioso.platforms.yue
-   :members:

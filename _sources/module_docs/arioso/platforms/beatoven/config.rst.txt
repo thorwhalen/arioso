@@ -1,4 +1,0 @@
-arioso.platforms.beatoven.config
-================================
-.. automodule:: arioso.platforms.beatoven.config
-   :members:

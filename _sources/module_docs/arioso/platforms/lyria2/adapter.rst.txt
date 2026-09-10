@@ -1,4 +1,0 @@
-arioso.platforms.lyria2.adapter
-===============================
-.. automodule:: arioso.platforms.lyria2.adapter
-   :members:

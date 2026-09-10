@@ -1,0 +1,12 @@
+arioso.platforms.mubert.adapter
+===============================
+
+.. automodule:: arioso.platforms.mubert.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

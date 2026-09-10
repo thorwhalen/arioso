@@ -1,0 +1,14 @@
+arioso.base
+===========
+
+.. automodule:: arioso.base
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Affordance
+      AudioResult
+      Song
+   

@@ -1,0 +1,12 @@
+arioso.platforms.lyria\_rt.adapter
+==================================
+
+.. automodule:: arioso.platforms.lyria_rt.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

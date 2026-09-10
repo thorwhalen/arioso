@@ -1,0 +1,14 @@
+arioso.platforms.lyria2
+=======================
+
+.. automodule:: arioso.platforms.lyria2
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

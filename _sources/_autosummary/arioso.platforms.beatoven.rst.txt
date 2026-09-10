@@ -1,0 +1,14 @@
+arioso.platforms.beatoven
+=========================
+
+.. automodule:: arioso.platforms.beatoven
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

@@ -1,4 +1,0 @@
-arioso.platforms.elevenlabs.adapter
-===================================
-.. automodule:: arioso.platforms.elevenlabs.adapter
-   :members:

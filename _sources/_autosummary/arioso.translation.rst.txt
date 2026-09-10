@@ -1,0 +1,13 @@
+arioso.translation
+==================
+
+.. automodule:: arioso.translation
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      make_generate_func
+      make_kwargs_trans
+   

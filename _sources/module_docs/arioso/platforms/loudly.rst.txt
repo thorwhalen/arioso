@@ -1,4 +1,0 @@
-arioso.platforms.loudly
-=======================
-.. automodule:: arioso.platforms.loudly
-   :members:

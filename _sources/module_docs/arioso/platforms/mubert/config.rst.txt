@@ -1,4 +1,0 @@
-arioso.platforms.mubert.config
-==============================
-.. automodule:: arioso.platforms.mubert.config
-   :members:

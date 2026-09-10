@@ -1,0 +1,38 @@
+﻿arioso
+======
+
+.. automodule:: arioso
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      AUDIO_INPUT_AFFORDANCES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_status
+      enhance
+      fetch_audio
+      generate
+      generate_many
+      get_platform_info
+      list_platforms
+      supports_audio_input
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   base
+   named_prompts
+   platforms
+   registry
+   services
+   tools
+   translation

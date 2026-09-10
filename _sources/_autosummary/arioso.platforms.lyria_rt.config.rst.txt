@@ -1,0 +1,6 @@
+arioso.platforms.lyria\_rt.config
+=================================
+
+.. automodule:: arioso.platforms.lyria_rt.config
+
+   

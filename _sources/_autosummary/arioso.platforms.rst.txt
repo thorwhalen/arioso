@@ -1,0 +1,26 @@
+arioso.platforms
+================
+
+.. automodule:: arioso.platforms
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   beatoven
+   elevenlabs
+   harmonai
+   jen
+   loudly
+   lyria2
+   lyria_rt
+   mubert
+   musicgen
+   riffusion
+   stable_audio
+   sunoapi
+   udio
+   yue

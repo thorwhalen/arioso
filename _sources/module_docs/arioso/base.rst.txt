@@ -1,4 +1,0 @@
-arioso.base
-===========
-.. automodule:: arioso.base
-   :members:

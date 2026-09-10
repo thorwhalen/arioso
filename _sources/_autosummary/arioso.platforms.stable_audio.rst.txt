@@ -1,0 +1,14 @@
+arioso.platforms.stable\_audio
+==============================
+
+.. automodule:: arioso.platforms.stable_audio
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

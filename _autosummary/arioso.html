@@ -1,0 +1,790 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="arioso.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+    <title>arioso &#8212; arioso</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=3baad687" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="../_static/documentation_options.js?v=544df88d"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/arioso';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="arioso.base" href="arioso.base.html" />
+    <link rel="prev" title="API reference" href="../api.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.14" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">arioso</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">arioso</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="arioso.base.html">arioso.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.named_prompts.html">arioso.named_prompts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="arioso.platforms.html">arioso.platforms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.yue.html">arioso.platforms.yue</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.registry.html">arioso.registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.services.html">arioso.services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.tools.html">arioso.tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.translation.html">arioso.translation</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">arioso</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-arioso">
+<span id="arioso"></span><h1>arioso<a class="headerlink" href="#module-arioso" title="Link to this heading">#</a></h1>
+<p>Arioso - Unified facade for AI music generation platforms.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
+
+<span class="c1"># Generate with the default platform (musicgen)</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"upbeat jazz piano"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Generate with a specific platform</span>
+<span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"epic orchestral"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"elevenlabs"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># List available platforms</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">()</span>  <span class="c1"># ['musicgen', 'sunoapi', 'elevenlabs', ...]</span>
+
+<span class="c1"># Get platform config</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">get_platform_info</span><span class="p">(</span><span class="s2">"musicgen"</span><span class="p">)</span>
+
+<span class="c1"># Rich platform access via services</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">sunoapi</span>
+<span class="n">s</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"jazz piano"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>       <span class="c1"># unified names</span>
+<span class="n">s</span><span class="o">.</span><span class="n">native_generate</span><span class="p">(</span><span class="s2">"jazz"</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s2">"jazz"</span><span class="p">)</span>     <span class="c1"># native names</span>
+<span class="n">s</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">"/path/to/audio.mp3"</span><span class="p">)</span>         <span class="c1"># platform-specific</span>
+
+<span class="c1"># Cross-platform slices</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="s2">"sunoapi"</span><span class="p">](</span><span class="s2">"jazz"</span><span class="p">)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">generators</span><span class="o">.</span><span class="n">sunoapi</span><span class="p">(</span><span class="s2">"jazz"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a></p></td>
+<td><p>Affordances that carry caller-supplied <em>input</em> audio (used by <a class="reference internal" href="#arioso.enhance" title="arioso.enhance"><code class="xref py py-func docutils literal notranslate"><span class="pre">enhance()</span></code></a>).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.check_status" title="arioso.check_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_status</span></code></a>(song)</p></td>
+<td><p>Check the current status of a pending Song and return updated Songs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.enhance" title="arioso.enhance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enhance</span></code></a>(audio[, prompt, platform, strength, as_])</p></td>
+<td><p>Transform existing audio into AI-enhanced audio (pipeline stage 3-&gt;4).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.fetch_audio" title="arioso.fetch_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch_audio</span></code></a>(song)</p></td>
+<td><p>Download the audio bytes for a Song that has an audio_url.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(prompt, *[, platform])</p></td>
+<td><p>Generate music using the specified platform.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.generate_many" title="arioso.generate_many"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_many</span></code></a>(prompt, *[, platform])</p></td>
+<td><p>Generate music, returning all results (some platforms return multiple).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.get_platform_info" title="arioso.get_platform_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_platform_info</span></code></a>(name)</p></td>
+<td><p>Get configuration info for a platform.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.list_platforms" title="arioso.list_platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_platforms</span></code></a>()</p></td>
+<td><p>Return names of all available platforms.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.supports_audio_input" title="arioso.supports_audio_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supports_audio_input</span></code></a>(platform)</p></td>
+<td><p>Whether <em>platform</em> can condition on caller-supplied input audio.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.AUDIO_INPUT_AFFORDANCES">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('audio_input',</span> <span class="pre">'melody',</span> <span class="pre">'reference_audio')</span></span><a class="headerlink" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="Link to this definition">#</a></dt>
+<dd><p>Affordances that carry caller-supplied <em>input</em> audio (used by <a class="reference internal" href="#arioso.enhance" title="arioso.enhance"><code class="xref py py-func docutils literal notranslate"><span class="pre">enhance()</span></code></a>).
+Distinct from clip-extension affordances like <code class="docutils literal notranslate"><span class="pre">continue_from</span></code> (which
+reference a prior generation by id/URL rather than uploaded audio).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.check_status">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">check_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#check_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.check_status" title="Link to this definition">#</a></dt>
+<dd><p>Check the current status of a pending Song and return updated Songs.</p>
+<p>For platforms that use async/callback-based generation (like sunoapi),
+this polls the platform’s status endpoint to get the latest state,
+including audio URLs once generation is complete.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>song</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span>) – A Song object (typically with status=’pending’).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of updated Song objects with current status and audio URLs.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span><span class="s2">"reggae"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="c1"># ... wait a bit ...</span>
+<span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">songs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">audio_url</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.enhance">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">enhance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stable_audio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#enhance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.enhance" title="Link to this definition">#</a></dt>
+<dd><p>Transform existing audio into AI-enhanced audio (pipeline stage 3-&gt;4).</p>
+<p>Progressive-disclosure sugar over <a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate()</span></code></a>: routes <em>audio</em> into the
+platform’s audio-conditioning affordance and generates. This is the entry
+point for the “rendered MIDI audio -&gt; AI-enhanced audio” step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>audio</strong> – The input audio to transform – a <a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>,
+<a class="reference internal" href="arioso.base.html#arioso.base.AudioResult" title="arioso.base.AudioResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioResult</span></code></a>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, a file path, an
+<code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code> pair, or a NumPy waveform (normalized by
+<code class="docutils literal notranslate"><span class="pre">arioso._audio.to_audio_ref</span></code>).</p></li>
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Optional text guiding the transformation.</p></li>
+<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – An audio-capable platform (default <code class="docutils literal notranslate"><span class="pre">'stable_audio'</span></code>); verify
+with <a class="reference internal" href="#arioso.supports_audio_input" title="arioso.supports_audio_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">supports_audio_input()</span></code></a>.</p></li>
+<li><p><strong>strength</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – How much the input audio influences the output (0-1), where the
+platform supports it. (Note: <code class="docutils literal notranslate"><span class="pre">stable_audio</span></code> via diffusers has no
+strength knob and will warn if one is passed.)</p></li>
+<li><p><strong>as_</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Which affordance to route <em>audio</em> into – <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> (default; picks
+<code class="docutils literal notranslate"><span class="pre">audio_input</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">melody</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) or an explicit
+affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a>.</p></li>
+<li><p><strong>**kwargs</strong> – Further unified affordance parameters (duration, seed, …).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a> with the enhanced audio.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rendered</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># a Song from a score2audio render</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="s2">"warm analog studio band"</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.fetch_audio">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">fetch_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#fetch_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.fetch_audio" title="Link to this definition">#</a></dt>
+<dd><p>Download the audio bytes for a Song that has an audio_url.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>song</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span>) – A Song with a populated audio_url (status=’complete’).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Song with audio_bytes populated.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">updated</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">check_status</span><span class="p">(</span><span class="n">song</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
+    <span class="n">song_with_audio</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">fetch_audio</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># song_with_audio.audio_bytes is now the raw MP3 data</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.generate">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'musicgen'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.generate" title="Link to this definition">#</a></dt>
+<dd><p>Generate music using the specified platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Text description of desired music.</p></li>
+<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the generation platform (default: ‘musicgen’).</p></li>
+<li><p><strong>**kwargs</strong> – Parameters using unified affordance names.
+See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFFORDANCES</span></code> for the full list.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A Song object containing the generated audio and metadata.</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="s2">"upbeat jazz piano"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.generate_many">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">generate_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'musicgen'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#generate_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.generate_many" title="Link to this definition">#</a></dt>
+<dd><p>Generate music, returning all results (some platforms return multiple).</p>
+<p>Same interface as <a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate()</span></code></a> but always returns a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.get_platform_info">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">get_platform_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#get_platform_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.get_platform_info" title="Link to this definition">#</a></dt>
+<dd><p>Get configuration info for a platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Platform identifier.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The platform’s PLATFORM_CONFIG dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.list_platforms">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">list_platforms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#list_platforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.list_platforms" title="Link to this definition">#</a></dt>
+<dd><p>Return names of all available platforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.supports_audio_input">
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">supports_audio_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso.html#supports_audio_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.supports_audio_input" title="Link to this definition">#</a></dt>
+<dd><p>Whether <em>platform</em> can condition on caller-supplied input audio.</p>
+<p>Returns True if the platform declares any of
+<a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a> (<code class="docutils literal notranslate"><span class="pre">audio_input</span></code> / <code class="docutils literal notranslate"><span class="pre">melody</span></code> /
+<code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) in its config’s <code class="docutils literal notranslate"><span class="pre">supported_affordances</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"stable_audio"</span><span class="p">)</span>  <span class="c1"># True</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"mubert"</span><span class="p">)</span>        <span class="c1"># False</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Modules</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.base.html#module-arioso.base" title="arioso.base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code></a></p></td>
+<td><p>Core types and constants for arioso.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.named_prompts.html#module-arioso.named_prompts" title="arioso.named_prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_prompts</span></code></a></p></td>
+<td><p>Named prompts: a ledger of (name, prompt_text) pairs organized by category.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.platforms.html#module-arioso.platforms" title="arioso.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a></p></td>
+<td><p>Platform packages for arioso.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.registry.html#module-arioso.registry" title="arioso.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
+<td><p>Platform registry with auto-discovery and lazy loading.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.services.html#arioso.services" title="arioso.services"><code class="xref py py-obj docutils literal notranslate"><span class="pre">services</span></code></a></p></td>
+<td><p>Lazy mapping of platform names to <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceHandle</span></code> objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.tools.html#module-arioso.tools" title="arioso.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
+<td><p>High-level tools for common arioso workflows (submit, poll, download).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.translation.html#module-arioso.translation" title="arioso.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a></p></td>
+<td><p>Parameter translation layer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../api.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="arioso.base.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">arioso.base</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.AUDIO_INPUT_AFFORDANCES"><code class="docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.check_status"><code class="docutils literal notranslate"><span class="pre">check_status()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.enhance"><code class="docutils literal notranslate"><span class="pre">enhance()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.fetch_audio"><code class="docutils literal notranslate"><span class="pre">fetch_audio()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.generate_many"><code class="docutils literal notranslate"><span class="pre">generate_many()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.get_platform_info"><code class="docutils literal notranslate"><span class="pre">get_platform_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.list_platforms"><code class="docutils literal notranslate"><span class="pre">list_platforms()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.supports_audio_input"><code class="docutils literal notranslate"><span class="pre">supports_audio_input()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/arioso.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

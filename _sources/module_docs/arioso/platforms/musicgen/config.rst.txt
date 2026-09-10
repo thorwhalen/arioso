@@ -1,4 +1,0 @@
-arioso.platforms.musicgen.config
-================================
-.. automodule:: arioso.platforms.musicgen.config
-   :members:

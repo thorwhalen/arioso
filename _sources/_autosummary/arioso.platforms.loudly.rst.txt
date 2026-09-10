@@ -1,0 +1,14 @@
+arioso.platforms.loudly
+=======================
+
+.. automodule:: arioso.platforms.loudly
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

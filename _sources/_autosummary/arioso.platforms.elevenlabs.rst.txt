@@ -1,0 +1,14 @@
+arioso.platforms.elevenlabs
+===========================
+
+.. automodule:: arioso.platforms.elevenlabs
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

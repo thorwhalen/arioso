@@ -1,0 +1,12 @@
+arioso.platforms.harmonai.adapter
+=================================
+
+.. automodule:: arioso.platforms.harmonai.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

@@ -64,7 +64,7 @@ including audio URLs once generation is complete.
 * **Parameters:**
   **song** ([`Song`](arioso.base.html.md#arioso.base.Song)) – A Song object (typically with status=’pending’).
 * **Return type:**
-  [`list`](https://docs.python.org/3/library/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
 * **Returns:**
   List of updated Song objects with current status and audio URLs.
 
@@ -91,13 +91,13 @@ point for the “rendered MIDI audio -> AI-enhanced audio” step.
     [`AudioResult`](arioso.base.html.md#arioso.base.AudioResult), `bytes`, a file path, an
     `(array, sample_rate)` pair, or a NumPy waveform (normalized by
     `arioso._audio.to_audio_ref`).
-  * **prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Optional text guiding the transformation.
-  * **platform** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – An audio-capable platform (default `'stable_audio'`); verify
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Optional text guiding the transformation.
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – An audio-capable platform (default `'stable_audio'`); verify
     with [`supports_audio_input()`](#arioso.supports_audio_input).
-  * **strength** ([`float`](https://docs.python.org/3/library/functions.html#float)) – How much the input audio influences the output (0-1), where the
+  * **strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much the input audio influences the output (0-1), where the
     platform supports it. (Note: `stable_audio` via diffusers has no
     strength knob and will warn if one is passed.)
-  * **as_** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Which affordance to route *audio* into – `'auto'` (default; picks
+  * **as_** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Which affordance to route *audio* into – `'auto'` (default; picks
     `audio_input` > `melody` > `reference_audio`) or an explicit
     affordance name from [`AUDIO_INPUT_AFFORDANCES`](#arioso.AUDIO_INPUT_AFFORDANCES).
   * **\*\*kwargs** – Further unified affordance parameters (duration, seed, …).
@@ -138,8 +138,8 @@ if updated[0].status == "complete":
 Generate music using the specified platform.
 
 * **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Text description of desired music.
-  * **platform** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Name of the generation platform (default: ‘musicgen’).
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of desired music.
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Name of the generation platform (default: ‘musicgen’).
   * **\*\*kwargs** – Parameters using unified affordance names.
     See `arioso.base.AFFORDANCES` for the full list.
 * **Return type:**
@@ -160,16 +160,16 @@ Generate music, returning all results (some platforms return multiple).
 Same interface as [`generate()`](#arioso.generate) but always returns a list.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/library/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
 
 ### arioso.get_platform_info(name)
 
 Get configuration info for a platform.
 
 * **Parameters:**
-  **name** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Platform identifier.
+  **name** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Platform identifier.
 * **Return type:**
-  [`dict`](https://docs.python.org/3/library/stdtypes.html#dict)
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 * **Returns:**
   The platform’s PLATFORM_CONFIG dict.
 
@@ -178,7 +178,7 @@ Get configuration info for a platform.
 Return names of all available platforms.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/library/stdtypes.html#list)[[`str`](https://docs.python.org/3/library/stdtypes.html#str)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### arioso.supports_audio_input(platform)
 
@@ -196,7 +196,7 @@ arioso.supports_audio_input("mubert")        # False
 ```
 
 * **Return type:**
-  [`bool`](https://docs.python.org/3/library/functions.html#bool)
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### Modules
 

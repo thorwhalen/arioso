@@ -6,7 +6,7 @@
 ## Pages
 
 - [arioso](index.html.md): Unified Python facade for AI music generation.
-- [API reference](api.html.md): | [`arioso`](_autosummary/arioso.html.md#module-arioso)   | Arioso - Unified facade for AI music gen...
+- [API reference](api.html.md): | &#96;arioso&#96;   | Arioso - Unified facade for AI music generation platforms.   |
 - [arioso](_autosummary/arioso.html.md): Arioso - Unified facade for AI music generation platforms.
 - [arioso.base](_autosummary/arioso.base.html.md): Core types and constants for arioso.
 - [arioso.named_prompts](_autosummary/arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
@@ -55,11 +55,16 @@
 - [arioso.platforms.yue.adapter](_autosummary/arioso.platforms.yue.adapter.html.md): YuE adapter supporting fal.ai REST API and local CLI backends.
 - [arioso.platforms.yue.config](_autosummary/arioso.platforms.yue.config.html.md): YuE platform configuration.
 - [arioso.registry](_autosummary/arioso.registry.html.md): Platform registry with auto-discovery and lazy loading.
-- [arioso.services](_autosummary/arioso.services.html.md): Lazy mapping of platform names to `ServiceHandle` objects.
+- [arioso.services](_autosummary/arioso.services.html.md): Lazy mapping of platform names to &#96;ServiceHandle&#96; objects.
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
-- [For AI agents](ai-agents.html.md): `arioso` ships artifacts for coding agents alongside its code. This page lists
+- [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-09-22 14:49 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
----
+## Optional
 
-For more comprehensive documentation, see [arioso.md](arioso.md)
+- [arioso.md](arioso.md): Complete documentation in a single file.
+
+## Build
+
+- [build_info.json](build_info.json): build provenance (commit, version, tool versions, whether the docs match the package)

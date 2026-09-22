@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=544df88d"></script>
+    <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.14" />
+  <meta name="docsearch:version" content="0.0.16" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -777,6 +777,70 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">return</span> <span class="n">kwargs_trans</span></div>
 
+
+
+<span class="c1">#: Affordances that always raise on an unsupported platform, regardless of</span>
+<span class="c1">#: that platform's own ``on_unsupported_param`` policy. Losing these silently</span>
+<span class="c1">#: is losing *content*, not a quality knob -- e.g. an instrumental with none</span>
+<span class="c1">#: of the caller's words in it, with no signal that happened. See</span>
+<span class="c1">#: thorwhalen/arioso#3.</span>
+<span class="n">ALWAYS_RAISE_UNSUPPORTED</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"lyrics"</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="check_supported_params">
+<a class="viewcode-back" href="../../_autosummary/arioso.translation.html#arioso.translation.check_supported_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_supported_params</span><span class="p">(</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">always_raise</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="n">ALWAYS_RAISE_UNSUPPORTED</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Warn or raise for kwargs not declared in a platform's ``supported_affordances``.</span>
+
+<span class="sd">    ``on_unsupported_param`` was, until thorwhalen/arioso#3, only ever enforced</span>
+<span class="sd">    inside :func:`make_kwargs_trans` -- reached solely by the REST-fallback</span>
+<span class="sd">    ``generate`` built by :func:`make_generate_func`. Every platform that ships</span>
+<span class="sd">    a custom ``adapter.py`` (which is all 14, as of this writing) never went</span>
+<span class="sd">    through that translator: its ``Adapter.generate(..., **kwargs)`` absorbed</span>
+<span class="sd">    and silently dropped anything unsupported, regardless of the config's</span>
+<span class="sd">    declared policy. Call this once, uniformly, before dispatching to *any*</span>
+<span class="sd">    adapter -- see ``arioso.generate``/``arioso.generate_many``.</span>
+
+<span class="sd">    This only validates; it does not translate or drop keys itself. The</span>
+<span class="sd">    caller's kwargs are passed to the adapter unchanged either way.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        kwargs: The unified-name kwargs about to be passed to an adapter</span>
+<span class="sd">            (must not include ``prompt``).</span>
+<span class="sd">        config: The platform's ``PLATFORM_CONFIG`` dict.</span>
+<span class="sd">        always_raise: Affordance names that raise unconditionally when</span>
+<span class="sd">            unsupported, overriding the platform's own policy.</span>
+<span class="sd">    """</span>
+    <span class="n">supported</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"supported_affordances"</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">on_unsupported</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"on_unsupported_param"</span><span class="p">,</span> <span class="s2">"warn"</span><span class="p">)</span>
+    <span class="n">platform_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">supported</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">always_raise</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">platform_name</span><span class="si">}</span><span class="s2">: parameter </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not supported and would "</span>
+                <span class="sa">f</span><span class="s2">"be silently dropped -- this loses content, not just a quality "</span>
+                <span class="sa">f</span><span class="s2">"knob. Supported affordances: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">supported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">on_unsupported</span> <span class="o">==</span> <span class="s2">"raise"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">platform_name</span><span class="si">}</span><span class="s2">: parameter </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> not supported. "</span>
+                <span class="sa">f</span><span class="s2">"Supported affordances: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">supported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">on_unsupported</span> <span class="o">==</span> <span class="s2">"warn"</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">platform_name</span><span class="si">}</span><span class="s2">: parameter </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> not supported, ignoring"</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+        <span class="c1"># 'ignore': silently drop -- the adapter's **kwargs still absorbs it.</span>
 
 
 <div class="viewcode-block" id="make_generate_func">

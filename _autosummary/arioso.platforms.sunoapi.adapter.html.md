@@ -52,10 +52,10 @@ Download the audio bytes for a Song that has an audio_url.
 Check the status of a generation task and return updated Songs.
 
 * **Parameters:**
-  **task_id** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – The taskId returned from generate(), upload_extend(),
+  **task_id** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The taskId returned from generate(), upload_extend(),
   or upload_cover().
 * **Return type:**
-  [`list`](https://docs.python.org/3/library/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Song`](arioso.base.html.md#arioso.base.Song)]
 * **Returns:**
   List of Song objects with current status and audio URLs
   (if generation is complete).
@@ -72,8 +72,8 @@ Uses the sunoapi.org file upload API. Uploaded files are temporary
 and automatically deleted after 3 days.
 
 * **Parameters:**
-  **file_path** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Path to the local audio file.
+  **file_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to the local audio file.
 * **Return type:**
-  [`str`](https://docs.python.org/3/library/stdtypes.html#str)
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 * **Returns:**
   Public URL of the uploaded file.

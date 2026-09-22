@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-09-22T14:49:28Z",
+  "package": {
+    "name": "arioso",
+    "version": "0.0.16",
+    "display_name": "arioso",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a",
+    "short_commit": "e8d8d8a",
+    "branch": "main",
+    "tags": [
+      "0.0.16"
+    ],
+    "dirty": false,
+    "remote_url": "https://github.com/thorwhalen/arioso",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "thorwhalen/arioso",
+    "sha": "0754d28c4d0f436a333978c4aa15f32df72dd4d0",
+    "sha_in_history": true,
+    "ref": "refs/heads/main",
+    "ref_name": "main",
+    "run_id": "35742788980",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/35742788980",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.12",
+    "sphinx": "9.1.0",
+    "docutils": "0.22.4",
+    "python": "3.12.14"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "pydata_sphinx_theme",
+    "accent": "#923240",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 51,
+    "objects_documented": 100
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.0.16",
+    "relation": "same",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

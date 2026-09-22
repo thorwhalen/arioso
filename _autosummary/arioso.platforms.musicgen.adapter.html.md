@@ -14,7 +14,7 @@ style from the text prompt.
 
 ### *class* arioso.platforms.musicgen.adapter.Adapter(config)
 
-Bases: [`object`](https://docs.python.org/3/library/functions.html#object)
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 MusicGen adapter with lazy model loading.
 
@@ -26,13 +26,13 @@ HuggingFace `transformers` pipeline.
 Generate music from a text prompt, optionally following a melody.
 
 * **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Text description of desired music.
-  * **duration** ([`float`](https://docs.python.org/3/library/functions.html#float)) – Length in seconds.
-  * **temperature** ([`float`](https://docs.python.org/3/library/functions.html#float)) – Sampling randomness.
-  * **top_k** ([`int`](https://docs.python.org/3/library/functions.html#int)) – Top-k sampling parameter.
-  * **top_p** ([`float`](https://docs.python.org/3/library/functions.html#float)) – Top-p nucleus sampling.
-  * **guidance** ([`float`](https://docs.python.org/3/library/functions.html#float)) – Classifier-free guidance scale.
-  * **model** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Model variant name (e.g. ‘facebook/musicgen-small’). When a
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of desired music.
+  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length in seconds.
+  * **temperature** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Sampling randomness.
+  * **top_k** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Top-k sampling parameter.
+  * **top_p** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Top-p nucleus sampling.
+  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Classifier-free guidance scale.
+  * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Model variant name (e.g. ‘facebook/musicgen-small’). When a
     `melody` is supplied and `model` isn’t already a melody
     variant, it is switched to `facebook/musicgen-melody`.
   * **melody** – Optional input audio whose pitch contour the output follows

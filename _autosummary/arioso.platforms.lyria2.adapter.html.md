@@ -21,11 +21,11 @@ Google Lyria 2 adapter with SDK-first, REST-fallback strategy.
 Generate music using Google Lyria 2.
 
 * **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Text description of desired music.
-  * **negative_prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Elements to avoid in the generation.
-  * **seed** ([`int`](https://docs.python.org/3/library/functions.html#int)) – Random seed for reproducibility.
-  * **model** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Model version identifier.
-  * **batch_size** ([`int`](https://docs.python.org/3/library/functions.html#int)) – Number of samples to generate.
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of desired music.
+  * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Elements to avoid in the generation.
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed for reproducibility.
+  * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Model version identifier.
+  * **batch_size** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Number of samples to generate.
 * **Return type:**
   [`Song`](arioso.base.html.md#arioso.base.Song)
 * **Returns:**

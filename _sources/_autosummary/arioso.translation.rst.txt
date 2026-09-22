@@ -4,10 +4,17 @@ arioso.translation
 .. automodule:: arioso.translation
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ALWAYS_RAISE_UNSUPPORTED
+   
    .. rubric:: Functions
 
    .. autosummary::
    
+      check_supported_params
       make_generate_func
       make_kwargs_trans
    

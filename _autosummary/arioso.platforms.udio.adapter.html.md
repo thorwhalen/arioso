@@ -9,7 +9,7 @@ Udio adapter via udio-wrapper (unofficial).
 
 ### *class* arioso.platforms.udio.adapter.Adapter(config)
 
-Bases: [`object`](https://docs.python.org/3/library/functions.html#object)
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Adapter for Udio using the unofficial udio-wrapper package.
 
@@ -21,10 +21,10 @@ set in the UDIO_AUTH_COOKIE environment variable.
 Generate music via Udio.
 
 * **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Text description of desired music.
-  * **lyrics** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Custom lyrics text.
-  * **seed** ([`int`](https://docs.python.org/3/library/functions.html#int)) – Random seed (-1 for random).
-  * **audio_input** ([`str`](https://docs.python.org/3/library/stdtypes.html#str)) – Path to conditioning audio file.
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of desired music.
+  * **lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Custom lyrics text.
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed (-1 for random).
+  * **audio_input** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to conditioning audio file.
 * **Return type:**
   [`Song`](arioso.base.html.md#arioso.base.Song)
 * **Returns:**

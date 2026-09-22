@@ -55,9 +55,11 @@ def generate(prompt: str, *, platform: str = "musicgen", **kwargs) -> Song:
         song = generate("upbeat jazz piano", platform="musicgen", duration=10)
     """
     from arioso.registry import get_platform
+    from arioso.translation import check_supported_params
 
     entry = get_platform(platform)
     adapter = entry["adapter"]
+    check_supported_params(kwargs, entry["config"])
 
     if hasattr(adapter, "generate"):
         result = adapter.generate(prompt, **kwargs)
@@ -78,9 +80,11 @@ def generate_many(prompt: str, *, platform: str = "musicgen", **kwargs) -> list[
     Same interface as :func:`generate` but always returns a list.
     """
     from arioso.registry import get_platform
+    from arioso.translation import check_supported_params
 
     entry = get_platform(platform)
     adapter = entry["adapter"]
+    check_supported_params(kwargs, entry["config"])
 
     if hasattr(adapter, "generate"):
         result = adapter.generate(prompt, **kwargs)

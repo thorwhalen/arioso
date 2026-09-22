@@ -3,7 +3,7 @@
 import warnings
 
 import pytest
-from arioso.translation import make_kwargs_trans
+from arioso.translation import make_kwargs_trans, check_supported_params
 
 
 def test_simple_rename():
@@ -77,6 +77,60 @@ def test_unsupported_ignore():
     trans = make_kwargs_trans(param_map, on_unsupported="ignore")
     result = trans({"prompt": "test", "unknown_param": 42})
     assert result == {"prompt": "test"}
+
+
+def _config(*, on_unsupported="warn", supported=("prompt", "duration")):
+    return {
+        "name": "fake_platform",
+        "supported_affordances": list(supported),
+        "on_unsupported_param": on_unsupported,
+    }
+
+
+def test_check_supported_params_no_warning_for_supported_key():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        check_supported_params({"duration": 10}, _config())
+        assert len(w) == 0
+
+
+def test_check_supported_params_warns_by_default():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        check_supported_params({"bogus": 1}, _config(on_unsupported="warn"))
+        assert len(w) == 1
+        assert "bogus" in str(w[0].message)
+
+
+def test_check_supported_params_raise_policy():
+    with pytest.raises(ValueError, match="bogus"):
+        check_supported_params({"bogus": 1}, _config(on_unsupported="raise"))
+
+
+def test_check_supported_params_ignore_policy_is_silent():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        check_supported_params({"bogus": 1}, _config(on_unsupported="ignore"))
+        assert len(w) == 0
+
+
+def test_check_supported_params_lyrics_always_raises_even_under_warn_policy():
+    """Regression test for thorwhalen/arioso#3.
+
+    lyrics is content, not a quality knob: silently dropping it must raise
+    regardless of the platform's own on_unsupported_param policy.
+    """
+    with pytest.raises(ValueError, match="lyrics"):
+        check_supported_params({"lyrics": "a poem"}, _config(on_unsupported="warn"))
+
+
+def test_check_supported_params_lyrics_ok_when_platform_supports_it():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        check_supported_params(
+            {"lyrics": "a poem"}, _config(supported=("prompt", "lyrics"))
+        )
+        assert len(w) == 0
 
 
 def test_multiple_params():

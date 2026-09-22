@@ -60,6 +60,67 @@ def make_kwargs_trans(
     return kwargs_trans
 
 
+#: Affordances that always raise on an unsupported platform, regardless of
+#: that platform's own ``on_unsupported_param`` policy. Losing these silently
+#: is losing *content*, not a quality knob -- e.g. an instrumental with none
+#: of the caller's words in it, with no signal that happened. See
+#: thorwhalen/arioso#3.
+ALWAYS_RAISE_UNSUPPORTED = ("lyrics",)
+
+
+def check_supported_params(
+    kwargs: dict,
+    config: dict,
+    *,
+    always_raise: tuple = ALWAYS_RAISE_UNSUPPORTED,
+) -> None:
+    """Warn or raise for kwargs not declared in a platform's ``supported_affordances``.
+
+    ``on_unsupported_param`` was, until thorwhalen/arioso#3, only ever enforced
+    inside :func:`make_kwargs_trans` -- reached solely by the REST-fallback
+    ``generate`` built by :func:`make_generate_func`. Every platform that ships
+    a custom ``adapter.py`` (which is all 14, as of this writing) never went
+    through that translator: its ``Adapter.generate(..., **kwargs)`` absorbed
+    and silently dropped anything unsupported, regardless of the config's
+    declared policy. Call this once, uniformly, before dispatching to *any*
+    adapter -- see ``arioso.generate``/``arioso.generate_many``.
+
+    This only validates; it does not translate or drop keys itself. The
+    caller's kwargs are passed to the adapter unchanged either way.
+
+    Args:
+        kwargs: The unified-name kwargs about to be passed to an adapter
+            (must not include ``prompt``).
+        config: The platform's ``PLATFORM_CONFIG`` dict.
+        always_raise: Affordance names that raise unconditionally when
+            unsupported, overriding the platform's own policy.
+    """
+    supported = set(config.get("supported_affordances", []))
+    on_unsupported = config.get("on_unsupported_param", "warn")
+    platform_name = config.get("name", "?")
+
+    for key in kwargs:
+        if key in supported:
+            continue
+        if key in always_raise:
+            raise ValueError(
+                f"{platform_name}: parameter {key!r} is not supported and would "
+                f"be silently dropped -- this loses content, not just a quality "
+                f"knob. Supported affordances: {sorted(supported)}"
+            )
+        if on_unsupported == "raise":
+            raise ValueError(
+                f"{platform_name}: parameter {key!r} not supported. "
+                f"Supported affordances: {sorted(supported)}"
+            )
+        elif on_unsupported == "warn":
+            warnings.warn(
+                f"{platform_name}: parameter {key!r} not supported, ignoring",
+                stacklevel=3,
+            )
+        # 'ignore': silently drop -- the adapter's **kwargs still absorbs it.
+
+
 def make_generate_func(config: dict) -> Callable:
     """Build a generate() callable from a platform config.
 

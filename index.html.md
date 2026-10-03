@@ -4,7 +4,7 @@
 
 Unified Python facade for AI music generation.
 
-One interface, many backends. Arioso wraps 14 AI music generation platforms —
+One interface, many backends. Arioso wraps 16 AI music generation platforms —
 from local open-source models to commercial REST APIs — behind a single `generate()` call.
 
 ## Install
@@ -46,6 +46,15 @@ rendered = (
 # Audio-to-audio: continue/transform the input (Stable Audio Open, local)
 better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
 
+# Subtle variation: low strength keeps the input, high lets the prompt take over
+# (Stable Audio 2.5 on fal.ai; needs FAL_KEY)
+close = arioso.enhance(
+    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.3
+)
+
+# Remix toward style tags (ACE-Step on fal.ai)
+remix = arioso.enhance(rendered, "orchestral, film score, brass", platform="ace_step")
+
 # Melody-conditioned: keep the tune, take the style from the prompt (MusicGen-melody)
 variation = arioso.enhance(rendered, "energetic EDM", platform="musicgen")
 
@@ -60,28 +69,31 @@ routes your audio into the platform’s audio-conditioning affordance
 accepted in any form a `Song`/`AudioResult`/`bytes`/path/`(array, sample_rate)`/
 numpy-waveform can take (normalized internally). Note that `stable_audio` via
 diffusers uses the input as an initial waveform (continuation/init) and has no
-`strength` knob (a value passed there is ignored with a warning).
+`strength` knob (a value passed there is ignored with a warning); for a
+strength-controlled transform use `stable_audio_25`.
 
 ## Platforms
 
-14 platforms are included, spanning local models, REST APIs, and SDK-based services:
+16 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
-| Platform                   | Access                          | Auth                                 | Install                            |
-|----------------------------|---------------------------------|--------------------------------------|------------------------------------|
-| **MusicGen**               | Local (audiocraft/transformers) | None                                 | `pip install arioso[musicgen]`     |
-| **Stable Audio Open**      | Local (diffusers)               | None                                 | `pip install arioso[stable-audio]` |
-| **Harmonai**               | Local (diffusers)               | None                                 | `pip install arioso[harmonai]`     |
-| **Riffusion**              | Local (diffusers)               | None                                 | `pip install arioso[riffusion]`    |
-| **ElevenLabs**             | REST API                        | `ELEVENLABS_API_KEY`                 | `pip install arioso[elevenlabs]`   |
-| **Suno** (via sunoapi.org) | REST API                        | `SUNO_API_KEY`                       | `pip install arioso[sunoapi]`      |
-| **Google Lyria 2**         | REST (Vertex AI)                | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]`       |
-| **Google Lyria RT**        | WebSocket (genai SDK)           | `GOOGLE_API_KEY`                     | `pip install arioso[lyria-rt]`     |
-| **Mubert**                 | REST API                        | `MUBERT_PAT`                         | `pip install arioso[mubert]`       |
-| **Beatoven.ai**            | REST API                        | `BEATOVEN_API_KEY`                   | `pip install arioso[beatoven]`     |
-| **Loudly**                 | REST API                        | `LOUDLY_API_KEY`                     | `pip install arioso[loudly]`       |
-| **Jen**                    | REST API                        | `JEN_API_KEY`                        | `pip install arioso[jen]`          |
-| **YuE**                    | fal.ai / local CLI              | `FAL_KEY`                            | `pip install arioso[yue]`          |
-| **Udio**                   | Unofficial wrapper              | `UDIO_AUTH_COOKIE`                   | `pip install arioso[udio]`         |
+| Platform                   | Access                          | Auth                                 | Install                               |
+|----------------------------|---------------------------------|--------------------------------------|---------------------------------------|
+| **MusicGen**               | Local (audiocraft/transformers) | None                                 | `pip install arioso[musicgen]`        |
+| **Stable Audio Open**      | Local (diffusers)               | None                                 | `pip install arioso[stable-audio]`    |
+| **Harmonai**               | Local (diffusers)               | None                                 | `pip install arioso[harmonai]`        |
+| **Riffusion**              | Local (diffusers)               | None                                 | `pip install arioso[riffusion]`       |
+| **ElevenLabs**             | REST API                        | `ELEVENLABS_API_KEY`                 | `pip install arioso[elevenlabs]`      |
+| **Suno** (via sunoapi.org) | REST API                        | `SUNO_API_KEY`                       | `pip install arioso[sunoapi]`         |
+| **Google Lyria 2**         | REST (Vertex AI)                | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]`          |
+| **Google Lyria RT**        | WebSocket (genai SDK)           | `GOOGLE_API_KEY`                     | `pip install arioso[lyria-rt]`        |
+| **Mubert**                 | REST API                        | `MUBERT_PAT`                         | `pip install arioso[mubert]`          |
+| **Beatoven.ai**            | REST API                        | `BEATOVEN_API_KEY`                   | `pip install arioso[beatoven]`        |
+| **Loudly**                 | REST API                        | `LOUDLY_API_KEY`                     | `pip install arioso[loudly]`          |
+| **Jen**                    | REST API                        | `JEN_API_KEY`                        | `pip install arioso[jen]`             |
+| **YuE**                    | fal.ai / local CLI              | `FAL_KEY`                            | `pip install arioso[yue]`             |
+| **Stable Audio 2.5**       | fal.ai                          | `FAL_KEY`                            | `pip install arioso[stable-audio-25]` |
+| **ACE-Step**               | fal.ai                          | `FAL_KEY`                            | `pip install arioso[ace-step]`        |
+| **Udio**                   | Unofficial wrapper              | `UDIO_AUTH_COOKIE`                   | `pip install arioso[udio]`            |
 ```python
 # See what's available
 arioso.list_platforms()
@@ -392,6 +404,8 @@ arioso/
         loudly/            # Loudly REST API
         jen/               # Jen REST API
         yue/               # YuE via fal.ai or local CLI
+        stable_audio_25/   # Stable Audio 2.5 via fal.ai (audio-to-audio with strength)
+        ace_step/          # ACE-Step via fal.ai (tags -> music, audio remix)
         udio/              # Udio via unofficial wrapper
 ```
 

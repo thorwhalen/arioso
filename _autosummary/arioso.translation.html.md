@@ -15,7 +15,7 @@ native parameter names, applying type coercions along the way.
 | [`check_supported_params`](#arioso.translation.check_supported_params)(kwargs, config, \*[, ...])   | Warn or raise for kwargs not declared in a platform's `supported_affordances`.   |
 |------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | [`make_generate_func`](#arioso.translation.make_generate_func)(config)                          | Build a generate() callable from a platform config.                              |
-| [`make_kwargs_trans`](#arioso.translation.make_kwargs_trans)(param_map, \*[, on_unsupported])  | Build a kwargs translation function from a platform's param_map.                 |
+| [`make_kwargs_trans`](#arioso.translation.make_kwargs_trans)(param_map, \*[, ...])             | Build a kwargs translation function from a platform's param_map.                 |
 
 ### arioso.translation.ALWAYS_RAISE_UNSUPPORTED *= ('lyrics',)*
 
@@ -66,7 +66,7 @@ and wraps it with parameter translation and output normalization.
   A callable that accepts unified affordance kwargs and returns
   a Song.
 
-### arioso.translation.make_kwargs_trans(param_map, , on_unsupported='warn')
+### arioso.translation.make_kwargs_trans(param_map, , on_unsupported='warn', passthrough=())
 
 Build a kwargs translation function from a platform’s param_map.
 
@@ -83,6 +83,8 @@ The returned function transforms:
     bool).
   * **on_unsupported** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to do with params not in param_map.
     One of ‘warn’, ‘raise’, or ‘ignore’.
+  * **passthrough** – Adapter-only keyword names (a config’s
+    `adapter_params`) passed through untranslated and unwarned.
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)], [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
 * **Returns:**

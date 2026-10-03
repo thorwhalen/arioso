@@ -1,6 +1,6 @@
 # arioso.services
 
-### arioso.services *= ServiceCollection(beatoven, elevenlabs, harmonai, jen, loudly, lyria2, lyria_rt, mubert, musicgen, riffusion, stable_audio, sunoapi, udio, yue)*
+### arioso.services *= ServiceCollection(ace_step, beatoven, elevenlabs, harmonai, jen, loudly, lyria2, lyria_rt, mubert, musicgen, riffusion, stable_audio, stable_audio_25, sunoapi, udio, yue)*
 
 Lazy mapping of platform names to `ServiceHandle` objects.
 

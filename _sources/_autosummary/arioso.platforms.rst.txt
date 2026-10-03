@@ -10,6 +10,7 @@ arioso.platforms
    :toctree:
    :recursive:
 
+   ace_step
    beatoven
    elevenlabs
    harmonai
@@ -21,6 +22,7 @@ arioso.platforms
    musicgen
    riffusion
    stable_audio
+   stable_audio_25
    sunoapi
    udio
    yue

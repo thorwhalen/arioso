@@ -1,0 +1,12 @@
+arioso.platforms.ace\_step.adapter
+==================================
+
+.. automodule:: arioso.platforms.ace_step.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

@@ -1,4 +1,4 @@
-> built 2026-09-22 14:49 UTC from e8d8d8a (main) · arioso 0.0.16. Details: build_info.json
+> built 2026-10-03 11:15 UTC from 6ec3c99 (main) · arioso 0.0.17. Details: build_info.json
 
 # index.html.md
 
@@ -8,7 +8,7 @@
 
 Unified Python facade for AI music generation.
 
-One interface, many backends. Arioso wraps 14 AI music generation platforms —
+One interface, many backends. Arioso wraps 16 AI music generation platforms —
 from local open-source models to commercial REST APIs — behind a single `generate()` call.
 
 ## Install
@@ -50,6 +50,15 @@ rendered = (
 # Audio-to-audio: continue/transform the input (Stable Audio Open, local)
 better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
 
+# Subtle variation: low strength keeps the input, high lets the prompt take over
+# (Stable Audio 2.5 on fal.ai; needs FAL_KEY)
+close = arioso.enhance(
+    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.3
+)
+
+# Remix toward style tags (ACE-Step on fal.ai)
+remix = arioso.enhance(rendered, "orchestral, film score, brass", platform="ace_step")
+
 # Melody-conditioned: keep the tune, take the style from the prompt (MusicGen-melody)
 variation = arioso.enhance(rendered, "energetic EDM", platform="musicgen")
 
@@ -64,28 +73,31 @@ routes your audio into the platform’s audio-conditioning affordance
 accepted in any form a `Song`/`AudioResult`/`bytes`/path/`(array, sample_rate)`/
 numpy-waveform can take (normalized internally). Note that `stable_audio` via
 diffusers uses the input as an initial waveform (continuation/init) and has no
-`strength` knob (a value passed there is ignored with a warning).
+`strength` knob (a value passed there is ignored with a warning); for a
+strength-controlled transform use `stable_audio_25`.
 
 ## Platforms
 
-14 platforms are included, spanning local models, REST APIs, and SDK-based services:
+16 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
-| Platform                   | Access                          | Auth                                 | Install                            |
-|----------------------------|---------------------------------|--------------------------------------|------------------------------------|
-| **MusicGen**               | Local (audiocraft/transformers) | None                                 | `pip install arioso[musicgen]`     |
-| **Stable Audio Open**      | Local (diffusers)               | None                                 | `pip install arioso[stable-audio]` |
-| **Harmonai**               | Local (diffusers)               | None                                 | `pip install arioso[harmonai]`     |
-| **Riffusion**              | Local (diffusers)               | None                                 | `pip install arioso[riffusion]`    |
-| **ElevenLabs**             | REST API                        | `ELEVENLABS_API_KEY`                 | `pip install arioso[elevenlabs]`   |
-| **Suno** (via sunoapi.org) | REST API                        | `SUNO_API_KEY`                       | `pip install arioso[sunoapi]`      |
-| **Google Lyria 2**         | REST (Vertex AI)                | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]`       |
-| **Google Lyria RT**        | WebSocket (genai SDK)           | `GOOGLE_API_KEY`                     | `pip install arioso[lyria-rt]`     |
-| **Mubert**                 | REST API                        | `MUBERT_PAT`                         | `pip install arioso[mubert]`       |
-| **Beatoven.ai**            | REST API                        | `BEATOVEN_API_KEY`                   | `pip install arioso[beatoven]`     |
-| **Loudly**                 | REST API                        | `LOUDLY_API_KEY`                     | `pip install arioso[loudly]`       |
-| **Jen**                    | REST API                        | `JEN_API_KEY`                        | `pip install arioso[jen]`          |
-| **YuE**                    | fal.ai / local CLI              | `FAL_KEY`                            | `pip install arioso[yue]`          |
-| **Udio**                   | Unofficial wrapper              | `UDIO_AUTH_COOKIE`                   | `pip install arioso[udio]`         |
+| Platform                   | Access                          | Auth                                 | Install                               |
+|----------------------------|---------------------------------|--------------------------------------|---------------------------------------|
+| **MusicGen**               | Local (audiocraft/transformers) | None                                 | `pip install arioso[musicgen]`        |
+| **Stable Audio Open**      | Local (diffusers)               | None                                 | `pip install arioso[stable-audio]`    |
+| **Harmonai**               | Local (diffusers)               | None                                 | `pip install arioso[harmonai]`        |
+| **Riffusion**              | Local (diffusers)               | None                                 | `pip install arioso[riffusion]`       |
+| **ElevenLabs**             | REST API                        | `ELEVENLABS_API_KEY`                 | `pip install arioso[elevenlabs]`      |
+| **Suno** (via sunoapi.org) | REST API                        | `SUNO_API_KEY`                       | `pip install arioso[sunoapi]`         |
+| **Google Lyria 2**         | REST (Vertex AI)                | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]`          |
+| **Google Lyria RT**        | WebSocket (genai SDK)           | `GOOGLE_API_KEY`                     | `pip install arioso[lyria-rt]`        |
+| **Mubert**                 | REST API                        | `MUBERT_PAT`                         | `pip install arioso[mubert]`          |
+| **Beatoven.ai**            | REST API                        | `BEATOVEN_API_KEY`                   | `pip install arioso[beatoven]`        |
+| **Loudly**                 | REST API                        | `LOUDLY_API_KEY`                     | `pip install arioso[loudly]`          |
+| **Jen**                    | REST API                        | `JEN_API_KEY`                        | `pip install arioso[jen]`             |
+| **YuE**                    | fal.ai / local CLI              | `FAL_KEY`                            | `pip install arioso[yue]`             |
+| **Stable Audio 2.5**       | fal.ai                          | `FAL_KEY`                            | `pip install arioso[stable-audio-25]` |
+| **ACE-Step**               | fal.ai                          | `FAL_KEY`                            | `pip install arioso[ace-step]`        |
+| **Udio**                   | Unofficial wrapper              | `UDIO_AUTH_COOKIE`                   | `pip install arioso[udio]`            |
 ```python
 # See what's available
 arioso.list_platforms()
@@ -396,6 +408,8 @@ arioso/
         loudly/            # Loudly REST API
         jen/               # Jen REST API
         yue/               # YuE via fal.ai or local CLI
+        stable_audio_25/   # Stable Audio 2.5 via fal.ai (audio-to-audio with strength)
+        ace_step/          # ACE-Step via fal.ai (tags -> music, audio remix)
         udio/              # Udio via unofficial wrapper
 ```
 
@@ -888,6 +902,84 @@ Search for prompts matching a query string.
   Dict of `{(category, name): prompt_text}` for all matches.
 
 
+# _autosummary/arioso.platforms.ace_step.adapter.html.md
+
+# arioso.platforms.ace_step.adapter
+
+ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.
+
+ACE-Step is steered by comma-separated style *tags*, not a sentence, so the
+unified `prompt` (or `genre`) becomes `tags`. Its audio-to-audio endpoint
+“remixes” an input toward new tags; it also needs `original_tags` describing
+the input, which default to the new tags when not given.
+
+### Classes
+
+| [`Adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#arioso.platforms.ace_step.adapter.Adapter)(config)   | fal.ai ACE-Step adapter.   |
+|--------------------------------------------------------------------|----------------------------|
+
+### *class* arioso.platforms.ace_step.adapter.Adapter(config)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+fal.ai ACE-Step adapter.
+
+#### generate(prompt='', , genre='', lyrics='', instrumental=False, duration=60.0, num_steps=27, guidance=15.0, seed=None, audio_input=None, original_tags='', original_lyrics='', edit_mode='remix', fetch=True, \*\*kwargs)
+
+Generate music from tags, or remix `audio_input` toward them.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Style tags (comma-separated works best). `genre` wins
+    when both are given.
+  * **genre** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Style tags; an alias of `prompt` for this platform.
+  * **lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Lyrics to sing. Empty or `instrumental=True` sends
+    `[inst]`, so a remix of a song with vocals comes out
+    instrumental unless you pass its lyrics (or new ones).
+  * **instrumental** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Force an instrumental (discards `lyrics`).
+  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Seconds (text-to-music only; a remix keeps the input’s
+    length).
+  * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – `number_of_steps` (default 27).
+  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – `guidance_scale` (default 15).
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed.
+  * **audio_input** – Audio to remix (path, bytes, Song, URL, …). When
+    given, the audio-to-audio endpoint is used.
+  * **original_tags** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Tags describing `audio_input` (defaults to the
+    new tags).
+  * **original_lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Lyrics of `audio_input`, if any.
+  * **edit_mode** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"remix"` (default) or `"lyrics"`.
+  * **fetch** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Download the result so `audio_bytes` is populated.
+  * **\*\*kwargs** – Native fal arguments in `_NATIVE_EXTRAS`
+    (`scheduler`, `guidance_type`, `tag_guidance_scale`, …)
+    are passed through; anything else is ignored.
+* **Return type:**
+  [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
+* **Returns:**
+  A completed Song.
+
+
+# _autosummary/arioso.platforms.ace_step.config.html.md
+
+# arioso.platforms.ace_step.config
+
+ACE-Step platform configuration (fal.ai hosted).
+
+Live docs (verified 2026-10-03): [https://fal.ai/models/fal-ai/ace-step/api](https://fal.ai/models/fal-ai/ace-step/api) and
+[https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api](https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api)
+
+
+# _autosummary/arioso.platforms.ace_step.html.md
+
+# arioso.platforms.ace_step
+
+ACE-Step (hosted on fal.ai) platform for arioso.
+
+### Modules
+
+| [`adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#module-arioso.platforms.ace_step.adapter)   | ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.   |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`config`](_autosummary/arioso.platforms.ace_step.config.html.md#module-arioso.platforms.ace_step.config)     | ACE-Step platform configuration (fal.ai hosted).                     |
+
+
 # _autosummary/arioso.platforms.beatoven.adapter.html.md
 
 # arioso.platforms.beatoven.adapter
@@ -1104,21 +1196,23 @@ auto-discovered by [`arioso.registry.discover_platforms()`](_autosummary/arioso.
 
 ### Modules
 
-| [`beatoven`](_autosummary/arioso.platforms.beatoven.html.md#module-arioso.platforms.beatoven)         | Beatoven.ai platform for arioso.                |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| [`elevenlabs`](_autosummary/arioso.platforms.elevenlabs.html.md#module-arioso.platforms.elevenlabs)     | ElevenLabs Music platform for arioso.           |
-| [`harmonai`](_autosummary/arioso.platforms.harmonai.html.md#module-arioso.platforms.harmonai)         | Harmonai (Dance Diffusion) platform for arioso. |
-| [`jen`](_autosummary/arioso.platforms.jen.html.md#module-arioso.platforms.jen)                   | Jen platform for arioso.                        |
-| [`loudly`](_autosummary/arioso.platforms.loudly.html.md#module-arioso.platforms.loudly)             | Loudly platform for arioso.                     |
-| [`lyria2`](_autosummary/arioso.platforms.lyria2.html.md#module-arioso.platforms.lyria2)             | Google Lyria 2 platform for arioso.             |
-| [`lyria_rt`](_autosummary/arioso.platforms.lyria_rt.html.md#module-arioso.platforms.lyria_rt)         | Google Lyria RealTime platform for arioso.      |
-| [`mubert`](_autosummary/arioso.platforms.mubert.html.md#module-arioso.platforms.mubert)             | Mubert platform for arioso.                     |
-| [`musicgen`](_autosummary/arioso.platforms.musicgen.html.md#module-arioso.platforms.musicgen)         | MusicGen platform for arioso.                   |
-| [`riffusion`](_autosummary/arioso.platforms.riffusion.html.md#module-arioso.platforms.riffusion)       | Riffusion platform for arioso.                  |
-| [`stable_audio`](_autosummary/arioso.platforms.stable_audio.html.md#module-arioso.platforms.stable_audio) | Stable Audio Open platform for arioso.          |
-| [`sunoapi`](_autosummary/arioso.platforms.sunoapi.html.md#module-arioso.platforms.sunoapi)           | Suno platform (via sunoapi.org) for arioso.     |
-| [`udio`](_autosummary/arioso.platforms.udio.html.md#module-arioso.platforms.udio)                 | Udio platform (via UdioWrapper) for arioso.     |
-| [`yue`](_autosummary/arioso.platforms.yue.html.md#module-arioso.platforms.yue)                   | YuE platform for arioso.                        |
+| [`ace_step`](_autosummary/arioso.platforms.ace_step.html.md#module-arioso.platforms.ace_step)               | ACE-Step (hosted on fal.ai) platform for arioso.         |
+|----------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| [`beatoven`](_autosummary/arioso.platforms.beatoven.html.md#module-arioso.platforms.beatoven)               | Beatoven.ai platform for arioso.                         |
+| [`elevenlabs`](_autosummary/arioso.platforms.elevenlabs.html.md#module-arioso.platforms.elevenlabs)           | ElevenLabs Music platform for arioso.                    |
+| [`harmonai`](_autosummary/arioso.platforms.harmonai.html.md#module-arioso.platforms.harmonai)               | Harmonai (Dance Diffusion) platform for arioso.          |
+| [`jen`](_autosummary/arioso.platforms.jen.html.md#module-arioso.platforms.jen)                         | Jen platform for arioso.                                 |
+| [`loudly`](_autosummary/arioso.platforms.loudly.html.md#module-arioso.platforms.loudly)                   | Loudly platform for arioso.                              |
+| [`lyria2`](_autosummary/arioso.platforms.lyria2.html.md#module-arioso.platforms.lyria2)                   | Google Lyria 2 platform for arioso.                      |
+| [`lyria_rt`](_autosummary/arioso.platforms.lyria_rt.html.md#module-arioso.platforms.lyria_rt)               | Google Lyria RealTime platform for arioso.               |
+| [`mubert`](_autosummary/arioso.platforms.mubert.html.md#module-arioso.platforms.mubert)                   | Mubert platform for arioso.                              |
+| [`musicgen`](_autosummary/arioso.platforms.musicgen.html.md#module-arioso.platforms.musicgen)               | MusicGen platform for arioso.                            |
+| [`riffusion`](_autosummary/arioso.platforms.riffusion.html.md#module-arioso.platforms.riffusion)             | Riffusion platform for arioso.                           |
+| [`stable_audio`](_autosummary/arioso.platforms.stable_audio.html.md#module-arioso.platforms.stable_audio)       | Stable Audio Open platform for arioso.                   |
+| [`stable_audio_25`](_autosummary/arioso.platforms.stable_audio_25.html.md#module-arioso.platforms.stable_audio_25) | Stable Audio 2.5 (hosted on fal.ai) platform for arioso. |
+| [`sunoapi`](_autosummary/arioso.platforms.sunoapi.html.md#module-arioso.platforms.sunoapi)                 | Suno platform (via sunoapi.org) for arioso.              |
+| [`udio`](_autosummary/arioso.platforms.udio.html.md#module-arioso.platforms.udio)                       | Udio platform (via UdioWrapper) for arioso.              |
+| [`yue`](_autosummary/arioso.platforms.yue.html.md#module-arioso.platforms.yue)                         | YuE platform for arioso.                                 |
 
 
 # _autosummary/arioso.platforms.jen.adapter.html.md
@@ -1606,6 +1700,77 @@ Stable Audio Open platform for arioso.
 | [`config`](_autosummary/arioso.platforms.stable_audio.config.html.md#module-arioso.platforms.stable_audio.config)     | Stable Audio Open platform configuration.                |
 
 
+# _autosummary/arioso.platforms.stable_audio_25.adapter.html.md
+
+# arioso.platforms.stable_audio_25.adapter
+
+Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.
+
+Unlike the local `stable_audio` platform (Stable Audio Open via diffusers,
+which has no strength knob), the hosted 2.5 audio-to-audio endpoint takes a
+`strength` in [0, 1]: low values keep the input nearly intact, high values
+let the prompt take over. That makes it the arioso backend for “the same piece,
+subtly changed”.
+
+### Classes
+
+| [`Adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#arioso.platforms.stable_audio_25.adapter.Adapter)(config)   | fal.ai Stable Audio 2.5 adapter.   |
+|--------------------------------------------------------------------|------------------------------------|
+
+### *class* arioso.platforms.stable_audio_25.adapter.Adapter(config)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+fal.ai Stable Audio 2.5 adapter.
+
+#### generate(prompt, , duration=None, num_steps=8, guidance=1.0, seed=None, audio_input=None, audio_input_strength=0.8, fetch=True, \*\*kwargs)
+
+Generate audio from a prompt, or transform `audio_input` toward it.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the desired audio (required).
+  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Output length in seconds (1-190). Text-to-audio
+    defaults to 30 s (fal’s own default is its 190 s maximum, the
+    most expensive clip); audio-to-audio defaults to the input’s
+    length.
+  * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Denoising steps (`num_inference_steps`, default 8).
+  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Prompt adherence (`guidance_scale`, default 1).
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed for reproducibility.
+  * **audio_input** – Audio to transform (path, bytes, Song, URL, …).
+    When given, the audio-to-audio endpoint is used.
+  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Denoising strength for audio-to-audio
+    (0-1, default 0.8); lower keeps more of the input.
+  * **fetch** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Download the result so `audio_bytes` is populated.
+* **Return type:**
+  [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
+* **Returns:**
+  A completed Song (`audio_bytes` and `audio_url`).
+
+
+# _autosummary/arioso.platforms.stable_audio_25.config.html.md
+
+# arioso.platforms.stable_audio_25.config
+
+Stable Audio 2.5 platform configuration (fal.ai hosted).
+
+Live docs (verified 2026-10-03):
+[https://fal.ai/models/fal-ai/stable-audio-25/text-to-audio/api](https://fal.ai/models/fal-ai/stable-audio-25/text-to-audio/api) and
+[https://fal.ai/models/fal-ai/stable-audio-25/audio-to-audio/api](https://fal.ai/models/fal-ai/stable-audio-25/audio-to-audio/api)
+
+
+# _autosummary/arioso.platforms.stable_audio_25.html.md
+
+# arioso.platforms.stable_audio_25
+
+Stable Audio 2.5 (hosted on fal.ai) platform for arioso.
+
+### Modules
+
+| [`adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#module-arioso.platforms.stable_audio_25.adapter)   | Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.   |
+|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
+| [`config`](_autosummary/arioso.platforms.stable_audio_25.config.html.md#module-arioso.platforms.stable_audio_25.config)     | Stable Audio 2.5 platform configuration (fal.ai hosted).               |
+
+
 # _autosummary/arioso.platforms.sunoapi.adapter.html.md
 
 # arioso.platforms.sunoapi.adapter
@@ -1991,7 +2156,7 @@ Manually register a platform (for third-party plugins).
 
 # arioso.services
 
-### arioso.services *= ServiceCollection(beatoven, elevenlabs, harmonai, jen, loudly, lyria2, lyria_rt, mubert, musicgen, riffusion, stable_audio, sunoapi, udio, yue)*
+### arioso.services *= ServiceCollection(ace_step, beatoven, elevenlabs, harmonai, jen, loudly, lyria2, lyria_rt, mubert, musicgen, riffusion, stable_audio, stable_audio_25, sunoapi, udio, yue)*
 
 Lazy mapping of platform names to `ServiceHandle` objects.
 
@@ -2085,7 +2250,7 @@ native parameter names, applying type coercions along the way.
 | [`check_supported_params`](_autosummary/arioso.translation.html.md#arioso.translation.check_supported_params)(kwargs, config, \*[, ...])   | Warn or raise for kwargs not declared in a platform's `supported_affordances`.   |
 |------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | [`make_generate_func`](_autosummary/arioso.translation.html.md#arioso.translation.make_generate_func)(config)                          | Build a generate() callable from a platform config.                              |
-| [`make_kwargs_trans`](_autosummary/arioso.translation.html.md#arioso.translation.make_kwargs_trans)(param_map, \*[, on_unsupported])  | Build a kwargs translation function from a platform's param_map.                 |
+| [`make_kwargs_trans`](_autosummary/arioso.translation.html.md#arioso.translation.make_kwargs_trans)(param_map, \*[, ...])             | Build a kwargs translation function from a platform's param_map.                 |
 
 ### arioso.translation.ALWAYS_RAISE_UNSUPPORTED *= ('lyrics',)*
 
@@ -2136,7 +2301,7 @@ and wraps it with parameter translation and output normalization.
   A callable that accepts unified affordance kwargs and returns
   a Song.
 
-### arioso.translation.make_kwargs_trans(param_map, , on_unsupported='warn')
+### arioso.translation.make_kwargs_trans(param_map, , on_unsupported='warn', passthrough=())
 
 Build a kwargs translation function from a platform’s param_map.
 
@@ -2153,6 +2318,8 @@ The returned function transforms:
     bool).
   * **on_unsupported** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to do with params not in param_map.
     One of ‘warn’, ‘raise’, or ‘ignore’.
+  * **passthrough** – Adapter-only keyword names (a config’s
+    `adapter_params`) passed through untranslated and unwarned.
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)], [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
 * **Returns:**
@@ -2165,7 +2332,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-09-22 14:49 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a"><code>e8d8d8a</code></a> on branch <code>main</code>, for **arioso 0.0.16** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-03 11:15 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/6ec3c9934c23d878d94a493512a5170efb85e1eb"><code>6ec3c99</code></a> on branch <code>main</code>, for **arioso 0.0.17** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2174,9 +2341,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a"><code>e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/6ec3c9934c23d878d94a493512a5170efb85e1eb"><code>6ec3c9934c23d878d94a493512a5170efb85e1eb</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.16</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.17</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2185,9 +2352,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/35742788980">35742788980</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/37118990615">37118990615</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0754d28c4d0f436a333978c4aa15f32df72dd4d0</code> (in the history of the built commit) |
+| Event commit | <code>a826e0b6d02c991d865f2a19df39da7b11e2be8d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2212,13 +2379,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.16/">0.0.16</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.17/">0.0.17</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout e8d8d8aa201d7ef93d646ee2b2b85379ea965b9a
+git checkout 6ec3c9934c23d878d94a493512a5170efb85e1eb
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
@@ -2242,7 +2409,7 @@ Skills are folders holding a `SKILL.md` (the [Agent Skills](https://agentskills.
 
 ### `arioso`
 
-Generate music with AI using the `arioso` package — one Python interface over 14 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, MusicGen, Stable Audio, Riffusion, Harmonai, Lyria, Mubert, Beatoven, Loudly, Jen). Use when the user wants to “make a song”, “generate music”, “write a song about X”, “turn this poem/text/script into a song”, “set these lyrics to music”, “text to music”, “make a theme tune”, “I need background music”, or “a royalty-free instrumental track” — or when they name a platform (Suno, ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the one-line call, which four backends can actually SING lyrics you wrote (the other ten drop them silently), the Suno customMode title/genre requirement, which backends are free versus paid, polling an async job, and writing the audio to disk.
+Generate music with AI using the `arioso` package — one Python interface over 16 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, ACE-Step, MusicGen, Stable Audio, Stable Audio 2.5, Riffusion, Harmonai, Lyria, Mubert, Beatoven, Loudly, Jen). Use when the user wants to “make a song”, “generate music”, “write a song about X”, “turn this poem/text/script into a song”, “set these lyrics to music”, “text to music”, “make a theme tune”, “I need background music”, or “a royalty-free instrumental track” — or when they name a platform (Suno, ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the one-line call, which five backends can actually SING lyrics you wrote (the other eleven drop them silently), the Suno customMode title/genre requirement, which backends are free versus paid, polling an async job, and writing the audio to disk.
 
 ```bash
 gh skill install thorwhalen/arioso arioso --agent claude-code

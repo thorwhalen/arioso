@@ -13,7 +13,7 @@ SUNO_MODELS = ("V4", "V4_5", "V4_5ALL", "V4_5PLUS", "V5")
 # File upload base URL (separate from the generation API).
 # Configurable via env var in case the provider changes domains again.
 SUNO_FILE_UPLOAD_BASE_URL = os.environ.get(
-    "SUNO_FILE_UPLOAD_BASE_URL", "https://sunoapiorg.riftrunnerai.com"
+    "SUNO_FILE_UPLOAD_BASE_URL", "https://sunoapiorg.redpandaai.co"
 )
 
 # Default model, configurable via env var
@@ -558,8 +558,15 @@ class Adapter(BaseRestAdapter):
             self.tasks.update(task_id, status=status_raw, response=record)
 
         if status_raw in _ERROR_STATUSES:
+            # The provider explains the failure in errorCode/errorMessage (e.g.
+            # 413 "This audio matches an existing recording in our catalog."
+            # for an upload-cover of a copyrighted recording); surface it.
+            reason = record.get("errorMessage") or ""
+            code = record.get("errorCode")
+            detail = f" [{code}] {reason}" if reason or code else ""
             raise RuntimeError(
-                f"sunoapi generation failed (status={status_raw}): taskId={task_id}"
+                f"sunoapi generation failed (status={status_raw}){detail}: "
+                f"taskId={task_id}"
             )
 
         suno_data = (record.get("response") or {}).get("sunoData", [])

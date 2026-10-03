@@ -158,9 +158,9 @@ class Adapter:
     ) -> Song:
         import torch
 
-        inputs = self._processor(
-            text=[prompt], padding=True, return_tensors="pt"
-        ).to(self._model.device)
+        inputs = self._processor(text=[prompt], padding=True, return_tensors="pt").to(
+            self._model.device
+        )
         # MusicGen generates ~50 tokens per second of audio at 32kHz
         max_new_tokens = int(duration * 50)
 

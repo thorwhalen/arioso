@@ -61,9 +61,20 @@ def _audio_file(result: Any) -> dict:
     return {}
 
 
-_SUBTYPE_FORMAT = {"mpeg": "mp3", "mp3": "mp3", "x-wav": "wav", "wav": "wav",
-                   "wave": "wav", "vnd.wave": "wav", "ogg": "ogg", "flac": "flac",
-                   "x-flac": "flac", "aac": "aac", "mp4": "m4a", "webm": "webm"}
+_SUBTYPE_FORMAT = {
+    "mpeg": "mp3",
+    "mp3": "mp3",
+    "x-wav": "wav",
+    "wav": "wav",
+    "wave": "wav",
+    "vnd.wave": "wav",
+    "ogg": "ogg",
+    "flac": "flac",
+    "x-flac": "flac",
+    "aac": "aac",
+    "mp4": "m4a",
+    "webm": "webm",
+}
 
 
 def _format_of(content_type: str, url: str) -> str:

@@ -16,12 +16,27 @@ PLATFORM_CONFIG = {
     "optional_dependencies": ["fal_client", "requests"],
     "param_map": {
         "prompt": {"native_name": "prompt", "required": True, "adapter_handled": True},
-        "duration": {"native_name": "seconds_total | total_seconds (audio-to-audio)", "adapter_handled": True},
-        "num_steps": {"native_name": "num_inference_steps", "native_default": 8, "adapter_handled": True},
-        "guidance": {"native_name": "guidance_scale", "native_default": 1.0, "adapter_handled": True},
+        "duration": {
+            "native_name": "seconds_total | total_seconds (audio-to-audio)",
+            "adapter_handled": True,
+        },
+        "num_steps": {
+            "native_name": "num_inference_steps",
+            "native_default": 8,
+            "adapter_handled": True,
+        },
+        "guidance": {
+            "native_name": "guidance_scale",
+            "native_default": 1.0,
+            "adapter_handled": True,
+        },
         "seed": {"native_name": "seed", "adapter_handled": True},
         "audio_input": {"native_name": "audio_url", "adapter_handled": True},
-        "audio_input_strength": {"native_name": "strength", "native_default": 0.8, "adapter_handled": True},
+        "audio_input_strength": {
+            "native_name": "strength",
+            "native_default": 0.8,
+            "adapter_handled": True,
+        },
     },
     "supported_affordances": [
         "prompt",

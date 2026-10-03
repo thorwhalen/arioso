@@ -39,8 +39,10 @@ class Adapter:
 
         Args:
             prompt: Text description of the desired audio (required).
-            duration: Output length in seconds (max 190). For audio-to-audio
-                it defaults to the input's length.
+            duration: Output length in seconds (1-190). Text-to-audio
+                defaults to 30 s (fal's own default is its 190 s maximum, the
+                most expensive clip); audio-to-audio defaults to the input's
+                length.
             num_steps: Denoising steps (``num_inference_steps``, default 8).
             guidance: Prompt adherence (``guidance_scale``, default 1).
             seed: Random seed for reproducibility.
@@ -62,15 +64,19 @@ class Adapter:
         }
         if seed is not None:
             arguments["seed"] = int(seed)
+        seconds = None
         if duration is not None:
-            arguments["seconds_total"] = int(min(duration, _API["max_seconds"]))
+            seconds = max(1, min(int(round(duration)), _API["max_seconds"]))
         if audio_input is not None:
             if not 0 <= audio_input_strength <= 1:
                 raise ValueError("audio_input_strength must be in [0, 1]")
             arguments["audio_url"] = fal_upload_audio(audio_input)
             arguments["strength"] = audio_input_strength
+            if seconds is not None:  # this endpoint names it total_seconds
+                arguments["total_seconds"] = seconds
             endpoint = _API["audio_to_audio_endpoint"]
         else:
+            arguments["seconds_total"] = seconds or _API["default_seconds"]
             endpoint = _API["text_to_audio_endpoint"]
         result = fal_run(endpoint, arguments)
         meta = {k: v for k, v in arguments.items() if k != "audio_url"}

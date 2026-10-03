@@ -61,6 +61,20 @@ def _audio_file(result: Any) -> dict:
     return {}
 
 
+_SUBTYPE_FORMAT = {"mpeg": "mp3", "mp3": "mp3", "x-wav": "wav", "wav": "wav",
+                   "wave": "wav", "vnd.wave": "wav", "ogg": "ogg", "flac": "flac",
+                   "x-flac": "flac", "aac": "aac", "mp4": "m4a", "webm": "webm"}
+
+
+def _format_of(content_type: str, url: str) -> str:
+    """``audio/wav;rate=44100`` -> ``wav``; unknown types fall back to the URL."""
+    subtype = content_type.split(";")[0].strip().lower().rpartition("/")[2]
+    if subtype in _SUBTYPE_FORMAT:
+        return _SUBTYPE_FORMAT[subtype]
+    ext = url.split("?")[0].rpartition(".")[2].lower()
+    return _SUBTYPE_FORMAT.get(ext, ext if 2 <= len(ext) <= 4 else "wav")
+
+
 def fal_audio_song(
     result: dict,
     *,
@@ -77,9 +91,7 @@ def fal_audio_song(
     url = file.get("url", "")
     if not url:
         raise RuntimeError(f"{platform}: no audio in fal result: {result!r}")
-    content_type = file.get("content_type") or ""
-    fmt = content_type.split("/")[-1] if "/" in content_type else ""
-    fmt = {"mpeg": "mp3", "x-wav": "wav", "wave": "wav"}.get(fmt, fmt) or "wav"
+    fmt = _format_of(file.get("content_type") or "", url)
     audio_bytes = None
     if fetch:
         import requests

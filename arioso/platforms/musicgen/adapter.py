@@ -46,7 +46,7 @@ class Adapter:
                     MusicgenForConditionalGeneration as _ModelClass,
                 )
 
-            self._model = _ModelClass.from_pretrained(model_variant)
+            self._model = _ModelClass.from_pretrained(model_variant).to(_device())
             self._processor = AutoProcessor.from_pretrained(model_variant)
             self._model_name = model_variant
             self._use_transformers = True
@@ -158,7 +158,9 @@ class Adapter:
     ) -> Song:
         import torch
 
-        inputs = self._processor(text=[prompt], padding=True, return_tensors="pt")
+        inputs = self._processor(
+            text=[prompt], padding=True, return_tensors="pt"
+        ).to(self._model.device)
         # MusicGen generates ~50 tokens per second of audio at 32kHz
         max_new_tokens = int(duration * 50)
 
@@ -241,7 +243,7 @@ class Adapter:
             text=[prompt],
             padding=True,
             return_tensors="pt",
-        )
+        ).to(self._model.device)
         max_new_tokens = int(duration * 50)
 
         with torch.no_grad():
@@ -294,3 +296,21 @@ def _melody_input(array, sample_rate, *, target_rate):
         audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=target_rate)
         sample_rate = target_rate
     return audio.astype(np.float32), sample_rate
+
+
+def _device() -> str:
+    """The torch device for the transformers path: ``$ARIOSO_TORCH_DEVICE``,
+    else CUDA, else Apple MPS, else CPU (the CPU-only default made a
+    30-second melody-conditioned generation take a quarter of an hour)."""
+    import os
+
+    import torch
+
+    env = os.environ.get("ARIOSO_TORCH_DEVICE")
+    if env:
+        return env
+    if torch.cuda.is_available():
+        return "cuda"
+    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"

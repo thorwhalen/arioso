@@ -7,7 +7,7 @@ Endpoints (verified 2026-10-03): `fal-ai/stable-audio-25/text-to-audio` and `fal
 | arioso | native | notes |
 |---|---|---|
 | `prompt` | `prompt` | required |
-| `duration` | `seconds_total` | max 190; audio-to-audio defaults to the input's length |
+| `duration` | `seconds_total` (text-to-audio), `total_seconds` (audio-to-audio) | 1-190; text defaults to 30 s in arioso (190 s at fal); audio-to-audio defaults to the input's length |
 | `num_steps` | `num_inference_steps` | default 8 |
 | `guidance` | `guidance_scale` | default 1 |
 | `seed` | `seed` | |

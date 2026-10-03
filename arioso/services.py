@@ -279,7 +279,11 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
     param_map = config.get("param_map", {})
     on_unsupported = config.get("on_unsupported_param", "warn")
     supported = set(config.get("supported_affordances", []))
-    kwargs_trans = make_kwargs_trans(param_map, on_unsupported=on_unsupported)
+    kwargs_trans = make_kwargs_trans(
+        param_map,
+        on_unsupported=on_unsupported,
+        passthrough=tuple(config.get("adapter_params", ())),
+    )
 
     @functools.wraps(native_func)
     def validated_generate(prompt: str, **kwargs):

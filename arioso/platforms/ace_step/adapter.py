@@ -14,6 +14,20 @@ from arioso.platforms.ace_step.config import PLATFORM_CONFIG
 
 _API = PLATFORM_CONFIG["api"]
 _INSTRUMENTAL = "[inst]"
+#: fal-native ACE-Step arguments passed through as given (live docs 2026-10-03).
+_NATIVE_EXTRAS = frozenset(
+    {
+        "scheduler",
+        "guidance_type",
+        "granularity_scale",
+        "guidance_interval",
+        "guidance_interval_decay",
+        "minimum_guidance_scale",
+        "tag_guidance_scale",
+        "lyric_guidance_scale",
+        "original_seed",
+    }
+)
 
 
 class Adapter:
@@ -47,7 +61,8 @@ class Adapter:
                 when both are given.
             genre: Style tags; an alias of ``prompt`` for this platform.
             lyrics: Lyrics to sing. Empty or ``instrumental=True`` sends
-                ``[inst]``.
+                ``[inst]``, so a remix of a song with vocals comes out
+                instrumental unless you pass its lyrics (or new ones).
             instrumental: Force an instrumental (discards ``lyrics``).
             duration: Seconds (text-to-music only; a remix keeps the input's
                 length).
@@ -61,8 +76,9 @@ class Adapter:
             original_lyrics: Lyrics of ``audio_input``, if any.
             edit_mode: ``"remix"`` (default) or ``"lyrics"``.
             fetch: Download the result so ``audio_bytes`` is populated.
-            **kwargs: Further native fal arguments (``scheduler``,
-                ``guidance_type``, ``granularity_scale``, ...), passed through.
+            **kwargs: Native fal arguments in ``_NATIVE_EXTRAS``
+                (``scheduler``, ``guidance_type``, ``tag_guidance_scale``, ...)
+                are passed through; anything else is ignored.
 
         Returns:
             A completed Song.
@@ -77,8 +93,7 @@ class Adapter:
             "number_of_steps": num_steps,
             "guidance_scale": guidance,
         }
-        native = {"scheduler", "guidance_type", "granularity_scale", "guidance_interval"}
-        arguments.update({k: v for k, v in kwargs.items() if k in native})
+        arguments.update({k: v for k, v in kwargs.items() if k in _NATIVE_EXTRAS})
         if seed is not None:
             arguments["seed"] = int(seed)
         if audio_input is not None:

@@ -80,3 +80,54 @@ def test_ace_step_remix_defaults_original_tags(capture):
 def test_ace_step_needs_tags(capture):
     with pytest.raises(ValueError):
         ace_mod.Adapter({}).generate("")
+
+
+def test_services_path_keeps_unified_params(capture):
+    """arioso.services.<p>.generate must not rename params the adapter maps itself."""
+    arioso.services.stable_audio_25.generate(
+        "strings", audio_input="in.wav", audio_input_strength=0.2, num_steps=50,
+        guidance=3.0, fetch=False,
+    )
+    args = capture["arguments"]
+    assert (args["strength"], args["num_inference_steps"], args["guidance_scale"]) == (0.2, 50, 3.0)
+    arioso.services.ace_step.generate("rock, guitar", fetch=False)
+    assert capture["arguments"]["tags"] == "rock, guitar"
+
+
+def test_adapter_params_do_not_warn(capture, recwarn):
+    arioso.enhance("in.wav", "x", platform="ace_step", original_tags="midi", fetch=False)
+    assert not [w for w in recwarn if "not supported" in str(w.message)]
+    assert capture["arguments"]["original_tags"] == "midi"
+
+
+def test_stable_audio_25_duration_names_per_endpoint(capture):
+    a = sa_mod.Adapter({})
+    a.generate("x", audio_input="in.wav", duration=10.4, fetch=False)
+    assert capture["arguments"]["total_seconds"] == 10
+    assert "seconds_total" not in capture["arguments"]
+    a.generate("x", fetch=False)
+    assert capture["arguments"]["seconds_total"] == 30  # not fal's 190 s default
+    a.generate("x", duration=0.4, fetch=False)
+    assert capture["arguments"]["seconds_total"] == 1
+
+
+def test_ace_step_passes_documented_native_extras(capture):
+    ace_mod.Adapter({}).generate("x", tag_guidance_scale=7, bogus=1, fetch=False)
+    assert capture["arguments"]["tag_guidance_scale"] == 7
+    assert "bogus" not in capture["arguments"]
+
+
+@pytest.mark.parametrize(
+    "content_type, url, fmt",
+    [
+        ("audio/wav;rate=44100", "https://x/a", "wav"),
+        ("audio/ogg; codecs=opus", "https://x/a", "ogg"),
+        ("audio/mpeg", "https://x/a", "mp3"),
+        ("application/octet-stream", "https://x/a.flac?sig=1", "flac"),
+        ("", "https://x/noext", "wav"),
+    ],
+)
+def test_format_of(content_type, url, fmt):
+    from arioso._fal import _format_of
+
+    assert _format_of(content_type, url) == fmt

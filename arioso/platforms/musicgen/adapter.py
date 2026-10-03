@@ -46,7 +46,7 @@ class Adapter:
                     MusicgenForConditionalGeneration as _ModelClass,
                 )
 
-            self._model = _ModelClass.from_pretrained(model_variant)
+            self._model = _ModelClass.from_pretrained(model_variant).to(_device())
             self._processor = AutoProcessor.from_pretrained(model_variant)
             self._model_name = model_variant
             self._use_transformers = True
@@ -158,7 +158,9 @@ class Adapter:
     ) -> Song:
         import torch
 
-        inputs = self._processor(text=[prompt], padding=True, return_tensors="pt")
+        inputs = self._processor(
+            text=[prompt], padding=True, return_tensors="pt"
+        ).to(self._model.device)
         # MusicGen generates ~50 tokens per second of audio at 32kHz
         max_new_tokens = int(duration * 50)
 
@@ -230,13 +232,18 @@ class Adapter:
         import torch
 
         ref = to_audio_ref(melody)
+        audio, sample_rate = _melody_input(
+            ref.as_array(),
+            ref.sample_rate,
+            target_rate=self._processor.feature_extractor.sampling_rate,
+        )
         inputs = self._processor(
-            audio=ref.as_array(),
-            sampling_rate=ref.sample_rate,
+            audio=audio,
+            sampling_rate=sample_rate,
             text=[prompt],
             padding=True,
             return_tensors="pt",
-        )
+        ).to(self._model.device)
         max_new_tokens = int(duration * 50)
 
         with torch.no_grad():
@@ -268,3 +275,42 @@ class Adapter:
                 "melody_conditioned": True,
             },
         )
+
+
+def _melody_input(array, sample_rate, *, target_rate):
+    """Mono float32 audio at the feature extractor's rate.
+
+    The transformers MusicGen-melody feature extractor resamples with
+    torchaudio, which fails on the float64 NumPy arrays soundfile returns
+    (``torch.arange`` rejects a NumPy dtype). Handing it mono float32 at its
+    own rate means it never has to resample.
+    """
+    import numpy as np
+
+    audio = np.asarray(array, dtype=np.float32)
+    if audio.ndim > 1:  # (frames, channels) or (channels, frames)
+        audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)
+    if target_rate and sample_rate != target_rate:
+        import librosa
+
+        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=target_rate)
+        sample_rate = target_rate
+    return audio.astype(np.float32), sample_rate
+
+
+def _device() -> str:
+    """The torch device for the transformers path: ``$ARIOSO_TORCH_DEVICE``,
+    else CUDA, else Apple MPS, else CPU (the CPU-only default made a
+    30-second melody-conditioned generation take a quarter of an hour)."""
+    import os
+
+    import torch
+
+    env = os.environ.get("ARIOSO_TORCH_DEVICE")
+    if env:
+        return env
+    if torch.cuda.is_available():
+        return "cuda"
+    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"

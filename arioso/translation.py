@@ -9,7 +9,7 @@ from collections.abc import Callable
 
 
 def make_kwargs_trans(
-    param_map: dict, *, on_unsupported: str = "warn"
+    param_map: dict, *, on_unsupported: str = "warn", passthrough=()
 ) -> Callable[[dict], dict]:
     """Build a kwargs translation function from a platform's param_map.
 
@@ -24,6 +24,8 @@ def make_kwargs_trans(
             bool).
         on_unsupported: What to do with params not in param_map.
             One of 'warn', 'raise', or 'ignore'.
+        passthrough: Adapter-only keyword names (a config's
+            ``adapter_params``) passed through untranslated and unwarned.
 
     Returns:
         A function that translates outer kwargs to inner kwargs.
@@ -32,6 +34,9 @@ def make_kwargs_trans(
     def kwargs_trans(outer_kwargs: dict) -> dict:
         inner_kwargs = {}
         for common_name, value in outer_kwargs.items():
+            if common_name in passthrough:
+                inner_kwargs[common_name] = value
+                continue
             if common_name in param_map:
                 mapping = param_map[common_name]
                 if mapping.get("adapter_handled", False):
@@ -99,8 +104,9 @@ def check_supported_params(
     on_unsupported = config.get("on_unsupported_param", "warn")
     platform_name = config.get("name", "?")
 
+    adapter_params = set(config.get("adapter_params", ()))
     for key in kwargs:
-        if key in supported:
+        if key in supported or key in adapter_params:
             continue
         if key in always_raise:
             raise ValueError(

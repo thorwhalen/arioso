@@ -2,15 +2,16 @@
 name: arioso
 description: >-
   Generate music with AI using the `arioso` package — one Python interface over
-  14 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, MusicGen,
-  Stable Audio, Riffusion, Harmonai, Lyria, Mubert, Beatoven, Loudly, Jen).
+  16 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, ACE-Step, MusicGen,
+  Stable Audio, Stable Audio 2.5, Riffusion, Harmonai, Lyria, Mubert, Beatoven,
+  Loudly, Jen).
   Use when the user wants to "make a song", "generate music", "write a song
   about X", "turn this poem/text/script into a song", "set these lyrics to
   music", "text to music", "make a theme tune", "I need background music", or
   "a royalty-free instrumental track" — or when they name a platform (Suno,
   ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the
-  one-line call, which four backends can actually SING lyrics you wrote (the
-  other ten drop them silently), the Suno customMode title/genre requirement,
+  one-line call, which five backends can actually SING lyrics you wrote (the
+  other eleven drop them silently), the Suno customMode title/genre requirement,
   which backends are free versus paid, polling an async job, and writing the
   audio to disk.
 metadata:
@@ -19,12 +20,12 @@ metadata:
 
 # Making a song with arioso
 
-`arioso` is a facade: one `generate()` call, fourteen backends behind it. It is a
+`arioso` is a facade: one `generate()` call, sixteen backends behind it. It is a
 **Python library only — there is no CLI**. Everything below is `import arioso`.
 
 Two questions decide everything else. Answer them before you write any code.
 
-1. **Does it have to sing words the user wrote?** Only **four** of the fourteen
+1. **Does it have to sing words the user wrote?** Only **five** of the sixteen
    backends can. Get this wrong and you get a pleasant instrumental and no error.
 2. **Are you allowed to spend money?** arioso has **no cost gate, no
    `estimate()`, and no confirmation prompt.** A `generate()` call to a paid
@@ -49,7 +50,7 @@ loop*, *an instrumental* — it costs nothing and needs no account.
 
 ## Setting words to music
 
-**Only these four platforms accept `lyrics=`:**
+**Only these five platforms accept `lyrics=`:**
 
 | Platform | `platform=` | Key | Sings your words? |
 |---|---|---|---|
@@ -57,13 +58,14 @@ loop*, *an instrumental* — it costs nothing and needs no account.
 | ElevenLabs Music | `"elevenlabs"` | `ELEVENLABS_API_KEY` | yes |
 | Udio (unofficial wrapper) | `"udio"` | `UDIO_AUTH_COOKIE` | yes |
 | YuE (via fal.ai) | `"yue"` | `FAL_KEY` | yes |
+| ACE-Step (via fal.ai) | `"ace_step"` | `FAL_KEY` | yes (empty lyrics = instrumental) |
 
-The other ten — `musicgen`, `stable_audio`, `harmonai`, `riffusion`, `lyria2`,
-`lyria_rt`, `mubert`, `beatoven`, `loudly`, `jen` — **do not**. Every adapter
+The other eleven — `musicgen`, `stable_audio`, `stable_audio_25`, `harmonai`,
+`riffusion`, `lyria2`, `lyria_rt`, `mubert`, `beatoven`, `loudly`, `jen` — **do not**. Every adapter
 takes `**kwargs`, so `lyrics=` lands there and is **dropped silently**: no
 warning, no error, a normal-looking `Song` with no vocals. (The
 `on_unsupported_param: "warn"` in the configs only fires on the config-driven
-REST path, and all 14 platforms ship a custom adapter, so nothing reaches it.)
+REST path, and all 16 platforms ship a custom adapter, so nothing reaches it.)
 
 Check rather than remember:
 
@@ -144,7 +146,7 @@ What you get back differs per backend. Look at the field that is populated.
 | Backends | `Song` field | How to write it |
 |---|---|---|
 | `sunoapi`, `udio`, `mubert`, `beatoven`, `loudly`, `jen` | `audio_url` | `arioso.fetch_audio(song)` first, then write `.audio_bytes` |
-| `elevenlabs`, `lyria2`, `lyria_rt`, `yue` | `audio_bytes` | write the bytes directly |
+| `elevenlabs`, `lyria2`, `lyria_rt`, `yue`, `stable_audio_25`, `ace_step` | `audio_bytes` | write the bytes directly |
 | `musicgen`, `stable_audio`, `riffusion`, `harmonai` | `audio_array` | `soundfile.write(path, arr, song.sample_rate)` |
 
 ```python
@@ -160,7 +162,7 @@ job is not finished, so poll first.
 
 | Free (local inference, no key, no account) | Paid / metered (needs a key) |
 |---|---|
-| `musicgen`, `stable_audio`, `riffusion`, `harmonai` | `sunoapi`, `elevenlabs`, `udio`, `yue`, `lyria2`, `lyria_rt`, `mubert`, `beatoven`, `loudly`, `jen` |
+| `musicgen`, `stable_audio`, `riffusion`, `harmonai` | `sunoapi`, `elevenlabs`, `udio`, `yue`, `stable_audio_25`, `ace_step`, `lyria2`, `lyria_rt`, `mubert`, `beatoven`, `loudly`, `jen` |
 
 The free four need a heavy install (`torch`, `diffusers`/`audiocraft`) and real
 CPU/GPU time, but cost nothing and send nothing anywhere.
@@ -209,12 +211,24 @@ arioso.supports_audio_input("stable_audio")  # can it take audio IN? -> True
 | Background bed / loop / instrumental, free | `musicgen` |
 | Free, texture / sound-design rather than a tune | `stable_audio` |
 | Transform audio the user already has | `arioso.enhance(audio, prompt)` — see below |
+| The same piece, subtly changed (a strength knob) | `enhance(..., platform="stable_audio_25", strength=0.2-0.5)` (paid, fal) |
+| Remix existing audio toward style tags | `enhance(..., platform="ace_step")` (paid, fal) |
 
 `arioso.enhance(audio, "warm analog studio band")` routes existing audio into
 whichever conditioning affordance the platform has (`audio_input` / `melody` /
 `reference_audio`). It accepts a `Song`, bytes, a path, an `(array, rate)` pair
 or a waveform. Only some platforms take input audio — check
 `supports_audio_input` first.
+
+Audio-in platforms: `stable_audio` (local, no strength knob), `stable_audio_25`
+(fal; `strength` 0-1, lower keeps more of the input), `ace_step` (fal remix),
+`musicgen` (melody only, local, 30 s max), `sunoapi` (`upload_cover` /
+`upload_extend`), `yue` (vocal prompt), `udio`.
+
+**Suno refuses copyrighted material on upload**, and not only the recording:
+an upload-cover of a synthesized render of a copyrighted *score* fails too,
+with `[413] This audio matches an existing recording in our catalog.` at poll
+time. The fal-hosted platforms did not check (2026-10).
 
 ## Three levels of control
 

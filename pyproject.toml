@@ -66,6 +66,7 @@ musicgen = [
 musicgen-transformers = [
     "transformers>=4.30",
     "torch>=2.0",
+    "librosa>=0.10",
 ]
 sunoapi = [
     "requests>=2.28",
@@ -101,6 +102,14 @@ jen = [
 ]
 yue = [
     "fal-client>=0.4",
+]
+stable-audio-25 = [
+    "fal-client>=0.4",
+    "requests>=2.28",
+]
+ace-step = [
+    "fal-client>=0.4",
+    "requests>=2.28",
 ]
 harmonai = [
     "diffusers>=0.25",

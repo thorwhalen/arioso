@@ -230,9 +230,14 @@ class Adapter:
         import torch
 
         ref = to_audio_ref(melody)
+        audio, sample_rate = _melody_input(
+            ref.as_array(),
+            ref.sample_rate,
+            target_rate=self._processor.feature_extractor.sampling_rate,
+        )
         inputs = self._processor(
-            audio=ref.as_array(),
-            sampling_rate=ref.sample_rate,
+            audio=audio,
+            sampling_rate=sample_rate,
             text=[prompt],
             padding=True,
             return_tensors="pt",
@@ -268,3 +273,24 @@ class Adapter:
                 "melody_conditioned": True,
             },
         )
+
+
+def _melody_input(array, sample_rate, *, target_rate):
+    """Mono float32 audio at the feature extractor's rate.
+
+    The transformers MusicGen-melody feature extractor resamples with
+    torchaudio, which fails on the float64 NumPy arrays soundfile returns
+    (``torch.arange`` rejects a NumPy dtype). Handing it mono float32 at its
+    own rate means it never has to resample.
+    """
+    import numpy as np
+
+    audio = np.asarray(array, dtype=np.float32)
+    if audio.ndim > 1:  # (frames, channels) or (channels, frames)
+        audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)
+    if target_rate and sample_rate != target_rate:
+        import librosa
+
+        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=target_rate)
+        sample_rate = target_rate
+    return audio.astype(np.float32), sample_rate

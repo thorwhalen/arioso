@@ -102,3 +102,30 @@ def test_elevenlabs_output_format_parsing(mock_make_session):
 
     song = adapter.generate("test", output_format="wav_44100_16")
     assert song.audio.format == "wav"
+
+
+def test_elevenlabs_falls_back_when_generated_signature_cannot_bind():
+    """ho may demand optional spec fields as required args; use plain requests."""
+    adapter = Adapter(PLATFORM_CONFIG)
+
+    def strict(**kwargs):
+        raise TypeError("missing a required argument: 'generation_mode'")
+
+    adapter._raw_func = strict
+    response = MagicMock(content=b"ID3audio", headers={"content-type": "audio/mpeg"})
+    with patch.object(adapter.session, "post", return_value=response) as post:
+        song = adapter.generate("strings", duration=10)
+    assert song.audio.audio_bytes == b"ID3audio"
+    _, kwargs = post.call_args
+    assert kwargs["params"] == {"output_format": "mp3_44100_128"}
+    assert "output_format" not in kwargs["json"]
+
+
+def test_bind_header_param_prefills_the_key():
+    from arioso.platforms.elevenlabs.adapter import _bind_header_param
+
+    def f(prompt, xi_api_key):
+        return xi_api_key
+
+    assert _bind_header_param(f, "xi-api-key", "K")(prompt="p") == "K"
+    assert _bind_header_param(len, "xi-api-key", "K") is len

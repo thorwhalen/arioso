@@ -33,20 +33,25 @@ class Adapter(BaseRestAdapter):
             target_route = routes[endpoint["method"], endpoint["path"]]
 
             api_key = os.environ.get(self.config["auth"]["env_var"], "")
-            self._raw_func = route_to_func(
+            header = self.config["auth"]["header_name"]
+            raw = route_to_func(
                 target_route,
                 self.config["api"]["base_url"],
-                custom_headers={self.config["auth"]["header_name"]: api_key},
+                custom_headers={header: api_key},
             )
+            self._raw_func = _bind_header_param(raw, header, api_key)
         except (ImportError, Exception):
             # Fallback to plain requests if ho/ju not available
             self._raw_func = self._fallback_func
 
     def _fallback_func(self, **kwargs):
-        """Simple requests-based fallback when ho/ju aren't available."""
+        """Plain-requests call: used when ho/ju are missing or their binding fails."""
         endpoint = self.config["api"]["generate_endpoint"]
         url = f"{self.base_url}{endpoint['path']}"
-        response = self.session.post(url, json=kwargs)
+        params = {}
+        if "output_format" in kwargs:  # a query parameter in the spec, not body
+            params["output_format"] = kwargs.pop("output_format")
+        response = self.session.post(url, json=kwargs, params=params)
         response.raise_for_status()
         content_type = response.headers.get("content-type", "")
         if "json" in content_type:
@@ -110,7 +115,16 @@ class Adapter(BaseRestAdapter):
                 composition_plan["sections"] = [{"lyrics": lyrics}]
             native_kwargs["composition_plan"] = composition_plan
 
-        result = self._raw_func(**native_kwargs)
+        try:
+            result = self._raw_func(**native_kwargs)
+        except TypeError as exc:
+            # ho can turn optional, nullable spec fields into required
+            # arguments (e.g. ``generation_mode``); the plain request needs
+            # none of them.
+            if "missing a required argument" not in str(exc):
+                raise
+            self._raw_func = self._fallback_func
+            result = self._raw_func(**native_kwargs)
 
         # Determine actual audio bytes
         if isinstance(result, bytes):
@@ -136,3 +150,24 @@ class Adapter(BaseRestAdapter):
             title=title,
             metadata={"model": model, "output_format": output_format},
         )
+
+
+def _bind_header_param(func, header: str, value: str):
+    """Pre-fill the auth header when the spec also declares it as a parameter.
+
+    The live ElevenLabs OpenAPI spec lists ``xi-api-key`` as a header
+    parameter, so ``ho`` turns it into a required ``xi_api_key`` argument and
+    ``custom_headers`` alone no longer satisfies the signature
+    (``TypeError: missing a required argument: 'xi_api_key'``).
+    """
+    import functools
+    import inspect
+
+    name = header.replace("-", "_").lower()
+    try:
+        params = inspect.signature(func).parameters
+    except (TypeError, ValueError):  # pragma: no cover - uninspectable callable
+        return func
+    if name in params:
+        return functools.partial(func, **{name: value})
+    return func

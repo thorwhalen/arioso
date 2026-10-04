@@ -228,7 +228,9 @@ Audio-in platforms: `stable_audio` (local, no strength knob), `stable_audio_25`
 **Suno refuses copyrighted material on upload**, and not only the recording:
 an upload-cover of a synthesized render of a copyrighted *score* fails too,
 with `[413] This audio matches an existing recording in our catalog.` at poll
-time. The fal-hosted platforms did not check (2026-10).
+time. Suno matches the *composition* (melody, harmony, structure), not just the
+recording, so no re-render or re-performance gets through. The fal-hosted
+platforms did not check (2026-10). Why, and what to expect: [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/music-gen-upload-copyright-detection.md).
 
 ## Three levels of control
 

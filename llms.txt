@@ -65,7 +65,7 @@
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
 - [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-04 10:51 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-04 12:23 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

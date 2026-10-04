@@ -1251,3 +1251,7 @@ All accept `taskId` as a query parameter.
 | POST | `/api/v1/mp4/generate` | [Create Music Video](#create-music-video) |
 | GET | `/api/v1/generate/record-info` | [Get Music Generation Details](#get-music-generation-details) |
 | GET | `/api/v1/generate/credit` | [Get Remaining Credits](#get-remaining-credits) |
+
+## Copyrighted uploads
+
+`upload_cover` and `upload_extend` refuse audio that matches a copyrighted work, at poll time, with `[413] This audio matches an existing recording in our catalog.`. The match is at the composition level: synthesized MIDI renders of a copyrighted score are refused too. Suno screens uploads with Audible Magic (since 2024-10). Details, sources and what to expect: [music-gen upload copyright detection](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/music-gen-upload-copyright-detection.md).

@@ -33,6 +33,19 @@ The academic state of the art is in the same place. ByteCover and CoverHunter le
 
 The same session measured how closely each render follows the recording with a chroma-DTW cost (`denote.align_audio`): 0.087–0.116, against about 0.16–0.21 for prompt-only pieces in the same style. In other words, the renders carry the original's harmonic and melodic content, which is what a version-identification system detects.
 
+### Landscape: who matches recordings, who matches compositions (2026-10)
+
+| Service | Matches | Access |
+|---|---|---|
+| Shazam / ShazamKit, Chromaprint + AcoustID (open source), Dejavu, audfprint, Panako/Olaf (open source) | the **recording** (audio fingerprint) | ShazamKit SDK; open-source libraries |
+| YouTube Content ID | recordings, and **compositions**: cover versions and live performances, by the underlying melody, using publishers' reference data [12] | rightsholders only (YouTube CMS) |
+| Audible Magic (Version ID) | recordings and **compositions** (melody, harmony, structure; lyrics) [2][3] | enterprise; Suno's and Udio's upload screen [1][5] |
+| Pex (Attribution Engine) | recordings and **melody** ("cover song identification"), segments down to 1 s, speed 50-200 %, pitch up to an octave [13] | enterprise API |
+| ACRCloud | audio fingerprinting, and a cover-song / humming engine that detects covers and live performances, selectable per project [14] | self-serve API (free trial tier) |
+| Musixmatch Sentinel | **lyrics** and compositions via lyric matching (covers through lyrics) [4] | enterprise |
+
+An agent that wants to know *before* uploading whether a piece will be flagged can use ACRCloud's cover-song engine. It is the only self-serve composition-level matcher in this list. The open-source route is a cover-song identification model (CoverHunter publishes code [10]) or, for a single known reference, a chroma-DTW distance like `denote.align_audio`.
+
 ### Open questions
 
 - Whether Suno's threshold catches short quotations or reharmonized variations. Untested.
@@ -51,3 +64,6 @@ The same session measured how closely each render follows the recording with a c
 9. [Du et al. — ByteCover: Cover Song Identification via Multi-Loss Training (arXiv 2010.14022)](https://arxiv.org/pdf/2010.14022)
 10. [Liu et al. — CoverHunter: Cover Song Identification with Refined Attention and Alignments (arXiv 2306.09025)](https://arxiv.org/pdf/2306.09025)
 11. [Yesiler et al. — Da-TACOS: A dataset for cover song identification and understanding (ISMIR 2019)](https://repositori.upf.edu/handle/10230/42771)
+12. [YouTube — Creating new opportunities for publishers and songwriters (2011-08)](https://youtube.googleblog.com/2011/08/creating-new-opportunities-for.html)
+13. [Pex — ACR identification capabilities (melody matching)](https://pex.com/?p=354365)
+14. [ACRCloud — Recognize music (fingerprinting vs. cover song / humming engines)](https://docs.acrcloud.com/tutorials/recognize-music)

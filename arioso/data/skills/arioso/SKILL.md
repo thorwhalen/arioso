@@ -168,7 +168,7 @@ ad = arioso.services.sunoapi.adapter
 done = poll_status(task_id, adapter="sunoapi")  # Songs now carry metadata["task_id"]
 ts = ad.get_timestamped_lyrics(done[0])
 ts["aligned_words"]  # [{"word","text","start","end","line_end","success"}, ...]
-ts["hoot_cer"]       # Suno's own character error rate for the alignment
+ts["hoot_cer"]  # Suno's own character error rate for the alignment
 ```
 
 Three things to know: the words are **what was sung**, which can differ from the

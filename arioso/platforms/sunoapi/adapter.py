@@ -634,9 +634,9 @@ class Adapter(BaseRestAdapter):
         """
         if isinstance(song_or_task_id, Song):
             song = song_or_task_id
-            task_id = (song.metadata or {}).get("task_id") or (
-                song.metadata or {}
-            ).get("taskId")
+            task_id = (song.metadata or {}).get("task_id") or (song.metadata or {}).get(
+                "taskId"
+            )
             audio_id = audio_id or song.id
             if song.status != "complete":
                 raise ValueError(
@@ -653,9 +653,7 @@ class Adapter(BaseRestAdapter):
         if not audio_id:
             raise ValueError("audio_id is required when passing a taskId")
         url = f"{self.base_url}/api/v1/generate/get-timestamped-lyrics"
-        response = self.session.post(
-            url, json={"taskId": task_id, "audioId": audio_id}
-        )
+        response = self.session.post(url, json={"taskId": task_id, "audioId": audio_id})
         response.raise_for_status()
         data = response.json()
         _check_api_error(data)
@@ -686,7 +684,11 @@ class Adapter(BaseRestAdapter):
                 f"Suno returned no aligned words for taskId={task_id}, "
                 f"audioId={audio_id} (not finished, or not aligned yet)."
             )
-        return {"aligned_words": words, "hoot_cer": record.get("hootCer"), "raw": record}
+        return {
+            "aligned_words": words,
+            "hoot_cer": record.get("hootCer"),
+            "raw": record,
+        }
 
     def fetch_audio(self, song: Song) -> Song:
         """Download the audio bytes for a Song that has an audio_url.

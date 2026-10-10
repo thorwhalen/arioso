@@ -1,4 +1,4 @@
-> built 2026-10-04 12:23 UTC from 29d074d (main) · arioso 0.0.19. Details: build_info.json
+> built 2026-10-10 13:45 UTC from e50e997 (main) · arioso 0.0.20. Details: build_info.json
 
 # index.html.md
 
@@ -1835,6 +1835,35 @@ Check the status of a generation task and return updated Songs.
   List of Song objects with current status and audio URLs
   (if generation is complete).
 
+#### get_timestamped_lyrics(song_or_task_id, audio_id=None)
+
+Suno’s own alignment of the sung lyric to a finished song.
+
+One entry per sung *word* (Suno’s tokens: space-separated, so a whole
+katakana word such as `バカンス` is one entry), in the order sung —
+which can differ from the lyric you sent when Suno repeats or drops a
+line. Times sit on a coarse (~0.16 s) grid and tend to run late, so
+treat them as windows for a finer aligner rather than as onsets.
+
+* **Parameters:**
+  * **song_or_task_id** ([`Song`](_autosummary/arioso.base.html.md#arioso.base.Song) | [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – a completed `Song` from `get_status` /
+    `poll_status` (it carries `metadata["task_id"]`), or a taskId.
+  * **audio_id** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – the song’s audio id; defaults to `song.id`.
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+* **Returns:**
+  `{"aligned_words": [...], "hoot_cer": float | None, "raw": dict}`
+  where each aligned word is `{"word", "text", "start", "end",
+  "line_end", "section", "success"}`: `word` is Suno’s raw token
+  (it may carry `[Section]` tags and newlines), `text` the token
+  with those removed, `line_end` whether a lyric line ends there,
+  `section` the label of a section starting at this word (else
+  `None`). Bare section tags are folded onto the next word.
+* **Raises:**
+  * [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – the Song is not complete, carries no task_id, or Suno
+        has no alignment for it yet.
+  * **hoot_cer\` is Suno's character error rate for the alignment** – 
+
 #### *property* tasks
 
 Local task store (`SunoTasks` Mapping) for recorded requests.
@@ -2332,20 +2361,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-04 12:23 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/29d074d31a32013bcd332ab91b6a67b350b7b914"><code>29d074d</code></a> on branch <code>main</code>, for **arioso 0.0.19** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-10 13:45 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e50e997f3f167b28dcf883675096560fd1c7ffe5"><code>e50e997</code></a> on branch <code>main</code>, for **arioso 0.0.20** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.19) is ahead of the latest release on PyPI (0.0.18): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/29d074d31a32013bcd332ab91b6a67b350b7b914"><code>29d074d31a32013bcd332ab91b6a67b350b7b914</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/e50e997f3f167b28dcf883675096560fd1c7ffe5"><code>e50e997f3f167b28dcf883675096560fd1c7ffe5</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.19</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.20</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2354,9 +2381,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/37201822004">37201822004</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/38056805900">38056805900</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>b22b4f6701b74bdd46a0181b6cc3ef936f05fe30</code> (in the history of the built commit) |
+| Event commit | <code>22a8dfa96336dde74cbd2d0d5ec1b2ef8bcc5698</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2365,7 +2392,7 @@ The documentation and the package may be misaligned:
 | epythet  | 0.2.12  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
-| Python   | 3.12.14 |
+| Python   | 3.12.15 |
 
 ## Configuration as resolved
 
@@ -2381,13 +2408,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.18/">0.0.18</a>, older than the documented version (0.0.19).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.20/">0.0.20</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 29d074d31a32013bcd332ab91b6a67b350b7b914
+git checkout e50e997f3f167b28dcf883675096560fd1c7ffe5
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -5,21 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-04 12:23 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/29d074d31a32013bcd332ab91b6a67b350b7b914"><code>29d074d</code></a> on branch <code>main</code>, for **arioso 0.0.19** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-10 13:45 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e50e997f3f167b28dcf883675096560fd1c7ffe5"><code>e50e997</code></a> on branch <code>main</code>, for **arioso 0.0.20** (from <code>pyproject.toml</code>).
 
-:::{warning}
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.19) is ahead of the latest release on PyPI (0.0.18): these docs describe unreleased code.
+:::{note}
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/arioso/commit/29d074d31a32013bcd332ab91b6a67b350b7b914"><code>29d074d31a32013bcd332ab91b6a67b350b7b914</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/arioso/commit/e50e997f3f167b28dcf883675096560fd1c7ffe5"><code>e50e997f3f167b28dcf883675096560fd1c7ffe5</code></a> |
 | Branch | <code>main</code> |
-| Tags at this commit | <code>0.0.19</code> |
+| Tags at this commit | <code>0.0.20</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/thorwhalen/arioso</code> |
 
@@ -28,9 +26,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>thorwhalen/arioso</code> |
-| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/37201822004">37201822004</a> |
+| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/38056805900">38056805900</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>b22b4f6701b74bdd46a0181b6cc3ef936f05fe30</code> (in the history of the built commit) |
+| Event commit | <code>22a8dfa96336dde74cbd2d0d5ec1b2ef8bcc5698</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -39,7 +37,7 @@ The documentation and the package may be misaligned:
 | epythet | 0.2.12 |
 | Sphinx | 9.1.0 |
 | docutils | 0.22.4 |
-| Python | 3.12.14 |
+| Python | 3.12.15 |
 
 ## Configuration as resolved
 
@@ -55,13 +53,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.18/">0.0.18</a>, older than the documented version (0.0.19).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.20/">0.0.20</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 29d074d31a32013bcd332ab91b6a67b350b7b914
+git checkout e50e997f3f167b28dcf883675096560fd1c7ffe5
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -30,20 +30,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=3baad687" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=2fd7553c"></script>
+    <script src="../_static/documentation_options.js?v=056c92e6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,8 +55,9 @@
     <link rel="next" title="arioso.platforms.yue.config" href="arioso.platforms.yue.config.html" />
     <link rel="prev" title="arioso.platforms.yue" href="arioso.platforms.yue.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.19" />
+  <meta name="docsearch:version" content="0.0.20" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -429,7 +430,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.yue.adapter.Adapter">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.yue.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/yue/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.yue.adapter.Adapter" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>YuE adapter with dual backend support.</p>
 <p>Prefers the fal.ai hosted API when <code class="docutils literal notranslate"><span class="pre">FAL_KEY</span></code> is set.  Falls back to
 local subprocess invocation of <code class="docutils literal notranslate"><span class="pre">infer.py</span></code> otherwise.</p>
@@ -442,14 +443,14 @@ local subprocess invocation of <code class="docutils literal notranslate"><span 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Genre/style description (mapped to <code class="docutils literal notranslate"><span class="pre">genre_txt</span></code>).</p></li>
-<li><p><strong>lyrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Lyrics text (mapped to <code class="docutils literal notranslate"><span class="pre">lyrics_txt</span></code>).</p></li>
-<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Desired length in seconds (converted to segments).</p></li>
-<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Stage-1 model identifier.</p></li>
-<li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Stage-2 batch size.</p></li>
-<li><p><strong>max_tokens</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Maximum new tokens for generation.</p></li>
-<li><p><strong>repetition_penalty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Token repetition penalty.</p></li>
-<li><p><strong>audio_input</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a vocal track prompt file, if any.</p></li>
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Genre/style description (mapped to <code class="docutils literal notranslate"><span class="pre">genre_txt</span></code>).</p></li>
+<li><p><strong>lyrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Lyrics text (mapped to <code class="docutils literal notranslate"><span class="pre">lyrics_txt</span></code>).</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Desired length in seconds (converted to segments).</p></li>
+<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Stage-1 model identifier.</p></li>
+<li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Stage-2 batch size.</p></li>
+<li><p><strong>max_tokens</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Maximum new tokens for generation.</p></li>
+<li><p><strong>repetition_penalty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Token repetition penalty.</p></li>
+<li><p><strong>audio_input</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a vocal track prompt file, if any.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -541,8 +542,8 @@ local subprocess invocation of <code class="docutils literal notranslate"><span 
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -554,7 +555,7 @@ local subprocess invocation of <code class="docutils literal notranslate"><span 
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
 </p></div>
       
     </div>

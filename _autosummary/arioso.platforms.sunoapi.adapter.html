@@ -30,20 +30,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=3baad687" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=2fd7553c"></script>
+    <script src="../_static/documentation_options.js?v=056c92e6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,8 +55,9 @@
     <link rel="next" title="arioso.platforms.sunoapi.config" href="arioso.platforms.sunoapi.config.html" />
     <link rel="prev" title="arioso.platforms.sunoapi" href="arioso.platforms.sunoapi.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.19" />
+  <meta name="docsearch:version" content="0.0.20" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -474,15 +475,54 @@ local task store (<code class="docutils literal notranslate"><span class="pre">S
 <dd><p>Check the status of a generation task and return updated Songs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>task_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The taskId returned from generate(), upload_extend(),
+<dd class="field-odd"><p><strong>task_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The taskId returned from generate(), upload_extend(),
 or upload_cover().</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of Song objects with current status and audio URLs
 (if generation is complete).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.sunoapi.adapter.Adapter.get_timestamped_lyrics">
+<span class="sig-name descname"><span class="pre">get_timestamped_lyrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">song_or_task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/sunoapi/adapter.html#Adapter.get_timestamped_lyrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.sunoapi.adapter.Adapter.get_timestamped_lyrics" title="Link to this definition">#</a></dt>
+<dd><p>Suno’s own alignment of the sung lyric to a finished song.</p>
+<p>One entry per sung <em>word</em> (Suno’s tokens: space-separated, so a whole
+katakana word such as <code class="docutils literal notranslate"><span class="pre">バカンス</span></code> is one entry), in the order sung —
+which can differ from the lyric you sent when Suno repeats or drops a
+line. Times sit on a coarse (~0.16 s) grid and tend to run late, so
+treat them as windows for a finer aligner rather than as onsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>song_or_task_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – a completed <code class="docutils literal notranslate"><span class="pre">Song</span></code> from <code class="docutils literal notranslate"><span class="pre">get_status</span></code> /
+<code class="docutils literal notranslate"><span class="pre">poll_status</span></code> (it carries <code class="docutils literal notranslate"><span class="pre">metadata[&quot;task_id&quot;]</span></code>), or a taskId.</p></li>
+<li><p><strong>audio_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – the song’s audio id; defaults to <code class="docutils literal notranslate"><span class="pre">song.id</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">{&quot;aligned_words&quot;:</span> <span class="pre">[...],</span> <span class="pre">&quot;hoot_cer&quot;:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None,</span> <span class="pre">&quot;raw&quot;:</span> <span class="pre">dict}</span></code>
+where each aligned word is <code class="docutils literal notranslate"><span class="pre">{&quot;word&quot;,</span> <span class="pre">&quot;text&quot;,</span> <span class="pre">&quot;start&quot;,</span> <span class="pre">&quot;end&quot;,</span>
+<span class="pre">&quot;line_end&quot;,</span> <span class="pre">&quot;section&quot;,</span> <span class="pre">&quot;success&quot;}</span></code>: <code class="docutils literal notranslate"><span class="pre">word</span></code> is Suno’s raw token
+(it may carry <code class="docutils literal notranslate"><span class="pre">[Section]</span></code> tags and newlines), <code class="docutils literal notranslate"><span class="pre">text</span></code> the token
+with those removed, <code class="docutils literal notranslate"><span class="pre">line_end</span></code> whether a lyric line ends there,
+<code class="docutils literal notranslate"><span class="pre">section</span></code> the label of a section starting at this word (else
+<code class="docutils literal notranslate"><span class="pre">None</span></code>). Bare section tags are folded onto the next word.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – the Song is not complete, carries no task_id, or Suno
+    has no alignment for it yet.</p></li>
+<li><p><strong>hoot_cer` is Suno's character error rate for the alignment</strong> – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -501,10 +541,10 @@ or upload_cover().</p>
 and automatically deleted after 3 days.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the local audio file.</p>
+<dd class="field-odd"><p><strong>file_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the local audio file.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Public URL of the uploaded file.</p>
@@ -566,6 +606,7 @@ and automatically deleted after 3 days.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter.fetch_audio"><code class="docutils literal notranslate"><span class="pre">Adapter.fetch_audio()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter.get_status"><code class="docutils literal notranslate"><span class="pre">Adapter.get_status()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter.get_timestamped_lyrics"><code class="docutils literal notranslate"><span class="pre">Adapter.get_timestamped_lyrics()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter.tasks"><code class="docutils literal notranslate"><span class="pre">Adapter.tasks</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.sunoapi.adapter.Adapter.upload_file"><code class="docutils literal notranslate"><span class="pre">Adapter.upload_file()</span></code></a></li>
 </ul>
@@ -595,8 +636,8 @@ and automatically deleted after 3 days.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -608,7 +649,7 @@ and automatically deleted after 3 days.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
 </p></div>
       
     </div>

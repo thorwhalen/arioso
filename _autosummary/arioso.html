@@ -30,20 +30,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=3baad687" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=2fd7553c"></script>
+    <script src="../_static/documentation_options.js?v=056c92e6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,8 +55,9 @@
     <link rel="next" title="arioso.base" href="arioso.base.html" />
     <link rel="prev" title="API reference" href="../api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.19" />
+  <meta name="docsearch:version" content="0.0.20" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -493,7 +494,7 @@ including audio URLs once generation is complete.</p>
 <dd class="field-odd"><p><strong>song</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a></span>) – A Song object (typically with status=’pending’).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of updated Song objects with current status and audio URLs.</p>
@@ -523,13 +524,13 @@ point for the “rendered MIDI audio -&gt; AI-enhanced audio” step.</p>
 <a class="reference internal" href="arioso.base.html#arioso.base.AudioResult" title="arioso.base.AudioResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioResult</span></code></a>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, a file path, an
 <code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code> pair, or a NumPy waveform (normalized by
 <code class="docutils literal notranslate"><span class="pre">arioso._audio.to_audio_ref</span></code>).</p></li>
-<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Optional text guiding the transformation.</p></li>
-<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – An audio-capable platform (default <code class="docutils literal notranslate"><span class="pre">'stable_audio'</span></code>); verify
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Optional text guiding the transformation.</p></li>
+<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – An audio-capable platform (default <code class="docutils literal notranslate"><span class="pre">'stable_audio'</span></code>); verify
 with <a class="reference internal" href="#arioso.supports_audio_input" title="arioso.supports_audio_input"><code class="xref py py-func docutils literal notranslate"><span class="pre">supports_audio_input()</span></code></a>.</p></li>
-<li><p><strong>strength</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – How much the input audio influences the output (0-1), where the
+<li><p><strong>strength</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – How much the input audio influences the output (0-1), where the
 platform supports it. (Note: <code class="docutils literal notranslate"><span class="pre">stable_audio</span></code> via diffusers has no
 strength knob and will warn if one is passed.)</p></li>
-<li><p><strong>as_</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Which affordance to route <em>audio</em> into – <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> (default; picks
+<li><p><strong>as_</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Which affordance to route <em>audio</em> into – <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> (default; picks
 <code class="docutils literal notranslate"><span class="pre">audio_input</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">melody</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) or an explicit
 affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFFORDANCES" title="arioso.AUDIO_INPUT_AFFORDANCES"><code class="xref py py-data docutils literal notranslate"><span class="pre">AUDIO_INPUT_AFFORDANCES</span></code></a>.</p></li>
 <li><p><strong>**kwargs</strong> – Further unified affordance parameters (duration, seed, …).</p></li>
@@ -580,8 +581,8 @@ affordance name from <a class="reference internal" href="#arioso.AUDIO_INPUT_AFF
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Text description of desired music.</p></li>
-<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the generation platform (default: ‘musicgen’).</p></li>
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Text description of desired music.</p></li>
+<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the generation platform (default: ‘musicgen’).</p></li>
 <li><p><strong>**kwargs</strong> – Parameters using unified affordance names.
 See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFFORDANCES</span></code> for the full list.</p></li>
 </ul>
@@ -606,7 +607,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 <p>Same interface as <a class="reference internal" href="#arioso.generate" title="arioso.generate"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate()</span></code></a> but always returns a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="arioso.base.html#arioso.base.Song" title="arioso.base.Song"><code class="xref py py-class docutils literal notranslate"><span class="pre">Song</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -617,10 +618,10 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 <dd><p>Get configuration info for a platform.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Platform identifier.</p>
+<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Platform identifier.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The platform’s PLATFORM_CONFIG dict.</p>
@@ -634,7 +635,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 <dd><p>Return names of all available platforms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -653,7 +654,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -768,8 +769,8 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -781,7 +782,7 @@ See <code class="docutils literal notranslate"><span class="pre">arioso.base.AFF
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
 </p></div>
       
     </div>

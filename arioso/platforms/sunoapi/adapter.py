@@ -597,7 +597,7 @@ class Adapter(BaseRestAdapter):
                     ),
                     platform="sunoapi",
                     status="complete" if is_complete else "generating",
-                    metadata={"task_id": task_id, **item},
+                    metadata={**item, "task_id": task_id},
                 )
             )
         return songs
@@ -621,9 +621,15 @@ class Adapter(BaseRestAdapter):
         Returns:
             ``{"aligned_words": [...], "hoot_cer": float | None, "raw": dict}``
             where each aligned word is ``{"word", "text", "start", "end",
-            "line_end", "success"}``: ``word`` is Suno's raw token (it may
-            carry ``[Section]`` tags and newlines), ``text`` the token with
-            those removed, ``line_end`` whether a lyric line ends there.
+            "line_end", "section", "success"}``: ``word`` is Suno's raw token
+            (it may carry ``[Section]`` tags and newlines), ``text`` the token
+            with those removed, ``line_end`` whether a lyric line ends there,
+            ``section`` the label of a section starting at this word (else
+            ``None``). Bare section tags are folded onto the next word.
+
+        Raises:
+            ValueError: the Song is not complete, carries no task_id, or Suno
+                has no alignment for it yet.
             ``hoot_cer`` is Suno's character error rate for the alignment.
         """
         if isinstance(song_or_task_id, Song):
@@ -632,6 +638,11 @@ class Adapter(BaseRestAdapter):
                 song.metadata or {}
             ).get("taskId")
             audio_id = audio_id or song.id
+            if song.status != "complete":
+                raise ValueError(
+                    f"Song {song.id!r} is {song.status!r}; timestamps exist only "
+                    "for a complete song (poll_status first)."
+                )
             if not task_id:
                 raise ValueError(
                     "This Song carries no task_id; pass the taskId explicitly "
@@ -649,17 +660,32 @@ class Adapter(BaseRestAdapter):
         data = response.json()
         _check_api_error(data)
         record = data.get("data") or {}
-        words = [
-            {
-                "word": w.get("word", ""),
-                "text": re.sub(r"\[[^\]]*\]|\s", "", w.get("word", "")),
-                "start": w.get("startS"),
-                "end": w.get("endS"),
-                "line_end": w.get("word", "").rstrip(" ").endswith("\n"),
-                "success": w.get("success", True),
-            }
-            for w in record.get("alignedWords") or []
-        ]
+        words, section = [], None
+        for w in record.get("alignedWords") or []:
+            raw = w.get("word", "")
+            tags = re.findall(r"\[([^\]]*)\]", raw)
+            if tags:
+                section = tags[-1].strip()
+            text = " ".join(re.sub(r"\[[^\]]*\]", " ", raw).split())
+            if not text:  # a bare section tag: carried onto the next word
+                continue
+            words.append(
+                {
+                    "word": raw,
+                    "text": text,
+                    "start": w.get("startS"),
+                    "end": w.get("endS"),
+                    "line_end": raw.rstrip(" ").endswith("\n"),
+                    "section": section,
+                    "success": w.get("success"),
+                }
+            )
+            section = None
+        if not words:
+            raise ValueError(
+                f"Suno returned no aligned words for taskId={task_id}, "
+                f"audioId={audio_id} (not finished, or not aligned yet)."
+            )
         return {"aligned_words": words, "hoot_cer": record.get("hootCer"), "raw": record}
 
     def fetch_audio(self, song: Song) -> Song:

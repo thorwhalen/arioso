@@ -255,7 +255,8 @@ def check_status(song: Song) -> list[Song]:
             f"Platform {platform!r} does not support status checking"
         )
 
-    task_id = song.id
+    # A completed Suno song's id is its AUDIO id; the task id rides in metadata.
+    task_id = (song.metadata or {}).get("task_id") or song.id
     if not task_id:
         raise ValueError("Song has no id/taskId, cannot check status")
 

@@ -326,3 +326,46 @@ def test_sunoapi_fetch_audio(mock_make_session):
     assert result.audio_bytes == b"fake mp3 audio bytes"
     assert result.audio_url == "https://cdn.sunoapi.org/clip1.mp3"
     assert result.id == "clip-1"
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_get_timestamped_lyrics(mock_make_session):
+    from arioso.base import Song
+
+    mock_session = MagicMock()
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "code": 200,
+        "msg": "success",
+        "data": {
+            "alignedWords": [
+                {"word": "[Intro]\nカ ", "success": True, "startS": 2.87, "endS": 3.43, "palign": 0},
+                {"word": "ン\n", "success": True, "startS": 5.19, "endS": 7.58, "palign": 0},
+            ],
+            "hootCer": 0.43,
+        },
+    }
+    mock_session.post.return_value = mock_response
+    mock_make_session.return_value = mock_session
+
+    adapter = Adapter(PLATFORM_CONFIG)
+    song = Song(id="audio-1", platform="sunoapi", metadata={"task_id": "task-1"})
+    out = adapter.get_timestamped_lyrics(song)
+
+    url = mock_session.post.call_args[0][0]
+    assert url.endswith("/api/v1/generate/get-timestamped-lyrics")
+    assert mock_session.post.call_args[1]["json"] == {"taskId": "task-1", "audioId": "audio-1"}
+    assert out["hoot_cer"] == 0.43
+    assert [w["text"] for w in out["aligned_words"]] == ["カ", "ン"]
+    assert [w["line_end"] for w in out["aligned_words"]] == [False, True]
+    assert out["aligned_words"][0]["start"] == 2.87
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_get_timestamped_lyrics_needs_task_id(mock_make_session):
+    from arioso.base import Song
+
+    mock_make_session.return_value = MagicMock()
+    adapter = Adapter(PLATFORM_CONFIG)
+    with pytest.raises(ValueError, match="task_id"):
+        adapter.get_timestamped_lyrics(Song(id="audio-1", platform="sunoapi"))

@@ -158,6 +158,26 @@ with open("song.mp3", "wb") as f:
 `fetch_audio` raises `ValueError` if `audio_url` is still empty — that means the
 job is not finished, so poll first.
 
+## When was each word sung? — Suno's timestamped lyrics
+
+For a lyric video or karaoke you need word times. Suno computes them; ask for them
+on a *finished* song (free, no generation):
+
+```python
+ad = arioso.services.sunoapi.adapter
+done = poll_status(task_id, adapter="sunoapi")  # Songs now carry metadata["task_id"]
+ts = ad.get_timestamped_lyrics(done[0])
+ts["aligned_words"]  # [{"word","text","start","end","line_end","success"}, ...]
+ts["hoot_cer"]       # Suno's own character error rate for the alignment
+```
+
+Three things to know: the words are **what was sung**, which can differ from the
+lyric you sent (Suno repeats or drops lines) — so display this sequence, not
+your input; the unit is a space-separated token, so a whole katakana or CJK
+word is one entry; and the times sit on a ~0.16 s grid and run ~0.1 s late
+(measured against vocal onsets, 2026-10). Use them as windows for a finer
+forced aligner (muvid's), not as onsets.
+
 ## Free versus paid — say so before you spend
 
 | Free (local inference, no key, no account) | Paid / metered (needs a key) |

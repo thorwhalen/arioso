@@ -274,7 +274,7 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
     The returned function accepts unified affordance names, validates them,
     translates to native names, and calls the underlying adapter.
     """
-    from arioso.translation import make_kwargs_trans
+    from arioso.translation import check_supported_params, make_kwargs_trans
 
     param_map = config.get("param_map", {})
     on_unsupported = config.get("on_unsupported_param", "warn")
@@ -285,8 +285,19 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
         passthrough=tuple(config.get("adapter_params", ())),
     )
 
+    # Same content-loss guard as ``arioso.generate`` (thorwhalen/arioso#3).
+    # Policy is forced to 'ignore' here so only ``ALWAYS_RAISE_UNSUPPORTED``
+    # affordances raise; ``kwargs_trans`` below still owns warn/raise for the
+    # rest (avoids a double warning).
+    guard_config = {
+        **config,
+        "name": config.get("name", platform_name),
+        "on_unsupported_param": "ignore",
+    }
+
     @functools.wraps(native_func)
     def validated_generate(prompt: str, **kwargs):
+        check_supported_params(kwargs, guard_config)
         _validate_kwargs(kwargs, supported, param_map, platform_name)
         translated = kwargs_trans({"prompt": prompt, **kwargs})
         # prompt may have been translated; extract it if still present

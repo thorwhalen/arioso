@@ -184,6 +184,35 @@ class TestServiceHandle:
             sh.generate("hello", energy=0.5)
             assert any("not supported" in str(x.message) for x in w)
 
+    def test_generate_raises_on_unsupported_lyrics_regardless_of_policy(self):
+        """Same guard as arioso.generate() (thorwhalen/arioso#6)."""
+        _, adapter = _register_fake("fake_plat")
+        sh = ServiceHandle("fake_plat")
+        with pytest.raises(ValueError, match="lyrics"):
+            sh.generate("hello", lyrics="a poem")
+
+    def test_generate_lyrics_ok_when_supported(self):
+        _register_fake(
+            "fake_plat",
+            extra_config={
+                "supported_affordances": ["prompt", "duration", "model", "lyrics"],
+                "param_map": {
+                    "prompt": {"native_name": "prompt"},
+                    "lyrics": {"native_name": "lyrics"},
+                },
+            },
+        )
+        sh = ServiceHandle("fake_plat")
+        assert sh.generate("hello", lyrics="a poem")["lyrics"] == "a poem"
+
+    def test_generate_unsupported_warns_exactly_once(self):
+        _register_fake("fake_plat")
+        sh = ServiceHandle("fake_plat")
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sh.generate("hello", energy=0.5)
+        assert len([x for x in w if "energy" in str(x.message)]) == 1
+
     def test_generate_warns_on_type_mismatch(self):
         """Type warning fires for params without coercion in param_map.
 

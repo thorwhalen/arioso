@@ -418,7 +418,10 @@ Key design choices:
   is mostly configuration.
 - **Automatic parameter translation.** The translation layer renames unified
   affordance names to native platform names and applies type coercions
-  (e.g. `duration` seconds to `music_length_ms` milliseconds for ElevenLabs).
+  (e.g. `duration` seconds to `music_length_ms` milliseconds for ElevenLabs)
+  for platforms served by the config-generated REST adapter. A platform with its
+  own `adapter.py` takes unified names directly, on every path
+  (`arioso.generate` and `arioso.services.<platform>.generate` alike).
 - **Leverages existing libraries.** Uses
   [ho](https://github.com/i2mint/ho) for OpenAPI-to-Python-function generation,
   [i2](https://github.com/i2mint/i2) for signature manipulation and function wrapping.

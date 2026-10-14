@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../_static/documentation_options.js?v=96ec9c95"></script>
+    <script src="../../../../_static/documentation_options.js?v=3294188c"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.22" />
+  <meta name="docsearch:version" content="0.0.23" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -718,6 +718,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
@@ -754,6 +755,30 @@ window.runMermaid = runMermaid;</script>
     <span class="s2">"CALLBACK_EXCEPTION"</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="n">_PARTIAL_STATUSES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"TEXT_SUCCESS"</span><span class="p">,</span> <span class="s2">"FIRST_SUCCESS"</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cover_source</span><span class="p">(</span><span class="n">audio_input</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``(url_or_path, ref_to_clean_up)`` for upload-cover from any audio input.</span>
+
+<span class="sd">    A URL (or a Song/AudioResult that is only a remote URL) is passed as is,</span>
+<span class="sd">    since upload-cover takes one; anything else goes through</span>
+<span class="sd">    :func:`arioso._audio.to_audio_ref` to a local file that</span>
+<span class="sd">    :meth:`Adapter.upload_file` sends.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_audio_ref</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">audio_input</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">audio_input</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"http://"</span><span class="p">,</span> <span class="s2">"https://"</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">audio_input</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">audio</span> <span class="o">=</span> <span class="n">audio_input</span><span class="o">.</span><span class="n">audio</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">audio_input</span><span class="p">,</span> <span class="n">Song</span><span class="p">)</span> <span class="k">else</span> <span class="n">audio_input</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">AudioResult</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">audio</span><span class="o">.</span><span class="n">audio_url</span>
+        <span class="ow">and</span> <span class="n">audio</span><span class="o">.</span><span class="n">audio_array</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">audio</span><span class="o">.</span><span class="n">audio_bytes</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">audio</span><span class="o">.</span><span class="n">audio_url</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ref</span><span class="o">.</span><span class="n">as_path</span><span class="p">(),</span> <span class="n">ref</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
@@ -831,6 +856,8 @@ window.runMermaid = runMermaid;</script>
         <span class="n">continue_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">callback_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">audio_input</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">audio_input_strength</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
@@ -855,6 +882,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">                Defaults to SUNO_CALLBACK_URL env var, or a no-op</span>
 <span class="sd">                placeholder (polling still works).</span>
 <span class="sd">            negative_prompt: Styles to exclude (negativeTags).</span>
+<span class="sd">            audio_input: Audio to start from, in any form the ``audio_input``</span>
+<span class="sd">                affordance accepts (a URL, a file path, a ``Song`` or</span>
+<span class="sd">                ``AudioResult``, bytes, an ``(array, sample_rate)`` pair).</span>
+<span class="sd">                Given, the call goes to :meth:`upload_cover` (sunoapi's</span>
+<span class="sd">                upload-cover endpoint) with the same prompt, style, lyrics and</span>
+<span class="sd">                title, instead of plain generation. A ``Song`` that is only a</span>
+<span class="sd">                remote URL is passed as that URL.</span>
+<span class="sd">            audio_input_strength: How much ``audio_input`` shapes the output,</span>
+<span class="sd">                0-1 (upload-cover's ``audioWeight``). 0 leaves it to the API.</span>
 <span class="sd">            wait_for_completion: If True, poll until audio is ready (or</span>
 <span class="sd">                timeout). If False (default), return pending Songs immediately.</span>
 <span class="sd">            poll_interval: Seconds between status checks (default 5).</span>
@@ -868,6 +904,49 @@ window.runMermaid = runMermaid;</script>
 
         <span class="c1"># Determine if we need customMode (lyrics, genre, or title provided)</span>
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
+            <span class="c1"># Same customMode rules as below, expressed in upload_cover's terms:</span>
+            <span class="c1"># its customMode is "style or title", and its prompt is the lyrics</span>
+            <span class="c1"># in custom mode, the description otherwise.</span>
+            <span class="k">if</span> <span class="n">continue_from</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"sunoapi: audio_input and continue_from are two different "</span>
+                    <span class="s2">"endpoints (upload-cover vs extend); pass one of them."</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">continue_at</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">"sunoapi: continue_at is ignored with audio_input "</span>
+                    <span class="s2">"(upload-cover has no start point)"</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="p">(</span><span class="n">genre</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span> <span class="k">if</span> <span class="n">custom_mode</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="k">if</span> <span class="n">custom_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">"sunoapi: upload-cover runs in non-custom mode without a "</span>
+                    <span class="s2">"style or title; pass genre, title or a prompt to keep the "</span>
+                    <span class="s2">"lyrics as lyrics"</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">source</span><span class="p">,</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">_cover_source</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_cover</span><span class="p">(</span>
+                    <span class="n">source</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                    <span class="n">prompt</span><span class="o">=</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span> <span class="k">if</span> <span class="n">custom_mode</span> <span class="k">else</span> <span class="n">prompt</span><span class="p">,</span>
+                    <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">callback_url</span><span class="o">=</span><span class="n">callback_url</span><span class="p">,</span>
+                    <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
+                    <span class="n">audio_weight</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
+                    <span class="n">wait_for_completion</span><span class="o">=</span><span class="n">wait_for_completion</span><span class="p">,</span>
+                    <span class="n">poll_interval</span><span class="o">=</span><span class="n">poll_interval</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ref</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>

@@ -1,4 +1,4 @@
-> built 2026-10-13 16:58 UTC from 31506fc (main) · arioso 0.0.21. Details: build_info.json
+> built 2026-10-14 02:24 UTC from e2c4db8 (main) · arioso 0.0.22. Details: build_info.json
 
 # index.html.md
 
@@ -2361,18 +2361,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-13 16:58 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/31506fc4b6839410547318f23fc958bc46402223"><code>31506fc</code></a> on branch <code>main</code>, for **arioso 0.0.21** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-14 02:24 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e2c4db8f6041f142d289b9701d30bf8a14002d53"><code>e2c4db8</code></a> on branch <code>main</code>, for **arioso 0.0.22** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.22) is ahead of the latest release on PyPI (0.0.21): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/31506fc4b6839410547318f23fc958bc46402223"><code>31506fc4b6839410547318f23fc958bc46402223</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/e2c4db8f6041f142d289b9701d30bf8a14002d53"><code>e2c4db8f6041f142d289b9701d30bf8a14002d53</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.21</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.22</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2381,9 +2383,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/38434585167">38434585167</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/38500732851">38500732851</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ae227fe21341f1a4e91229ca345eed2014bb5c5b</code> (in the history of the built commit) |
+| Event commit | <code>1a8d74a935f0a78f991e3ae5a8648f47a4900432</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2408,13 +2410,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.21/">0.0.21</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.21/">0.0.21</a>, older than the documented version (0.0.22).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 31506fc4b6839410547318f23fc958bc46402223
+git checkout e2c4db8f6041f142d289b9701d30bf8a14002d53
 pip install "epythet==0.2.17"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

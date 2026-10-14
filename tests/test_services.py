@@ -415,3 +415,57 @@ class TestAriosoIntegration:
         facade_list = set(arioso.list_platforms())
         services_list = set(arioso.services)
         assert facade_list == services_list
+
+
+# ---------------------------------------------------------------------------
+# thorwhalen/arioso#13: one source of truth for "supported"
+# ---------------------------------------------------------------------------
+
+
+def _warned_keys(fn, kwargs):
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        try:
+            fn("hello", **kwargs)
+        except (ValueError, TypeError):
+            pass  # a probe value a coercion refuses; the check has run by then
+    return {k for k in kwargs if any(repr(k) in str(x.message) for x in w)}
+
+
+def test_both_entry_points_judge_supported_alike_on_every_platform():
+    """For every shipped config, the services wrapper warns for exactly the
+    keys ``arioso.generate``'s check warns for (both read
+    ``supported_affordances``; the services path used to read ``param_map``)."""
+    from arioso.base import AFFORDANCES
+    from arioso.registry import _registry
+    from arioso.services import _make_validated_generate
+    from arioso.translation import check_supported_params
+
+    import arioso
+
+    arioso.list_platforms()  # discovery
+    probe = {k: None for k in AFFORDANCES if k not in ("prompt", "lyrics")}
+    for name in list(_registry):
+        config = {**_registry[name]["config"], "on_unsupported_param": "warn"}
+        wrapped = _make_validated_generate(lambda *a, **k: None, config, name)
+        via_generate = _warned_keys(
+            lambda prompt, **kw: check_supported_params(kw, config), probe
+        )
+        assert _warned_keys(wrapped, probe) == via_generate, name
+
+
+def test_a_supported_affordance_without_a_param_map_entry_reaches_the_adapter():
+    """sunoapi's ``audio_input`` is supported but not in its param_map: the
+    services path used to warn "not supported" and drop it."""
+    _register_fake(
+        "fake_plat",
+        extra_config={
+            "supported_affordances": ["prompt", "duration", "model", "audio_input"],
+        },
+    )
+    sh = ServiceHandle("fake_plat")
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        result = sh.generate("hello", audio_input="clip.wav")
+    assert not [x for x in w if "audio_input" in str(x.message)]
+    assert result["audio_input"] == "clip.wav"

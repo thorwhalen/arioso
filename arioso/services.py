@@ -277,23 +277,22 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
     from arioso.translation import check_supported_params, make_kwargs_trans
 
     param_map = config.get("param_map", {})
-    on_unsupported = config.get("on_unsupported_param", "warn")
     supported = set(config.get("supported_affordances", []))
+    # One source of truth for "supported" (thorwhalen/arioso#13): the config's
+    # ``supported_affordances``, judged by ``check_supported_params`` exactly as
+    # ``arioso.generate`` judges it, with the platform's own policy. The
+    # translator only renames: a supported affordance with no ``param_map``
+    # entry (sunoapi's ``audio_input``) passes through under its unified name,
+    # as ``arioso.generate`` passes it, and an unsupported one is dropped
+    # silently here because the check has already warned or raised.
     kwargs_trans = make_kwargs_trans(
         param_map,
-        on_unsupported=on_unsupported,
-        passthrough=tuple(config.get("adapter_params", ())),
+        on_unsupported="ignore",
+        passthrough=tuple(
+            set(config.get("adapter_params", ())) | (supported - set(param_map))
+        ),
     )
-
-    # Same content-loss guard as ``arioso.generate`` (thorwhalen/arioso#3).
-    # Policy is forced to 'ignore' here so only ``ALWAYS_RAISE_UNSUPPORTED``
-    # affordances raise; ``kwargs_trans`` below still owns warn/raise for the
-    # rest (avoids a double warning).
-    guard_config = {
-        **config,
-        "name": config.get("name", platform_name),
-        "on_unsupported_param": "ignore",
-    }
+    guard_config = {**config, "name": config.get("name", platform_name)}
 
     @functools.wraps(native_func)
     def validated_generate(prompt: str, **kwargs):

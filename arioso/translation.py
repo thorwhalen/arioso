@@ -143,7 +143,15 @@ def make_generate_func(config: dict) -> Callable:
     """
     param_map = config.get("param_map", {})
     on_unsupported = config.get("on_unsupported_param", "warn")
-    kwargs_trans_fn = make_kwargs_trans(param_map, on_unsupported=on_unsupported)
+    # Names the platform takes but param_map does not rename -- its adapter-only
+    # ``adapter_params`` and any supported affordance with no param_map entry --
+    # pass through under their own name instead of being warned about and
+    # dropped (thorwhalen/arioso#17).
+    supported = set(config.get("supported_affordances", ()))
+    passthrough = set(config.get("adapter_params", ())) | (supported - set(param_map))
+    kwargs_trans_fn = make_kwargs_trans(
+        param_map, on_unsupported=on_unsupported, passthrough=passthrough
+    )
 
     access_type = config.get("access_type", "rest_api")
 

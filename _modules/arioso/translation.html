@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../_static/documentation_options.js?v=3294188c"></script>
+    <script src="../../_static/documentation_options.js?v=f91d8841"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.23" />
+  <meta name="docsearch:version" content="0.0.24" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -867,7 +867,17 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    """</span>
     <span class="n">param_map</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"param_map"</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">on_unsupported</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"on_unsupported_param"</span><span class="p">,</span> <span class="s2">"warn"</span><span class="p">)</span>
-    <span class="n">kwargs_trans_fn</span> <span class="o">=</span> <span class="n">make_kwargs_trans</span><span class="p">(</span><span class="n">param_map</span><span class="p">,</span> <span class="n">on_unsupported</span><span class="o">=</span><span class="n">on_unsupported</span><span class="p">)</span>
+    <span class="c1"># Names the platform takes but param_map does not rename -- its adapter-only</span>
+    <span class="c1"># ``adapter_params`` and any supported affordance with no param_map entry --</span>
+    <span class="c1"># pass through under their own name instead of being warned about and</span>
+    <span class="c1"># dropped (thorwhalen/arioso#17). A name param_map does cover keeps its</span>
+    <span class="c1"># rename and coercion, even if also listed in adapter_params.</span>
+    <span class="n">supported</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"supported_affordances"</span><span class="p">,</span> <span class="p">()))</span>
+    <span class="n">adapter_params</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"adapter_params"</span><span class="p">,</span> <span class="p">()))</span>
+    <span class="n">passthrough</span> <span class="o">=</span> <span class="p">(</span><span class="n">adapter_params</span> <span class="o">|</span> <span class="n">supported</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">param_map</span><span class="p">)</span>
+    <span class="n">kwargs_trans_fn</span> <span class="o">=</span> <span class="n">make_kwargs_trans</span><span class="p">(</span>
+        <span class="n">param_map</span><span class="p">,</span> <span class="n">on_unsupported</span><span class="o">=</span><span class="n">on_unsupported</span><span class="p">,</span> <span class="n">passthrough</span><span class="o">=</span><span class="n">passthrough</span>
+    <span class="p">)</span>
 
     <span class="n">access_type</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"access_type"</span><span class="p">,</span> <span class="s2">"rest_api"</span><span class="p">)</span>
 

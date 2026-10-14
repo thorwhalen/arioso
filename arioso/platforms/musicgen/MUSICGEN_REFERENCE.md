@@ -82,7 +82,7 @@ the text prompt. See [AudioCraft melody docs](https://github.com/facebookresearc
 ### Extending generations
 
 MusicGen supports `extend_stride` for generating pieces longer than the base window by
-iteratively extending the output.
+iteratively extending the output. (Not wired in arioso yet: its adapter does not pass `extend_stride` through, so it is not a supported affordance; thorwhalen/arioso#15.)
 
 ### Background
 

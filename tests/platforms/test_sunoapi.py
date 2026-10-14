@@ -445,3 +445,43 @@ def test_sunoapi_audio_input_with_continue_from_is_refused(mock_make_session):
         Adapter(PLATFORM_CONFIG).generate(
             "x", audio_input="https://example.com/a.mp3", continue_from="clip-1"
         )
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_audio_input_accepts_the_affordance_forms(mock_make_session, tmp_path):
+    """Song (remote URL), bytes and Path all reach upload-cover (review of #16)."""
+    import os
+    from pathlib import Path
+    from arioso.base import AudioResult, Song
+
+    session = _cover_session(mock_make_session)
+    adapter = Adapter(PLATFORM_CONFIG)
+    uploaded = []
+    adapter.upload_file = lambda path: (uploaded.append(path), "https://files.example/up.wav")[1]
+
+    remote = Song(audio=AudioResult(audio_url="https://cdn.example/s.mp3"), platform="sunoapi")
+    adapter.generate("x", audio_input=remote, callback_url=CALLBACK_URL)
+    assert session.post.call_args[1]["json"]["uploadUrl"] == "https://cdn.example/s.mp3"
+    assert uploaded == []
+
+    adapter.generate("x", audio_input=b"RIFF....", callback_url=CALLBACK_URL)
+    assert session.post.call_args[1]["json"]["uploadUrl"] == "https://files.example/up.wav"
+    assert len(uploaded) == 1 and not os.path.exists(uploaded[0]), "temp file cleaned up"
+
+    clip = tmp_path / "seed.wav"
+    clip.write_bytes(b"RIFF....")
+    adapter.generate("x", audio_input=Path(clip), callback_url=CALLBACK_URL)
+    assert uploaded[-1] == str(clip) and clip.exists(), "a caller's file is not deleted"
+
+    with pytest.raises(ValueError, match="local file path or a URL"):
+        adapter.generate("x", audio_input=tmp_path / "missing.wav")
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_audio_input_warns_on_what_upload_cover_cannot_do(mock_make_session):
+    _cover_session(mock_make_session)
+    adapter = Adapter(PLATFORM_CONFIG)
+    with pytest.warns(UserWarning, match="continue_at is ignored"):
+        adapter.generate("x", audio_input="https://e.x/a.mp3", continue_at=12)
+    with pytest.warns(UserWarning, match="non-custom mode"):
+        adapter.generate("", lyrics="la", audio_input="https://e.x/a.mp3")

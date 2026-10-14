@@ -85,3 +85,24 @@ def test_an_unsupported_name_is_still_warned_about_and_dropped(sent):
         arioso.generate("a song", platform=NAME, bogus=1)
     (native_kwargs,) = sent
     assert "bogus" not in native_kwargs
+
+
+def test_a_name_param_map_covers_keeps_its_rename_even_if_in_adapter_params(monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        translation, "_build_rest_func", lambda config: lambda **kw: calls.append(kw) or b""
+    )
+    generate = translation.make_generate_func(
+        {
+            "name": "overlap_fake",
+            "param_map": {
+                "prompt": {"native_name": "text"},
+                "duration": {"native_name": "seconds", "coerce": float},
+            },
+            "supported_affordances": ["prompt", "duration"],
+            "adapter_params": ["duration"],
+            "output": {"returns": "bytes"},
+        }
+    )
+    generate("a song", duration=10)
+    assert calls == [{"text": "a song", "seconds": 10.0}]

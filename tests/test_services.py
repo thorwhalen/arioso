@@ -469,3 +469,14 @@ def test_a_supported_affordance_without_a_param_map_entry_reaches_the_adapter():
         result = sh.generate("hello", audio_input="clip.wav")
     assert not [x for x in w if "audio_input" in str(x.message)]
     assert result["audio_input"] == "clip.wav"
+
+
+def test_the_prompt_reaches_the_adapter_even_when_undeclared():
+    """harmonai declares no ``prompt``: the services path used to drop it with a
+    "not supported" warning, while arioso.generate passes it (arioso#13 review)."""
+    _register_fake(
+        "fake_plat",
+        extra_config={"supported_affordances": ["duration"], "param_map": {}},
+    )
+    sh = ServiceHandle("fake_plat")
+    assert sh.generate("hello")["prompt"] == "hello"

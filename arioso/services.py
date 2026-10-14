@@ -289,7 +289,9 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
         param_map,
         on_unsupported="ignore",
         passthrough=tuple(
-            set(config.get("adapter_params", ())) | (supported - set(param_map))
+            set(config.get("adapter_params", ()))
+            | (supported - set(param_map))
+            | ({"prompt"} - set(param_map))  # always reaches the adapter
         ),
     )
     guard_config = {**config, "name": config.get("name", platform_name)}

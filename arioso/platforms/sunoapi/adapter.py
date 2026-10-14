@@ -2,6 +2,7 @@
 
 import re
 import os
+import warnings
 import time
 from pathlib import Path
 
@@ -38,6 +39,30 @@ _ERROR_STATUSES = {
     "CALLBACK_EXCEPTION",
 }
 _PARTIAL_STATUSES = {"TEXT_SUCCESS", "FIRST_SUCCESS"}
+
+
+def _cover_source(audio_input):
+    """``(url_or_path, ref_to_clean_up)`` for upload-cover from any audio input.
+
+    A URL (or a Song/AudioResult that is only a remote URL) is passed as is,
+    since upload-cover takes one; anything else goes through
+    :func:`arioso._audio.to_audio_ref` to a local file that
+    :meth:`Adapter.upload_file` sends.
+    """
+    from arioso._audio import to_audio_ref
+
+    if isinstance(audio_input, str) and audio_input.startswith(("http://", "https://")):
+        return audio_input, None
+    audio = audio_input.audio if isinstance(audio_input, Song) else audio_input
+    if (
+        isinstance(audio, AudioResult)
+        and audio.audio_url
+        and audio.audio_array is None
+        and audio.audio_bytes is None
+    ):
+        return audio.audio_url, None
+    ref = to_audio_ref(audio_input)
+    return ref.as_path(), ref
 
 
 def _check_api_error(data: dict):
@@ -113,6 +138,8 @@ class Adapter(BaseRestAdapter):
         continue_at: float = 0,
         callback_url: str = "",
         negative_prompt: str = "",
+        audio_input: str = "",
+        audio_input_strength: float = 0,
         wait_for_completion: bool = False,
         poll_interval: float = 5.0,
         timeout: float = 300.0,
@@ -137,6 +164,15 @@ class Adapter(BaseRestAdapter):
                 Defaults to SUNO_CALLBACK_URL env var, or a no-op
                 placeholder (polling still works).
             negative_prompt: Styles to exclude (negativeTags).
+            audio_input: Audio to start from, in any form the ``audio_input``
+                affordance accepts (a URL, a file path, a ``Song`` or
+                ``AudioResult``, bytes, an ``(array, sample_rate)`` pair).
+                Given, the call goes to :meth:`upload_cover` (sunoapi's
+                upload-cover endpoint) with the same prompt, style, lyrics and
+                title, instead of plain generation. A ``Song`` that is only a
+                remote URL is passed as that URL.
+            audio_input_strength: How much ``audio_input`` shapes the output,
+                0-1 (upload-cover's ``audioWeight``). 0 leaves it to the API.
             wait_for_completion: If True, poll until audio is ready (or
                 timeout). If False (default), return pending Songs immediately.
             poll_interval: Seconds between status checks (default 5).
@@ -150,6 +186,49 @@ class Adapter(BaseRestAdapter):
 
         # Determine if we need customMode (lyrics, genre, or title provided)
         custom_mode = bool(lyrics or genre or title)
+
+        if audio_input:
+            # Same customMode rules as below, expressed in upload_cover's terms:
+            # its customMode is "style or title", and its prompt is the lyrics
+            # in custom mode, the description otherwise.
+            if continue_from:
+                raise ValueError(
+                    "sunoapi: audio_input and continue_from are two different "
+                    "endpoints (upload-cover vs extend); pass one of them."
+                )
+            if continue_at:
+                warnings.warn(
+                    "sunoapi: continue_at is ignored with audio_input "
+                    "(upload-cover has no start point)",
+                    stacklevel=2,
+                )
+            style = (genre or prompt) if custom_mode else ""
+            if custom_mode and not (style or title):
+                warnings.warn(
+                    "sunoapi: upload-cover runs in non-custom mode without a "
+                    "style or title; pass genre, title or a prompt to keep the "
+                    "lyrics as lyrics",
+                    stacklevel=2,
+                )
+            source, ref = _cover_source(audio_input)
+            try:
+                return self.upload_cover(
+                    source,
+                    style=style,
+                    title=title,
+                    prompt=(lyrics or prompt) if custom_mode else prompt,
+                    instrumental=instrumental,
+                    model=model,
+                    callback_url=callback_url,
+                    negative_prompt=negative_prompt,
+                    audio_weight=audio_input_strength,
+                    wait_for_completion=wait_for_completion,
+                    poll_interval=poll_interval,
+                    timeout=timeout,
+                )
+            finally:
+                if ref is not None:
+                    ref.cleanup()
 
         payload = {
             "model": model,

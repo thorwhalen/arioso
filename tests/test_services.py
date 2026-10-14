@@ -163,12 +163,15 @@ class TestServiceHandle:
         result = sh.native_generate("hello")
         assert result["prompt"] == "hello"
 
-    def test_generate_translates_params(self):
+    def test_generate_passes_unified_names(self):
+        """Adapters take unified names; translating here hid them in **kwargs
+        (thorwhalen/arioso#15), so services must pass them unchanged, as
+        ``arioso.generate`` does."""
         _register_fake("fake_plat")
         sh = ServiceHandle("fake_plat")
         result = sh.generate("hello", duration=10)
-        # duration should have been translated to duration_sec and coerced
-        assert result.get("duration_sec") == 10.0
+        assert result.get("duration") == 10
+        assert "duration_sec" not in result
 
     def test_generate_validates_choices(self):
         _register_fake("fake_plat")

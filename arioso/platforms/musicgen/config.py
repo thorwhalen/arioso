@@ -20,16 +20,14 @@ PLATFORM_CONFIG = {
             "native_name": "model_variant",
             "native_default": "facebook/musicgen-small",
         },
-        "extend_stride": {"native_name": "extend_stride", "native_default": 18},
-        "batch_size": {
-            "native_name": "batch_size",
-            "adapter_handled": True,
-        },
         "melody": {
             "native_name": "melody",
             "adapter_handled": True,
         },
     },
+    # batch_size and extend_stride are not listed: the adapter never read them,
+    # so they were silently dropped on every path (thorwhalen/arioso#15). Add
+    # them back with an adapter that passes them to audiocraft/transformers.
     "supported_affordances": [
         "prompt",
         "duration",
@@ -38,8 +36,6 @@ PLATFORM_CONFIG = {
         "top_p",
         "guidance",
         "model",
-        "batch_size",
-        "extend_stride",
         "melody",
     ],
     "on_unsupported_param": "warn",

@@ -113,6 +113,8 @@ class Adapter(BaseRestAdapter):
         continue_at: float = 0,
         callback_url: str = "",
         negative_prompt: str = "",
+        audio_input: str = "",
+        audio_input_strength: float = 0,
         wait_for_completion: bool = False,
         poll_interval: float = 5.0,
         timeout: float = 300.0,
@@ -137,6 +139,12 @@ class Adapter(BaseRestAdapter):
                 Defaults to SUNO_CALLBACK_URL env var, or a no-op
                 placeholder (polling still works).
             negative_prompt: Styles to exclude (negativeTags).
+            audio_input: Local file path or public URL of audio to start from.
+                Given, the call goes to :meth:`upload_cover` (sunoapi's
+                upload-cover endpoint) with the same prompt, style, lyrics and
+                title, instead of plain generation.
+            audio_input_strength: How much ``audio_input`` shapes the output,
+                0-1 (upload-cover's ``audioWeight``). 0 leaves it to the API.
             wait_for_completion: If True, poll until audio is ready (or
                 timeout). If False (default), return pending Songs immediately.
             poll_interval: Seconds between status checks (default 5).
@@ -150,6 +158,30 @@ class Adapter(BaseRestAdapter):
 
         # Determine if we need customMode (lyrics, genre, or title provided)
         custom_mode = bool(lyrics or genre or title)
+
+        if audio_input:
+            # Same customMode rules as below, expressed in upload_cover's terms:
+            # its customMode is "style or title", and its prompt is the lyrics
+            # in custom mode, the description otherwise.
+            if continue_from:
+                raise ValueError(
+                    "sunoapi: audio_input and continue_from are two different "
+                    "endpoints (upload-cover vs extend); pass one of them."
+                )
+            return self.upload_cover(
+                audio_input,
+                style=(genre or prompt) if custom_mode else "",
+                title=title,
+                prompt=(lyrics or prompt) if custom_mode else prompt,
+                instrumental=instrumental,
+                model=model,
+                callback_url=callback_url,
+                negative_prompt=negative_prompt,
+                audio_weight=audio_input_strength,
+                wait_for_completion=wait_for_completion,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
 
         payload = {
             "model": model,

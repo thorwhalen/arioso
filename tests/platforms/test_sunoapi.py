@@ -384,3 +384,64 @@ def test_sunoapi_get_timestamped_lyrics_needs_task_id(mock_make_session):
     adapter = Adapter(PLATFORM_CONFIG)
     with pytest.raises(ValueError, match="task_id"):
         adapter.get_timestamped_lyrics(Song(id="audio-1", platform="sunoapi", status="complete"))
+
+
+# --- audio_input routes to upload-cover (thorwhalen/arioso#15) ---------------
+
+
+def _cover_session(mock_make_session):
+    mock_session = MagicMock()
+    mock_session.post.return_value.json.return_value = {
+        "code": 200,
+        "data": {"taskId": "cover-task"},
+    }
+    mock_make_session.return_value = mock_session
+    return mock_session
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_audio_input_goes_to_upload_cover(mock_make_session):
+    """audio_input / audio_input_strength used to be declared but never read."""
+    session = _cover_session(mock_make_session)
+    songs = Adapter(PLATFORM_CONFIG).generate(
+        "dreamy synth pop",
+        audio_input="https://example.com/seed.mp3",
+        audio_input_strength=0.7,
+        callback_url=CALLBACK_URL,
+    )
+    url, kwargs = session.post.call_args[0][0], session.post.call_args[1]
+    assert url.endswith("/api/v1/generate/upload-cover")
+    payload = kwargs["json"]
+    assert payload["uploadUrl"] == "https://example.com/seed.mp3"
+    assert payload["audioWeight"] == 0.7
+    assert payload["customMode"] is False
+    assert payload["prompt"] == "dreamy synth pop"
+    assert songs[0].id == "cover-task"
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_audio_input_keeps_generate_custom_mode_rules(mock_make_session):
+    """Lyrics + genre: style is the genre and the prompt carries the lyrics,
+    exactly as plain generation builds its customMode payload."""
+    session = _cover_session(mock_make_session)
+    Adapter(PLATFORM_CONFIG).generate(
+        "ignored as style",
+        genre="folk",
+        lyrics="la la la",
+        title="T",
+        audio_input="https://example.com/seed.mp3",
+        callback_url=CALLBACK_URL,
+    )
+    payload = session.post.call_args[1]["json"]
+    assert payload["customMode"] is True
+    assert (payload["style"], payload["prompt"], payload["title"]) == ("folk", "la la la", "T")
+    assert "audioWeight" not in payload  # 0 leaves it to the API
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_audio_input_with_continue_from_is_refused(mock_make_session):
+    _cover_session(mock_make_session)
+    with pytest.raises(ValueError, match="audio_input and continue_from"):
+        Adapter(PLATFORM_CONFIG).generate(
+            "x", audio_input="https://example.com/a.mp3", continue_from="clip-1"
+        )

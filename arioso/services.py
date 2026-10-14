@@ -1,8 +1,9 @@
 """Service layer providing rich access to music generation platforms.
 
 Exposes platforms as a nested Mapping/namespace structure with three
-access levels: unified (translated + validated), native (adapter's own
-signature), and raw (the adapter instance).
+access levels: unified (validated, then passed to the adapter under the
+unified names), native (adapter's own signature), and raw (the adapter
+instance).
 
 Usage::
 
@@ -99,7 +100,7 @@ class ServiceHandle(Mapping):
 
     Exposes:
 
-    - ``generate`` -- unified affordance names, validated + translated.
+    - ``generate`` -- unified affordance names, validated.
     - ``native_generate`` -- adapter's own ``generate`` with native params.
     - ``config`` -- full ``PLATFORM_CONFIG`` dict.
     - ``info`` -- lightweight summary dict.
@@ -157,7 +158,7 @@ class ServiceHandle(Mapping):
 
     @functools.cached_property
     def generate(self):
-        """Generate with unified affordance names, validated and translated."""
+        """Generate with unified affordance names, validated."""
         return _make_validated_generate(self.native_generate, self.config, self._name)
 
     # -- Mapping protocol ---------------------------------------------------
@@ -269,57 +270,43 @@ class SliceMapping(Mapping):
 
 
 def _make_validated_generate(native_func, config: dict, platform_name: str):
-    """Wrap an adapter's generate with translation and validation.
+    """Wrap an adapter's generate with validation, passing unified names through.
 
-    The returned function accepts unified affordance names, validates them,
-    translates to native names, and calls the underlying adapter.
+    The returned function accepts unified affordance names, validates them, and
+    calls the adapter with those same names -- exactly what ``arioso.generate``
+    does. Every adapter takes unified names: a custom ``Adapter.generate`` reads
+    them directly, and the REST fallback built by
+    :func:`arioso.translation.make_generate_func` translates to native names
+    itself. Translating here as well renamed ``guidance`` to ``cfg_coef`` (and
+    ~40 others) before the adapter saw them, so its ``**kwargs`` absorbed them
+    and the default was used instead (thorwhalen/arioso#15).
     """
-    from arioso.translation import check_supported_params, make_kwargs_trans
+    from arioso.translation import check_supported_params
 
     param_map = config.get("param_map", {})
     supported = set(config.get("supported_affordances", []))
     # One source of truth for "supported" (thorwhalen/arioso#13): the config's
     # ``supported_affordances``, judged by ``check_supported_params`` exactly as
-    # ``arioso.generate`` judges it, with the platform's own policy. The
-    # translator only renames: a supported affordance with no ``param_map``
-    # entry (sunoapi's ``audio_input``) passes through under its unified name,
-    # as ``arioso.generate`` passes it, and an unsupported one is dropped
-    # silently here because the check has already warned or raised.
-    kwargs_trans = make_kwargs_trans(
-        param_map,
-        on_unsupported="ignore",
-        passthrough=tuple(
-            set(config.get("adapter_params", ()))
-            | (supported - set(param_map))
-            | ({"prompt"} - set(param_map))  # always reaches the adapter
-        ),
-    )
+    # ``arioso.generate`` judges it, with the platform's own policy. An
+    # unsupported name is then dropped here, because the check has already
+    # warned or raised.
+    accepted = supported | set(config.get("adapter_params", ()))
     guard_config = {**config, "name": config.get("name", platform_name)}
 
     @functools.wraps(native_func)
     def validated_generate(prompt: str, **kwargs):
         check_supported_params(kwargs, guard_config)
         _validate_kwargs(kwargs, supported, param_map, platform_name)
-        translated = kwargs_trans({"prompt": prompt, **kwargs})
-        # prompt may have been translated; extract it if still present
-        prompt_val = translated.pop("prompt", None)
-        # Some adapters expect prompt as first positional arg
-        if prompt_val is not None:
-            # Check if 'prompt' was mapped to a different native name
-            prompt_native = param_map.get("prompt", {}).get("native_name", "prompt")
-            if prompt_native != "prompt" and prompt_native in translated:
-                # prompt was already translated to its native name
-                return native_func(**translated)
-            return native_func(prompt_val, **translated)
-        return native_func(**translated)
+        kwargs = {k: v for k, v in kwargs.items() if k in accepted}
+        return native_func(prompt, **kwargs)
 
     validated_generate.__name__ = "generate"
     validated_generate.__qualname__ = f"{platform_name}.generate"
     validated_generate.__doc__ = (
         f"Generate music via {platform_name} using unified affordance names.\n\n"
         f"Supported affordances: {', '.join(sorted(supported)) or '(see config)'}\n\n"
-        f"Translates unified parameter names to {platform_name}'s native names "
-        f"and validates before calling the adapter."
+        f"Validates the parameters, then passes them to {platform_name}'s adapter "
+        f"under their unified names, as ``arioso.generate`` does."
     )
     return validated_generate
 

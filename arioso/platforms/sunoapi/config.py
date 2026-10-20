@@ -21,7 +21,17 @@ PLATFORM_CONFIG = {
         "model": {
             "native_name": "model",
             "native_default": "V6",
-            "choices": ["V6", "V6_WILD", "V6_MINI", "V5_5", "V5", "V4_5PLUS", "V4_5ALL", "V4_5", "V4"],
+            "choices": [
+                "V6",
+                "V6_WILD",
+                "V6_MINI",
+                "V5_5",
+                "V5",
+                "V4_5PLUS",
+                "V4_5ALL",
+                "V4_5",
+                "V4",
+            ],
             "default_env_var": "SUNO_DEFAULT_MODEL",
         },
         "duration": {"native_name": "duration", "adapter_handled": True},

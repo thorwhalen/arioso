@@ -11,7 +11,17 @@ from arioso.platforms._base_adapter import BaseRestAdapter
 
 # Model versions accepted by sunoapi.org (2026-10: the V6 family is current; the rest still
 # accepted but deprecated).
-SUNO_MODELS = ("V6", "V6_WILD", "V6_MINI", "V5_5", "V5", "V4_5PLUS", "V4_5ALL", "V4_5", "V4")
+SUNO_MODELS = (
+    "V6",
+    "V6_WILD",
+    "V6_MINI",
+    "V5_5",
+    "V5",
+    "V4_5PLUS",
+    "V4_5ALL",
+    "V4_5",
+    "V4",
+)
 # Models that honour an exact ``duration`` (10-360 s).
 SUNO_DURATION_MODELS = ("V6", "V6_WILD", "V6_MINI", "V5_5")
 SUNO_DURATION_RANGE = (10, 360)
@@ -95,7 +105,10 @@ def _custom_controls(
                 f"sunoapi: duration needs one of {SUNO_DURATION_MODELS}, not {model!r}"
             )
         controls["duration"] = duration
-    for name, value in (("styleWeight", style_weight), ("weirdnessConstraint", weirdness)):
+    for name, value in (
+        ("styleWeight", style_weight),
+        ("weirdnessConstraint", weirdness),
+    ):
         if value is not None:
             if not 0 <= value <= 1:
                 raise ValueError(f"sunoapi: {name} must be 0-1, got {value}")
@@ -107,7 +120,9 @@ def _custom_controls(
         controls["variety"] = int(variety)
     if vocal_gender:
         if vocal_gender not in ("m", "f"):
-            raise ValueError(f"sunoapi: vocal_gender must be 'm' or 'f', got {vocal_gender!r}")
+            raise ValueError(
+                f"sunoapi: vocal_gender must be 'm' or 'f', got {vocal_gender!r}"
+            )
         controls["vocalGender"] = vocal_gender
     if controls and not custom_mode:
         raise ValueError(

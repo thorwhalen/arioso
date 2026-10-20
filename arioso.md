@@ -1,4 +1,4 @@
-> built 2026-10-20 08:15 UTC from 50bb1b4 (main) · arioso 0.0.25. Details: build_info.json
+> built 2026-10-20 08:35 UTC from fefa640 (main) · arioso 0.0.26. Details: build_info.json
 
 # index.html.md
 
@@ -2291,7 +2291,7 @@ Poll until a task completes. Returns list of completed Song objects.
 
 Convert arbitrary text to a filesystem-safe string.
 
-### arioso.tools.submit_cover(source_path, \*, style='', prompt='', instrumental=True, model='V5', audio_weight=0.5, style_weight=0.5, source_prep=functools.partial(<function wav_to_mp3>, max_duration=480), adapter='sunoapi')
+### arioso.tools.submit_cover(source_path, \*, style='', prompt='', instrumental=True, model='V6', audio_weight=0.5, style_weight=0.5, source_prep=functools.partial(<function wav_to_mp3>, max_duration=480), adapter='sunoapi')
 
 Submit an upload-cover job. Returns `(task_id, source_path)`.
 
@@ -2412,7 +2412,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-20 08:15 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/50bb1b4f8f435781598e091557341e89c307e08d"><code>50bb1b4</code></a> on branch <code>main</code>, for **arioso 0.0.25** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 08:35 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/fefa640005dd54d22588ab521f93cfa1dcdaf8cc"><code>fefa640</code></a> on branch <code>main</code>, for **arioso 0.0.26** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2421,9 +2421,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/50bb1b4f8f435781598e091557341e89c307e08d"><code>50bb1b4f8f435781598e091557341e89c307e08d</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/fefa640005dd54d22588ab521f93cfa1dcdaf8cc"><code>fefa640005dd54d22588ab521f93cfa1dcdaf8cc</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.25</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.26</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2432,9 +2432,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39391910937">39391910937</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39394230194">39394230194</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>607992d753b7930d2c7ebbcd054aa6b53dc186d6</code> (in the history of the built commit) |
+| Event commit | <code>7360adf4a764b41f12f41a44c693c46eca60c04e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2459,13 +2459,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.25/">0.0.25</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.26/">0.0.26</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 50bb1b4f8f435781598e091557341e89c307e08d
+git checkout fefa640005dd54d22588ab521f93cfa1dcdaf8cc
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

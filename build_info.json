@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-20T08:15:59Z",
+  "built_at": "2026-10-20T08:35:03Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.25",
+    "version": "0.0.26",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "50bb1b4f8f435781598e091557341e89c307e08d",
-    "short_commit": "50bb1b4",
+    "commit": "fefa640005dd54d22588ab521f93cfa1dcdaf8cc",
+    "short_commit": "fefa640",
     "branch": "main",
     "tags": [
-      "0.0.25"
+      "0.0.26"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/50bb1b4f8f435781598e091557341e89c307e08d",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/fefa640005dd54d22588ab521f93cfa1dcdaf8cc",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "607992d753b7930d2c7ebbcd054aa6b53dc186d6",
+    "sha": "7360adf4a764b41f12f41a44c693c46eca60c04e",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39391910937",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/39391910937",
+    "run_id": "39394230194",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/39394230194",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -62,11 +62,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.25",
+    "latest": "0.0.26",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout 50bb1b4f8f435781598e091557341e89c307e08d\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout fefa640005dd54d22588ab521f93cfa1dcdaf8cc\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

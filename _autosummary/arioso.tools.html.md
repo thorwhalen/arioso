@@ -43,7 +43,7 @@ Poll until a task completes. Returns list of completed Song objects.
 
 Convert arbitrary text to a filesystem-safe string.
 
-### arioso.tools.submit_cover(source_path, \*, style='', prompt='', instrumental=True, model='V5', audio_weight=0.5, style_weight=0.5, source_prep=functools.partial(<function wav_to_mp3>, max_duration=480), adapter='sunoapi')
+### arioso.tools.submit_cover(source_path, \*, style='', prompt='', instrumental=True, model='V6', audio_weight=0.5, style_weight=0.5, source_prep=functools.partial(<function wav_to_mp3>, max_duration=480), adapter='sunoapi')
 
 Submit an upload-cover job. Returns `(task_id, source_path)`.
 

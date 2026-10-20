@@ -38,18 +38,54 @@ SILENCE_DB = -60.0
 def read_audio(path: str | os.PathLike, sr: int = DFLT_SR) -> np.ndarray:
     """Decode any audio file to mono float32 at ``sr`` (needs ffmpeg)."""
     raw = subprocess.run(
-        ["ffmpeg", "-v", "error", "-i", str(path), "-f", "f32le", "-ac", "1", "-ar", str(sr), "pipe:1"],
-        capture_output=True, check=True,
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-f",
+            "f32le",
+            "-ac",
+            "1",
+            "-ar",
+            str(sr),
+            "pipe:1",
+        ],
+        capture_output=True,
+        check=True,
     ).stdout
     return np.frombuffer(raw, dtype=np.float32).copy()
 
 
-def write_audio(path: str | os.PathLike, y: np.ndarray, sr: int = DFLT_SR, *, quality: str = "2") -> str:
+def write_audio(
+    path: str | os.PathLike, y: np.ndarray, sr: int = DFLT_SR, *, quality: str = "2"
+) -> str:
     """Encode a mono float array to a file; MP3 (VBR ``quality``) or anything ffmpeg infers from the name."""
-    codec = ["-c:a", "libmp3lame", "-q:a", quality] if str(path).lower().endswith(".mp3") else []
+    codec = (
+        ["-c:a", "libmp3lame", "-q:a", quality]
+        if str(path).lower().endswith(".mp3")
+        else []
+    )
     subprocess.run(
-        ["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ac", "1", "-ar", str(sr), "-i", "pipe:0", *codec, str(path)],
-        input=np.asarray(y, dtype=np.float32).tobytes(), check=True,
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-y",
+            "-f",
+            "f32le",
+            "-ac",
+            "1",
+            "-ar",
+            str(sr),
+            "-i",
+            "pipe:0",
+            *codec,
+            str(path),
+        ],
+        input=np.asarray(y, dtype=np.float32).tobytes(),
+        check=True,
     )
     return str(path)
 
@@ -102,7 +138,7 @@ def phrase_starts(
     for i in range(1, len(db) - 1):
         if not (db[i] <= db[i - 1] and db[i] < db[i + 1]):
             continue
-        after = db[i + 1: i + 1 + w]
+        after = db[i + 1 : i + 1 + w]
         if not len(after):
             continue
         depth = after.max() - db[i]
@@ -146,7 +182,11 @@ def plan_starts(
             end = starts[-1] + durations[k - 1]
             lo, hi, preferred = end + min_gap_s, end + max_gap_s, end + gap_s
         candidates = [p + lead_s for p in phrases if lo <= p + lead_s <= hi]
-        start = min(candidates, key=lambda c: abs(c - preferred)) if candidates else preferred
+        start = (
+            min(candidates, key=lambda c: abs(c - preferred))
+            if candidates
+            else preferred
+        )
         starts.append(round(start, 2))
     return starts
 
@@ -257,7 +297,7 @@ def score(
     voice = np.zeros(n, dtype=np.float32)
     for s, seg in zip(starts, segments):
         i = int(round(s * sr))
-        voice[i: i + len(seg)] += seg[: n - i]
+        voice[i : i + len(seg)] += seg[: n - i]
     speech_db = active_db(np.concatenate(list(segments)), sr)
     music_db = active_db(music, sr)
     music_gain_db = speech_db + gap_rel_db - music_db
@@ -265,11 +305,22 @@ def score(
     bed[: min(n, len(music))] = music[:n]
     music_end = min(end_s, len(music) / sr)
     gain = duck_gain(
-        n, sr, [(s, s + d) for s, d in zip(starts, durations)],
-        under_db=under_rel_db - gap_rel_db, end_s=music_end, **(duck_kwargs or {}),
+        n,
+        sr,
+        [(s, s + d) for s, d in zip(starts, durations)],
+        under_db=under_rel_db - gap_rel_db,
+        end_s=music_end,
+        **(duck_kwargs or {}),
     )
     mix = voice + bed * gain * 10 ** (music_gain_db / 20)
     top = float(np.max(np.abs(mix))) if len(mix) else 0.0
     if top > peak:
         mix *= peak / top
-    return Scored(mix.astype(np.float32), sr, list(starts), durations, list(phrases), round(music_gain_db, 1))
+    return Scored(
+        mix.astype(np.float32),
+        sr,
+        list(starts),
+        durations,
+        list(phrases),
+        round(music_gain_db, 1),
+    )

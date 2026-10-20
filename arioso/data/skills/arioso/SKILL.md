@@ -87,7 +87,7 @@ songs = arioso.generate_many(
     lyrics=poem_text,
     title="Il pleut",  # REQUIRED in customMode — the adapter will not invent one
     genre="chanson, ambient, french",  # sets `style` explicitly; do this too
-    model="V5",
+    model="V6",
 )
 ```
 
@@ -95,11 +95,12 @@ Three more Suno rules in the same family:
 
 - **`instrumental=True` discards `lyrics`.** The adapter only sends lyrics
   `if not instrumental`. Never pass both.
-- **Length caps depend on the model, and the default model is `V4`** — the
-  tightest one. Lyrics: 3,000 chars on V4, 5,000 on everything later. Style:
-  200 on V4, 1,000 later. Title: 80 on V4 and `V4_5ALL`, 100 on
-  `V4_5`/`V4_5PLUS`/`V5`. Pass `model="V5"` (or set `SUNO_DEFAULT_MODEL`) for a
-  long poem. Valid values: `V4`, `V4_5`, `V4_5ALL`, `V4_5PLUS`, `V5`.
+- **The default model is `V6`** (2026-10: `V6`, `V6_WILD`, `V6_MINI` are current;
+  `V5_5`, `V5`, `V4_5PLUS`, `V4_5ALL`, `V4_5`, `V4` are deprecated but accepted).
+  Lyrics up to 5,000 chars and style up to 1,000 on V6; V4 is the tight one (3,000 / 200).
+- **Custom-mode controls** (pass `genre=` or `title=` to be in custom mode):
+  `duration=` exact length 10-360 s (V6 family and V5_5), `style_weight=` 0-1 (Suno's
+  "Style Influence"), `weirdness=` 0-1, `variety=` 0-4, `vocal_gender="m"|"f"`.
 - **A rejected lyric fails at poll time, not call time** — `get_status` raises
   `RuntimeError` with `SENSITIVE_WORD_ERROR` once the job has run.
 
@@ -117,7 +118,7 @@ songs = arioso.generate_many(
     lyrics=poem_text,
     title="Il pleut",
     genre="chanson",
-    model="V5",
+    model="V6",
     wait_for_completion=True,
     timeout=600,  # default is 300s; Suno often needs more
 )
@@ -281,7 +282,8 @@ Suno's `upload_extend` / `upload_cover`, its local task store
 | Song has no vocals though you passed `lyrics` | the platform is not one of the four | check `supported_affordances`; switch to `sunoapi` |
 | Suno rejects the request outright | customMode with no `title` | always pass `title=` alongside `lyrics=` |
 | Lyrics ignored on Suno specifically | `instrumental=True` was also passed | drop `instrumental` |
-| Long poem truncated | default model is `V4` (3,000 chars) | `model="V5"` |
+| Long poem truncated | an old `V4` model (3,000 chars) | use the default `V6` |
+| Song length not what you need | no `duration=` | `duration=` 10-360 s (custom mode, V6 family) |
 | `ValueError: ... has no audio_url` | job not finished | `poll_status` / `check_status` before `fetch_audio` |
 | `TimeoutError` after 300s | Suno is slower than the default | raise `timeout=` (600–900) |
 | `RuntimeError ... SENSITIVE_WORD_ERROR` | the lyric or style tripped a filter | reword and regenerate; that attempt still cost credit |

@@ -175,7 +175,11 @@ class FalAdapter:
     # -- building the call ---------------------------------------------------
 
     def _endpoint(self, params: dict) -> tuple:
-        kind = "audio_to_audio" if params.get("audio_input") is not None else "text_to_audio"
+        kind = (
+            "audio_to_audio"
+            if params.get("audio_input") is not None
+            else "text_to_audio"
+        )
         endpoint = self.spec["endpoints"].get(kind)
         if endpoint is None:
             raise ValueError(f"{self.platform} has no {kind} endpoint")
@@ -183,7 +187,11 @@ class FalAdapter:
 
     def _value(self, native: str, rule: dict, params: dict, built: dict):
         given = next(
-            (params[name] for name in rule.get("from", ()) if params.get(name) not in _ABSENT),
+            (
+                params[name]
+                for name in rule.get("from", ())
+                if params.get(name) not in _ABSENT
+            ),
             None,
         )
         force = rule.get("force")
@@ -253,7 +261,9 @@ class FalAdapter:
         ]
         names = {name for rule in rules for name in rule.get("from", ())}
         names |= {rule["force"]["when"] for rule in rules if "force" in rule}
-        return frozenset(names | set(self.spec.get("native_extras", ())) | {"prompt", "fetch"})
+        return frozenset(
+            names | set(self.spec.get("native_extras", ())) | {"prompt", "fetch"}
+        )
 
     # -- the adapter contract --------------------------------------------------
 
@@ -263,5 +273,9 @@ class FalAdapter:
         endpoint, arguments, uploaded = self.build(params)
         result = self._run(endpoint, arguments)
         meta = {k: v for k, v in arguments.items() if k not in uploaded}
-        meta.update(endpoint=endpoint, audio_to_audio=params.get("audio_input") is not None)
-        return fal_audio_song(result, platform=self.platform, metadata=meta, fetch=fetch)
+        meta.update(
+            endpoint=endpoint, audio_to_audio=params.get("audio_input") is not None
+        )
+        return fal_audio_song(
+            result, platform=self.platform, metadata=meta, fetch=fetch
+        )

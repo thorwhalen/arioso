@@ -65,7 +65,10 @@ PLATFORM_CONFIG = {
     "fal": {
         "platform": "stable_audio_25",
         "shared": {
-            "prompt": {"from": ["prompt"], "required": "stable_audio_25 requires a non-empty prompt"},
+            "prompt": {
+                "from": ["prompt"],
+                "required": "stable_audio_25 requires a non-empty prompt",
+            },
             "num_inference_steps": {"from": ["num_steps"], "default": 8},
             "guidance_scale": {"from": ["guidance"], "default": 1.0},
             "seed": {"from": ["seed"], "type": "int"},
@@ -85,9 +88,17 @@ PLATFORM_CONFIG = {
             "audio_to_audio": {
                 "endpoint": "fal-ai/stable-audio-25/audio-to-audio",
                 "arguments": {
-                    "total_seconds": {"from": ["duration"], "type": "int", "clamp": [1, 190]},
+                    "total_seconds": {
+                        "from": ["duration"],
+                        "type": "int",
+                        "clamp": [1, 190],
+                    },
                     "audio_url": {"from": ["audio_input"], "upload": True},
-                    "strength": {"from": ["audio_input_strength"], "default": 0.8, "range": [0, 1]},
+                    "strength": {
+                        "from": ["audio_input_strength"],
+                        "default": 0.8,
+                        "range": [0, 1],
+                    },
                 },
             },
         },

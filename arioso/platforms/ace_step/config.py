@@ -108,14 +108,21 @@ PLATFORM_CONFIG = {
             "text_to_audio": {
                 "endpoint": "fal-ai/ace-step",
                 "arguments": {
-                    "duration": {"from": ["duration"], "default": 60.0, "type": "float"},
+                    "duration": {
+                        "from": ["duration"],
+                        "default": 60.0,
+                        "type": "float",
+                    },
                 },
             },
             "audio_to_audio": {
                 "endpoint": "fal-ai/ace-step/audio-to-audio",
                 "arguments": {
                     "audio_url": {"from": ["audio_input"], "upload": True},
-                    "original_tags": {"from": ["original_tags"], "default_from": "tags"},
+                    "original_tags": {
+                        "from": ["original_tags"],
+                        "default_from": "tags",
+                    },
                     "original_lyrics": {"from": ["original_lyrics"], "default": ""},
                     "edit_mode": {
                         "from": ["edit_mode"],

@@ -34,6 +34,7 @@
 <link href="_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/epythet.css?v=3baad687" />
   
@@ -43,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="_static/documentation_options.js?v=f91d8841"></script>
+    <script src="_static/documentation_options.js?v=5d650c58"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.24" />
+  <meta name="docsearch:version" content="0.0.25" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -383,7 +384,7 @@ machine-readable copies of this documentation.</p>
 <p>Skills are folders holding a <code class="docutils literal notranslate"><span class="pre">SKILL.md</span></code> (the <a class="reference external" href="https://agentskills.io">Agent Skills</a> format): a description that tells an agent when to use it and a body with the procedure. Install one into your agent with <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">skill</span></code> (any host: <code class="docutils literal notranslate"><span class="pre">--agent</span> <span class="pre">claude-code</span></code>, <code class="docutils literal notranslate"><span class="pre">copilot</span></code>, <code class="docutils literal notranslate"><span class="pre">cursor</span></code>, <code class="docutils literal notranslate"><span class="pre">codex</span></code>, <code class="docutils literal notranslate"><span class="pre">gemini</span></code>), or use the copy bundled in the wheel.</p>
 <section id="arioso">
 <h3><code class="docutils literal notranslate"><span class="pre">arioso</span></code><a class="headerlink" href="#arioso" title="Link to this heading">#</a></h3>
-<p>Generate music with AI using the <code class="docutils literal notranslate"><span class="pre">arioso</span></code> package — one Python interface over 16 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, ACE-Step, MusicGen, Stable Audio, Stable Audio 2.5, Riffusion, Harmonai, Lyria, Mubert, Beatoven, Loudly, Jen). Use when the user wants to “make a song”, “generate music”, “write a song about X”, “turn this poem/text/script into a song”, “set these lyrics to music”, “text to music”, “make a theme tune”, “I need background music”, or “a royalty-free instrumental track” — or when they name a platform (Suno, ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the one-line call, which five backends can actually SING lyrics you wrote (the other eleven drop them silently), the Suno customMode title/genre requirement, which backends are free versus paid, polling an async job, and writing the audio to disk.</p>
+<p>Generate music with AI using the <code class="docutils literal notranslate"><span class="pre">arioso</span></code> package — one Python interface over 16 music-generation backends (Suno, ElevenLabs Music, Udio, YuE, ACE-Step, MusicGen, Stable Audio, Stable Audio 2.5, Riffusion, Harmonai, Lyria, Mubert, Beatoven, Loudly, Jen). Use when the user wants to “make a song”, “generate music”, “write a song about X”, “turn this poem/text/script into a song”, “set these lyrics to music”, “text to music”, “make a theme tune”, “I need background music”, or “a royalty-free instrumental track”, “music under the narration”, “a bed for this voice-over” — or when they name a platform (Suno, ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the one-line call, which five backends can actually SING lyrics you wrote (the other eleven drop them silently), the Suno customMode title/genre requirement, which backends are free versus paid, polling an async job, and writing the audio to disk.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gh<span class="w"> </span>skill<span class="w"> </span>install<span class="w"> </span>thorwhalen/arioso<span class="w"> </span>arioso<span class="w"> </span>--agent<span class="w"> </span>claude-code
 </pre></div>
 </div>

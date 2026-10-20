@@ -59,7 +59,12 @@ def read_audio(path: str | os.PathLike, sr: int = DFLT_SR) -> np.ndarray:
 
 
 def write_audio(
-    path: str | os.PathLike, y: np.ndarray, sr: int = DFLT_SR, *, quality: str = "2", bitrate: str | None = None
+    path: str | os.PathLike,
+    y: np.ndarray,
+    sr: int = DFLT_SR,
+    *,
+    quality: str = "2",
+    bitrate: str | None = None,
 ) -> str:
     """Encode a mono float array to a file; MP3 or anything ffmpeg infers from the name.
 

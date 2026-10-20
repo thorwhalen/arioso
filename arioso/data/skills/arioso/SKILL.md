@@ -8,7 +8,7 @@ description: >-
   Use when the user wants to "make a song", "generate music", "write a song
   about X", "turn this poem/text/script into a song", "set these lyrics to
   music", "text to music", "make a theme tune", "I need background music", or
-  "a royalty-free instrumental track" — or when they name a platform (Suno,
+  "a royalty-free instrumental track", "music under the narration", "a bed for this voice-over" — or when they name a platform (Suno,
   ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the
   one-line call, which five backends can actually SING lyrics you wrote (the
   other eleven drop them silently), the Suno customMode title/genre requirement,
@@ -251,6 +251,16 @@ with `[413] This audio matches an existing recording in our catalog.` at poll
 time. Suno matches the *composition* (melody, harmony, structure), not just the
 recording, so no re-render or re-performance gets through. The fal-hosted
 platforms did not check (2026-10). Why, and what to expect: [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/music-gen-upload-copyright-detection.md).
+
+## Music under a narration (a bed for an audiobook, podcast or voice-over)
+
+When the music goes *under speech*, the work is mostly fitting and post-production, not generation. Read the [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/scoring-narration.md) before choosing a route; in short:
+
+- **Always instrumental**, and exclude vocals, singing, choir and humming in the style. A sparse, unmetered texture (a drone with free melody, like a Hindustani alap) sits under speech without fighting its rhythm; save the pulse for the gaps between sections.
+- **Fit to the timeline:** generate a little longer than needed and cut at downbeats, or ask for exact section lengths with ElevenLabs Music's composition plan (`platform="elevenlabs"`, `structure=[...]`). Suno's duration control is a target, not a guarantee.
+- **Accompaniment around an existing voice** exists in Suno (Add Instrumental, Studio) and ACE-Step (Vocal2BGM), but none is documented for spoken word: try one short section first and keep only the instrumental stem.
+- **Duck and swell** with a gain envelope built from the narration's speech map (about -18 to -22 dB under speech, ramps of 0.5-2 s), or ffmpeg `sidechaincompress`. To sync more closely, choose the gaps between sections so each one starts on a musical phrase (beats from `beat_this`, sections from `allin1`).
+- Suno (since 2026-09) has only v6-family models, monthly download caps on paid plans, and watermarks its tracks.
 
 ## Three levels of control
 

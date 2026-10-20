@@ -33,6 +33,7 @@
    named_prompts
    platforms
    registry
+   scoring
    services
    tools
    translation

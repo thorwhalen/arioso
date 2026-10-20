@@ -95,6 +95,10 @@ def _load_adapter(name: str, config: dict):
             return adapter_class(config)
     except ImportError:
         pass
+    if config.get("fal"):  # a fal-hosted model declared by config alone
+        from arioso._fal import FalAdapter
+
+        return FalAdapter(config)
     # Fall back to auto-generated adapter from config
     from arioso.translation import make_generate_func
 

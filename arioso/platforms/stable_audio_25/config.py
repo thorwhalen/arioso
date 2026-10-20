@@ -58,4 +58,38 @@ PLATFORM_CONFIG = {
         "max_seconds": 190,
         "default_seconds": 30,
     },
+    # How unified affordances become fal arguments (see arioso._fal.FalAdapter).
+    # fal's own text-to-audio duration default is its 190 s maximum, the most
+    # expensive clip, so text-to-audio defaults to 30 s; audio-to-audio names the
+    # field total_seconds and defaults to the input's length.
+    "fal": {
+        "platform": "stable_audio_25",
+        "shared": {
+            "prompt": {"from": ["prompt"], "required": "stable_audio_25 requires a non-empty prompt"},
+            "num_inference_steps": {"from": ["num_steps"], "default": 8},
+            "guidance_scale": {"from": ["guidance"], "default": 1.0},
+            "seed": {"from": ["seed"], "type": "int"},
+        },
+        "endpoints": {
+            "text_to_audio": {
+                "endpoint": "fal-ai/stable-audio-25/text-to-audio",
+                "arguments": {
+                    "seconds_total": {
+                        "from": ["duration"],
+                        "default": 30,
+                        "type": "int",
+                        "clamp": [1, 190],
+                    },
+                },
+            },
+            "audio_to_audio": {
+                "endpoint": "fal-ai/stable-audio-25/audio-to-audio",
+                "arguments": {
+                    "total_seconds": {"from": ["duration"], "type": "int", "clamp": [1, 190]},
+                    "audio_url": {"from": ["audio_input"], "upload": True},
+                    "strength": {"from": ["audio_input_strength"], "default": 0.8, "range": [0, 1]},
+                },
+            },
+        },
+    },
 }

@@ -4,7 +4,15 @@
 > API wrapper for [Suno](https://suno.com/) — the leading AI music generation platform.
 > Source documentation: [docs.sunoapi.org](https://docs.sunoapi.org/)
 
-**Last updated: 2026-03-13**
+**Last updated: 2026-03-13** (generate parameters re-checked 2026-10-20, see below)
+
+## 2026-10 changes to `/api/v1/generate` (from the live docs)
+
+- Models: `V6` (default), `V6_WILD`, `V6_MINI` are current; `V5_5`, `V5`, `V4_5PLUS`, `V4_5ALL`, `V4_5`, `V4` are deprecated.
+- New custom-mode fields: `duration` (10-360 s; V5_5 and the V6 family), `styleWeight` (0-1), `weirdnessConstraint` (0-1), `audioWeight` (0-1, vocals only), `variety` (integer 0-4, default 1), `vocalGender` (`m`/`f`), `lyrics` (up to 5,000 chars on V6, takes priority over `prompt`), `personaId`/`personaModel`.
+- Non-custom mode accepts `imageUrls` (up to 5), `videoUrls` (1) and `audioUrls` as inputs.
+- Limits on V6: style and negativeTags up to 1,000 chars, title up to 80.
+- arioso maps them as `duration=`, `style_weight=`, `weirdness=`, `variety=`, `vocal_gender=` (adapter-level parameters; validated before the call).
 
 ---
 

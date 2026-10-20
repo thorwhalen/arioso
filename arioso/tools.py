@@ -15,7 +15,7 @@ from arioso.base import Song
 DFLT_MAX_DURATION = 480  # 8 minutes (sunoapi limit)
 DFLT_POLL_INTERVAL = 15
 DFLT_TIMEOUT = 600
-DFLT_MODEL = "V5"
+DFLT_MODEL = "V6"
 DFLT_AUDIO_WEIGHT = 0.5
 DFLT_STYLE_WEIGHT = 0.5
 DFLT_PLATFORM = os.getenv("ACCOMPY_DFLT_PLATFORM", "sunoapi")

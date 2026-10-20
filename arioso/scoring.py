@@ -59,14 +59,16 @@ def read_audio(path: str | os.PathLike, sr: int = DFLT_SR) -> np.ndarray:
 
 
 def write_audio(
-    path: str | os.PathLike, y: np.ndarray, sr: int = DFLT_SR, *, quality: str = "2"
+    path: str | os.PathLike, y: np.ndarray, sr: int = DFLT_SR, *, quality: str = "2", bitrate: str | None = None
 ) -> str:
-    """Encode a mono float array to a file; MP3 (VBR ``quality``) or anything ffmpeg infers from the name."""
-    codec = (
-        ["-c:a", "libmp3lame", "-q:a", quality]
-        if str(path).lower().endswith(".mp3")
-        else []
-    )
+    """Encode a mono float array to a file; MP3 or anything ffmpeg infers from the name.
+
+    MP3 is VBR at ``quality`` unless ``bitrate`` (e.g. ``"128k"``) asks for constant bitrate, which
+    browsers can seek precisely (VBR seeking goes through a coarse table and can land a second or
+    more away from the requested time).
+    """
+    mp3 = ["-b:a", bitrate] if bitrate else ["-q:a", quality]
+    codec = ["-c:a", "libmp3lame", *mp3] if str(path).lower().endswith(".mp3") else []
     subprocess.run(
         [
             "ffmpeg",

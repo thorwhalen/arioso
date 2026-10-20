@@ -50,3 +50,18 @@ def test_score_places_segments_and_sets_levels():
     i = int((out.starts[0] + 1.5) * SR)
     seg = out.mix[i: i + SR // 2]
     assert np.sqrt(np.mean(seg ** 2)) == pytest.approx(0.2 / np.sqrt(2), rel=0.1)  # the voice dominates
+
+
+def test_write_audio_constant_bitrate(tmp_path):
+    import shutil
+    import subprocess
+
+    if not shutil.which("ffprobe"):
+        pytest.skip("needs ffprobe")
+    from arioso.scoring import write_audio
+
+    y = (0.1 * np.sin(2 * np.pi * 220 * np.arange(SR * 3) / SR)).astype(np.float32)
+    path = write_audio(tmp_path / "c.mp3", y, SR, bitrate="64k")
+    rate = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=bit_rate", "-of", "csv=p=0", path],
+                          capture_output=True, text=True).stdout.strip()
+    assert rate == "64000"

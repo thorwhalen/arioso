@@ -258,7 +258,7 @@ ffmpeg -i music.wav -i narration.wav -filter_complex \
 
 - Exact-length sections: ElevenLabs Music's composition plan, reached through `arioso.generate(..., platform="elevenlabs", structure=[...])` (each section a dict passed into `composition_plan.sections`; check the live API for the per-section duration field before relying on it).
 - Accompaniment from an existing recording: `arioso.enhance(audio, prompt)` on the audio-in platforms (`ace_step`, `stable_audio_25`, `sunoapi` upload-cover/extend). Suno's Add Instrumental and ACE-Step's Vocal2BGM are not exposed yet.
-- Ducking, beat-aware cutting and gap planning are post-production, outside arioso today (ffmpeg, beat_this, allin1, WhisperX/MFA, Rubber Band).
+- Ducking and phrase-timed pauses: `arioso.scoring` (`phrase_starts`, `plan_starts`, `duck_gain`, `score`), levels 0 to 2 of the pipeline above. Bar-accurate cutting, time-stretching and syllable-level alignment remain outside arioso (beat_this, allin1, WhisperX/MFA, Rubber Band).
 
 ## REFERENCES
 

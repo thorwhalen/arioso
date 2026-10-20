@@ -44,6 +44,10 @@ Repository = "https://github.com/thorwhalen/arioso"
 Documentation = "https://thorwhalen.github.io/arioso"
 
 [project.optional-dependencies]
+# arioso.scoring: music under a narration (ducking, phrase-timed pauses); also needs ffmpeg.
+scoring = [
+    "numpy",
+]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

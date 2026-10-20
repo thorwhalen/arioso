@@ -1,4 +1,4 @@
-> built 2026-10-20 08:57 UTC from 586f153 (main) · arioso 0.0.28. Details: build_info.json
+> built 2026-10-20 12:34 UTC from d336174 (main) · arioso 0.0.29. Details: build_info.json
 
 # index.html.md
 
@@ -957,55 +957,23 @@ Search for prompts matching a query string.
 
 # arioso.platforms.ace_step.adapter
 
-ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.
+ACE-Step adapter: a thin shim over the config-driven `arioso._fal.FalAdapter`.
 
-ACE-Step is steered by comma-separated style *tags*, not a sentence, so the
-unified `prompt` (or `genre`) becomes `tags`. Its audio-to-audio endpoint
-“remixes” an input toward new tags; it also needs `original_tags` describing
-the input, which default to the new tags when not given.
+The mapping from unified affordances to fal arguments lives in this platform’s
+`config.py` (`PLATFORM_CONFIG["fal"]`); nothing here is platform-specific. The
+module-level `fal_run` / `fal_upload_audio` are looked up at call time, so tests
+can patch them here.
 
 ### Classes
 
-| [`Adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#arioso.platforms.ace_step.adapter.Adapter)(config)   | fal.ai ACE-Step adapter.   |
-|--------------------------------------------------------------------|----------------------------|
+| [`Adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#arioso.platforms.ace_step.adapter.Adapter)([config])   | fal.ai ACE-Step adapter.   |
+|----------------------------------------------------------------------|----------------------------|
 
-### *class* arioso.platforms.ace_step.adapter.Adapter(config)
+### *class* arioso.platforms.ace_step.adapter.Adapter(config=None)
 
-Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+Bases: `FalAdapter`
 
 fal.ai ACE-Step adapter.
-
-#### generate(prompt='', , genre='', lyrics='', instrumental=False, duration=60.0, num_steps=27, guidance=15.0, seed=None, audio_input=None, original_tags='', original_lyrics='', edit_mode='remix', fetch=True, \*\*kwargs)
-
-Generate music from tags, or remix `audio_input` toward them.
-
-* **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Style tags (comma-separated works best). `genre` wins
-    when both are given.
-  * **genre** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Style tags; an alias of `prompt` for this platform.
-  * **lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Lyrics to sing. Empty or `instrumental=True` sends
-    `[inst]`, so a remix of a song with vocals comes out
-    instrumental unless you pass its lyrics (or new ones).
-  * **instrumental** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Force an instrumental (discards `lyrics`).
-  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Seconds (text-to-music only; a remix keeps the input’s
-    length).
-  * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – `number_of_steps` (default 27).
-  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – `guidance_scale` (default 15).
-  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed.
-  * **audio_input** – Audio to remix (path, bytes, Song, URL, …). When
-    given, the audio-to-audio endpoint is used.
-  * **original_tags** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Tags describing `audio_input` (defaults to the
-    new tags).
-  * **original_lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Lyrics of `audio_input`, if any.
-  * **edit_mode** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"remix"` (default) or `"lyrics"`.
-  * **fetch** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Download the result so `audio_bytes` is populated.
-  * **\*\*kwargs** – Native fal arguments in `_NATIVE_EXTRAS`
-    (`scheduler`, `guidance_type`, `tag_guidance_scale`, …)
-    are passed through; anything else is ignored.
-* **Return type:**
-  [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
-* **Returns:**
-  A completed Song.
 
 
 # _autosummary/arioso.platforms.ace_step.config.html.md
@@ -1026,9 +994,9 @@ ACE-Step (hosted on fal.ai) platform for arioso.
 
 ### Modules
 
-| [`adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#module-arioso.platforms.ace_step.adapter)   | ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.   |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| [`config`](_autosummary/arioso.platforms.ace_step.config.html.md#module-arioso.platforms.ace_step.config)     | ACE-Step platform configuration (fal.ai hosted).                     |
+| [`adapter`](_autosummary/arioso.platforms.ace_step.adapter.html.md#module-arioso.platforms.ace_step.adapter)   | ACE-Step adapter: a thin shim over the config-driven `arioso._fal.FalAdapter`.   |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`config`](_autosummary/arioso.platforms.ace_step.config.html.md#module-arioso.platforms.ace_step.config)     | ACE-Step platform configuration (fal.ai hosted).                                 |
 
 
 # _autosummary/arioso.platforms.beatoven.adapter.html.md
@@ -1755,47 +1723,23 @@ Stable Audio Open platform for arioso.
 
 # arioso.platforms.stable_audio_25.adapter
 
-Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.
+Stable Audio 2.5 adapter: a thin shim over the config-driven `arioso._fal.FalAdapter`.
 
-Unlike the local `stable_audio` platform (Stable Audio Open via diffusers,
-which has no strength knob), the hosted 2.5 audio-to-audio endpoint takes a
-`strength` in [0, 1]: low values keep the input nearly intact, high values
-let the prompt take over. That makes it the arioso backend for “the same piece,
-subtly changed”.
+The mapping from unified affordances to fal arguments lives in this platform’s
+`config.py` (`PLATFORM_CONFIG["fal"]`); nothing here is platform-specific. The
+module-level `fal_run` / `fal_upload_audio` are looked up at call time, so tests
+can patch them here.
 
 ### Classes
 
-| [`Adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#arioso.platforms.stable_audio_25.adapter.Adapter)(config)   | fal.ai Stable Audio 2.5 adapter.   |
-|--------------------------------------------------------------------|------------------------------------|
+| [`Adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#arioso.platforms.stable_audio_25.adapter.Adapter)([config])   | fal.ai Stable Audio 2.5 adapter.   |
+|----------------------------------------------------------------------|------------------------------------|
 
-### *class* arioso.platforms.stable_audio_25.adapter.Adapter(config)
+### *class* arioso.platforms.stable_audio_25.adapter.Adapter(config=None)
 
-Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+Bases: `FalAdapter`
 
 fal.ai Stable Audio 2.5 adapter.
-
-#### generate(prompt, , duration=None, num_steps=8, guidance=1.0, seed=None, audio_input=None, audio_input_strength=0.8, fetch=True, \*\*kwargs)
-
-Generate audio from a prompt, or transform `audio_input` toward it.
-
-* **Parameters:**
-  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the desired audio (required).
-  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Output length in seconds (1-190). Text-to-audio
-    defaults to 30 s (fal’s own default is its 190 s maximum, the
-    most expensive clip); audio-to-audio defaults to the input’s
-    length.
-  * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Denoising steps (`num_inference_steps`, default 8).
-  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Prompt adherence (`guidance_scale`, default 1).
-  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed for reproducibility.
-  * **audio_input** – Audio to transform (path, bytes, Song, URL, …).
-    When given, the audio-to-audio endpoint is used.
-  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Denoising strength for audio-to-audio
-    (0-1, default 0.8); lower keeps more of the input.
-  * **fetch** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Download the result so `audio_bytes` is populated.
-* **Return type:**
-  [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
-* **Returns:**
-  A completed Song (`audio_bytes` and `audio_url`).
 
 
 # _autosummary/arioso.platforms.stable_audio_25.config.html.md
@@ -1817,9 +1761,9 @@ Stable Audio 2.5 (hosted on fal.ai) platform for arioso.
 
 ### Modules
 
-| [`adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#module-arioso.platforms.stable_audio_25.adapter)   | Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.   |
-|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| [`config`](_autosummary/arioso.platforms.stable_audio_25.config.html.md#module-arioso.platforms.stable_audio_25.config)     | Stable Audio 2.5 platform configuration (fal.ai hosted).               |
+| [`adapter`](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md#module-arioso.platforms.stable_audio_25.adapter)   | Stable Audio 2.5 adapter: a thin shim over the config-driven `arioso._fal.FalAdapter`.   |
+|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| [`config`](_autosummary/arioso.platforms.stable_audio_25.config.html.md#module-arioso.platforms.stable_audio_25.config)     | Stable Audio 2.5 platform configuration (fal.ai hosted).                                 |
 
 
 # _autosummary/arioso.platforms.sunoapi.adapter.html.md
@@ -2412,7 +2356,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-20 08:57 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/586f15300e6cf40e757ea7a698049b117fc7867f"><code>586f153</code></a> on branch <code>main</code>, for **arioso 0.0.28** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 12:34 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/d336174e8915cbcfa98dc39965d475acfad4a4da"><code>d336174</code></a> on branch <code>main</code>, for **arioso 0.0.29** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2421,9 +2365,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/586f15300e6cf40e757ea7a698049b117fc7867f"><code>586f15300e6cf40e757ea7a698049b117fc7867f</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/d336174e8915cbcfa98dc39965d475acfad4a4da"><code>d336174e8915cbcfa98dc39965d475acfad4a4da</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.28</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.29</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2432,15 +2376,15 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39396972007">39396972007</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39423093563">39423093563</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>a31be781e687bf847b9256bce1534d6c2b61fb3f</code> (in the history of the built commit) |
+| Event commit | <code>0b05499221f2b1112dd9d27087327a795414b987</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.18  |
+| epythet  | 0.2.20  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -2459,14 +2403,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.28/">0.0.28</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.29/">0.0.29</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 586f15300e6cf40e757ea7a698049b117fc7867f
-pip install "epythet==0.2.18"
+git checkout d336174e8915cbcfa98dc39965d475acfad4a4da
+pip install "epythet==0.2.20"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

@@ -2,7 +2,7 @@
 
 # About this build
 
-This documentation was built on **2026-10-20 08:57 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/586f15300e6cf40e757ea7a698049b117fc7867f"><code>586f153</code></a> on branch <code>main</code>, for **arioso 0.0.28** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 12:34 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/d336174e8915cbcfa98dc39965d475acfad4a4da"><code>d336174</code></a> on branch <code>main</code>, for **arioso 0.0.29** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11,9 +11,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/586f15300e6cf40e757ea7a698049b117fc7867f"><code>586f15300e6cf40e757ea7a698049b117fc7867f</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/d336174e8915cbcfa98dc39965d475acfad4a4da"><code>d336174e8915cbcfa98dc39965d475acfad4a4da</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.28</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.29</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -22,15 +22,15 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39396972007">39396972007</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/39423093563">39423093563</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>a31be781e687bf847b9256bce1534d6c2b61fb3f</code> (in the history of the built commit) |
+| Event commit | <code>0b05499221f2b1112dd9d27087327a795414b987</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.18  |
+| epythet  | 0.2.20  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -49,14 +49,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.28/">0.0.28</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.29/">0.0.29</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 586f15300e6cf40e757ea7a698049b117fc7867f
-pip install "epythet==0.2.18"
+git checkout d336174e8915cbcfa98dc39965d475acfad4a4da
+pip install "epythet==0.2.20"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

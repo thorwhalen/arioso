@@ -10,7 +10,7 @@
 - [arioso.named_prompts](arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
 - [arioso.platforms](arioso.platforms.html.md): Platform packages for arioso.
 - [arioso.platforms.ace_step](arioso.platforms.ace_step.html.md): ACE-Step (hosted on fal.ai) platform for arioso.
-- [arioso.platforms.ace_step.adapter](arioso.platforms.ace_step.adapter.html.md): ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.
+- [arioso.platforms.ace_step.adapter](arioso.platforms.ace_step.adapter.html.md): ACE-Step adapter: a thin shim over the config-driven &#96;arioso.&#95;fal.FalAdapter&#96;.
 - [arioso.platforms.ace_step.config](arioso.platforms.ace_step.config.html.md): ACE-Step platform configuration (fal.ai hosted).
 - [arioso.platforms.beatoven](arioso.platforms.beatoven.html.md): Beatoven.ai platform for arioso.
 - [arioso.platforms.beatoven.adapter](arioso.platforms.beatoven.adapter.html.md): Beatoven.ai adapter via REST API.
@@ -46,7 +46,7 @@
 - [arioso.platforms.stable_audio.adapter](arioso.platforms.stable_audio.adapter.html.md): Stable Audio Open adapter using HuggingFace Diffusers.
 - [arioso.platforms.stable_audio.config](arioso.platforms.stable_audio.config.html.md): Stable Audio Open platform configuration.
 - [arioso.platforms.stable_audio_25](arioso.platforms.stable_audio_25.html.md): Stable Audio 2.5 (hosted on fal.ai) platform for arioso.
-- [arioso.platforms.stable_audio_25.adapter](arioso.platforms.stable_audio_25.adapter.html.md): Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.
+- [arioso.platforms.stable_audio_25.adapter](arioso.platforms.stable_audio_25.adapter.html.md): Stable Audio 2.5 adapter: a thin shim over the config-driven &#96;arioso.&#95;fal.FalAdapter&#96;.
 - [arioso.platforms.stable_audio_25.config](arioso.platforms.stable_audio_25.config.html.md): Stable Audio 2.5 platform configuration (fal.ai hosted).
 - [arioso.platforms.sunoapi](arioso.platforms.sunoapi.html.md): Suno platform (via sunoapi.org) for arioso.
 - [arioso.platforms.sunoapi.adapter](arioso.platforms.sunoapi.adapter.html.md): Suno adapter via sunoapi.org REST API.

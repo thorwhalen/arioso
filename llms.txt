@@ -12,7 +12,7 @@
 - [arioso.named_prompts](_autosummary/arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
 - [arioso.platforms](_autosummary/arioso.platforms.html.md): Platform packages for arioso.
 - [arioso.platforms.ace_step](_autosummary/arioso.platforms.ace_step.html.md): ACE-Step (hosted on fal.ai) platform for arioso.
-- [arioso.platforms.ace_step.adapter](_autosummary/arioso.platforms.ace_step.adapter.html.md): ACE-Step adapter (fal.ai): text-to-music and audio-to-audio remix.
+- [arioso.platforms.ace_step.adapter](_autosummary/arioso.platforms.ace_step.adapter.html.md): ACE-Step adapter: a thin shim over the config-driven &#96;arioso.&#95;fal.FalAdapter&#96;.
 - [arioso.platforms.ace_step.config](_autosummary/arioso.platforms.ace_step.config.html.md): ACE-Step platform configuration (fal.ai hosted).
 - [arioso.platforms.beatoven](_autosummary/arioso.platforms.beatoven.html.md): Beatoven.ai platform for arioso.
 - [arioso.platforms.beatoven.adapter](_autosummary/arioso.platforms.beatoven.adapter.html.md): Beatoven.ai adapter via REST API.
@@ -48,7 +48,7 @@
 - [arioso.platforms.stable_audio.adapter](_autosummary/arioso.platforms.stable_audio.adapter.html.md): Stable Audio Open adapter using HuggingFace Diffusers.
 - [arioso.platforms.stable_audio.config](_autosummary/arioso.platforms.stable_audio.config.html.md): Stable Audio Open platform configuration.
 - [arioso.platforms.stable_audio_25](_autosummary/arioso.platforms.stable_audio_25.html.md): Stable Audio 2.5 (hosted on fal.ai) platform for arioso.
-- [arioso.platforms.stable_audio_25.adapter](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md): Stable Audio 2.5 adapter (fal.ai): text-to-audio and audio-to-audio.
+- [arioso.platforms.stable_audio_25.adapter](_autosummary/arioso.platforms.stable_audio_25.adapter.html.md): Stable Audio 2.5 adapter: a thin shim over the config-driven &#96;arioso.&#95;fal.FalAdapter&#96;.
 - [arioso.platforms.stable_audio_25.config](_autosummary/arioso.platforms.stable_audio_25.config.html.md): Stable Audio 2.5 platform configuration (fal.ai hosted).
 - [arioso.platforms.sunoapi](_autosummary/arioso.platforms.sunoapi.html.md): Suno platform (via sunoapi.org) for arioso.
 - [arioso.platforms.sunoapi.adapter](_autosummary/arioso.platforms.sunoapi.adapter.html.md): Suno adapter via sunoapi.org REST API.
@@ -65,7 +65,7 @@
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
 - [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-20 08:57 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-20 12:34 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

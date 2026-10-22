@@ -29,6 +29,7 @@
    :toctree:
    :recursive:
 
+   analysis
    base
    named_prompts
    platforms

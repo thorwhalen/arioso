@@ -72,7 +72,9 @@ def pitch_class(name: str) -> int:
     """
     note = _FLATS.get(name, name)
     if note not in NOTES:
-        raise ValueError(f"not a note name: {name!r}; use one of {NOTES} (or a flat, or H)")
+        raise ValueError(
+            f"not a note name: {name!r}; use one of {NOTES} (or a flat, or H)"
+        )
     return NOTES.index(note)
 
 
@@ -118,7 +120,9 @@ def _median_filter_rows(x: np.ndarray, n: int) -> np.ndarray:
 def _runs(mask: np.ndarray, fps: float, min_len_s: float) -> list[tuple[float, float]]:
     edges = np.diff(np.concatenate([[0], mask.astype(int), [0]]))
     starts, ends = np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)
-    return [(a / fps, b / fps) for a, b in zip(starts, ends) if (b - a) / fps >= min_len_s]
+    return [
+        (a / fps, b / fps) for a, b in zip(starts, ends) if (b - a) / fps >= min_len_s
+    ]
 
 
 def drone_report(

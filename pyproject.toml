@@ -48,6 +48,10 @@ Documentation = "https://thorwhalen.github.io/arioso"
 scoring = [
     "numpy",
 ]
+# arioso.analysis: checks on generated takes (drone_report: does a take hold one drone?).
+analysis = [
+    "numpy",
+]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

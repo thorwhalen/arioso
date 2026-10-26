@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
+    <script src="../_static/documentation_options.js?v=f2234cd1"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.31" />
+  <meta name="docsearch:version" content="0.0.32" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -819,8 +819,9 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="c1">#: Affordances that carry caller-supplied *input* audio (used by :func:`enhance`).</span>
-<span class="c1">#: Distinct from clip-extension affordances like ``continue_from`` (which</span>
-<span class="c1">#: reference a prior generation by id/URL rather than uploaded audio).</span>
+<span class="c1">#: Distinct from the clip-extension affordance ``continue_from``, which extends</span>
+<span class="c1">#: a track rather than conditioning on one (a prior generation's id/URL on</span>
+<span class="c1">#: hosted platforms, the audio itself on musicgen).</span>
 <span class="n">AUDIO_INPUT_AFFORDANCES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"audio_input"</span><span class="p">,</span> <span class="s2">"melody"</span><span class="p">,</span> <span class="s2">"reference_audio"</span><span class="p">)</span>
 
 

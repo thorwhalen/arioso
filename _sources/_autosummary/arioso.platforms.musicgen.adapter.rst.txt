@@ -4,6 +4,14 @@ arioso.platforms.musicgen.adapter
 .. automodule:: arioso.platforms.musicgen.adapter
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      WINDOW_SECONDS
+      DEFAULT_FRAME_RATE
+      SEAM_CROSSFADE_SECONDS
+   
    .. rubric:: Classes
 
    .. autosummary::

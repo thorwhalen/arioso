@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="_static/documentation_options.js?v=c5dbc6bb"></script>
+    <script src="_static/documentation_options.js?v=f2234cd1"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.31" />
+  <meta name="docsearch:version" content="0.0.32" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -392,6 +392,18 @@ follows an input melody. This is the <code class="docutils literal notranslate">
 <span class="c1"># Discover which platforms accept input audio</span>
 <span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"stable_audio"</span><span class="p">)</span>  <span class="c1"># True</span>
 <span class="n">arioso</span><span class="o">.</span><span class="n">supports_audio_input</span><span class="p">(</span><span class="s2">"mubert"</span><span class="p">)</span>  <span class="c1"># False</span>
+</pre></div>
+</div>
+<p>To <em>extend</em> a recording rather than transform it, pass it as <code class="docutils literal notranslate"><span class="pre">continue_from</span></code> to <code class="docutils literal notranslate"><span class="pre">musicgen</span></code>. The last <code class="docutils literal notranslate"><span class="pre">prompt_seconds</span></code> (default 10) of the audio prompt the model, which writes <code class="docutils literal notranslate"><span class="pre">extend_seconds</span></code> (default <code class="docutils literal notranslate"><span class="pre">duration</span></code>) of what comes next, chained over <code class="docutils literal notranslate"><span class="pre">rounds</span></code> calls. The result is the original followed by the continuation; the continuation alone is in <code class="docutils literal notranslate"><span class="pre">song.metadata[&quot;continuation&quot;]</span></code>. It runs locally, so it also extends audio that a hosted extend route refuses (Suno’s <code class="docutils literal notranslate"><span class="pre">upload_extend</span></code> rejects uploads that match a catalogued composition).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">longer</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="s2">"warm piano trio"</span><span class="p">,</span>
+    <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"facebook/musicgen-medium"</span><span class="p">,</span>
+    <span class="n">continue_from</span><span class="o">=</span><span class="s2">"take.wav"</span><span class="p">,</span>
+    <span class="n">prompt_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">extend_seconds</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">rounds</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">enhance(audio,</span> <span class="pre">prompt='',</span> <span class="pre">*,</span> <span class="pre">platform='stable_audio',</span> <span class="pre">strength=None,</span> <span class="pre">as_='auto')</span></code>
@@ -914,7 +926,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-26 07:52 UTC from <a href="https://github.com/thorwhalen/arioso/commit/baf9e4b96b76c977ac6df99cb9659fc94ce6cc51">baf9e4b</a> (main) · arioso 0.0.31 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-26 09:45 UTC from <a href="https://github.com/thorwhalen/arioso/commit/d64f9547acb3544ba36e3e97b53e45bc8a8fbb6e">d64f954</a> (main) · arioso 0.0.32 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
+    <script src="../_static/documentation_options.js?v=f2234cd1"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.31" />
+  <meta name="docsearch:version" content="0.0.32" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -514,7 +514,9 @@ a Song.</p>
 <li><p><strong>param_map</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Dict mapping common affordance names to native config
 dicts.  Each value has keys: <code class="docutils literal notranslate"><span class="pre">native_name</span></code> (str),
 <code class="docutils literal notranslate"><span class="pre">coerce</span></code> (optional callable), <code class="docutils literal notranslate"><span class="pre">adapter_handled</span></code> (optional
-bool).</p></li>
+bool), <code class="docutils literal notranslate"><span class="pre">type</span></code> (optional Python class: narrows the AFFORDANCES
+type for the soft type check in <code class="docutils literal notranslate"><span class="pre">arioso.services</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">str</span></code>
+for a <code class="docutils literal notranslate"><span class="pre">continue_from</span></code> that is a clip id on that platform).</p></li>
 <li><p><strong>on_unsupported</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – What to do with params not in param_map.
 One of ‘warn’, ‘raise’, or ‘ignore’.</p></li>
 <li><p><strong>passthrough</strong> – Adapter-only keyword names (a config’s

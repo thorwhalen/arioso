@@ -50,8 +50,9 @@ arioso.generators.sunoapi("jazz")
 ### arioso.AUDIO_INPUT_AFFORDANCES *= ('audio_input', 'melody', 'reference_audio')*
 
 Affordances that carry caller-supplied *input* audio (used by [`enhance()`](#arioso.enhance)).
-Distinct from clip-extension affordances like `continue_from` (which
-reference a prior generation by id/URL rather than uploaded audio).
+Distinct from the clip-extension affordance `continue_from`, which extends
+a track rather than conditioning on one (a prior generation’s id/URL on
+hosted platforms, the audio itself on musicgen).
 
 ### arioso.check_status(song)
 

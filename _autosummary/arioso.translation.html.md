@@ -80,7 +80,9 @@ The returned function transforms:
   * **param_map** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)) – Dict mapping common affordance names to native config
     dicts.  Each value has keys: `native_name` (str),
     `coerce` (optional callable), `adapter_handled` (optional
-    bool).
+    bool), `type` (optional Python class: narrows the AFFORDANCES
+    type for the soft type check in `arioso.services`, e.g. `str`
+    for a `continue_from` that is a clip id on that platform).
   * **on_unsupported** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to do with params not in param_map.
     One of ‘warn’, ‘raise’, or ‘ignore’.
   * **passthrough** – Adapter-only keyword names (a config’s

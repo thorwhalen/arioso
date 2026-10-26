@@ -22,10 +22,9 @@ from collections.abc import Callable
 from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
 from arioso.platforms.musicgen.backends import (
-    AudiocraftBackend,
     Backend,
     Sampling,
-    TransformersBackend,
+    select_backend_class,
 )
 
 #: MusicGen's context window in seconds: an audio prompt plus the new audio it
@@ -36,30 +35,33 @@ WINDOW_SECONDS = 30.0
 SEAM_CROSSFADE_SECONDS = 0.01
 
 
-def _load_backend(model_variant: str) -> Backend:
-    """Load *model_variant* with audiocraft, or with transformers when audiocraft is
-    not installed."""
-    try:
-        return AudiocraftBackend.load(model_variant)
-    except ImportError:
-        return TransformersBackend.load(model_variant)
-
-
 class Adapter:
     """MusicGen adapter with lazy model loading.
 
-    Tries ``audiocraft`` first; if unavailable, falls back to the
-    HuggingFace ``transformers`` pipeline. ``load_backend`` (model variant ->
-    :class:`Backend`) replaces that choice.
+    ``backend_for`` (model variant -> backend class) chooses the library without
+    loading weights: ``audiocraft`` when it imports, else the HuggingFace
+    ``transformers`` pipeline (:func:`select_backend_class`). The chosen class is
+    asked what it can do (``can_continue``) and then loads the weights, so the class
+    that answers is the class that loads. ``load_backend`` (model variant ->
+    :class:`Backend`) replaces the choice and the loading together: nothing is asked
+    before it loads, and the backend it returns is on its own.
     """
 
     def __init__(
-        self, config: dict, *, load_backend: Callable[[str], Backend] = _load_backend
+        self,
+        config: dict,
+        *,
+        backend_for: Callable[[str], type[Backend]] | None = None,
+        load_backend: Callable[[str], Backend] | None = None,
     ):
+        if backend_for is not None and load_backend is not None:
+            raise ValueError("give backend_for or load_backend, not both")
+        if backend_for is None and load_backend is None:
+            backend_for = select_backend_class
         self.config = config
-        self._load_backend = load_backend
-        self._loaded: Backend | None = None
-        self._model_name: str | None = None
+        self._backend_for = backend_for  # None: the injected loader owns the choice
+        self._load_backend = load_backend or (lambda v: backend_for(v).load(v))
+        self._loaded: tuple[str, Backend] | None = None  # (model variant, its backend)
 
     def generate(
         self,
@@ -149,17 +151,16 @@ class Adapter:
         return _song(
             audio,
             backend.sample_rate,
-            model=self._model_name,
+            model=model,
             temperature=temperature,
             **extra,
         )
 
     def _backend(self, model: str) -> Backend:
         """The *model* loaded (once per variant) behind the interface of its library."""
-        if self._loaded is None or self._model_name != model:
-            self._loaded = self._load_backend(model)
-            self._model_name = model
-        return self._loaded
+        if self._loaded is None or self._loaded[0] != model:
+            self._loaded = (model, self._load_backend(model))
+        return self._loaded[1]
 
     def _continue(
         self,
@@ -174,7 +175,6 @@ class Adapter:
         sampling: Sampling,
     ) -> Song:
         """Extend *source* by ``rounds`` chained audio-prompted generations."""
-        import importlib.util
         import os
 
         _check_continuation_window(prompt_seconds, extend_seconds, rounds)
@@ -184,12 +184,12 @@ class Adapter:
                 f"runs locally and continues the audio itself (a path, bytes, "
                 f"Song or (array, sample_rate)), not a hosted clip id or URL."
             )
-        # transformers is the fallback when audiocraft is missing; refuse before
-        # loading a multi-GB checkpoint that cannot do this
-        if "melody" in model and importlib.util.find_spec("audiocraft") is None:
+        # refuse before loading a multi-GB checkpoint that cannot do this
+        backend_class = self._backend_for and self._backend_for(model)
+        if backend_class and not backend_class.can_continue(model):
             raise ValueError(
                 f"musicgen: {model!r} cannot continue audio with "
-                f"transformers (its audio input is melody chroma, not a prompt "
+                f"{backend_class.__name__} (its audio input is melody chroma, not a prompt "
                 f"to extend). Use a non-melody checkpoint such as "
                 f"'facebook/musicgen-small'."
             )
@@ -228,7 +228,7 @@ class Adapter:
         return _song(
             stitched,
             sample_rate,
-            model=self._model_name,
+            model=model,
             temperature=sampling.temperature,
             continued=True,
             continue_from_seconds=len(audio) / sample_rate,

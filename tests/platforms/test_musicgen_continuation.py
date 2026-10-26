@@ -123,7 +123,14 @@ def _adapter(monkeypatch, model, *, transformers=False):
             return TransformersBackend(model, _processor)
         return AudiocraftBackend(model)
 
-    adapter = Adapter(PLATFORM_CONFIG, load_backend=fake_load)
+    if transformers:  # the class that is asked about continuing is the one that loads
+
+        class _Loading(TransformersBackend):
+            load = staticmethod(fake_load)
+
+        adapter = Adapter(PLATFORM_CONFIG, backend_for=lambda variant: _Loading)
+    else:
+        adapter = Adapter(PLATFORM_CONFIG, load_backend=fake_load)
     adapter.loaded = loaded
     return adapter
 
@@ -236,7 +243,6 @@ def test_transformers_compensates_delay_frames(monkeypatch, fake_torch):
 
 
 def test_transformers_refuses_melody_checkpoint(monkeypatch, fake_torch):
-    monkeypatch.setattr("importlib.util.find_spec", lambda name: None)
     adapter = _adapter(monkeypatch, _TransformersModel(), transformers=True)
 
     with pytest.raises(ValueError, match="non-melody checkpoint"):
@@ -244,6 +250,67 @@ def test_transformers_refuses_melody_checkpoint(monkeypatch, fake_torch):
             "x", continue_from=_source(3), model="facebook/musicgen-melody"
         )
     assert adapter.loaded == []  # refused before loading a multi-GB checkpoint
+
+
+def test_the_backend_class_that_loads_is_the_one_asked_about_continuing(fake_torch):
+    asked = []
+
+    class Fake(AudiocraftBackend):  # loads like audiocraft, refuses melody checkpoints
+        @classmethod
+        def can_continue(cls, model_variant):
+            asked.append(model_variant)
+            return "melody" not in model_variant
+
+        @classmethod
+        def load(cls, model_variant):
+            asked.append("loaded")
+            return cls(_AudiocraftModel())
+
+    adapter = Adapter(PLATFORM_CONFIG, backend_for=lambda variant: Fake)
+    with pytest.raises(ValueError, match="Fake"):
+        adapter.generate("x", continue_from=_source(3), model="facebook/musicgen-melody")
+    assert asked == ["facebook/musicgen-melody"]  # refused before loading
+    adapter.generate("x", continue_from=_source(3), model="facebook/musicgen-small")
+    assert asked[-1] == "loaded"
+
+
+def test_an_injected_loader_is_not_second_guessed(monkeypatch, fake_torch):
+    monkeypatch.setitem(sys.modules, "audiocraft.models", None)  # selection says transformers
+    adapter = Adapter(
+        PLATFORM_CONFIG,
+        load_backend=lambda variant: AudiocraftBackend(_AudiocraftModel()),
+    )
+    song = adapter.generate(
+        "x", continue_from=_source(3), model="facebook/musicgen-melody"
+    )
+    assert song.metadata["model"] == "facebook/musicgen-melody"
+
+
+def test_backend_for_and_load_backend_are_exclusive():
+    with pytest.raises(ValueError, match="not both"):
+        Adapter(PLATFORM_CONFIG, backend_for=lambda v: None, load_backend=lambda v: None)
+
+
+def test_default_adapter_refuses_a_melody_continuation_before_loading(monkeypatch):
+    monkeypatch.setitem(sys.modules, "audiocraft.models", None)  # audiocraft does not import
+    with pytest.raises(ValueError, match="TransformersBackend"):
+        Adapter(PLATFORM_CONFIG).generate(
+            "x", continue_from=_source(3), model="facebook/musicgen-melody"
+        )
+
+
+def test_selection_falls_back_to_transformers_when_audiocraft_does_not_import(
+    monkeypatch,
+):
+    import sys
+
+    from arioso.platforms.musicgen.backends import select_backend_class
+
+    monkeypatch.setitem(sys.modules, "audiocraft.models", None)
+    assert select_backend_class("facebook/musicgen-small") is TransformersBackend
+    monkeypatch.setitem(sys.modules, "audiocraft", types.ModuleType("audiocraft"))
+    monkeypatch.setitem(sys.modules, "audiocraft.models", types.ModuleType("m"))
+    assert select_backend_class("facebook/musicgen-small") is AudiocraftBackend
 
 
 @pytest.mark.parametrize(

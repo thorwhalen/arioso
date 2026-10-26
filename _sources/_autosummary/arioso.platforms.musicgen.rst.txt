@@ -11,4 +11,5 @@ arioso.platforms.musicgen
    :recursive:
 
    adapter
+   backends
    config

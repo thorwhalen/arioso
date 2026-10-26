@@ -1,4 +1,4 @@
-> built 2026-10-26 11:22 UTC from 2148b50 (main) · arioso 0.0.34. Details: build_info.json
+> built 2026-10-26 11:36 UTC from 6f010b7 (main) · arioso 0.0.36. Details: build_info.json
 
 # index.html.md
 
@@ -1597,6 +1597,8 @@ Mubert platform for arioso.
 
 MusicGen adapter using audiocraft (preferred) or transformers.
 
+The adapter holds the modes; `backends.py` holds how each library runs them.
+
 Supports text-to-music generation and, via `facebook/musicgen-melody`,
 melody-conditioned generation (the `melody` affordance / `arioso.enhance`
 stage): the output follows the pitch contour of an input audio while taking its
@@ -1613,7 +1615,6 @@ composition; thorwhalen/arioso#29).
 
 | [`WINDOW_SECONDS`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.WINDOW_SECONDS)         | an audio prompt plus the new audio it generates must fit in it (transformers caps generation at 1500 frames).                                         |
 |-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`DEFAULT_FRAME_RATE`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE)     | Codec frames per second, used when a model does not report its own.                                                                                   |
 | [`SEAM_CROSSFADE_SECONDS`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS) | Crossfade from the original audio into the model's re-decoded prompt at each seam, hiding the codec's reconstruction error there (a click otherwise). |
 
 ### Classes
@@ -1670,10 +1671,6 @@ continuing a recording.
 * **Returns:**
   A Song with audio_array populated.
 
-### arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE *= 50*
-
-Codec frames per second, used when a model does not report its own.
-
 ### arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS *= 0.01*
 
 Crossfade from the original audio into the model’s re-decoded prompt at each
@@ -1686,6 +1683,224 @@ generates must fit in it (transformers caps generation at 1500 frames).
 
 * **Type:**
   MusicGen’s context window in seconds
+
+
+# _autosummary/arioso.platforms.musicgen.backends.html.md
+
+# arioso.platforms.musicgen.backends
+
+The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).
+
+The adapter holds the modes (text, melody, continuation: window checks, chaining, splicing); a
+backend holds what one library needs to load a model and run it in each of them. `audiocraft`
+is Meta’s library, `transformers` the HuggingFace port the adapter falls back to. Each backend
+wraps a model that is already loaded, so building one is free; `load` is what loads one.
+
+Both return the model’s own output layout for text and melody, `(channels, frames)` from
+audiocraft and `(frames,)` from transformers’ first channel, and mono for a continuation.
+
+### Module Attributes
+
+| [`DEFAULT_FRAME_RATE`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE)   | Codec frames per second, used when a model does not report its own.   |
+|-----------------------------------------------------------------------|-----------------------------------------------------------------------|
+
+### Classes
+
+| [`AudiocraftBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.AudiocraftBackend)(model)                          | A loaded `audiocraft.models.MusicGen`.                                              |
+|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`Backend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Backend)(\*args, \*\*kwargs)                       | What the adapter needs from a library that runs a loaded MusicGen model.            |
+| [`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)(\*, temperature, top_k, top_p, guidance) | Sampling settings shared by every MusicGen mode.                                    |
+| [`TransformersBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.TransformersBackend)(model, processor)             | A loaded transformers `Musicgen(Melody)ForConditionalGeneration` and its processor. |
+
+### *class* arioso.platforms.musicgen.backends.AudiocraftBackend(model)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A loaded `audiocraft.models.MusicGen`.
+
+#### continuation(prompt, tail, , seconds, sampling)
+
+Continue `tail` (mono, at `sample_rate`) by `seconds`.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **tail** (`ndarray`) – The audio prompt to continue.
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length of new audio to generate after `tail`.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The re-decoded `tail` followed by the new audio, mono.
+
+#### *property* frame_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Codec frames per second (50 for every MusicGen checkpoint).
+
+#### *classmethod* load(model_variant)
+
+Load `model_variant` (e.g. `'facebook/musicgen-small'`) with audiocraft.
+
+* **Parameters:**
+  **model_variant** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A MusicGen checkpoint name.
+* **Return type:**
+  [`AudiocraftBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.AudiocraftBackend)
+* **Returns:**
+  The backend wrapping the loaded model.
+* **Raises:**
+  [**ImportError**](https://docs.python.org/3/builtins/exceptions.html#ImportError) – If audiocraft is not installed.
+
+#### melody(prompt, ref, , seconds, sampling)
+
+Generate from a text prompt, following the chroma of `ref`.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **ref** (`AudioRef`) – The audio whose melody to follow.
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length to generate.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The audio, `(channels, frames)`.
+
+#### *property* sample_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Output samples per second.
+
+#### text(prompt, , seconds, sampling)
+
+Generate from a text prompt.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length to generate.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The audio, `(channels, frames)`.
+
+### *class* arioso.platforms.musicgen.backends.Backend(\*args, \*\*kwargs)
+
+Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
+
+What the adapter needs from a library that runs a loaded MusicGen model.
+
+#### continuation(prompt, tail, , seconds, sampling)
+
+The re-decoded `tail` and `seconds` after it, mono.
+
+* **Return type:**
+  `ndarray`
+
+#### *property* frame_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Codec frames per second.
+
+#### melody(prompt, ref, , seconds, sampling)
+
+`seconds` of audio for `prompt` that follows the chroma of `ref`.
+
+* **Return type:**
+  `ndarray`
+
+#### *property* sample_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Output samples per second.
+
+#### text(prompt, , seconds, sampling)
+
+`seconds` of audio for the text `prompt`.
+
+* **Return type:**
+  `ndarray`
+
+### arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE *= 50*
+
+Codec frames per second, used when a model does not report its own.
+
+### *class* arioso.platforms.musicgen.backends.Sampling(, temperature, top_k, top_p, guidance)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Sampling settings shared by every MusicGen mode.
+
+### *class* arioso.platforms.musicgen.backends.TransformersBackend(model, processor)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A loaded transformers `Musicgen(Melody)ForConditionalGeneration` and its processor.
+
+#### *property* audio_channels *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Channels the decoder generates (2 for the stereo checkpoints); 1 when its
+config does not say, or it has none.
+
+#### continuation(prompt, tail, , seconds, sampling)
+
+Continue `tail` (mono, at `sample_rate`) by `seconds`.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **tail** (`ndarray`) – The audio prompt to continue (duplicated for a stereo model).
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length of new audio to generate after `tail`.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The re-decoded `tail` followed by the new audio, mono.
+
+#### *property* delay_frames *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Frames the codebook delay pattern consumes from `max_new_tokens` (3 for the
+4-codebook checkpoints), so a call yields the seconds asked for.
+
+#### *property* frame_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Codec frames per second (50 for every MusicGen checkpoint).
+
+#### *classmethod* load(model_variant)
+
+Load `model_variant` and its processor with transformers, on `_device()`.
+
+* **Parameters:**
+  **model_variant** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A MusicGen checkpoint name; a melody variant gets the
+  melody-specific model class.
+* **Return type:**
+  [`TransformersBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.TransformersBackend)
+* **Returns:**
+  The backend wrapping the loaded model and processor.
+
+#### melody(prompt, ref, , seconds, sampling)
+
+Generate from a text prompt, following the chroma of `ref`.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **ref** (`AudioRef`) – The audio whose melody to follow, resampled to the processor’s rate.
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length to generate.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The first channel of the audio, `(frames,)`.
+
+#### *property* sample_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Output samples per second.
+
+#### text(prompt, , seconds, sampling)
+
+Generate from a text prompt.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **seconds** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length to generate.
+  * **sampling** ([`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)) – Sampling settings.
+* **Return type:**
+  `ndarray`
+* **Returns:**
+  The first channel of the audio, `(frames,)`.
 
 
 # _autosummary/arioso.platforms.musicgen.config.html.md
@@ -1703,9 +1918,10 @@ MusicGen platform for arioso.
 
 ### Modules
 
-| [`adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#module-arioso.platforms.musicgen.adapter)   | MusicGen adapter using audiocraft (preferred) or transformers.   |
-|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| [`config`](_autosummary/arioso.platforms.musicgen.config.html.md#module-arioso.platforms.musicgen.config)     | MusicGen platform configuration.                                 |
+| [`adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#module-arioso.platforms.musicgen.adapter)   | MusicGen adapter using audiocraft (preferred) or transformers.             |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`backends`](_autosummary/arioso.platforms.musicgen.backends.html.md#module-arioso.platforms.musicgen.backends) | The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31). |
+| [`config`](_autosummary/arioso.platforms.musicgen.config.html.md#module-arioso.platforms.musicgen.config)     | MusicGen platform configuration.                                           |
 
 
 # _autosummary/arioso.platforms.riffusion.adapter.html.md
@@ -2472,7 +2688,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-26 11:22 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/2148b5021981057bf3cc10e1b5683c7fda30e1de"><code>2148b50</code></a> on branch <code>main</code>, for **arioso 0.0.34** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 11:36 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/6f010b7ffd66b23d4b0d9553cb067d2a380fc402"><code>6f010b7</code></a> on branch <code>main</code>, for **arioso 0.0.36** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2481,9 +2697,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/2148b5021981057bf3cc10e1b5683c7fda30e1de"><code>2148b5021981057bf3cc10e1b5683c7fda30e1de</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/6f010b7ffd66b23d4b0d9553cb067d2a380fc402"><code>6f010b7ffd66b23d4b0d9553cb067d2a380fc402</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.34</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.36</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2492,9 +2708,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40314332614">40314332614</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40316126447">40316126447</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>5ff49440efc32ea6f27cddcb817542d519b001c0</code> (in the history of the built commit) |
+| Event commit | <code>8654c9e5911615d46e8149b9864d73004dc48fea</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2519,13 +2735,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.34/">0.0.34</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.36/">0.0.36</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 2148b5021981057bf3cc10e1b5683c7fda30e1de
+git checkout 6f010b7ffd66b23d4b0d9553cb067d2a380fc402
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

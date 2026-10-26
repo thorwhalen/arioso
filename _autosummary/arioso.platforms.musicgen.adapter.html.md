@@ -2,6 +2,8 @@
 
 MusicGen adapter using audiocraft (preferred) or transformers.
 
+The adapter holds the modes; `backends.py` holds how each library runs them.
+
 Supports text-to-music generation and, via `facebook/musicgen-melody`,
 melody-conditioned generation (the `melody` affordance / `arioso.enhance`
 stage): the output follows the pitch contour of an input audio while taking its
@@ -18,7 +20,6 @@ composition; thorwhalen/arioso#29).
 
 | [`WINDOW_SECONDS`](#arioso.platforms.musicgen.adapter.WINDOW_SECONDS)         | an audio prompt plus the new audio it generates must fit in it (transformers caps generation at 1500 frames).                                         |
 |-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`DEFAULT_FRAME_RATE`](#arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE)     | Codec frames per second, used when a model does not report its own.                                                                                   |
 | [`SEAM_CROSSFADE_SECONDS`](#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS) | Crossfade from the original audio into the model's re-decoded prompt at each seam, hiding the codec's reconstruction error there (a click otherwise). |
 
 ### Classes
@@ -74,10 +75,6 @@ continuing a recording.
   [`Song`](arioso.base.html.md#arioso.base.Song)
 * **Returns:**
   A Song with audio_array populated.
-
-### arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE *= 50*
-
-Codec frames per second, used when a model does not report its own.
 
 ### arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS *= 0.01*
 

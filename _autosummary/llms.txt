@@ -38,6 +38,7 @@
 - [arioso.platforms.mubert.config](arioso.platforms.mubert.config.html.md): Mubert platform configuration.
 - [arioso.platforms.musicgen](arioso.platforms.musicgen.html.md): MusicGen platform for arioso.
 - [arioso.platforms.musicgen.adapter](arioso.platforms.musicgen.adapter.html.md): MusicGen adapter using audiocraft (preferred) or transformers.
+- [arioso.platforms.musicgen.backends](arioso.platforms.musicgen.backends.html.md): The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).
 - [arioso.platforms.musicgen.config](arioso.platforms.musicgen.config.html.md): MusicGen platform configuration.
 - [arioso.platforms.riffusion](arioso.platforms.riffusion.html.md): Riffusion platform for arioso.
 - [arioso.platforms.riffusion.adapter](arioso.platforms.riffusion.adapter.html.md): Riffusion adapter using the riffusion library or diffusers fallback.

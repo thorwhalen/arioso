@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../_static/documentation_options.js?v=9dd25805"></script>
+    <script src="../../../../_static/documentation_options.js?v=0e525676"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.34" />
+  <meta name="docsearch:version" content="0.0.36" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -717,6 +717,8 @@ window.runMermaid = runMermaid;</script>
   <h1>Source code for arioso.platforms.musicgen.adapter</h1><div class="highlight"><pre>
 <span></span><span class="sd">"""MusicGen adapter using audiocraft (preferred) or transformers.</span>
 
+<span class="sd">The adapter holds the modes; ``backends.py`` holds how each library runs them.</span>
+
 <span class="sd">Supports text-to-music generation and, via ``facebook/musicgen-melody``,</span>
 <span class="sd">melody-conditioned generation (the ``melody`` affordance / ``arioso.enhance``</span>
 <span class="sd">stage): the output follows the pitch contour of an input audio while taking its</span>
@@ -732,12 +734,16 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_audio_ref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.musicgen.backends</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AudiocraftBackend</span><span class="p">,</span>
+    <span class="n">Backend</span><span class="p">,</span>
+    <span class="n">Sampling</span><span class="p">,</span>
+    <span class="n">TransformersBackend</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1">#: MusicGen's context window in seconds: an audio prompt plus the new audio it</span>
 <span class="c1">#: generates must fit in it (transformers caps generation at 1500 frames).</span>
 <span class="n">WINDOW_SECONDS</span> <span class="o">=</span> <span class="mf">30.0</span>
-<span class="c1">#: Codec frames per second, used when a model does not report its own.</span>
-<span class="n">DEFAULT_FRAME_RATE</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="c1">#: Crossfade from the original audio into the model's re-decoded prompt at each</span>
 <span class="c1">#: seam, hiding the codec's reconstruction error there (a click otherwise).</span>
 <span class="n">SEAM_CROSSFADE_SECONDS</span> <span class="o">=</span> <span class="mf">0.01</span>
@@ -762,29 +768,17 @@ window.runMermaid = runMermaid;</script>
 <span class="w">        </span><span class="sd">"""Lazy-load the model only when first generation is requested."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">==</span> <span class="n">model_variant</span><span class="p">:</span>
             <span class="k">return</span>
+        <span class="c1"># The model, processor and library flag stay adapter attributes (rather than</span>
+        <span class="c1"># the backend itself) because tests monkeypatch this method or set them.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">audiocraft.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MusicGen</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">MusicGen</span><span class="o">.</span><span class="n">get_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="n">model_variant</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">AudiocraftBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProcessor</span>
-
-            <span class="c1"># Melody variants need the melody-specific model class.</span>
-            <span class="k">if</span> <span class="s2">"melody"</span> <span class="ow">in</span> <span class="n">model_variant</span><span class="p">:</span>
-                <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-                    <span class="n">MusicgenMelodyForConditionalGeneration</span> <span class="k">as</span> <span class="n">_ModelClass</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-                    <span class="n">MusicgenForConditionalGeneration</span> <span class="k">as</span> <span class="n">_ModelClass</span><span class="p">,</span>
-                <span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">_ModelClass</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">_device</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span> <span class="o">=</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="n">model_variant</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">TransformersBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">processor</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="n">model_variant</span>
 
 <div class="viewcode-block" id="Adapter.generate">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter.generate">[docs]</a>
@@ -843,6 +837,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Returns:</span>
 <span class="sd">            A Song with audio_array populated.</span>
 <span class="sd">        """</span>
+        <span class="n">sampling</span> <span class="o">=</span> <span class="n">Sampling</span><span class="p">(</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">continue_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -858,181 +855,33 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">extend_seconds</span><span class="o">=</span><span class="n">duration</span> <span class="k">if</span> <span class="n">extend_seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">extend_seconds</span><span class="p">,</span>
                 <span class="n">rounds</span><span class="o">=</span><span class="n">rounds</span><span class="p">,</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+                <span class="n">sampling</span><span class="o">=</span><span class="n">sampling</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"melody"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="s2">"facebook/musicgen-melody"</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_transformers_melody</span><span class="p">(</span>
-                    <span class="n">prompt</span><span class="p">,</span>
-                    <span class="n">melody</span><span class="p">,</span>
-                    <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-                    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                    <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                    <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                    <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_audiocraft_melody</span><span class="p">(</span>
-                <span class="n">prompt</span><span class="p">,</span>
-                <span class="n">melody</span><span class="p">,</span>
-                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_transformers</span><span class="p">(</span>
-                <span class="n">prompt</span><span class="p">,</span>
-                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_audiocraft</span><span class="p">(</span>
-            <span class="n">prompt</span><span class="p">,</span>
-            <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">audio</span><span class="p">,</span> <span class="n">extra</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="n">sampling</span><span class="p">),</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">melody</span><span class="p">)</span>
+            <span class="n">audio</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">melody</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="n">sampling</span><span class="p">)</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"melody_conditioned"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">_song</span><span class="p">(</span>
+            <span class="n">audio</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">extra</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_audiocraft</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_audiocraft_params</span><span class="p">(</span>
-            <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">wav</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate</span><span class="p">([</span><span class="n">prompt</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">_song</span><span class="p">(</span>
-            <span class="n">wav</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_transformers</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="n">prompt</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">device</span>
-        <span class="p">)</span>
-        <span class="n">audio_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformers_generate</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="p">,</span>
-            <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_song</span><span class="p">(</span>
-            <span class="n">audio_values</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">(),</span>
-            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_audiocraft_melody</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">melody</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_audiocraft_params</span><span class="p">(</span>
-            <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">ref</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">melody</span><span class="p">)</span>
-        <span class="n">melody_wav</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">as_waveform</span><span class="p">()</span>  <span class="c1"># (channels, frames)</span>
-        <span class="c1"># generate_with_chroma wants (batch, channels, frames)</span>
-        <span class="n">wav</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate_with_chroma</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">prompt</span><span class="p">],</span> <span class="n">melody_wav</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">ref</span><span class="o">.</span><span class="n">sample_rate</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_song</span><span class="p">(</span>
-            <span class="n">wav</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">melody_conditioned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_transformers_melody</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">melody</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
-        <span class="n">audio</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">melody</span><span class="p">)</span><span class="o">.</span><span class="n">as_mono</span><span class="p">(</span>
-            <span class="n">target_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">sampling_rate</span>
-        <span class="p">)</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">(</span>
-            <span class="n">audio</span><span class="o">=</span><span class="n">audio</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span>
-            <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="n">prompt</span><span class="p">],</span>
-            <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">audio_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformers_generate</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="p">,</span>
-            <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_song</span><span class="p">(</span>
-            <span class="n">audio_values</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">(),</span>
-            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">melody_conditioned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_set_audiocraft_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Sampling settings for the next audiocraft ``generate*`` call.</span>
-
-<span class="sd">        audiocraft generates ``int(duration * frame_rate)`` frames, so the</span>
-<span class="sd">        duration is aimed mid-frame: float error can then never drop the last</span>
-<span class="sd">        frame (``int(2.3 * 50)`` is 114)."""</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">set_generation_params</span><span class="p">(</span>
-            <span class="n">use_sampling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-            <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">duration</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frames</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_rate</span><span class="p">(),</span>
-            <span class="n">cfg_coef</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_transformers_generate</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Sample *seconds* of new audio with transformers; returns the</span>
-<span class="sd">        ``(batch, channels, frames)`` tensor. ``max_new_tokens`` adds the</span>
-<span class="sd">        frames the delay pattern consumes, so the output is the full length."""</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-                <span class="o">**</span><span class="n">inputs</span><span class="p">,</span>
-                <span class="n">max_new_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_frames</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_frames</span><span class="p">(),</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span> <span class="k">if</span> <span class="n">top_p</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">guidance_scale</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-            <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The loaded *model* behind the interface of its library."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TransformersBackend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AudiocraftBackend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_continue</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1044,10 +893,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">extend_seconds</span><span class="p">,</span>
         <span class="n">rounds</span><span class="p">,</span>
         <span class="n">model</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="p">,</span>
-        <span class="n">top_k</span><span class="p">,</span>
-        <span class="n">top_p</span><span class="p">,</span>
-        <span class="n">guidance</span><span class="p">,</span>
+        <span class="n">sampling</span><span class="p">:</span> <span class="n">Sampling</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Song</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Extend *source* by ``rounds`` chained audio-prompted generations."""</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
@@ -1069,12 +915,12 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"to extend). Use a non-melody checkpoint such as "</span>
                 <span class="sa">f</span><span class="s2">"'facebook/musicgen-small'."</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="n">sample_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">()</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">sample_rate</span>
         <span class="c1"># Prompt lengths are whole codec frames, so the model re-decodes the</span>
         <span class="c1"># prompt to exactly as many samples as it was given, and dropping that</span>
         <span class="c1"># many from the output leaves the continuation alone.</span>
-        <span class="n">hop</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_rate</span><span class="p">()</span>
+        <span class="n">hop</span> <span class="o">=</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="n">backend</span><span class="o">.</span><span class="n">frame_rate</span>
 
         <span class="n">audio</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">as_mono</span><span class="p">(</span><span class="n">target_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">continue_at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1090,17 +936,14 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"from; at least one codec frame (</span><span class="si">{</span><span class="n">hop</span><span class="si">}</span><span class="s2"> samples) is needed."</span>
             <span class="p">)</span>
         <span class="n">prompt_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">hop</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">prompt_seconds</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">)</span> <span class="o">//</span> <span class="n">hop</span> <span class="o">*</span> <span class="n">hop</span><span class="p">)</span>
-        <span class="n">sampling</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span>
-        <span class="p">)</span>
 
         <span class="n">crossfade</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">SEAM_CROSSFADE_SECONDS</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">)</span>
         <span class="n">used_prompt</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prompt_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="o">//</span> <span class="n">hop</span> <span class="o">*</span> <span class="n">hop</span><span class="p">)</span>
         <span class="n">stitched</span> <span class="o">=</span> <span class="n">audio</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rounds</span><span class="p">):</span>
             <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prompt_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">stitched</span><span class="p">)</span> <span class="o">//</span> <span class="n">hop</span> <span class="o">*</span> <span class="n">hop</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_continuation_round</span><span class="p">(</span>
-                <span class="n">prompt</span><span class="p">,</span> <span class="n">stitched</span><span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">:],</span> <span class="n">extend_seconds</span><span class="o">=</span><span class="n">extend_seconds</span><span class="p">,</span> <span class="o">**</span><span class="n">sampling</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">continuation</span><span class="p">(</span>
+                <span class="n">prompt</span><span class="p">,</span> <span class="n">stitched</span><span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">:],</span> <span class="n">seconds</span><span class="o">=</span><span class="n">extend_seconds</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="n">sampling</span>
             <span class="p">)</span>
             <span class="n">stitched</span> <span class="o">=</span> <span class="n">_splice</span><span class="p">(</span><span class="n">stitched</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">crossfade</span><span class="o">=</span><span class="n">crossfade</span><span class="p">)</span>
 
@@ -1108,86 +951,14 @@ window.runMermaid = runMermaid;</script>
             <span class="n">stitched</span><span class="p">,</span>
             <span class="n">sample_rate</span><span class="p">,</span>
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">,</span>
-            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">sampling</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
             <span class="n">continued</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">continue_from_seconds</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="p">,</span>
             <span class="n">prompt_seconds</span><span class="o">=</span><span class="n">used_prompt</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="p">,</span>
             <span class="n">extend_seconds</span><span class="o">=</span><span class="n">extend_seconds</span><span class="p">,</span>
             <span class="n">rounds</span><span class="o">=</span><span class="n">rounds</span><span class="p">,</span>
             <span class="n">continuation</span><span class="o">=</span><span class="n">_audio_result</span><span class="p">(</span><span class="n">stitched</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="p">:],</span> <span class="n">sample_rate</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_continuation_round</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">tail</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">extend_seconds</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">guidance</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">"""One audio-prompted call: the re-decoded *tail* followed by the new</span>
-<span class="sd">        audio, mono."""</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-            <span class="n">stereo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">"audio_channels"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">(</span>
-                <span class="n">audio</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tail</span><span class="p">,</span> <span class="n">tail</span><span class="p">])</span> <span class="k">if</span> <span class="n">stereo</span> <span class="k">else</span> <span class="n">tail</span><span class="p">],</span>
-                <span class="n">sampling_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">(),</span>
-                <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="n">prompt</span><span class="p">],</span>
-                <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-            <span class="n">audio_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformers_generate</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="p">,</span>
-                <span class="n">seconds</span><span class="o">=</span><span class="n">extend_seconds</span><span class="p">,</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">audio_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_set_audiocraft_params</span><span class="p">(</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
-                <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
-                <span class="n">guidance</span><span class="o">=</span><span class="n">guidance</span><span class="p">,</span>
-                <span class="c1"># audiocraft's duration covers the prompt and the continuation</span>
-                <span class="n">duration</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tail</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">()</span> <span class="o">+</span> <span class="n">extend_seconds</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">prompt_wav</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">tail</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="n">wav</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate_continuation</span><span class="p">(</span>
-                <span class="n">prompt_wav</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span><span class="p">(),</span> <span class="n">descriptions</span><span class="o">=</span><span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">wav</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (channels, frames) -&gt; mono</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_delay_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Frames the codebook delay pattern consumes from ``max_new_tokens``</span>
-<span class="sd">        on the transformers path (3 for the 4-codebook checkpoints), so a</span>
-<span class="sd">        call yields the seconds asked for."""</span>
-        <span class="n">decoder_config</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">decoder</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">codebooks</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">decoder_config</span><span class="p">,</span> <span class="s2">"num_codebooks"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">channels</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">decoder_config</span><span class="p">,</span> <span class="s2">"audio_channels"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">codebooks</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">return</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">codebooks</span> <span class="o">//</span> <span class="nb">max</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">audio_encoder</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Whole codec frames in *seconds*, rounded (not truncated)."""</span>
-        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">seconds</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_rate</span><span class="p">())</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Codec frames per second (50 for every MusicGen checkpoint)."""</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-            <span class="n">rate</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">audio_encoder</span><span class="p">,</span> <span class="s2">"frame_rate"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">rate</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="s2">"frame_rate"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">rate</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">DEFAULT_FRAME_RATE</span></div>
+        <span class="p">)</span></div>
 
 
 
@@ -1245,24 +1016,6 @@ window.runMermaid = runMermaid;</script>
         <span class="nb">format</span><span class="o">=</span><span class="s2">"wav"</span><span class="p">,</span>
         <span class="n">duration_seconds</span><span class="o">=</span><span class="n">audio_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="p">,</span>
     <span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""The torch device for the transformers path: ``$ARIOSO_TORCH_DEVICE``,</span>
-<span class="sd">    else CUDA, else Apple MPS, else CPU (the CPU-only default made a</span>
-<span class="sd">    30-second melody-conditioned generation take a quarter of an hour)."""</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-
-    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-
-    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ARIOSO_TORCH_DEVICE"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">env</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">env</span>
-    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s2">"cuda"</span>
-    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="p">,</span> <span class="s2">"mps"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s2">"mps"</span>
-    <span class="k">return</span> <span class="s2">"cpu"</span>
 </pre></div>
 
                 </article>

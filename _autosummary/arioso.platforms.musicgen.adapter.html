@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=9dd25805"></script>
+    <script src="../_static/documentation_options.js?v=0e525676"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,12 +53,12 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="arioso.platforms.musicgen.config" href="arioso.platforms.musicgen.config.html" />
+    <link rel="next" title="arioso.platforms.musicgen.backends" href="arioso.platforms.musicgen.backends.html" />
     <link rel="prev" title="arioso.platforms.musicgen" href="arioso.platforms.musicgen.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.34" />
+  <meta name="docsearch:version" content="0.0.36" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -419,6 +419,7 @@
   <section id="module-arioso.platforms.musicgen.adapter">
 <span id="arioso-platforms-musicgen-adapter"></span><h1>arioso.platforms.musicgen.adapter<a class="headerlink" href="#module-arioso.platforms.musicgen.adapter" title="Link to this heading">#</a></h1>
 <p>MusicGen adapter using audiocraft (preferred) or transformers.</p>
+<p>The adapter holds the modes; <code class="docutils literal notranslate"><span class="pre">backends.py</span></code> holds how each library runs them.</p>
 <p>Supports text-to-music generation and, via <code class="docutils literal notranslate"><span class="pre">facebook/musicgen-melody</span></code>,
 melody-conditioned generation (the <code class="docutils literal notranslate"><span class="pre">melody</span></code> affordance / <code class="docutils literal notranslate"><span class="pre">arioso.enhance</span></code>
 stage): the output follows the pitch contour of an input audio while taking its
@@ -435,10 +436,7 @@ composition; thorwhalen/arioso#29).</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.adapter.WINDOW_SECONDS" title="arioso.platforms.musicgen.adapter.WINDOW_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WINDOW_SECONDS</span></code></a></p></td>
 <td><p>an audio prompt plus the new audio it generates must fit in it (transformers caps generation at 1500 frames).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE" title="arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_FRAME_RATE</span></code></a></p></td>
-<td><p>Codec frames per second, used when a model does not report its own.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS" title="arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SEAM_CROSSFADE_SECONDS</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS" title="arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SEAM_CROSSFADE_SECONDS</span></code></a></p></td>
 <td><p>Crossfade from the original audio into the model's re-decoded prompt at each seam, hiding the codec's reconstruction error there (a click otherwise).</p></td>
 </tr>
 </tbody>
@@ -513,12 +511,6 @@ tail of the audio so far, so the extension totals
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE">
-<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.adapter.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_FRAME_RATE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></span><a class="headerlink" href="#arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE" title="Link to this definition">#</a></dt>
-<dd><p>Codec frames per second, used when a model does not report its own.</p>
-</dd></dl>
-
-<dl class="py data">
 <dt class="sig sig-object py" id="arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS">
 <span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.adapter.</span></span><span class="sig-name descname"><span class="pre">SEAM_CROSSFADE_SECONDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></span><a class="headerlink" href="#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS" title="Link to this definition">#</a></dt>
 <dd><p>Crossfade from the original audio into the model’s re-decoded prompt at each
@@ -559,11 +551,11 @@ generates must fit in it (transformers caps generation at 1500 frames).</p>
       </div>
     </a>
     <a class="right-next"
-       href="arioso.platforms.musicgen.config.html"
+       href="arioso.platforms.musicgen.backends.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">arioso.platforms.musicgen.config</p>
+        <p class="prev-next-title">arioso.platforms.musicgen.backends</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -590,7 +582,6 @@ generates must fit in it (transformers caps generation at 1500 frames).</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.adapter.Adapter.generate"><code class="docutils literal notranslate"><span class="pre">Adapter.generate()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.adapter.DEFAULT_FRAME_RATE"><code class="docutils literal notranslate"><span class="pre">DEFAULT_FRAME_RATE</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.adapter.SEAM_CROSSFADE_SECONDS"><code class="docutils literal notranslate"><span class="pre">SEAM_CROSSFADE_SECONDS</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.adapter.WINDOW_SECONDS"><code class="docutils literal notranslate"><span class="pre">WINDOW_SECONDS</span></code></a></li>
 </ul>

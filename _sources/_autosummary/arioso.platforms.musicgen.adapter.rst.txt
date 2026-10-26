@@ -9,7 +9,6 @@ arioso.platforms.musicgen.adapter
    .. autosummary::
    
       WINDOW_SECONDS
-      DEFAULT_FRAME_RATE
       SEAM_CROSSFADE_SECONDS
    
    .. rubric:: Classes

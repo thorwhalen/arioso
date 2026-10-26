@@ -40,6 +40,7 @@
 - [arioso.platforms.mubert.config](_autosummary/arioso.platforms.mubert.config.html.md): Mubert platform configuration.
 - [arioso.platforms.musicgen](_autosummary/arioso.platforms.musicgen.html.md): MusicGen platform for arioso.
 - [arioso.platforms.musicgen.adapter](_autosummary/arioso.platforms.musicgen.adapter.html.md): MusicGen adapter using audiocraft (preferred) or transformers.
+- [arioso.platforms.musicgen.backends](_autosummary/arioso.platforms.musicgen.backends.html.md): The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).
 - [arioso.platforms.musicgen.config](_autosummary/arioso.platforms.musicgen.config.html.md): MusicGen platform configuration.
 - [arioso.platforms.riffusion](_autosummary/arioso.platforms.riffusion.html.md): Riffusion platform for arioso.
 - [arioso.platforms.riffusion.adapter](_autosummary/arioso.platforms.riffusion.adapter.html.md): Riffusion adapter using the riffusion library or diffusers fallback.
@@ -65,7 +66,7 @@
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
 - [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 11:22 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 11:36 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

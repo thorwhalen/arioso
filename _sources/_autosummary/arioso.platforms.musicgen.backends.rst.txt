@@ -1,0 +1,21 @@
+arioso.platforms.musicgen.backends
+==================================
+
+.. automodule:: arioso.platforms.musicgen.backends
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DEFAULT_FRAME_RATE
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AudiocraftBackend
+      Backend
+      Sampling
+      TransformersBackend
+   

@@ -8,6 +8,23 @@ from typing import Optional, Any
 from dataclasses import dataclass, field
 
 
+class CatalogMatchError(RuntimeError):
+    """A platform refused the input audio because it matches a catalogued recording.
+
+    This is a policy refusal (copyright filter), not a transient failure: callers
+    that retry or regenerate in a loop should treat it as final.
+
+    Attributes:
+        task_id: The provider task id of the refused generation, if known.
+        code: The provider's error code (e.g. ``413``), if given.
+    """
+
+    def __init__(self, message: str, *, task_id: str | None = None, code=None):
+        super().__init__(message)
+        self.task_id = task_id
+        self.code = code
+
+
 @dataclass
 class AudioResult:
     """Unified audio output from any music generation platform.

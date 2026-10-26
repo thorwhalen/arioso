@@ -27,7 +27,7 @@ Usage::
     arioso.generators.sunoapi("jazz")
 """
 
-from arioso.base import Song, AudioResult, AFFORDANCES
+from arioso.base import Song, AudioResult, AFFORDANCES, CatalogMatchError
 from arioso.services import ServiceCollection, SliceMapping
 
 services = ServiceCollection()

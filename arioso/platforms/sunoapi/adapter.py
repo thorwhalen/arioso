@@ -6,7 +6,7 @@ import warnings
 import time
 from pathlib import Path
 
-from arioso.base import AudioResult, Song
+from arioso.base import AudioResult, CatalogMatchError, Song
 from arioso.platforms._base_adapter import BaseRestAdapter
 
 # Valid model versions accepted by sunoapi.org
@@ -644,6 +644,13 @@ class Adapter(BaseRestAdapter):
             reason = record.get("errorMessage") or ""
             code = record.get("errorCode")
             detail = f" [{code}] {reason}" if reason or code else ""
+            if str(code) == "413" and "catalog" in reason.lower():
+                raise CatalogMatchError(
+                    f"sunoapi refused the audio (status={status_raw}){detail}: "
+                    f"taskId={task_id}",
+                    task_id=task_id,
+                    code=code,
+                )
             raise RuntimeError(
                 f"sunoapi generation failed (status={status_raw}){detail}: "
                 f"taskId={task_id}"

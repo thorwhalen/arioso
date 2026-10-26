@@ -322,8 +322,6 @@ class Adapter:
         guidance,
     ) -> Song:
         """Extend *source* by ``rounds`` chained audio-prompted generations."""
-        import numpy as np
-
         _check_continuation_window(prompt_seconds, extend_seconds, rounds)
         self._ensure_model(model)
         if self._use_transformers and "melody" in self._model_name:

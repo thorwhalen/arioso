@@ -74,4 +74,63 @@ PLATFORM_CONFIG = {
         "text_to_audio_endpoint": "fal-ai/ace-step",
         "audio_to_audio_endpoint": "fal-ai/ace-step/audio-to-audio",
     },
+    # How unified affordances become fal arguments (see arioso._fal.FalAdapter).
+    # ACE-Step is steered by style tags, so `genre` (else `prompt`) is `tags`; empty
+    # lyrics or instrumental=True send "[inst]".
+    "fal": {
+        "platform": "ace_step",
+        "shared": {
+            "tags": {
+                "from": ["genre", "prompt"],
+                "required": "ace_step requires style tags (prompt or genre)",
+            },
+            "lyrics": {
+                "from": ["lyrics"],
+                "default": "[inst]",
+                "force": {"when": "instrumental", "value": "[inst]"},
+            },
+            "number_of_steps": {"from": ["num_steps"], "default": 27},
+            "guidance_scale": {"from": ["guidance"], "default": 15.0},
+            "seed": {"from": ["seed"], "type": "int"},
+        },
+        "native_extras": [
+            "scheduler",
+            "guidance_type",
+            "granularity_scale",
+            "guidance_interval",
+            "guidance_interval_decay",
+            "minimum_guidance_scale",
+            "tag_guidance_scale",
+            "lyric_guidance_scale",
+            "original_seed",
+        ],
+        "endpoints": {
+            "text_to_audio": {
+                "endpoint": "fal-ai/ace-step",
+                "arguments": {
+                    "duration": {
+                        "from": ["duration"],
+                        "default": 60.0,
+                        "type": "float",
+                    },
+                },
+            },
+            "audio_to_audio": {
+                "endpoint": "fal-ai/ace-step/audio-to-audio",
+                "arguments": {
+                    "audio_url": {"from": ["audio_input"], "upload": True},
+                    "original_tags": {
+                        "from": ["original_tags"],
+                        "default_from": "tags",
+                    },
+                    "original_lyrics": {"from": ["original_lyrics"], "default": ""},
+                    "edit_mode": {
+                        "from": ["edit_mode"],
+                        "default": "remix",
+                        "choices": ["remix", "lyrics"],
+                    },
+                },
+            },
+        },
+    },
 }

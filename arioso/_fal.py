@@ -118,3 +118,164 @@ def fal_audio_song(
         status="complete",
         metadata=meta,
     )
+
+
+# ---------------------------------------------------------------------------
+# Config-driven adapter: a fal-hosted model is a config entry, not an adapter
+# ---------------------------------------------------------------------------
+
+#: Values that count as "not given" for a unified parameter.
+_ABSENT = (None, "")
+
+_COERCE = {"int": lambda v: int(round(float(v))), "float": float, "str": str}
+
+
+class FalAdapter:
+    """Build and run a fal.ai call from a platform config's ``"fal"`` section.
+
+    The section declares, per endpoint (``text_to_audio``, ``audio_to_audio``), the
+    *native* argument each unified affordance becomes. ``shared`` arguments apply to
+    every endpoint; the ``audio_to_audio`` endpoint is used when ``audio_input`` is
+    given. Each native argument is a spec::
+
+        "native_name": {
+            "from": ["unified", "names"],      # first one given (not None/"") wins
+            "default": 8,                      # used when none is given (omitted if absent)
+            "default_from": "other_native",    # ...or copy another native argument's value
+            "required": True | "message",      # ValueError when nothing is given
+            "type": "int" | "float" | "str",   # coerce (int rounds)
+            "clamp": [lo, hi],                 # clamp into range
+            "range": [lo, hi],                 # ValueError outside the range
+            "choices": [...],                  # ValueError outside the set
+            "force": {"when": "unified", "value": X},  # value X when that param is truthy
+            "upload": True,                    # audio: upload and pass the URL
+        }
+
+    ``native_extras`` are fal-native argument names passed through from the caller's
+    keywords as given; any other unknown keyword is ignored. ``fetch`` (download the
+    result) is the one adapter keyword.
+
+    ``run`` and ``upload`` are injected (default: :func:`fal_run`,
+    :func:`fal_upload_audio`), so tests and callers can swap the transport.
+    """
+
+    def __init__(
+        self,
+        config: dict,
+        *,
+        run=None,
+        upload=None,
+    ):
+        self.config = config
+        self.spec = config["fal"]
+        self.platform = self.spec.get("platform") or config.get("name", "fal")
+        self._run = run or fal_run
+        self._upload = upload or fal_upload_audio
+
+    # -- building the call ---------------------------------------------------
+
+    def _endpoint(self, params: dict) -> tuple:
+        kind = (
+            "audio_to_audio"
+            if params.get("audio_input") is not None
+            else "text_to_audio"
+        )
+        endpoint = self.spec["endpoints"].get(kind)
+        if endpoint is None:
+            raise ValueError(f"{self.platform} has no {kind} endpoint")
+        return kind, endpoint
+
+    def _value(self, native: str, rule: dict, params: dict, built: dict):
+        given = next(
+            (
+                params[name]
+                for name in rule.get("from", ())
+                if params.get(name) not in _ABSENT
+            ),
+            None,
+        )
+        force = rule.get("force")
+        if force and params.get(force["when"]):
+            given = force["value"]
+        if given is None:
+            if rule.get("required"):
+                message = rule["required"]
+                raise ValueError(
+                    message
+                    if isinstance(message, str)
+                    else f"{self.platform} requires a non-empty {rule['from'][0]}"
+                )
+            if "default_from" in rule:
+                given = built.get(rule["default_from"])
+            else:
+                given = rule.get("default")
+        if given is None:
+            return None
+        name = (rule.get("from") or [native])[0]
+        if rule.get("upload"):
+            return self._upload(given)
+        if rule.get("type"):
+            given = _COERCE[rule["type"]](given)
+        if "range" in rule:
+            low, high = rule["range"]
+            if not low <= given <= high:
+                raise ValueError(f"{name} must be in [{low}, {high}]")
+        if "clamp" in rule:
+            low, high = rule["clamp"]
+            given = max(low, min(given, high))
+        if "choices" in rule and given not in rule["choices"]:
+            choices = " or ".join(repr(c) for c in rule["choices"])
+            raise ValueError(f"{name} must be {choices}")
+        return given
+
+    def build(self, params: dict) -> tuple:
+        """``(endpoint, arguments, uploaded)`` for ``params`` (unified names); no network call
+        except uploads of ``audio_input``."""
+        kind, endpoint = self._endpoint(params)
+        rules = {**self.spec.get("shared", {}), **endpoint.get("arguments", {})}
+        arguments: dict = {}
+        uploaded: set = set()
+        # `default_from` needs its source built first, so build in declaration order
+        # with the sources (those without default_from) first.
+        ordered = sorted(rules.items(), key=lambda item: "default_from" in item[1])
+        for native, rule in ordered:
+            value = self._value(native, rule, params, arguments)
+            if value is not None:
+                arguments[native] = value
+                if rule.get("upload"):
+                    uploaded.add(native)
+        for key in self.spec.get("native_extras", ()):
+            if key in params and params[key] is not None:
+                arguments[key] = params[key]
+        return endpoint["endpoint"], arguments, uploaded
+
+    def accepted_params(self) -> frozenset:
+        """Every keyword this adapter reads: unified names, native extras and ``fetch``."""
+        rules = [
+            *self.spec.get("shared", {}).values(),
+            *(
+                rule
+                for endpoint in self.spec["endpoints"].values()
+                for rule in endpoint.get("arguments", {}).values()
+            ),
+        ]
+        names = {name for rule in rules for name in rule.get("from", ())}
+        names |= {rule["force"]["when"] for rule in rules if "force" in rule}
+        return frozenset(
+            names | set(self.spec.get("native_extras", ())) | {"prompt", "fetch"}
+        )
+
+    # -- the adapter contract --------------------------------------------------
+
+    def generate(self, prompt: str = "", *, fetch: bool = True, **params) -> Song:
+        """Run the platform's fal endpoint for the unified ``params`` and return a Song."""
+        params["prompt"] = prompt
+        endpoint, arguments, uploaded = self.build(params)
+        result = self._run(endpoint, arguments)
+        meta = {k: v for k, v in arguments.items() if k not in uploaded}
+        meta.update(
+            endpoint=endpoint, audio_to_audio=params.get("audio_input") is not None
+        )
+        return fal_audio_song(
+            result, platform=self.platform, metadata=meta, fetch=fetch
+        )

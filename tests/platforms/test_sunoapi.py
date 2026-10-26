@@ -1,5 +1,7 @@
 """Tests for arioso.platforms.sunoapi (mocked HTTP)."""
 
+import warnings
+
 import pytest
 from unittest.mock import patch, MagicMock
 
@@ -21,7 +23,7 @@ def test_sunoapi_config_param_map():
     assert pm["prompt"]["native_name"] == "prompt"
     assert pm["instrumental"]["native_name"] == "instrumental"
     assert pm["genre"]["native_name"] == "style"
-    assert pm["model"]["native_default"] == "V4"
+    assert pm["model"]["native_default"] == "V6"
     assert "choices" in pm["model"]
     assert "V4" in pm["model"]["choices"]
 
@@ -512,3 +514,30 @@ def test_sunoapi_catalog_match_raises_typed_error(mock_make_session):
     assert exc_info.value.task_id == "task-123"
     assert exc_info.value.code == 413
     assert isinstance(exc_info.value, RuntimeError)
+
+def test_sunoapi_custom_controls_reach_payload(mock_make_session):
+    mock_session = MagicMock()
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"code": 200, "data": {"taskId": "t1"}}
+    mock_session.post.return_value = mock_response
+    mock_make_session.return_value = mock_session
+    import arioso
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # the Suno-only controls must not warn as unsupported
+        arioso.generate("calm drone", platform="sunoapi", genre="meditative chamber", title="T",
+                        instrumental=True, duration=300, style_weight=0.75, weirdness=0.25, variety=1)
+    payload = mock_session.post.call_args[1]["json"]
+    assert payload["model"] == "V6" and payload["customMode"] is True
+    assert (payload["duration"], payload["styleWeight"], payload["weirdnessConstraint"], payload["variety"]) == (300, 0.75, 0.25, 1)
+
+
+def test_sunoapi_custom_controls_validate():
+    from arioso.platforms.sunoapi.adapter import _custom_controls
+
+    with pytest.raises(ValueError, match="custom mode"):
+        _custom_controls(False, "V6", style_weight=0.5)
+    with pytest.raises(ValueError, match="duration needs"):
+        _custom_controls(True, "V4", duration=120)
+    with pytest.raises(ValueError, match="0-1"):
+        _custom_controls(True, "V6", weirdness=1.5)

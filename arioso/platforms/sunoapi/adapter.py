@@ -9,8 +9,23 @@ from pathlib import Path
 from arioso.base import AudioResult, CatalogMatchError, Song
 from arioso.platforms._base_adapter import BaseRestAdapter
 
-# Valid model versions accepted by sunoapi.org
-SUNO_MODELS = ("V4", "V4_5", "V4_5ALL", "V4_5PLUS", "V5")
+# Model versions accepted by sunoapi.org (2026-10: the V6 family is current; the rest still
+# accepted but deprecated).
+SUNO_MODELS = (
+    "V6",
+    "V6_WILD",
+    "V6_MINI",
+    "V5_5",
+    "V5",
+    "V4_5PLUS",
+    "V4_5ALL",
+    "V4_5",
+    "V4",
+)
+# Models that honour an exact ``duration`` (10-360 s).
+SUNO_DURATION_MODELS = ("V6", "V6_WILD", "V6_MINI", "V5_5")
+SUNO_DURATION_RANGE = (10, 360)
+SUNO_VARIETY_RANGE = (0, 4)
 
 # File upload base URL (separate from the generation API).
 # Configurable via env var in case the provider changes domains again.
@@ -19,7 +34,7 @@ SUNO_FILE_UPLOAD_BASE_URL = os.environ.get(
 )
 
 # Default model, configurable via env var
-SUNO_DEFAULT_MODEL = os.environ.get("SUNO_DEFAULT_MODEL", "V4")
+SUNO_DEFAULT_MODEL = os.environ.get("SUNO_DEFAULT_MODEL", "V6")
 
 # Default callback URL, configurable via env var.
 # The upload-extend and upload-cover endpoints require a callBackUrl field,
@@ -63,6 +78,58 @@ def _cover_source(audio_input):
         return audio.audio_url, None
     ref = to_audio_ref(audio_input)
     return ref.as_path(), ref
+
+
+def _custom_controls(
+    custom_mode: bool,
+    model: str,
+    *,
+    duration: float = 0,
+    style_weight: float | None = None,
+    weirdness: float | None = None,
+    variety: int | None = None,
+    vocal_gender: str = "",
+) -> dict:
+    """The custom-mode-only generate fields, validated (empty when none is given).
+
+    >>> _custom_controls(True, "V6", duration=300, style_weight=0.75)
+    {'duration': 300, 'styleWeight': 0.75}
+    """
+    controls = {}
+    if duration:
+        lo, hi = SUNO_DURATION_RANGE
+        if not lo <= duration <= hi:
+            raise ValueError(f"sunoapi: duration must be {lo}-{hi} s, got {duration}")
+        if model not in SUNO_DURATION_MODELS:
+            raise ValueError(
+                f"sunoapi: duration needs one of {SUNO_DURATION_MODELS}, not {model!r}"
+            )
+        controls["duration"] = duration
+    for name, value in (
+        ("styleWeight", style_weight),
+        ("weirdnessConstraint", weirdness),
+    ):
+        if value is not None:
+            if not 0 <= value <= 1:
+                raise ValueError(f"sunoapi: {name} must be 0-1, got {value}")
+            controls[name] = round(value, 2)
+    if variety is not None:
+        lo, hi = SUNO_VARIETY_RANGE
+        if not lo <= variety <= hi:
+            raise ValueError(f"sunoapi: variety must be {lo}-{hi}, got {variety}")
+        controls["variety"] = int(variety)
+    if vocal_gender:
+        if vocal_gender not in ("m", "f"):
+            raise ValueError(
+                f"sunoapi: vocal_gender must be 'm' or 'f', got {vocal_gender!r}"
+            )
+        controls["vocalGender"] = vocal_gender
+    if controls and not custom_mode:
+        raise ValueError(
+            f"sunoapi: {sorted(controls)} only work in custom mode; pass genre= or title= "
+            "(or lyrics=) to switch to it"
+        )
+    return controls
 
 
 def _check_api_error(data: dict):
@@ -140,6 +207,11 @@ class Adapter(BaseRestAdapter):
         negative_prompt: str = "",
         audio_input: str = "",
         audio_input_strength: float = 0,
+        duration: float = 0,
+        style_weight: float | None = None,
+        weirdness: float | None = None,
+        variety: int | None = None,
+        vocal_gender: str = "",
         wait_for_completion: bool = False,
         poll_interval: float = 5.0,
         timeout: float = 300.0,
@@ -157,7 +229,7 @@ class Adapter(BaseRestAdapter):
             title: Song title (used in customMode).
             instrumental: If True, generate without vocals.
             model: Suno model version. Valid: {models}.
-                Defaults to SUNO_DEFAULT_MODEL env var, or 'V4'.
+                Defaults to SUNO_DEFAULT_MODEL env var, or 'V6'.
             continue_from: Clip ID to extend from.
             continue_at: Timestamp in seconds to continue from.
             callback_url: Webhook URL for completion notification.
@@ -173,6 +245,14 @@ class Adapter(BaseRestAdapter):
                 remote URL is passed as that URL.
             audio_input_strength: How much ``audio_input`` shapes the output,
                 0-1 (upload-cover's ``audioWeight``). 0 leaves it to the API.
+            duration: Exact length in seconds, 10-360 (custom mode; V6, V6_WILD,
+                V6_MINI, V5_5). 0 leaves it to the API.
+            style_weight: How strongly the style is followed, 0-1 (Suno's
+                "Style Influence"; custom mode).
+            weirdness: How experimental the result is, 0-1 (Suno's "Weirdness";
+                custom mode).
+            variety: Variation between the two takes, 0-4 (custom mode).
+            vocal_gender: 'm' or 'f', a preference for sung parts (custom mode).
             wait_for_completion: If True, poll until audio is ready (or
                 timeout). If False (default), return pending Songs immediately.
             poll_interval: Seconds between status checks (default 5).
@@ -250,6 +330,18 @@ class Adapter(BaseRestAdapter):
 
         if negative_prompt:
             payload["negativeTags"] = negative_prompt
+
+        payload.update(
+            _custom_controls(
+                custom_mode,
+                model,
+                duration=duration,
+                style_weight=style_weight,
+                weirdness=weirdness,
+                variety=variety,
+                vocal_gender=vocal_gender,
+            )
+        )
 
         if continue_from:
             payload["continue_clip_id"] = continue_from

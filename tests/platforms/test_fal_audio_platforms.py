@@ -131,3 +131,43 @@ def test_format_of(content_type, url, fmt):
     from arioso._fal import _format_of
 
     assert _format_of(content_type, url) == fmt
+
+
+def test_a_new_fal_model_is_a_config_entry(monkeypatch):
+    """A platform declared by config alone (no adapter module) runs through FalAdapter."""
+    from arioso import registry
+    from arioso._fal import FalAdapter
+
+    calls = {}
+    config = {
+        "name": "demo_fal",
+        "fal": {
+            "shared": {
+                "text": {"from": ["prompt"], "required": True},
+                "steps": {"from": ["num_steps"], "default": 4},
+            },
+            "endpoints": {
+                "text_to_audio": {"endpoint": "fal-ai/demo", "arguments": {"len": {"from": ["duration"], "type": "int", "clamp": [1, 5]}}},
+            },
+        },
+    }
+    adapter = FalAdapter(
+        config,
+        run=lambda endpoint, arguments: calls.update(endpoint=endpoint, arguments=arguments) or _RESULT,
+    )
+    song = adapter.generate("hi", duration=9.2, bogus=1, fetch=False)
+    assert calls == {"endpoint": "fal-ai/demo", "arguments": {"text": "hi", "steps": 4, "len": 5}}
+    assert song.platform == "demo_fal"
+    registry.register_platform("demo_fal", config)
+    assert isinstance(registry._load_adapter("demo_fal", config), FalAdapter)
+
+
+def test_fal_specs_agree_with_the_platform_config():
+    """The fal section, param_map and supported_affordances are one story."""
+    for module in (sa_mod, ace_mod):
+        config = module.PLATFORM_CONFIG
+        adapter = module.Adapter(config)
+        accepted = adapter.accepted_params()
+        declared = set(config["supported_affordances"]) | set(config["adapter_params"])
+        assert set(config["supported_affordances"]) <= accepted
+        assert accepted - {"prompt"} <= declared | set(config["fal"].get("native_extras", ()))

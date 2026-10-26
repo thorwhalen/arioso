@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "arioso"
-version = "0.0.24"
+version = "0.0.30"
 description = "Make tunes"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -44,6 +44,14 @@ Repository = "https://github.com/thorwhalen/arioso"
 Documentation = "https://thorwhalen.github.io/arioso"
 
 [project.optional-dependencies]
+# arioso.scoring: music under a narration (ducking, phrase-timed pauses); also needs ffmpeg.
+scoring = [
+    "numpy",
+]
+# arioso.analysis: checks on generated takes (drone_report: does a take hold one drone?).
+analysis = [
+    "numpy",
+]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

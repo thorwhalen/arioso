@@ -8,7 +8,7 @@ description: >-
   Use when the user wants to "make a song", "generate music", "write a song
   about X", "turn this poem/text/script into a song", "set these lyrics to
   music", "text to music", "make a theme tune", "I need background music", or
-  "a royalty-free instrumental track" — or when they name a platform (Suno,
+  "a royalty-free instrumental track", "music under the narration", "a bed for this voice-over" — or when they name a platform (Suno,
   ElevenLabs Music, Udio, MusicGen, Stable Audio, Riffusion, Lyria). Covers the
   one-line call, which five backends can actually SING lyrics you wrote (the
   other eleven drop them silently), the Suno customMode title/genre requirement,
@@ -87,7 +87,7 @@ songs = arioso.generate_many(
     lyrics=poem_text,
     title="Il pleut",  # REQUIRED in customMode — the adapter will not invent one
     genre="chanson, ambient, french",  # sets `style` explicitly; do this too
-    model="V5",
+    model="V6",
 )
 ```
 
@@ -95,11 +95,12 @@ Three more Suno rules in the same family:
 
 - **`instrumental=True` discards `lyrics`.** The adapter only sends lyrics
   `if not instrumental`. Never pass both.
-- **Length caps depend on the model, and the default model is `V4`** — the
-  tightest one. Lyrics: 3,000 chars on V4, 5,000 on everything later. Style:
-  200 on V4, 1,000 later. Title: 80 on V4 and `V4_5ALL`, 100 on
-  `V4_5`/`V4_5PLUS`/`V5`. Pass `model="V5"` (or set `SUNO_DEFAULT_MODEL`) for a
-  long poem. Valid values: `V4`, `V4_5`, `V4_5ALL`, `V4_5PLUS`, `V5`.
+- **The default model is `V6`** (2026-10: `V6`, `V6_WILD`, `V6_MINI` are current;
+  `V5_5`, `V5`, `V4_5PLUS`, `V4_5ALL`, `V4_5`, `V4` are deprecated but accepted).
+  Lyrics up to 5,000 chars and style up to 1,000 on V6; V4 is the tight one (3,000 / 200).
+- **Custom-mode controls** (pass `genre=` or `title=` to be in custom mode):
+  `duration=` exact length 10-360 s (V6 family and V5_5), `style_weight=` 0-1 (Suno's
+  "Style Influence"), `weirdness=` 0-1, `variety=` 0-4, `vocal_gender="m"|"f"`.
 - **A rejected lyric fails at poll time, not call time** — `get_status` raises
   `RuntimeError` with `SENSITIVE_WORD_ERROR` once the job has run.
 
@@ -117,7 +118,7 @@ songs = arioso.generate_many(
     lyrics=poem_text,
     title="Il pleut",
     genre="chanson",
-    model="V5",
+    model="V6",
     wait_for_completion=True,
     timeout=600,  # default is 300s; Suno often needs more
 )
@@ -252,6 +253,16 @@ time (raised as `arioso.CatalogMatchError`, a `RuntimeError` subclass with `.tas
 recording, so no re-render or re-performance gets through. The fal-hosted
 platforms did not check (2026-10). Why, and what to expect: [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/music-gen-upload-copyright-detection.md).
 
+## Music under a narration (a bed for an audiobook, podcast or voice-over)
+
+When the music goes *under speech*, the work is mostly fitting and post-production, not generation. Read the [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/scoring-narration.md) before choosing a route; in short:
+
+- **Always instrumental**, and exclude vocals, singing, choir and humming in the style. A sparse, unmetered texture (a drone with free melody, like a Hindustani alap) sits under speech without fighting its rhythm; save the pulse for the gaps between sections.
+- **Fit to the timeline:** generate a little longer than needed and cut at downbeats, or ask for exact section lengths with ElevenLabs Music's composition plan (`platform="elevenlabs"`, `structure=[...]`). Suno's duration control is a target, not a guarantee.
+- **Accompaniment around an existing voice** exists in Suno (Add Instrumental, Studio) and ACE-Step (Vocal2BGM), but none is documented for spoken word: try one short section first and keep only the instrumental stem.
+- **Duck, swell and time the pauses with `arioso.scoring`** (`pip install 'arioso[scoring]'`, plus ffmpeg): `score(segments, music, sr)` lays the spoken segments over the music with the pauses chosen so each segment enters just after a musical phrase begins (`phrase_starts`, a loudness-rise detector that works on free-rhythm music), the music `under_rel_db` (default -26 dB) below the voice while it speaks and `gap_rel_db` (-12 dB) between, with raised-cosine ramps. `plan_starts` and `duck_gain` are usable alone; any other phrase finder (beat_this downbeats, allin1 sections) can feed `phrases=`.
+- Suno (since 2026-09) has only v6-family models, monthly download caps on paid plans, and watermarks its tracks.
+
 ## Three levels of control
 
 ```python
@@ -271,7 +282,8 @@ Suno's `upload_extend` / `upload_cover`, its local task store
 | Song has no vocals though you passed `lyrics` | the platform is not one of the four | check `supported_affordances`; switch to `sunoapi` |
 | Suno rejects the request outright | customMode with no `title` | always pass `title=` alongside `lyrics=` |
 | Lyrics ignored on Suno specifically | `instrumental=True` was also passed | drop `instrumental` |
-| Long poem truncated | default model is `V4` (3,000 chars) | `model="V5"` |
+| Long poem truncated | an old `V4` model (3,000 chars) | use the default `V6` |
+| Song length not what you need | no `duration=` | `duration=` 10-360 s (custom mode, V6 family) |
 | `ValueError: ... has no audio_url` | job not finished | `poll_status` / `check_status` before `fetch_audio` |
 | `TimeoutError` after 300s | Suno is slower than the default | raise `timeout=` (600–900) |
 | `RuntimeError ... SENSITIVE_WORD_ERROR` | the lyric or style tripped a filter | reword and regenerate; that attempt still cost credit |

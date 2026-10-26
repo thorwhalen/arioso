@@ -15,6 +15,8 @@ import inspect
 
 import pytest
 
+from arioso._fal import FalAdapter
+
 from arioso.registry import discover_platforms, list_platforms
 from arioso.services import _make_validated_generate
 
@@ -47,7 +49,10 @@ def _sample(name, config):
 @pytest.mark.parametrize("platform", PLATFORMS)
 def test_supported_affordances_are_explicit_adapter_parameters(platform):
     adapter_cls = importlib.import_module(f"arioso.platforms.{platform}.adapter").Adapter
-    params = set(inspect.signature(adapter_cls.generate).parameters)
+    if issubclass(adapter_cls, FalAdapter):  # its config declares what it reads
+        params = set(adapter_cls().accepted_params())
+    else:
+        params = set(inspect.signature(adapter_cls.generate).parameters)
     unread = [a for a in _config(platform)["supported_affordances"] if a not in params]
     assert not unread, (
         f"{platform} declares {unread} but its Adapter.generate never names them, "

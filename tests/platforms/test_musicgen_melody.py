@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 
 import arioso.platforms.musicgen.adapter as mg_adapter
 from arioso.platforms.musicgen.adapter import Adapter
+from arioso.platforms.musicgen.backends import AudiocraftBackend
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG
 
 
@@ -30,13 +31,11 @@ def test_melody_switches_model_and_calls_chroma(monkeypatch):
     fake_model = MagicMock()
     fake_model.sample_rate = 32000
 
-    def fake_ensure(self, model_variant="facebook/musicgen-small"):
+    def fake_load(model_variant):
         loaded["model"] = model_variant
-        self._model = fake_model
-        self._model_name = model_variant
-        self._use_transformers = False
+        return AudiocraftBackend(fake_model)
 
-    monkeypatch.setattr(Adapter, "_ensure_model", fake_ensure)
+    monkeypatch.setattr(mg_adapter, "_load_backend", fake_load)
     _stub_ingress(monkeypatch)
 
     song = adapter.generate("happy rock", melody="tune.wav")
@@ -55,12 +54,9 @@ def test_text_only_uses_plain_generate(monkeypatch):
     fake_model.sample_rate = 32000
     fake_model.generate.return_value = [MagicMock()]
 
-    def fake_ensure(self, model_variant="facebook/musicgen-small"):
-        self._model = fake_model
-        self._model_name = model_variant
-        self._use_transformers = False
-
-    monkeypatch.setattr(Adapter, "_ensure_model", fake_ensure)
+    monkeypatch.setattr(
+        mg_adapter, "_load_backend", lambda variant: AudiocraftBackend(fake_model)
+    )
 
     adapter.generate("happy rock")
 

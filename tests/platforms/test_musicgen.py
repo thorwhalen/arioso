@@ -1,7 +1,9 @@
 """Tests for arioso.platforms.musicgen (mocked, no GPU needed)."""
 
-from unittest.mock import MagicMock, patch
-import pytest
+from unittest.mock import MagicMock
+
+import arioso.platforms.musicgen.adapter as mg_adapter
+from arioso.platforms.musicgen.backends import AudiocraftBackend
 
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG
 from arioso.platforms.musicgen.adapter import Adapter
@@ -30,17 +32,14 @@ def test_musicgen_config_prompt_coerce():
 
 def test_musicgen_adapter_init():
     adapter = Adapter(PLATFORM_CONFIG)
-    assert adapter._model is None
-    assert adapter._use_transformers is False
+    assert adapter._loaded is None
 
 
-@patch("arioso.platforms.musicgen.adapter.Adapter._ensure_model")
-def test_musicgen_generate_audiocraft(mock_ensure):
+def test_musicgen_generate_audiocraft(monkeypatch):
     """Test generate with mocked audiocraft model."""
     import numpy as np
 
     adapter = Adapter(PLATFORM_CONFIG)
-    adapter._use_transformers = False
 
     # Mock the audiocraft model
     mock_model = MagicMock()
@@ -52,8 +51,9 @@ def test_musicgen_generate_audiocraft(mock_ensure):
         )
     )
     mock_model.generate.return_value = mock_tensor
-    adapter._model = mock_model
-    adapter._model_name = "facebook/musicgen-small"
+    monkeypatch.setattr(
+        mg_adapter, "_load_backend", lambda variant: AudiocraftBackend(mock_model)
+    )
 
     song = adapter.generate("jazz piano", duration=8.0)
 

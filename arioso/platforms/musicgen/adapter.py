@@ -15,6 +15,8 @@ refuses (``sunoapi.upload_extend`` rejects uploads matching a catalogued
 composition; thorwhalen/arioso#29).
 """
 
+from __future__ import annotations
+
 from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
 from arioso.platforms.musicgen.backends import (
@@ -41,25 +43,8 @@ class Adapter:
 
     def __init__(self, config: dict):
         self.config = config
-        self._model = None
-        self._model_name = None
-        self._use_transformers = False
-
-    def _ensure_model(self, model_variant: str = "facebook/musicgen-small"):
-        """Lazy-load the model only when first generation is requested."""
-        if self._model is not None and self._model_name == model_variant:
-            return
-        # The model, processor and library flag stay adapter attributes (rather than
-        # the backend itself) because tests monkeypatch this method or set them.
-        try:
-            backend = AudiocraftBackend.load(model_variant)
-            self._use_transformers = False
-        except ImportError:
-            backend = TransformersBackend.load(model_variant)
-            self._processor = backend.processor
-            self._use_transformers = True
-        self._model = backend.model
-        self._model_name = model_variant
+        self._loaded: Backend | None = None
+        self._model_name: str | None = None
 
     def generate(
         self,
@@ -155,11 +140,11 @@ class Adapter:
         )
 
     def _backend(self, model: str) -> Backend:
-        """The loaded *model* behind the interface of its library."""
-        self._ensure_model(model)
-        if self._use_transformers:
-            return TransformersBackend(self._model, self._processor)
-        return AudiocraftBackend(self._model)
+        """The *model* loaded (once per variant) behind the interface of its library."""
+        if self._loaded is None or self._model_name != model:
+            self._loaded = _load_backend(model)
+            self._model_name = model
+        return self._loaded
 
     def _continue(
         self,
@@ -237,6 +222,15 @@ class Adapter:
             rounds=rounds,
             continuation=_audio_result(stitched[len(audio) :], sample_rate),
         )
+
+
+def _load_backend(model_variant: str) -> Backend:
+    """Load *model_variant* with audiocraft, or with transformers when audiocraft is
+    not installed."""
+    try:
+        return AudiocraftBackend.load(model_variant)
+    except ImportError:
+        return TransformersBackend.load(model_variant)
 
 
 def _splice(audio, out, n, *, crossfade):

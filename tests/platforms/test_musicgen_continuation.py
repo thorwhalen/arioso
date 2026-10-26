@@ -15,7 +15,12 @@ import pytest
 
 np = pytest.importorskip("numpy")
 
+import arioso.platforms.musicgen.adapter as mg_adapter  # noqa: E402
 from arioso.platforms.musicgen.adapter import Adapter  # noqa: E402
+from arioso.platforms.musicgen.backends import (  # noqa: E402
+    AudiocraftBackend,
+    TransformersBackend,
+)
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG  # noqa: E402
 from arioso.translation import check_supported_params  # noqa: E402
 
@@ -113,14 +118,13 @@ def _processor(*, audio, sampling_rate, text, **kwargs):
 def _adapter(monkeypatch, model, *, transformers=False):
     loaded = []
 
-    def fake_ensure(self, model_variant="facebook/musicgen-small"):
+    def fake_load(model_variant):
         loaded.append(model_variant)
-        self._model = model
-        self._model_name = model_variant
-        self._use_transformers = transformers
-        self._processor = _processor
+        if transformers:
+            return TransformersBackend(model, _processor)
+        return AudiocraftBackend(model)
 
-    monkeypatch.setattr(Adapter, "_ensure_model", fake_ensure)
+    monkeypatch.setattr(mg_adapter, "_load_backend", fake_load)
     adapter = Adapter(PLATFORM_CONFIG)
     adapter.loaded = loaded
     return adapter

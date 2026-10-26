@@ -515,6 +515,8 @@ def test_sunoapi_catalog_match_raises_typed_error(mock_make_session):
     assert exc_info.value.code == 413
     assert isinstance(exc_info.value, RuntimeError)
 
+
+@patch("arioso.platforms._base_adapter.make_session")
 def test_sunoapi_custom_controls_reach_payload(mock_make_session):
     mock_session = MagicMock()
     mock_response = MagicMock()

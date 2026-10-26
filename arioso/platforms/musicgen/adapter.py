@@ -19,6 +19,8 @@ from arioso._audio import to_audio_ref
 #: MusicGen's context window in seconds: an audio prompt plus the new audio it
 #: generates must fit in it (transformers caps generation at 1500 frames).
 WINDOW_SECONDS = 30.0
+#: Codec frames per second, used when a model does not report its own.
+DEFAULT_FRAME_RATE = 50
 #: Crossfade from the original audio into the model's re-decoded prompt at each
 #: seam, hiding the codec's reconstruction error there (a click otherwise).
 SEAM_CROSSFADE_SECONDS = 0.01
@@ -185,77 +187,51 @@ class Adapter:
     def _generate_audiocraft(
         self, prompt, *, duration, temperature, top_k, top_p, guidance
     ) -> Song:
-        self._model.set_generation_params(
-            use_sampling=True,
+        self._set_audiocraft_params(
+            duration=duration,
+            temperature=temperature,
             top_k=top_k,
             top_p=top_p,
-            temperature=temperature,
-            duration=duration,
-            cfg_coef=guidance,
+            guidance=guidance,
         )
         wav = self._model.generate([prompt])
-        audio_array = wav[0].cpu().numpy()
-        sample_rate = self._model.sample_rate
-
-        return Song(
-            audio=AudioResult(
-                audio_array=audio_array,
-                sample_rate=sample_rate,
-                format="wav",
-                duration_seconds=duration,
-            ),
-            platform="musicgen",
-            status="complete",
-            metadata={"model": self._model_name, "temperature": temperature},
+        return _song(
+            wav[0].cpu().numpy(),
+            self._model.sample_rate,
+            model=self._model_name,
+            temperature=temperature,
         )
 
     def _generate_transformers(
         self, prompt, *, duration, temperature, top_k, top_p, guidance
     ) -> Song:
-        import torch
-
         inputs = self._processor(text=[prompt], padding=True, return_tensors="pt").to(
             self._model.device
         )
-        # MusicGen generates ~50 tokens per second of audio at 32kHz
-        max_new_tokens = int(duration * 50)
-
-        with torch.no_grad():
-            audio_values = self._model.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                temperature=temperature,
-                do_sample=True,
-                top_k=top_k,
-                top_p=top_p if top_p > 0 else None,
-                guidance_scale=guidance,
-            )
-
-        audio_array = audio_values[0, 0].cpu().numpy()
-        sample_rate = self._model.config.audio_encoder.sampling_rate
-
-        return Song(
-            audio=AudioResult(
-                audio_array=audio_array,
-                sample_rate=sample_rate,
-                format="wav",
-                duration_seconds=duration,
-            ),
-            platform="musicgen",
-            status="complete",
-            metadata={"model": self._model_name, "temperature": temperature},
+        audio_values = self._transformers_generate(
+            inputs,
+            seconds=duration,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
+            guidance=guidance,
+        )
+        return _song(
+            audio_values[0, 0].cpu().numpy(),
+            self._sample_rate(),
+            model=self._model_name,
+            temperature=temperature,
         )
 
     def _generate_audiocraft_melody(
         self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
     ) -> Song:
-        self._model.set_generation_params(
-            use_sampling=True,
+        self._set_audiocraft_params(
+            duration=duration,
+            temperature=temperature,
             top_k=top_k,
             top_p=top_p,
-            temperature=temperature,
-            duration=duration,
-            cfg_coef=guidance,
+            guidance=guidance,
         )
         ref = to_audio_ref(melody)
         melody_wav = ref.as_waveform()  # (channels, frames)
@@ -263,35 +239,19 @@ class Adapter:
         wav = self._model.generate_with_chroma(
             [prompt], melody_wav[None], ref.sample_rate
         )
-        audio_array = wav[0].cpu().numpy()
-        sample_rate = self._model.sample_rate
-
-        return Song(
-            audio=AudioResult(
-                audio_array=audio_array,
-                sample_rate=sample_rate,
-                format="wav",
-                duration_seconds=duration,
-            ),
-            platform="musicgen",
-            status="complete",
-            metadata={
-                "model": self._model_name,
-                "temperature": temperature,
-                "melody_conditioned": True,
-            },
+        return _song(
+            wav[0].cpu().numpy(),
+            self._model.sample_rate,
+            model=self._model_name,
+            temperature=temperature,
+            melody_conditioned=True,
         )
 
     def _generate_transformers_melody(
         self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
     ) -> Song:
-        import torch
-
-        ref = to_audio_ref(melody)
-        audio, sample_rate = _mono_at_rate(
-            ref.as_array(),
-            ref.sample_rate,
-            target_rate=self._processor.feature_extractor.sampling_rate,
+        audio, sample_rate = to_audio_ref(melody).as_mono(
+            target_rate=self._processor.feature_extractor.sampling_rate
         )
         inputs = self._processor(
             audio=audio,
@@ -300,37 +260,51 @@ class Adapter:
             padding=True,
             return_tensors="pt",
         ).to(self._model.device)
-        max_new_tokens = int(duration * 50)
+        audio_values = self._transformers_generate(
+            inputs,
+            seconds=duration,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
+            guidance=guidance,
+        )
+        return _song(
+            audio_values[0, 0].cpu().numpy(),
+            self._sample_rate(),
+            model=self._model_name,
+            temperature=temperature,
+            melody_conditioned=True,
+        )
+
+    def _set_audiocraft_params(self, *, duration, temperature, top_k, top_p, guidance):
+        """Sampling settings for the next audiocraft ``generate*`` call."""
+        self._model.set_generation_params(
+            use_sampling=True,
+            top_k=top_k,
+            top_p=top_p,
+            temperature=temperature,
+            duration=duration,
+            cfg_coef=guidance,
+        )
+
+    def _transformers_generate(
+        self, inputs, *, seconds, temperature, top_k, top_p, guidance
+    ):
+        """Sample *seconds* of new audio with transformers; returns the
+        ``(batch, channels, frames)`` tensor. ``max_new_tokens`` adds the
+        frames the delay pattern consumes, so the output is the full length."""
+        import torch
 
         with torch.no_grad():
-            audio_values = self._model.generate(
+            return self._model.generate(
                 **inputs,
-                max_new_tokens=max_new_tokens,
+                max_new_tokens=int(seconds * self._frame_rate()) + self._delay_frames(),
                 temperature=temperature,
                 do_sample=True,
                 top_k=top_k,
                 top_p=top_p if top_p > 0 else None,
                 guidance_scale=guidance,
             )
-
-        audio_array = audio_values[0, 0].cpu().numpy()
-        sample_rate = self._model.config.audio_encoder.sampling_rate
-
-        return Song(
-            audio=AudioResult(
-                audio_array=audio_array,
-                sample_rate=sample_rate,
-                format="wav",
-                duration_seconds=duration,
-            ),
-            platform="musicgen",
-            status="complete",
-            metadata={
-                "model": self._model_name,
-                "temperature": temperature,
-                "melody_conditioned": True,
-            },
-        )
 
     def _continue(
         self,
@@ -365,10 +339,7 @@ class Adapter:
         # many from the output leaves the continuation alone.
         hop = sample_rate // self._frame_rate()
 
-        ref = to_audio_ref(source)
-        audio, _ = _mono_at_rate(
-            ref.as_array(), ref.sample_rate, target_rate=sample_rate
-        )
+        audio, _ = to_audio_ref(source).as_mono(target_rate=sample_rate)
         if continue_at is not None:
             if not 0 < continue_at <= len(audio) / sample_rate:
                 raise ValueError(
@@ -396,31 +367,17 @@ class Adapter:
             )
             stitched = _splice(stitched, out, n, crossfade=crossfade)
 
-        continuation = stitched[len(audio) :]
-        return Song(
-            audio=AudioResult(
-                audio_array=stitched,
-                sample_rate=sample_rate,
-                format="wav",
-                duration_seconds=len(stitched) / sample_rate,
-            ),
-            platform="musicgen",
-            status="complete",
-            metadata={
-                "model": self._model_name,
-                "temperature": temperature,
-                "continued": True,
-                "continue_from_seconds": len(audio) / sample_rate,
-                "prompt_seconds": used_prompt / sample_rate,
-                "extend_seconds": extend_seconds,
-                "rounds": rounds,
-                "continuation": AudioResult(
-                    audio_array=continuation,
-                    sample_rate=sample_rate,
-                    format="wav",
-                    duration_seconds=len(continuation) / sample_rate,
-                ),
-            },
+        return _song(
+            stitched,
+            sample_rate,
+            model=self._model_name,
+            temperature=temperature,
+            continued=True,
+            continue_from_seconds=len(audio) / sample_rate,
+            prompt_seconds=used_prompt / sample_rate,
+            extend_seconds=extend_seconds,
+            rounds=rounds,
+            continuation=_audio_result(stitched[len(audio) :], sample_rate),
         )
 
     def _continuation_round(
@@ -440,24 +397,21 @@ class Adapter:
                 padding=True,
                 return_tensors="pt",
             ).to(self._model.device)
-            with torch.no_grad():
-                audio_values = self._model.generate(
-                    **inputs,
-                    max_new_tokens=int(extend_seconds * self._frame_rate())
-                    + self._delay_frames(),
-                    temperature=temperature,
-                    do_sample=True,
-                    top_k=top_k,
-                    top_p=top_p if top_p > 0 else None,
-                    guidance_scale=guidance,
-                )
-            out = audio_values[0].cpu().numpy()
-        else:
-            self._model.set_generation_params(
-                use_sampling=True,
+            audio_values = self._transformers_generate(
+                inputs,
+                seconds=extend_seconds,
+                temperature=temperature,
                 top_k=top_k,
                 top_p=top_p,
+                guidance=guidance,
+            )
+            out = audio_values[0].cpu().numpy()
+        else:
+            self._set_audiocraft_params(
                 temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                guidance=guidance,
                 # audiocraft's duration covers the prompt and the continuation;
                 # it takes int(duration * frame_rate) frames, so aim mid-frame
                 # to keep float error from losing the last one.
@@ -467,7 +421,6 @@ class Adapter:
                     + 0.5
                 )
                 / self._frame_rate(),
-                cfg_coef=guidance,
             )
             prompt_wav = torch.from_numpy(tail).float()[None, None]
             wav = self._model.generate_continuation(
@@ -479,7 +432,7 @@ class Adapter:
     def _delay_frames(self) -> int:
         """Frames the codebook delay pattern consumes from ``max_new_tokens``
         on the transformers path (3 for the 4-codebook checkpoints), so a
-        round yields the ``extend_seconds`` asked for."""
+        call yields the seconds asked for."""
         decoder_config = getattr(self._model.decoder, "config", None)
         codebooks = getattr(decoder_config, "num_codebooks", None)
         channels = getattr(decoder_config, "audio_channels", 1)
@@ -498,7 +451,9 @@ class Adapter:
             rate = getattr(self._model.config.audio_encoder, "frame_rate", None)
         else:
             rate = getattr(self._model, "frame_rate", None)
-        return int(rate) if isinstance(rate, (int, float)) and rate else 50
+        if isinstance(rate, (int, float)) and rate:
+            return int(rate)
+        return DEFAULT_FRAME_RATE
 
 
 def _splice(audio, out, n, *, crossfade):
@@ -536,25 +491,25 @@ def _check_continuation_window(
         raise ValueError(f"musicgen: rounds must be a positive int, got {rounds!r}.")
 
 
-def _mono_at_rate(array, sample_rate, *, target_rate):
-    """Mono float32 audio at *target_rate* (melody input and continuation).
+def _song(audio_array, sample_rate, *, model, temperature, **metadata) -> Song:
+    """A complete musicgen Song of *audio_array*, ``(frames,)`` or
+    ``(channels, frames)``, with ``model``, ``temperature`` and *metadata*."""
+    return Song(
+        audio=_audio_result(audio_array, sample_rate),
+        platform="musicgen",
+        status="complete",
+        metadata={"model": model, "temperature": temperature, **metadata},
+    )
 
-    The transformers MusicGen-melody feature extractor resamples with
-    torchaudio, which fails on the float64 NumPy arrays soundfile returns
-    (``torch.arange`` rejects a NumPy dtype). Handing it mono float32 at its
-    own rate means it never has to resample.
-    """
-    import numpy as np
 
-    audio = np.asarray(array, dtype=np.float32)
-    if audio.ndim > 1:  # (frames, channels) or (channels, frames)
-        audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)
-    if target_rate and sample_rate != target_rate:
-        import librosa
-
-        audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=target_rate)
-        sample_rate = target_rate
-    return audio.astype(np.float32), sample_rate
+def _audio_result(audio_array, sample_rate) -> AudioResult:
+    """WAV-format AudioResult; its duration is the length of the frames axis."""
+    return AudioResult(
+        audio_array=audio_array,
+        sample_rate=sample_rate,
+        format="wav",
+        duration_seconds=audio_array.shape[-1] / sample_rate,
+    )
 
 
 def _device() -> str:

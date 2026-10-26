@@ -48,7 +48,8 @@ class AudioRef:
     Construct it via :func:`to_audio_ref` rather than directly. Exactly one of
     ``path`` / ``data`` / ``array`` describes the source; :attr:`sample_rate` is
     known immediately for array/tuple sources and decoded on demand otherwise.
-    The accessors (:meth:`as_array`, :meth:`as_path`, :meth:`as_waveform`)
+    The accessors (:meth:`as_array`, :meth:`as_mono`, :meth:`as_path`,
+    :meth:`as_waveform`)
     produce the requested concrete form, converting (and caching) as needed.
     """
 
@@ -132,6 +133,34 @@ class AudioRef:
             sf.write(tmp, self._array, self.sample_rate)
         self._tmp_path = tmp
         return tmp
+
+    def as_mono(self, *, target_rate: Optional[int] = None) -> tuple[Any, int]:
+        """Return ``(audio, sample_rate)``: mono float32, at *target_rate* if given.
+
+        Multichannel audio is averaged over its smaller axis, so both
+        ``(frames, channels)`` and ``(channels, frames)`` work. Resampling uses
+        :mod:`librosa` and only happens when the rate differs. Float32 matters
+        for the transformers MusicGen feature extractor: it resamples with
+        torchaudio, which fails on the float64 NumPy arrays soundfile returns
+        (``torch.arange`` rejects a NumPy dtype). Handing it mono float32 at its
+        own rate means it never has to resample.
+        """
+        import numpy as np
+
+        audio = np.asarray(self.as_array(), dtype=np.float32)
+        sample_rate = self.sample_rate
+        if audio.ndim > 1:  # (frames, channels) or (channels, frames)
+            audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)
+        if target_rate and sample_rate != target_rate:
+            try:
+                import librosa
+            except ImportError as e:  # pragma: no cover - exercised only w/o librosa
+                raise ImportError(
+                    "Resampling audio needs 'librosa' (pip install librosa)."
+                ) from e
+            audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=target_rate)
+            sample_rate = target_rate
+        return audio.astype(np.float32), sample_rate
 
     def as_waveform(self):
         """Return the audio as a torch tensor of shape ``(channels, frames)``.

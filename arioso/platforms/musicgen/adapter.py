@@ -19,6 +19,7 @@ from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
 from arioso.platforms.musicgen.backends import (
     AudiocraftBackend,
+    Backend,
     Sampling,
     TransformersBackend,
 )
@@ -48,29 +49,17 @@ class Adapter:
         """Lazy-load the model only when first generation is requested."""
         if self._model is not None and self._model_name == model_variant:
             return
+        # The model, processor and library flag stay adapter attributes (rather than
+        # the backend itself) because tests monkeypatch this method or set them.
         try:
-            from audiocraft.models import MusicGen
-
-            self._model = MusicGen.get_pretrained(model_variant)
-            self._model_name = model_variant
+            backend = AudiocraftBackend.load(model_variant)
             self._use_transformers = False
         except ImportError:
-            from transformers import AutoProcessor
-
-            # Melody variants need the melody-specific model class.
-            if "melody" in model_variant:
-                from transformers import (
-                    MusicgenMelodyForConditionalGeneration as _ModelClass,
-                )
-            else:
-                from transformers import (
-                    MusicgenForConditionalGeneration as _ModelClass,
-                )
-
-            self._model = _ModelClass.from_pretrained(model_variant).to(_device())
-            self._processor = AutoProcessor.from_pretrained(model_variant)
-            self._model_name = model_variant
+            backend = TransformersBackend.load(model_variant)
+            self._processor = backend.processor
             self._use_transformers = True
+        self._model = backend.model
+        self._model_name = model_variant
 
     def generate(
         self,
@@ -165,7 +154,7 @@ class Adapter:
             **extra,
         )
 
-    def _backend(self, model: str):
+    def _backend(self, model: str) -> Backend:
         """The loaded *model* behind the interface of its library."""
         self._ensure_model(model)
         if self._use_transformers:
@@ -304,21 +293,3 @@ def _audio_result(audio_array, sample_rate) -> AudioResult:
         format="wav",
         duration_seconds=audio_array.shape[-1] / sample_rate,
     )
-
-
-def _device() -> str:
-    """The torch device for the transformers path: ``$ARIOSO_TORCH_DEVICE``,
-    else CUDA, else Apple MPS, else CPU (the CPU-only default made a
-    30-second melody-conditioned generation take a quarter of an hour)."""
-    import os
-
-    import torch
-
-    env = os.environ.get("ARIOSO_TORCH_DEVICE")
-    if env:
-        return env
-    if torch.cuda.is_available():
-        return "cuda"
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"

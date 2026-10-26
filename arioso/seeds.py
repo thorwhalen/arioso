@@ -107,11 +107,16 @@ def pyin_f0(
     return f0, voiced, sr / hop
 
 
+#: Sample rate of torchaudio's HDEMUCS_HIGH_MUSDB_PLUS (checked when the model loads).
+HDEMUCS_SR = 44100
+
+
 @lru_cache(maxsize=2)
 def _hdemucs(device: str):
     import torchaudio
 
     bundle = torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS
+    assert bundle.sample_rate == HDEMUCS_SR, bundle.sample_rate
     return bundle.get_model().to(device).eval(), bundle.sample_rate
 
 
@@ -131,16 +136,15 @@ def hdemucs_vocals(
     bundle, trained on MUSDB-HQ plus extra data) download once; check their terms before
     commercial use.
     """
-    import torch
-    import torchaudio
-
-    model_sr = torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS.sample_rate
-    seg, ov = int(segment_s * model_sr), int(overlap_s * model_sr)
+    seg, ov = int(segment_s * HDEMUCS_SR), int(overlap_s * HDEMUCS_SR)
     if seg <= ov:  # in samples: the loop would never advance
         raise ValueError(
             f"segment_s ({segment_s}) must be longer than overlap_s ({overlap_s})"
         )
-    model, _ = _hdemucs(device)
+    import torch
+    import torchaudio
+
+    model, model_sr = _hdemucs(device)
     x = to_audio_ref((y, sr)).as_waveform().float()
     if x.shape[0] == 1:
         x = x.repeat(2, 1)

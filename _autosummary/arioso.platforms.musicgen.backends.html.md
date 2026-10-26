@@ -15,6 +15,11 @@ audiocraft and `(frames,)` from transformers’ first channel, and mono for a co
 | [`DEFAULT_FRAME_RATE`](#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE)   | Codec frames per second, used when a model does not report its own.   |
 |-----------------------------------------------------------------------|-----------------------------------------------------------------------|
 
+### Functions
+
+| [`select_backend_class`](#arioso.platforms.musicgen.backends.select_backend_class)(model_variant)   | The library that runs `model_variant`: audiocraft when it imports, else transformers.   |
+|----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`AudiocraftBackend`](#arioso.platforms.musicgen.backends.AudiocraftBackend)(model)                          | A loaded `audiocraft.models.MusicGen`.                                              |
@@ -28,6 +33,13 @@ audiocraft and `(frames,)` from transformers’ first channel, and mono for a co
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A loaded `audiocraft.models.MusicGen`.
+
+#### *classmethod* can_continue(model_variant)
+
+Every checkpoint takes an audio prompt to extend.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### continuation(prompt, tail, , seconds, sampling)
 
@@ -97,6 +109,13 @@ Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protoco
 
 What the adapter needs from a library that runs a loaded MusicGen model.
 
+#### *classmethod* can_continue(model_variant)
+
+Whether this library can continue audio with `model_variant` (cheap: loads nothing).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 #### continuation(prompt, tail, , seconds, sampling)
 
 The re-decoded `tail` and `seconds` after it, mono.
@@ -146,6 +165,13 @@ A loaded transformers `Musicgen(Melody)ForConditionalGeneration` and its process
 
 Channels the decoder generates (2 for the stereo checkpoints); 1 when its
 config does not say, or it has none.
+
+#### *classmethod* can_continue(model_variant)
+
+Not a melody checkpoint: its audio input is melody chroma, not a prompt to extend.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### continuation(prompt, tail, , seconds, sampling)
 
@@ -212,3 +238,13 @@ Generate from a text prompt.
   `ndarray`
 * **Returns:**
   The first channel of the audio, `(frames,)`.
+
+### arioso.platforms.musicgen.backends.select_backend_class(model_variant)
+
+The library that runs `model_variant`: audiocraft when it imports, else transformers.
+
+Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
+one is read; a present but broken install falls back like a missing one.
+
+* **Return type:**
+  [`type`](https://docs.python.org/3/builtins/functions.html#type)[[`Backend`](#arioso.platforms.musicgen.backends.Backend)]

@@ -1,4 +1,4 @@
-> built 2026-10-26 14:20 UTC from 771c75e (main) · arioso 0.0.40. Details: build_info.json
+> built 2026-10-26 15:38 UTC from 8fa03e2 (main) · arioso 0.0.41. Details: build_info.json
 
 # index.html.md
 
@@ -1619,18 +1619,22 @@ composition; thorwhalen/arioso#29).
 
 ### Classes
 
-| [`Adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, load_backend])   | MusicGen adapter with lazy model loading.   |
-|----------------------------------------------------------------------------------------|---------------------------------------------|
+| [`Adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, backend_for, load_backend])   | MusicGen adapter with lazy model loading.   |
+|-----------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* arioso.platforms.musicgen.adapter.Adapter(config, \*, load_backend=<function \_load_backend>)
+### *class* arioso.platforms.musicgen.adapter.Adapter(config, , backend_for=None, load_backend=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 MusicGen adapter with lazy model loading.
 
-Tries `audiocraft` first; if unavailable, falls back to the
-HuggingFace `transformers` pipeline. `load_backend` (model variant ->
-`Backend`) replaces that choice.
+`backend_for` (model variant -> backend class) chooses the library without
+loading weights: `audiocraft` when it imports, else the HuggingFace
+`transformers` pipeline (`select_backend_class()`). The chosen class is
+asked what it can do (`can_continue`) and then loads the weights, so the class
+that answers is the class that loads. `load_backend` (model variant ->
+`Backend`) replaces the choice and the loading together: nothing is asked
+before it loads, and the backend it returns is on its own.
 
 #### generate(prompt, , duration=8.0, temperature=1.0, top_k=250, top_p=0.0, guidance=3.0, model='facebook/musicgen-small', melody=None, continue_from=None, continue_at=None, prompt_seconds=10.0, extend_seconds=None, rounds=1, \*\*kwargs)
 
@@ -1705,6 +1709,11 @@ audiocraft and `(frames,)` from transformers’ first channel, and mono for a co
 | [`DEFAULT_FRAME_RATE`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE)   | Codec frames per second, used when a model does not report its own.   |
 |-----------------------------------------------------------------------|-----------------------------------------------------------------------|
 
+### Functions
+
+| [`select_backend_class`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.select_backend_class)(model_variant)   | The library that runs `model_variant`: audiocraft when it imports, else transformers.   |
+|----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`AudiocraftBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.AudiocraftBackend)(model)                          | A loaded `audiocraft.models.MusicGen`.                                              |
@@ -1718,6 +1727,13 @@ audiocraft and `(frames,)` from transformers’ first channel, and mono for a co
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A loaded `audiocraft.models.MusicGen`.
+
+#### *classmethod* can_continue(model_variant)
+
+Every checkpoint takes an audio prompt to extend.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### continuation(prompt, tail, , seconds, sampling)
 
@@ -1787,6 +1803,13 @@ Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protoco
 
 What the adapter needs from a library that runs a loaded MusicGen model.
 
+#### *classmethod* can_continue(model_variant)
+
+Whether this library can continue audio with `model_variant` (cheap: loads nothing).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 #### continuation(prompt, tail, , seconds, sampling)
 
 The re-decoded `tail` and `seconds` after it, mono.
@@ -1836,6 +1859,13 @@ A loaded transformers `Musicgen(Melody)ForConditionalGeneration` and its process
 
 Channels the decoder generates (2 for the stereo checkpoints); 1 when its
 config does not say, or it has none.
+
+#### *classmethod* can_continue(model_variant)
+
+Not a melody checkpoint: its audio input is melody chroma, not a prompt to extend.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### continuation(prompt, tail, , seconds, sampling)
 
@@ -1902,6 +1932,16 @@ Generate from a text prompt.
   `ndarray`
 * **Returns:**
   The first channel of the audio, `(frames,)`.
+
+### arioso.platforms.musicgen.backends.select_backend_class(model_variant)
+
+The library that runs `model_variant`: audiocraft when it imports, else transformers.
+
+Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
+one is read; a present but broken install falls back like a missing one.
+
+* **Return type:**
+  [`type`](https://docs.python.org/3/builtins/functions.html#type)[[`Backend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Backend)]
 
 
 # _autosummary/arioso.platforms.musicgen.config.html.md
@@ -2689,20 +2729,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-26 14:20 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/771c75e1064a3241cc468b103a26961e832525ad"><code>771c75e</code></a> on branch <code>main</code>, for **arioso 0.0.40** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 15:38 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e2</code></a> on branch <code>main</code>, for **arioso 0.0.41** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.40) is ahead of the latest release on PyPI (0.0.39): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/771c75e1064a3241cc468b103a26961e832525ad"><code>771c75e1064a3241cc468b103a26961e832525ad</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e23d27858ed874c7e512f8e98dcd273f143</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.40</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.41</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2711,9 +2749,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40338287813">40338287813</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40350814189">40350814189</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ba6c2d80868eceab118bc3f70d2ec3bc6902e184</code> (in the history of the built commit) |
+| Event commit | <code>2282350b493123aba72c460d2ab543fa7dd4033e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2738,13 +2776,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.39/">0.0.39</a>, older than the documented version (0.0.40).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.41/">0.0.41</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 771c75e1064a3241cc468b103a26961e832525ad
+git checkout 8fa03e23d27858ed874c7e512f8e98dcd273f143
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -10,6 +10,12 @@ arioso.platforms.musicgen.backends
    
       DEFAULT_FRAME_RATE
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      select_backend_class
+   
    .. rubric:: Classes
 
    .. autosummary::

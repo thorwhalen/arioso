@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../_static/documentation_options.js?v=84bd753f"></script>
+    <script src="../../../../_static/documentation_options.js?v=20c5f126"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.40" />
+  <meta name="docsearch:version" content="0.0.41" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -758,6 +758,13 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">Backend</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""What the adapter needs from a library that runs a loaded MusicGen model."""</span>
 
+<div class="viewcode-block" id="Backend.can_continue">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.can_continue">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_continue</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Whether this library can continue audio with ``model_variant`` (cheap: loads nothing)."""</span></div>
+
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Output samples per second."""</span>
@@ -790,6 +797,22 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="select_backend_class">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.select_backend_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">select_backend_class</span><span class="p">(</span><span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Backend</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The library that runs ``model_variant``: audiocraft when it imports, else transformers.</span>
+
+<span class="sd">    Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB</span>
+<span class="sd">    one is read; a present but broken install falls back like a missing one.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">audiocraft.models</span>  <span class="c1"># noqa: F401</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TransformersBackend</span>
+    <span class="k">return</span> <span class="n">AudiocraftBackend</span></div>
+
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_rate_or_default</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">rate</span> <span class="k">else</span> <span class="n">DEFAULT_FRAME_RATE</span>
 
@@ -819,6 +842,14 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+
+<div class="viewcode-block" id="AudiocraftBackend.can_continue">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.can_continue">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_continue</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Every checkpoint takes an audio prompt to extend."""</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
 
 <div class="viewcode-block" id="AudiocraftBackend.load">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.load">[docs]</a>
@@ -942,6 +973,14 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">processor</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">processor</span>
+
+<div class="viewcode-block" id="TransformersBackend.can_continue">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.can_continue">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_continue</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Not a melody checkpoint: its audio input is melody chroma, not a prompt to extend."""</span>
+        <span class="k">return</span> <span class="s2">"melody"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_variant</span></div>
+
 
 <div class="viewcode-block" id="TransformersBackend.load">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.load">[docs]</a>

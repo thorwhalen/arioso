@@ -2,20 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-10-26 14:20 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/771c75e1064a3241cc468b103a26961e832525ad"><code>771c75e</code></a> on branch <code>main</code>, for **arioso 0.0.40** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 15:38 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e2</code></a> on branch <code>main</code>, for **arioso 0.0.41** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.40) is ahead of the latest release on PyPI (0.0.39): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/771c75e1064a3241cc468b103a26961e832525ad"><code>771c75e1064a3241cc468b103a26961e832525ad</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e23d27858ed874c7e512f8e98dcd273f143</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.40</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.41</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -24,9 +22,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40338287813">40338287813</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40350814189">40350814189</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ba6c2d80868eceab118bc3f70d2ec3bc6902e184</code> (in the history of the built commit) |
+| Event commit | <code>2282350b493123aba72c460d2ab543fa7dd4033e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +49,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.39/">0.0.39</a>, older than the documented version (0.0.40).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.41/">0.0.41</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 771c75e1064a3241cc468b103a26961e832525ad
+git checkout 8fa03e23d27858ed874c7e512f8e98dcd273f143
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

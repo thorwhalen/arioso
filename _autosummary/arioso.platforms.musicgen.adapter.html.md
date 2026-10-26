@@ -24,18 +24,22 @@ composition; thorwhalen/arioso#29).
 
 ### Classes
 
-| [`Adapter`](#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, load_backend])   | MusicGen adapter with lazy model loading.   |
-|----------------------------------------------------------------------------------------|---------------------------------------------|
+| [`Adapter`](#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, backend_for, load_backend])   | MusicGen adapter with lazy model loading.   |
+|-----------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* arioso.platforms.musicgen.adapter.Adapter(config, \*, load_backend=<function \_load_backend>)
+### *class* arioso.platforms.musicgen.adapter.Adapter(config, , backend_for=None, load_backend=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 MusicGen adapter with lazy model loading.
 
-Tries `audiocraft` first; if unavailable, falls back to the
-HuggingFace `transformers` pipeline. `load_backend` (model variant ->
-`Backend`) replaces that choice.
+`backend_for` (model variant -> backend class) chooses the library without
+loading weights: `audiocraft` when it imports, else the HuggingFace
+`transformers` pipeline (`select_backend_class()`). The chosen class is
+asked what it can do (`can_continue`) and then loads the weights, so the class
+that answers is the class that loads. `load_backend` (model variant ->
+`Backend`) replaces the choice and the loading together: nothing is asked
+before it loads, and the backend it returns is on its own.
 
 #### generate(prompt, , duration=8.0, temperature=1.0, top_k=250, top_p=0.0, guidance=3.0, model='facebook/musicgen-small', melody=None, continue_from=None, continue_at=None, prompt_seconds=10.0, extend_seconds=None, rounds=1, \*\*kwargs)
 

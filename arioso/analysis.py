@@ -7,8 +7,9 @@ they still move the harmony in blocks. ``drone_report`` measures it from the bas
 
 - the bass chroma (pitch classes from C1 to B3) over time, median-smoothed over ``smooth_s``;
 - the drone pair actually played: the two pitch classes a fifth (or a fourth) apart that carry the
-  most bass energy (Sa: the requested ``sa`` if it is one of them, else the stronger), and its offset from a requested ``sa`` (a static but off-key take can be
-  transposed, a moving one cannot);
+  most bass energy (Sa: the requested ``sa`` if it is one of them, else the lower note of the fifth,
+  which is Sa in the usual Pa tuning even when the Pa string is the louder), and its offset from a
+  requested ``sa`` (a static but off-key take can be transposed, a moving one cannot);
 - the off-drone runs: stretches of at least ``min_run_s`` where the bass's strongest pitch class
   leaves the pair, or the pair's share of the bass falls under ``min_share``. Those are the
   harmony moves.
@@ -35,10 +36,14 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from arioso._audio import hz_to_midi
+
 NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 _FLATS = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "H": "B"}
 C1_HZ = 32.703
 C4_HZ = 261.626
+#: Semitones of a perfect fifth and of its inversion, a fourth.
+FIFTH, FOURTH = 7, 5
 
 
 @dataclass
@@ -151,7 +156,7 @@ def drone_report(
     smooth_s: float = 2.0,
     min_share: float = 0.35,
     loud_rel: float = 0.05,
-    intervals: Sequence[int] = (7, 5),
+    intervals: Sequence[int] = (FIFTH, FOURTH),
 ) -> DroneReport:
     """Does ``y`` hold one drone? See the module docstring for the measure.
 
@@ -176,9 +181,12 @@ def drone_report(
         key=lambda p: total[p[0]] + total[(p[0] + p[1]) % 12],
     )
     # Sa: the requested one when it is in the pair (a Ma tuning plays Sa and its fourth below),
-    # else the stronger of the two (a tanpura has two Sa strings)
+    # else the lower note of the fifth: the Pa tuning's Sa, whichever string is louder
     want = pitch_class(sa) if sa is not None else None
-    pair = sorted([root, (root + iv) % 12], key=lambda k: (k != want, -total[k]))
+    pair = [root, (root + iv) % 12]
+    if (pair[1] - pair[0]) % 12 == FOURTH:
+        pair.reverse()
+    pair.sort(key=lambda k: k != want)
     root = pair[0]
     share = chroma[pair].sum(0) / np.maximum(level, 1e-12)
     off = loud & (~np.isin(chroma.argmax(0), pair) | (share < min_share))
@@ -197,6 +205,61 @@ def drone_report(
         fps=fps,
         chroma=chroma,
     )
+
+
+def drone_sa(y: np.ndarray, sr: int, **report_kwargs) -> str:
+    """The Sa of a drone recording, assuming the usual Pa tuning: ``drone_report``'s first
+    note, the lower one of the fifth it finds (whichever string is louder). A Ma-tuned
+    recording reads as its Ma; name its Sa instead."""
+    return drone_report(y, sr, **report_kwargs).drone[0]
+
+
+def drone_tonic(
+    y: np.ndarray,
+    sr: int,
+    *,
+    sa: str | None = None,
+    band_midi: tuple = (36, 72),
+    lowest_rel: float = 0.1,
+) -> float:
+    """The tonic of a drone recording as a fractional pitch class (0 = C, 4.45 = E 45 cents
+    sharp): the Sa of :func:`drone_sa` (or the given ``sa`` name), refined to a spectral peak
+    within half a semitone of it in ``band_midi``, interpolated between bins.
+
+    Sa sounds in every octave of the band, and a stiff string's upper partials run sharp (about
+    6 cents at the second partial of a thick string), so the strongest copy reads sharp. The
+    estimate is the lowest copy whose peak is at least ``lowest_rel`` of the strongest one's,
+    the least stretched that still stands out of the noise.
+
+    The band is half-open, ``[band_midi[0], band_midi[1])``: a copy a few cents under its
+    bottom edge is not seen. (Unlike ``librosa.estimate_tuning``, which gives one offset for all
+    pitches, this follows one pitch class through its octave copies.)
+
+    Raises when there is no peak there (silence, or an ``sa`` the recording does not play):
+    the strongest bin would then sit on the window's edge and the estimate would be a guess.
+    """
+    if not 0 < lowest_rel <= 1:
+        raise ValueError(f"lowest_rel must be in (0, 1], got {lowest_rel}")
+    pc = pitch_class(sa) if sa is not None else pitch_class(drone_sa(y, sr))
+    spectrum = np.abs(np.fft.rfft(np.asarray(y, dtype=float) * np.hanning(len(y))))
+    midi = hz_to_midi(np.fft.rfftfreq(len(y), 1 / sr))
+    in_band = (midi >= band_midi[0]) & (midi < band_midi[1])
+    near = in_band & (np.abs((midi - pc + 6) % 12 - 6) < 0.5)
+    near[[0, -1]] = False  # a peak needs a bin on each side
+    copies = np.round((midi - pc) / 12)  # which octave's window a bin is in
+    peaks = []  # (bin of an octave copy's strongest peak, in ascending pitch)
+    for octave in np.unique(copies[near]):
+        window = np.flatnonzero(near & (copies == octave))
+        k = int(window[np.argmax(spectrum[window])])
+        if spectrum[k] > spectrum[k - 1] and spectrum[k] > spectrum[k + 1]:
+            peaks.append(k)
+    if not peaks:
+        raise ValueError(f"no spectral peak at {NOTES[pc]} in the recording")
+    strongest = max(spectrum[k] for k in peaks)
+    k = next(k for k in peaks if spectrum[k] >= lowest_rel * strongest)
+    a, b, c = np.log(spectrum[k - 1 : k + 2] + 1e-12)
+    bin_offset = float(np.clip(0.5 * (a - c) / (a - 2 * b + c), -0.5, 0.5))
+    return float(hz_to_midi((k + bin_offset) * sr / len(y)) % 12)
 
 
 #: DTW steps for melody_match: without single steps the path's slope stays within [1/2, 2], so a

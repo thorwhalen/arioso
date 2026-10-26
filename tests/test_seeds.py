@@ -542,3 +542,12 @@ def test_audio_contour_names_a_bad_tracker_result(result, match):
             separator=None,
             f0_tracker=lambda y, sr: SimpleNamespace(**result),
         )
+
+
+def test_the_dsp_primitives_live_in_audio_and_seeds_re_exports_them():
+    from arioso import _audio, analysis, seeds
+
+    for name in ("varispeed", "highpass", "loop_drone", "hz_to_midi", "midi_to_hz"):
+        assert getattr(seeds, name) is getattr(_audio, name)
+    for name in ("drone_sa", "drone_tonic"):
+        assert getattr(seeds, name) is getattr(analysis, name)

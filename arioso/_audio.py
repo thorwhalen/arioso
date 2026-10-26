@@ -170,7 +170,7 @@ class AudioRef:
 
         This is the form neural backends want (``stable_audio``'s
         ``initial_audio_waveforms``, ``musicgen`` melody chroma). Mono audio is
-        returned as ``(1, frames)``.
+        returned as ``(1, frames)``; a 2-D array may be either way round.
         """
         try:
             import torch
@@ -182,9 +182,9 @@ class AudioRef:
         tensor = torch.as_tensor(array, dtype=torch.float32)
         if tensor.ndim == 1:  # (frames,) -> (1, frames)
             tensor = tensor.unsqueeze(0)
-        elif (
-            tensor.ndim == 2
-        ):  # soundfile gives (frames, channels) -> (channels, frames)
+        elif tensor.ndim == 2 and tensor.shape[0] > tensor.shape[1]:
+            # soundfile gives (frames, channels); librosa and torchaudio give
+            # (channels, frames). The longer axis is time (as in as_mono).
             tensor = tensor.transpose(0, 1).contiguous()
         return tensor
 

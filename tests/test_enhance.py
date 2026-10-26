@@ -184,3 +184,14 @@ def test_audio_ref_as_mono_downmixes_either_orientation_to_float32():
     audio, sr = to_audio_ref((mono, 8000)).as_mono()  # no target: rate kept
     assert sr == 8000
     assert audio.dtype == np.float32 and np.array_equal(audio, mono)
+
+
+@pytest.mark.parametrize("shape", [(2, 1000), (1000, 2), (1000,)])
+def test_audio_ref_as_waveform_is_channels_first_from_either_orientation(shape):
+    pytest.importorskip("torch")
+    np = pytest.importorskip("numpy")
+    from arioso._audio import to_audio_ref
+
+    channels = shape[0] if shape[0] < 1000 else (shape[1] if len(shape) > 1 else 1)
+    wave = to_audio_ref((np.zeros(shape, dtype="float32"), 44100)).as_waveform()
+    assert tuple(wave.shape) == (channels, 1000)

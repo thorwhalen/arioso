@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T11:36:44Z",
+  "built_at": "2026-10-26T11:36:51Z",
   "package": {
     "name": "arioso",
     "version": "0.0.36",
@@ -23,12 +23,12 @@
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "8654c9e5911615d46e8149b9864d73004dc48fea",
+    "sha": "f252d8cc5803cf6f08522e984c2a6529f465697e",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40316126447",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/40316126447",
+    "run_id": "40316117257",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/40316117257",
     "server_url": "https://github.com"
   },
   "tools": {

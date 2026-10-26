@@ -26,9 +26,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/arioso</code> |
-| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/40316126447">40316126447</a> |
+| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/40316117257">40316117257</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>8654c9e5911615d46e8149b9864d73004dc48fea</code> (in the history of the built commit) |
+| Event commit | <code>f252d8cc5803cf6f08522e984c2a6529f465697e</code> (in the history of the built commit) |
 
 ## Tools
 

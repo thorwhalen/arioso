@@ -1,4 +1,6 @@
-"""Audio-input normalization for the enhance / audio-conditioning stage.
+"""Audio-input normalization for the enhance / audio-conditioning stage, and the small pitch
+and DSP primitives (``hz_to_midi``, ``varispeed``, ``highpass``, ``loop_drone``) that
+:mod:`arioso.analysis` and :mod:`arioso.seeds` share.
 
 The facade's :func:`arioso.enhance` and the audio-accepting adapters
 (``stable_audio``, ``musicgen`` melody, ``udio`` …) each want the input audio in

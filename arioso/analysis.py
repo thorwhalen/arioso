@@ -42,6 +42,8 @@ NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 _FLATS = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "H": "B"}
 C1_HZ = 32.703
 C4_HZ = 261.626
+#: Semitones of a perfect fifth and of its inversion, a fourth.
+FIFTH, FOURTH = 7, 5
 
 
 @dataclass
@@ -154,7 +156,7 @@ def drone_report(
     smooth_s: float = 2.0,
     min_share: float = 0.35,
     loud_rel: float = 0.05,
-    intervals: Sequence[int] = (7, 5),
+    intervals: Sequence[int] = (FIFTH, FOURTH),
 ) -> DroneReport:
     """Does ``y`` hold one drone? See the module docstring for the measure.
 
@@ -182,7 +184,7 @@ def drone_report(
     # else the lower note of the fifth: the Pa tuning's Sa, whichever string is louder
     want = pitch_class(sa) if sa is not None else None
     pair = [root, (root + iv) % 12]
-    if (pair[1] - pair[0]) % 12 == 5:
+    if (pair[1] - pair[0]) % 12 == FOURTH:
         pair.reverse()
     pair.sort(key=lambda k: k != want)
     root = pair[0]
@@ -205,8 +207,6 @@ def drone_report(
     )
 
 
-#: DTW steps for melody_match: without single steps the path's slope stays within [1/2, 2], so a
-#: take may run at half to double its seed's tempo but cannot sit on one frame (as in denote.align).
 def drone_sa(y: np.ndarray, sr: int, **report_kwargs) -> str:
     """The Sa of a drone recording, assuming the usual Pa tuning: ``drone_report``'s first
     note, the lower one of the fifth it finds (whichever string is louder). A Ma-tuned
@@ -231,9 +231,15 @@ def drone_tonic(
     estimate is the lowest copy whose peak is at least ``lowest_rel`` of the strongest one's,
     the least stretched that still stands out of the noise.
 
+    The band is half-open, ``[band_midi[0], band_midi[1])``: a copy a few cents under its
+    bottom edge is not seen. (Unlike ``librosa.estimate_tuning``, which gives one offset for all
+    pitches, this follows one pitch class through its octave copies.)
+
     Raises when there is no peak there (silence, or an ``sa`` the recording does not play):
     the strongest bin would then sit on the window's edge and the estimate would be a guess.
     """
+    if not 0 < lowest_rel <= 1:
+        raise ValueError(f"lowest_rel must be in (0, 1], got {lowest_rel}")
     pc = pitch_class(sa) if sa is not None else pitch_class(drone_sa(y, sr))
     spectrum = np.abs(np.fft.rfft(np.asarray(y, dtype=float) * np.hanning(len(y))))
     midi = hz_to_midi(np.fft.rfftfreq(len(y), 1 / sr))
@@ -256,6 +262,8 @@ def drone_tonic(
     return float(hz_to_midi((k + bin_offset) * sr / len(y)) % 12)
 
 
+#: DTW steps for melody_match: without single steps the path's slope stays within [1/2, 2], so a
+#: take may run at half to double its seed's tempo but cannot sit on one frame (as in denote.align).
 _MELODY_STEPS = np.array([[1, 1], [1, 2], [2, 1]])
 
 

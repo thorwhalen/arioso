@@ -86,3 +86,21 @@ def test_drone_tonic_takes_the_lowest_copy_not_the_stiffest():
 def test_drone_tonic_ignores_a_lowest_copy_that_is_only_noise():
     y = _stiff_string(40, stiffness=0.0017, partials={1: 0.01, 2: 1.0})
     assert drone_tonic(y, 8000, sa="E") == pytest.approx(4.06, abs=0.02)
+
+
+def test_a_pa_pair_that_arrives_as_a_fourth_still_puts_sa_first():
+    # Sa A soft, Pa E loud: the candidates A+7 and E+5 are the same pair, and the fourth is met first
+    y = _tones([_hz(45), _hz(57)], 20) * 0.4 + _tones([_hz(52)], 20)
+    assert drone_report(y, SR).drone == ("A", "E")
+
+
+def test_drone_tonic_sees_a_copy_flat_of_sa_and_interpolates_between_bins():
+    # 39.608 puts the peak half way between two bins (8 s: 0.125 Hz, 2.6 cents, at E2), so a
+    # bin-center reading is 1.3 cents off, and the interpolated one is within half a cent
+    y = _stiff_string(39.608, stiffness=0.0, partials={1: 1.0, 2: 0.5})
+    assert drone_tonic(y, 8000, sa="E") == pytest.approx(3.608, abs=0.005)
+
+
+def test_drone_tonic_rejects_a_lowest_rel_outside_zero_to_one():
+    with pytest.raises(ValueError, match="lowest_rel"):
+        drone_tonic(_tones([_hz(40)], 8), SR, sa="E", lowest_rel=0)

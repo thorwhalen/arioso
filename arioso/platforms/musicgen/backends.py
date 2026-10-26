@@ -36,6 +36,10 @@ class Sampling:
 class Backend(Protocol):
     """What the adapter needs from a library that runs a loaded MusicGen model."""
 
+    @classmethod
+    def can_continue(cls, model_variant: str) -> bool:
+        """Whether this library can continue audio with ``model_variant`` (cheap: loads nothing)."""
+
     @property
     def sample_rate(self) -> int:
         """Output samples per second."""
@@ -56,6 +60,19 @@ class Backend(Protocol):
         self, prompt: str, tail: np.ndarray, *, seconds: float, sampling: Sampling
     ) -> np.ndarray:
         """The re-decoded ``tail`` and ``seconds`` after it, mono."""
+
+
+def select_backend_class(model_variant: str) -> type[Backend]:
+    """The library that runs ``model_variant``: audiocraft when it imports, else transformers.
+
+    Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
+    one is read; a present but broken install falls back like a missing one.
+    """
+    try:
+        import audiocraft.models  # noqa: F401
+    except ImportError:
+        return TransformersBackend
+    return AudiocraftBackend
 
 
 def _rate_or_default(rate) -> int:
@@ -85,6 +102,11 @@ class AudiocraftBackend:
 
     def __init__(self, model):
         self.model = model
+
+    @classmethod
+    def can_continue(cls, model_variant: str) -> bool:
+        """Every checkpoint takes an audio prompt to extend."""
+        return True
 
     @classmethod
     def load(cls, model_variant: str) -> AudiocraftBackend:
@@ -193,6 +215,11 @@ class TransformersBackend:
     def __init__(self, model, processor):
         self.model = model
         self.processor = processor
+
+    @classmethod
+    def can_continue(cls, model_variant: str) -> bool:
+        """Not a melody checkpoint: its audio input is melody chroma, not a prompt to extend."""
+        return "melody" not in model_variant
 
     @classmethod
     def load(cls, model_variant: str) -> TransformersBackend:

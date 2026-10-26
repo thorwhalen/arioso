@@ -12,6 +12,11 @@ set of affordance names that all platform adapters map to.
 | [`AudioResult`](#arioso.base.AudioResult)([audio_bytes, audio_url, ...])       | Unified audio output from any music generation platform. |
 | [`Song`](#arioso.base.Song)([id, title, status, audio, metadata, ...])  | A generated song with its metadata and audio data.       |
 
+### Exceptions
+
+| [`CatalogMatchError`](#arioso.base.CatalogMatchError)(message, \*[, task_id, code])   | A platform refused the input audio because it matches a catalogued recording.   |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+
 ### *class* arioso.base.Affordance(name, type, description, default=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -97,6 +102,23 @@ Duration of the audio in seconds.
 
 * **Type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### *exception* arioso.base.CatalogMatchError(message, , task_id=None, code=None)
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+A platform refused the input audio because it matches a catalogued recording.
+
+This is a policy refusal (copyright filter), not a transient failure: callers
+that retry or regenerate in a loop should treat it as final.
+
+#### task_id
+
+The provider task id of the refused generation, if known.
+
+#### code
+
+The provider’s error code (e.g. `413`), if given.
 
 ### *class* arioso.base.Song(id='', title='', status='pending', audio=AudioResult(), metadata=dict(), platform='')
 

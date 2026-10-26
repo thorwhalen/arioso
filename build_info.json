@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-22T03:42:15Z",
+  "built_at": "2026-10-26T07:52:05Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.30",
+    "version": "0.0.31",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "68c449dc3929e2079e3de8da81dc786e886fd561",
-    "short_commit": "68c449d",
+    "commit": "baf9e4b96b76c977ac6df99cb9659fc94ce6cc51",
+    "short_commit": "baf9e4b",
     "branch": "main",
     "tags": [
-      "0.0.30"
+      "0.0.31"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/68c449dc3929e2079e3de8da81dc786e886fd561",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/baf9e4b96b76c977ac6df99cb9659fc94ce6cc51",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "fa26e35b5f1030d0b5da76636df0ca80d8fe52ff",
+    "sha": "2fe34c61cc6ee96c29dbd1a7943fad8b5ef854f4",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39718105894",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/39718105894",
+    "run_id": "40288241728",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/40288241728",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,15 +58,15 @@
   },
   "site": {
     "modules_documented": 57,
-    "objects_documented": 103
+    "objects_documented": 106
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.30",
+    "latest": "0.0.31",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout 68c449dc3929e2079e3de8da81dc786e886fd561\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout baf9e4b96b76c977ac6df99cb9659fc94ce6cc51\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

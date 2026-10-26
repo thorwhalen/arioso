@@ -12,3 +12,9 @@ arioso.base
       AudioResult
       Song
    
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CatalogMatchError
+   

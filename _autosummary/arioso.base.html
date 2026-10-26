@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=61a342a2"></script>
+    <script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.30" />
+  <meta name="docsearch:version" content="0.0.31" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -430,6 +430,15 @@ set of affordance names that all platform adapters map to.</p>
 </tbody>
 </table>
 </div>
+<p class="rubric">Exceptions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.base.CatalogMatchError" title="arioso.base.CatalogMatchError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CatalogMatchError</span></code></a>(message, *[, task_id, code])</p></td>
+<td><p>A platform refused the input audio because it matches a catalogued recording.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.base.Affordance">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">Affordance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/base.html#Affordance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.base.Affordance" title="Link to this definition">#</a></dt>
@@ -557,6 +566,29 @@ be done on demand by the caller.</p>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="arioso.base.CatalogMatchError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">CatalogMatchError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/base.html#CatalogMatchError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.base.CatalogMatchError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
+<p>A platform refused the input audio because it matches a catalogued recording.</p>
+<p>This is a policy refusal (copyright filter), not a transient failure: callers
+that retry or regenerate in a loop should treat it as final.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.CatalogMatchError.task_id">
+<span class="sig-name descname"><span class="pre">task_id</span></span><a class="headerlink" href="#arioso.base.CatalogMatchError.task_id" title="Link to this definition">#</a></dt>
+<dd><p>The provider task id of the refused generation, if known.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="arioso.base.CatalogMatchError.code">
+<span class="sig-name descname"><span class="pre">code</span></span><a class="headerlink" href="#arioso.base.CatalogMatchError.code" title="Link to this definition">#</a></dt>
+<dd><p>The provider’s error code (e.g. <code class="docutils literal notranslate"><span class="pre">413</span></code>), if given.</p>
 </dd></dl>
 
 </dd></dl>
@@ -735,6 +767,11 @@ be done on demand by the caller.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.AudioResult.sample_rate"><code class="docutils literal notranslate"><span class="pre">AudioResult.sample_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.AudioResult.format"><code class="docutils literal notranslate"><span class="pre">AudioResult.format</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.AudioResult.duration_seconds"><code class="docutils literal notranslate"><span class="pre">AudioResult.duration_seconds</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.CatalogMatchError"><code class="docutils literal notranslate"><span class="pre">CatalogMatchError</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.CatalogMatchError.task_id"><code class="docutils literal notranslate"><span class="pre">CatalogMatchError.task_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.CatalogMatchError.code"><code class="docutils literal notranslate"><span class="pre">CatalogMatchError.code</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.base.Song"><code class="docutils literal notranslate"><span class="pre">Song</span></code></a><ul class="nav section-nav flex-column">

@@ -307,7 +307,9 @@ def test_ensure_model_falls_back_to_transformers(monkeypatch):
         AutoProcessor=_AutoProcessor, MusicgenForConditionalGeneration=_ModelClass
     )
     monkeypatch.setitem(sys.modules, "audiocraft", None)  # import raises ImportError
-    monkeypatch.setitem(sys.modules, "audiocraft.models", None)  # even if already imported
+    monkeypatch.setitem(
+        sys.modules, "audiocraft.models", None
+    )  # even if already imported
     monkeypatch.setitem(sys.modules, "transformers", transformers)
     monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
 

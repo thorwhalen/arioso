@@ -10,7 +10,10 @@ import arioso
 import arioso.platforms.ace_step.adapter as ace_mod
 import arioso.platforms.stable_audio_25.adapter as sa_mod
 
-_RESULT = {"audio": {"url": "https://fal.media/x.wav", "content_type": "audio/wav"}, "seed": 3}
+_RESULT = {
+    "audio": {"url": "https://fal.media/x.wav", "content_type": "audio/wav"},
+    "seed": 3,
+}
 
 
 @pytest.fixture
@@ -24,7 +27,9 @@ def capture(monkeypatch):
 
     for mod in (sa_mod, ace_mod):
         monkeypatch.setattr(mod, "fal_run", fake_run)
-        monkeypatch.setattr(mod, "fal_upload_audio", lambda a: "https://fal.media/in.wav")
+        monkeypatch.setattr(
+            mod, "fal_upload_audio", lambda a: "https://fal.media/in.wav"
+        )
     return calls
 
 
@@ -57,7 +62,9 @@ def test_stable_audio_25_rejects_bad_strength(capture):
 
 
 def test_enhance_routes_strength_to_stable_audio_25(capture, monkeypatch):
-    arioso.enhance("in.wav", "strings", platform="stable_audio_25", strength=0.25, fetch=False)
+    arioso.enhance(
+        "in.wav", "strings", platform="stable_audio_25", strength=0.25, fetch=False
+    )
     assert capture["arguments"]["strength"] == 0.25
 
 
@@ -85,17 +92,27 @@ def test_ace_step_needs_tags(capture):
 def test_services_path_keeps_unified_params(capture):
     """arioso.services.<p>.generate must not rename params the adapter maps itself."""
     arioso.services.stable_audio_25.generate(
-        "strings", audio_input="in.wav", audio_input_strength=0.2, num_steps=50,
-        guidance=3.0, fetch=False,
+        "strings",
+        audio_input="in.wav",
+        audio_input_strength=0.2,
+        num_steps=50,
+        guidance=3.0,
+        fetch=False,
     )
     args = capture["arguments"]
-    assert (args["strength"], args["num_inference_steps"], args["guidance_scale"]) == (0.2, 50, 3.0)
+    assert (args["strength"], args["num_inference_steps"], args["guidance_scale"]) == (
+        0.2,
+        50,
+        3.0,
+    )
     arioso.services.ace_step.generate("rock, guitar", fetch=False)
     assert capture["arguments"]["tags"] == "rock, guitar"
 
 
 def test_adapter_params_do_not_warn(capture, recwarn):
-    arioso.enhance("in.wav", "x", platform="ace_step", original_tags="midi", fetch=False)
+    arioso.enhance(
+        "in.wav", "x", platform="ace_step", original_tags="midi", fetch=False
+    )
     assert not [w for w in recwarn if "not supported" in str(w.message)]
     assert capture["arguments"]["original_tags"] == "midi"
 
@@ -147,16 +164,26 @@ def test_a_new_fal_model_is_a_config_entry(monkeypatch):
                 "steps": {"from": ["num_steps"], "default": 4},
             },
             "endpoints": {
-                "text_to_audio": {"endpoint": "fal-ai/demo", "arguments": {"len": {"from": ["duration"], "type": "int", "clamp": [1, 5]}}},
+                "text_to_audio": {
+                    "endpoint": "fal-ai/demo",
+                    "arguments": {
+                        "len": {"from": ["duration"], "type": "int", "clamp": [1, 5]}
+                    },
+                },
             },
         },
     }
     adapter = FalAdapter(
         config,
-        run=lambda endpoint, arguments: calls.update(endpoint=endpoint, arguments=arguments) or _RESULT,
+        run=lambda endpoint, arguments: (
+            calls.update(endpoint=endpoint, arguments=arguments) or _RESULT
+        ),
     )
     song = adapter.generate("hi", duration=9.2, bogus=1, fetch=False)
-    assert calls == {"endpoint": "fal-ai/demo", "arguments": {"text": "hi", "steps": 4, "len": 5}}
+    assert calls == {
+        "endpoint": "fal-ai/demo",
+        "arguments": {"text": "hi", "steps": 4, "len": 5},
+    }
     assert song.platform == "demo_fal"
     registry.register_platform("demo_fal", config)
     assert isinstance(registry._load_adapter("demo_fal", config), FalAdapter)
@@ -170,4 +197,6 @@ def test_fal_specs_agree_with_the_platform_config():
         accepted = adapter.accepted_params()
         declared = set(config["supported_affordances"]) | set(config["adapter_params"])
         assert set(config["supported_affordances"]) <= accepted
-        assert accepted - {"prompt"} <= declared | set(config["fal"].get("native_extras", ()))
+        assert accepted - {"prompt"} <= declared | set(
+            config["fal"].get("native_extras", ())
+        )

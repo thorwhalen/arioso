@@ -48,7 +48,11 @@ def test_musicgen_generate_audiocraft(mock_ensure):
     mock_tensor = MagicMock()
     mock_tensor.__getitem__ = MagicMock(
         return_value=MagicMock(
-            cpu=MagicMock(return_value=MagicMock(numpy=MagicMock(return_value=np.zeros((1, 256000)))))
+            cpu=MagicMock(
+                return_value=MagicMock(
+                    numpy=MagicMock(return_value=np.zeros((1, 256000)))
+                )
+            )
         )
     )
     mock_model.generate.return_value = mock_tensor

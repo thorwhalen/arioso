@@ -53,11 +53,12 @@ analysis = [
     "numpy",
 ]
 # arioso.seeds: a melody over a tanpura drone as a cover source. The default voice separator
-# (hdemucs_vocals) also needs torch and torchaudio.
+# (hdemucs_vocals) is denote.separate, which also needs torch and torchaudio.
 seeds = [
     "numpy",
     "librosa>=0.10",
     "pretty_midi",
+    "denote>=0.0.9",
 ]
 test = [
     "pytest>=7.0",

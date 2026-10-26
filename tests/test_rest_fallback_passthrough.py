@@ -87,10 +87,14 @@ def test_an_unsupported_name_is_still_warned_about_and_dropped(sent):
     assert "bogus" not in native_kwargs
 
 
-def test_a_name_param_map_covers_keeps_its_rename_even_if_in_adapter_params(monkeypatch):
+def test_a_name_param_map_covers_keeps_its_rename_even_if_in_adapter_params(
+    monkeypatch,
+):
     calls = []
     monkeypatch.setattr(
-        translation, "_build_rest_func", lambda config: lambda **kw: calls.append(kw) or b""
+        translation,
+        "_build_rest_func",
+        lambda config: lambda **kw: calls.append(kw) or b"",
     )
     generate = translation.make_generate_func(
         {

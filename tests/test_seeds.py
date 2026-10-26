@@ -10,6 +10,10 @@ import pytest
 
 from arioso.analysis import drone_report
 from arioso.seeds import (
+    highpass,
+    musicgen_variation,
+    recorded_drone,
+    varispeed,
     Contour,
     audio_contour,
     bowed,
@@ -169,14 +173,13 @@ def _energy_at(y, hz):
 
 
 def test_melody_over_drone_takes_a_recorded_bed():
-    t = np.arange(4 * SR) / SR
-    bed = np.sin(
-        2 * np.pi * 1500 * t
-    )  # shorter than the melody: looped; far from any note
+    bed = tanpura(
+        "E", seconds=6, sr=SR, seed=7
+    )  # a "recording" in E, shorter than the tune
     y, _ = melody_over_drone(_tune(), "D", sr=SR, drone=bed, lead_in_s=0)
     assert len(y) == pytest.approx(_tune().seconds * SR, abs=2)
-    default, _ = melody_over_drone(_tune(), "D", sr=SR, lead_in_s=0)
-    assert _energy_at(y, 1500) > 20 * _energy_at(default, 1500)
+    r = drone_report(y, SR, sa="D")
+    assert r.drone == ("D", "A") and r.sa_offset == 0  # retuned from E to D
 
 
 def test_contour_at_rate_holds_into_silence():
@@ -282,3 +285,68 @@ def test_tanpura_plucks_end_without_a_tick():
     y = tanpura("C#", seconds=3.9, sr=SR, cycle_s=16, harmonics=1)
     assert np.max(np.abs(y[: SR // 2])) > 0.5
     assert np.max(np.abs(y[-int(0.005 * SR) :])) < 1e-3
+
+
+def test_varispeed_moves_pitch_and_rate():
+    t = np.arange(SR) / SR
+    y = np.sin(2 * np.pi * 200 * t)
+    up = varispeed(y, SR, semitones=12)  # an octave up, half as long
+    assert len(up) == SR // 2
+    peak_hz = np.argmax(np.abs(np.fft.rfft(up))) * SR / len(up)
+    assert peak_hz == pytest.approx(400, abs=2)
+    resampled = varispeed(y, SR, sr_out=SR // 2)  # same pitch at half the rate
+    assert len(resampled) == SR // 2
+    spectrum = np.abs(np.fft.rfft(resampled))
+    assert np.argmax(spectrum) == pytest.approx(200, abs=1)  # 1 s: bin = Hz
+    assert np.allclose(varispeed(y, SR), y)
+
+
+def test_recorded_drone_refuses_a_big_move():
+    drone = recorded_drone(tanpura("E", seconds=6, sr=SR), SR, max_shift=2)
+    assert drone_report(drone("D", seconds=10, sr=SR), SR, sa="D").sa_offset == 0
+    with pytest.raises(ValueError, match="max_shift"):
+        drone("A", seconds=10, sr=SR)  # E -> A is 5 semitones
+
+
+def test_highpass_removes_the_bass_and_keeps_the_rest():
+    t = np.arange(2 * SR) / SR
+    y = np.sin(2 * np.pi * 80 * t) + np.sin(2 * np.pi * 600 * t)
+    out = highpass(y, SR, 260)
+    assert _rms_at(out, 80) < 0.01 * _rms_at(y, 80)
+    assert _rms_at(out, 600) == pytest.approx(_rms_at(y, 600), rel=0.01)
+
+
+def _rms_at(y, hz):
+    spectrum = np.abs(np.fft.rfft(y))
+    return spectrum[int(round(hz * len(y) / SR))]
+
+
+def test_musicgen_variation_conditions_on_voice_and_drone_then_drops_the_bass():
+    seen = {}
+
+    def generate(audio, sr, *, prompt, seconds):
+        seen.update(audio=audio, sr=sr, prompt=prompt, seconds=seconds)
+        t = np.arange(int(seconds * sr)) / sr
+        # a take with its own moving bass (C2 then F2) under a melody
+        bass = np.where(
+            t < seconds / 2, np.sin(2 * np.pi * 65.4 * t), np.sin(2 * np.pi * 87.3 * t)
+        )
+        return bass + 0.5 * np.sin(2 * np.pi * 587.3 * t), sr
+
+    voice = _tune(seconds=40)
+    voice_audio, _ = melody_over_drone(voice, "D", sr=SR, drone_db=-80, lead_in_s=0)
+    y, sr = musicgen_variation(
+        voice_audio, "D", sr=SR, prompt="sarangi", generate=generate
+    )
+
+    assert (
+        seen["prompt"] == "sarangi" and seen["seconds"] == 30.0
+    )  # capped at the window
+    assert len(seen["audio"]) == 30 * SR
+    assert drone_report(seen["audio"], SR, sa="D").drone == (
+        "D",
+        "A",
+    )  # drone in the condition
+    assert sr == SR and len(y) == 30 * SR
+    r = drone_report(y, sr, sa="D")
+    assert r.drone == ("D", "A") and r.holds()  # the take's own bass is gone

@@ -15,7 +15,6 @@ import pytest
 
 np = pytest.importorskip("numpy")
 
-import arioso.platforms.musicgen.adapter as mg_adapter  # noqa: E402
 from arioso.platforms.musicgen.adapter import Adapter  # noqa: E402
 from arioso.platforms.musicgen.backends import (  # noqa: E402
     AudiocraftBackend,
@@ -124,8 +123,7 @@ def _adapter(monkeypatch, model, *, transformers=False):
             return TransformersBackend(model, _processor)
         return AudiocraftBackend(model)
 
-    monkeypatch.setattr(mg_adapter, "_load_backend", fake_load)
-    adapter = Adapter(PLATFORM_CONFIG)
+    adapter = Adapter(PLATFORM_CONFIG, load_backend=fake_load)
     adapter.loaded = loaded
     return adapter
 
@@ -166,6 +164,7 @@ def test_audiocraft_chains_rounds_and_stitches(monkeypatch, fake_torch):
     )
 
     audio = song.audio.audio_array
+    assert song.metadata["model"] == "facebook/musicgen-small"
     assert song.audio.sample_rate == SR
     assert len(audio) == int(6 * SR)
     # original kept, then round 1, then round 2

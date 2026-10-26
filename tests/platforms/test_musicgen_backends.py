@@ -336,8 +336,20 @@ def _fake_transformers(monkeypatch):
             MusicgenMelodyForConditionalGeneration=model_class("melody-model"),
         ),
     )
-    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
     return loaded
+
+
+def _fake_audiocraft(monkeypatch) -> list:
+    """A fake ``audiocraft.models``; the returned list collects the checkpoint names asked for."""
+    asked = []
+    models = types.SimpleNamespace(
+        MusicGen=types.SimpleNamespace(
+            get_pretrained=lambda name: asked.append(name) or "model"
+        )
+    )
+    monkeypatch.setitem(sys.modules, "audiocraft", types.SimpleNamespace(models=models))
+    monkeypatch.setitem(sys.modules, "audiocraft.models", models)
+    return asked
 
 
 def _without_audiocraft(monkeypatch):
@@ -348,6 +360,7 @@ def _without_audiocraft(monkeypatch):
 def test_adapter_falls_back_to_transformers_and_loads_once_per_variant(monkeypatch):
     loaded = _fake_transformers(monkeypatch)
     _without_audiocraft(monkeypatch)
+    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
 
     adapter = Adapter(PLATFORM_CONFIG)
     backend = adapter._backend("facebook/musicgen-small")
@@ -365,6 +378,7 @@ def test_adapter_falls_back_to_transformers_and_loads_once_per_variant(monkeypat
 def test_adapter_reloads_when_the_variant_changes(monkeypatch):
     loaded = _fake_transformers(monkeypatch)
     _without_audiocraft(monkeypatch)
+    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
 
     adapter = Adapter(PLATFORM_CONFIG)
     adapter._backend("facebook/musicgen-small")
@@ -387,19 +401,13 @@ def test_transformers_load_picks_the_model_class_of_the_variant(
     monkeypatch, variant, label
 ):
     loaded = _fake_transformers(monkeypatch)
+    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
     TransformersBackend.load(variant)
     assert loaded[0] == (label, variant)
 
 
 def test_audiocraft_load_asks_for_the_checkpoint_by_name(monkeypatch):
-    asked = []
-    models = types.SimpleNamespace(
-        MusicGen=types.SimpleNamespace(
-            get_pretrained=lambda name: asked.append(name) or "model"
-        )
-    )
-    monkeypatch.setitem(sys.modules, "audiocraft", types.SimpleNamespace(models=models))
-    monkeypatch.setitem(sys.modules, "audiocraft.models", models)
+    asked = _fake_audiocraft(monkeypatch)
 
     backend = AudiocraftBackend.load("facebook/musicgen-melody")
 
@@ -408,11 +416,7 @@ def test_audiocraft_load_asks_for_the_checkpoint_by_name(monkeypatch):
 
 
 def test_adapter_prefers_audiocraft(monkeypatch):
-    models = types.SimpleNamespace(
-        MusicGen=types.SimpleNamespace(get_pretrained=lambda name: "model")
-    )
-    monkeypatch.setitem(sys.modules, "audiocraft", types.SimpleNamespace(models=models))
-    monkeypatch.setitem(sys.modules, "audiocraft.models", models)
+    _fake_audiocraft(monkeypatch)
     backend = Adapter(PLATFORM_CONFIG)._backend("facebook/musicgen-small")
     assert isinstance(backend, AudiocraftBackend)
 
@@ -421,9 +425,11 @@ def test_adapter_prefers_audiocraft(monkeypatch):
 
 
 def _torch_with(monkeypatch, *, cuda, mps):
+    """A fake torch; ``mps=None`` is a build without the MPS backend."""
+    mps_backend = {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
     torch = types.SimpleNamespace(
         cuda=types.SimpleNamespace(is_available=lambda: cuda),
-        backends=types.SimpleNamespace(mps=types.SimpleNamespace(is_available=lambda: mps)),
+        backends=types.SimpleNamespace(**mps_backend),
     )
     monkeypatch.setitem(sys.modules, "torch", torch)
 
@@ -451,12 +457,5 @@ def test_device_without_an_mps_backend_is_cpu(monkeypatch):
     from arioso.platforms.musicgen.backends import _device
 
     monkeypatch.delenv("ARIOSO_TORCH_DEVICE", raising=False)
-    monkeypatch.setitem(
-        sys.modules,
-        "torch",
-        types.SimpleNamespace(
-            cuda=types.SimpleNamespace(is_available=lambda: False),
-            backends=types.SimpleNamespace(),
-        ),
-    )
+    _torch_with(monkeypatch, cuda=False, mps=None)
     assert _device() == "cpu"

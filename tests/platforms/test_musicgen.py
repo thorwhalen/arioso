@@ -2,7 +2,6 @@
 
 from unittest.mock import MagicMock
 
-import arioso.platforms.musicgen.adapter as mg_adapter
 from arioso.platforms.musicgen.backends import AudiocraftBackend
 
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG
@@ -35,11 +34,13 @@ def test_musicgen_adapter_init():
     assert adapter._loaded is None
 
 
-def test_musicgen_generate_audiocraft(monkeypatch):
+def test_musicgen_generate_audiocraft():
     """Test generate with mocked audiocraft model."""
     import numpy as np
 
-    adapter = Adapter(PLATFORM_CONFIG)
+    adapter = Adapter(
+        PLATFORM_CONFIG, load_backend=lambda variant: AudiocraftBackend(mock_model)
+    )
 
     # Mock the audiocraft model
     mock_model = MagicMock()
@@ -51,9 +52,6 @@ def test_musicgen_generate_audiocraft(monkeypatch):
         )
     )
     mock_model.generate.return_value = mock_tensor
-    monkeypatch.setattr(
-        mg_adapter, "_load_backend", lambda variant: AudiocraftBackend(mock_model)
-    )
 
     song = adapter.generate("jazz piano", duration=8.0)
 

@@ -30,6 +30,7 @@ The core is numpy. ``librosa`` (the default f0 tracker), ``pretty_midi`` (readin
 (8000, True)
 """
 
+import os
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -55,10 +56,6 @@ class Contour:
     @property
     def seconds(self) -> float:
         return len(self.midi) / self.fps
-
-    @property
-    def times(self) -> np.ndarray:
-        return np.arange(len(self.midi)) / self.fps
 
     def transposed(self, semitones: float) -> "Contour":
         return replace(self, midi=self.midi + semitones)
@@ -134,14 +131,16 @@ def hdemucs_vocals(
     bundle, trained on MUSDB-HQ plus extra data) download once; check their terms before
     commercial use.
     """
-    if segment_s <= overlap_s:
-        raise ValueError(
-            f"segment_s ({segment_s}) must be longer than overlap_s ({overlap_s})"
-        )
     import torch
     import torchaudio
 
-    model, model_sr = _hdemucs(device)
+    model_sr = torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS.sample_rate
+    seg, ov = int(segment_s * model_sr), int(overlap_s * model_sr)
+    if seg <= ov:  # in samples: the loop would never advance
+        raise ValueError(
+            f"segment_s ({segment_s}) must be longer than overlap_s ({overlap_s})"
+        )
+    model, _ = _hdemucs(device)
     x = to_audio_ref((y, sr)).as_waveform().float()
     if x.shape[0] == 1:
         x = x.repeat(2, 1)
@@ -149,7 +148,6 @@ def hdemucs_vocals(
     mean, std = x.mean(), x.std() + 1e-8
     x = (x - mean) / std
 
-    seg, ov = int(segment_s * model_sr), int(overlap_s * model_sr)
     n = x.shape[1]
     out = torch.zeros(n)
     weight = torch.zeros(n)
@@ -289,16 +287,24 @@ def notes_contour(
     vibrato_ramp_s: float = 0.3,
     vibrato_hz: float = 5.5,
     vibrato_semitones: float = 0.15,
+    restrike_s: float = 0.05,
 ) -> Contour:
     """The monophonic skyline of ``(start_s, end_s, midi_pitch)`` notes, made singable.
 
     Where notes overlap the highest sounds. A note that starts where the previous one ends glides
     into its pitch over ``glide_s``; a note held past ``vibrato_delay_s`` gets a vibrato that
     ramps in over ``vibrato_ramp_s``. ``glide_s=0`` or ``vibrato_semitones=0`` turns either off.
+    A note that starts where one of the same pitch ends would merge into one tone, so the earlier
+    one ends ``restrike_s`` early (longer than ``bowed``'s fade, so the breath is heard).
     """
-    notes = sorted(
-        notes, key=lambda n: n[2]
-    )  # paint low to high: the highest note wins
+
+    def segments(owner):
+        cuts = np.flatnonzero(np.diff(owner)) + 1
+        bounds = np.concatenate([[0], cuts, [len(owner)]])
+        return [(a, b) for a, b in zip(bounds[:-1], bounds[1:]) if owner[a] >= 0]
+
+    # paint low to high (then early to late), so the highest note wins and ties are stable
+    notes = sorted(notes, key=lambda n: (n[2], n[0]))
     if not notes:
         raise ValueError("no notes to make a contour from")
     n = int(np.ceil(max(end for _, end, _ in notes) * fps))
@@ -307,34 +313,26 @@ def notes_contour(
     for k, (start, end, p) in enumerate(notes):
         a, b = int(round(start * fps)), int(round(end * fps))
         pitch[a:b], owner[a:b] = p, k
-    # a note that starts where one of the same pitch ends would merge into one tone: give it
-    # a one-frame breath so the rhythm survives
-    restrike = np.flatnonzero(
+    breath = max(1, int(round(restrike_s * fps)))
+    for i in np.flatnonzero(
         (owner[1:] != owner[:-1]) & (owner[:-1] >= 0) & (pitch[1:] == pitch[:-1])
-    )
-    pitch[restrike], owner[restrike] = np.nan, -1
+    ):
+        a = max(0, i + 1 - breath)
+        pitch[a : i + 1], owner[a : i + 1] = np.nan, -1
 
     midi = pitch.copy()
-    segments = [
-        (a, b) for a, b in _segments(owner) if owner[a] >= 0
-    ]  # one per sounding note
-    for i, (a, b) in enumerate(segments):
+    notes_at = segments(owner)  # one per sounding note
+    for i, (a, b) in enumerate(notes_at):
         t = np.arange(b - a) / fps
         if vibrato_semitones and (b - a) / fps > vibrato_delay_s:
             tv = np.maximum(t - vibrato_delay_s, 0)
             depth = vibrato_semitones * np.minimum(tv / max(vibrato_ramp_s, 1e-9), 1)
             midi[a:b] += depth * np.sin(2 * np.pi * vibrato_hz * tv)
-        prev = segments[i - 1] if i else None
+        prev = notes_at[i - 1] if i else None
         if glide_s and prev and prev[1] == a and pitch[prev[0]] != pitch[a]:
             g = min(b - a, max(1, int(glide_s * fps)))
             midi[a : a + g] += (pitch[prev[0]] - pitch[a]) * (1 - np.arange(g) / g)
     return Contour(midi=midi, fps=fps)
-
-
-def _segments(owner: np.ndarray) -> list[tuple[int, int]]:
-    cuts = np.flatnonzero(np.diff(owner)) + 1
-    bounds = np.concatenate([[0], cuts, [len(owner)]])
-    return list(zip(bounds[:-1], bounds[1:]))
 
 
 def midi_contour(
@@ -380,7 +378,13 @@ def midi_contour(
 
 def _melody_track(instruments, *, min_mono: float, min_median_midi: float):
     stats = [
-        (k, inst, len(inst.notes), mono_share(inst.notes), _median_pitch(inst.notes))
+        (
+            k,
+            inst,
+            len(inst.notes),
+            mono_share(inst.notes),
+            float(np.median([n.pitch for n in inst.notes])),
+        )
         for k, inst in enumerate(instruments)
         if not inst.is_drum and inst.notes
     ]
@@ -397,10 +401,6 @@ def _melody_track(instruments, *, min_mono: float, min_median_midi: float):
             f"{min_median_midi}); pass track= one of:\n{table}"
         )
     return max(lines, key=lambda s: s[2])[1]
-
-
-def _median_pitch(notes) -> float:
-    return float(np.median([n.pitch for n in notes]))
 
 
 def mono_share(notes, *, fps: float = 20.0) -> float:
@@ -420,13 +420,15 @@ def _is_midi(source) -> bool:
         return True
     if isinstance(source, (bytes, bytearray)):
         return bytes(source[:4]) == b"MThd"
-    return isinstance(source, str) and source.lower().endswith((".mid", ".midi"))
+    if isinstance(source, (str, os.PathLike)):
+        return os.fspath(source).lower().endswith((".mid", ".midi"))
+    return False
 
 
 def melody_contour(source, sr: int | None = None, **kwargs) -> Contour:
     """A :class:`Contour` from a MIDI file (:func:`midi_contour`) or a recording
     (:func:`audio_contour`), told apart by the source; ``kwargs`` go to the one chosen."""
-    if _is_midi(source) or (hasattr(source, "suffix") and _is_midi(str(source))):
+    if _is_midi(source):
         return midi_contour(source, **kwargs)
     return audio_contour(source, sr, **kwargs)
 
@@ -545,7 +547,7 @@ def bowed(
     for a, b in index_runs(~voiced):
         before = pitch[a - 1] if a else pitch[b]
         after = pitch[b] if b < len(pitch) else before
-        mid = a if not a else (a + b) // 2
+        mid = 0 if a == 0 else (a + b) // 2
         filled[a:mid], filled[mid:b] = before, after
     f0 = midi_to_hz(filled)
     phase = 2 * np.pi * np.cumsum(f0) / sr

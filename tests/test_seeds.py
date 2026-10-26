@@ -202,7 +202,8 @@ def test_melody_match_ranks_the_right_seed():
     drone_only = tanpura("D", seconds=len(seed) / sr, sr=sr)
     true = melody_match(take, seed, sr)
     assert true > melody_match(other, seed, sr) + 0.2
-    assert true > melody_match(drone_only, seed, sr) + 0.2  # the drone is not the tune
+    assert melody_match(drone_only, seed, sr) < 0.6  # the drone is not the tune
+    assert melody_match(seed, take, sr) == pytest.approx(true, abs=0.05)  # symmetric
 
 
 def test_fix_octaves_keeps_real_leaps():
@@ -223,9 +224,17 @@ def test_hdemucs_rejects_a_segment_shorter_than_its_overlap():
         hdemucs_vocals(np.zeros(SR), SR, segment_s=1.0, overlap_s=1.0)
 
 
+def test_overlapping_same_pitch_notes_do_not_depend_on_order():
+    notes = [(0.0, 1.0, 60), (0.5, 2.0, 60)]
+    a = notes_contour(notes, fps=100, vibrato_semitones=0)
+    b = notes_contour(notes[::-1], fps=100, vibrato_semitones=0)
+    assert np.array_equal(a.midi, b.midi, equal_nan=True)
+
+
 def test_repeated_touching_notes_are_restruck():
     c = notes_contour([(0.0, 1.0, 60), (1.0, 2.0, 60)], fps=100, vibrato_semitones=0)
-    assert np.isnan(c.midi[99]) and c.midi[100] == 60 and c.midi[98] == 60
+    # the first ends restrike_s (5 frames) early, so the second is heard as a new note
+    assert np.all(np.isnan(c.midi[95:100])) and c.midi[94] == 60 and c.midi[100] == 60
 
 
 class _Note:
@@ -268,6 +277,8 @@ def test_bowed_enters_on_the_new_pitch():
 
 
 def test_tanpura_plucks_end_without_a_tick():
-    y = tanpura("C#", seconds=12, sr=SR)
-    curvature = np.abs(np.diff(y, 2))
-    assert curvature.max() < 3 * np.percentile(curvature, 99.9)
+    # a 16 s cycle and 3.9 s of drone: one string plucked once, its pluck cut at 3.9 s.
+    # Without a fade it would still ring at exp(-3.9 / 2.5), a fifth of its start, and click.
+    y = tanpura("C#", seconds=3.9, sr=SR, cycle_s=16, harmonics=1)
+    assert np.max(np.abs(y[: SR // 2])) > 0.5
+    assert np.max(np.abs(y[-int(0.005 * SR) :])) < 1e-3

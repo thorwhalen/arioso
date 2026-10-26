@@ -92,7 +92,7 @@ contour = melody_contour("song.mp3")                # or a recording: voice sepa
 seed, sr = melody_over_drone(contour.transposed(-3), "C#")  # bowed line over a tanpura on C#
 
 drone_report(take, sr, sa="C#").holds()             # does a take hold the drone?
-melody_match(take, seed, sr)                        # does it keep the tune? (~0.85 vs ~0.35 for another song)
+melody_match(take, seed, sr)                        # does it keep the tune? (~0.9 vs ~0.45 for another song)
 ```
 
 Every step is a seam: `audio_contour(..., separator=, f0_tracker=)`, `melody_over_drone(..., drone=, timbre=)`. `drone=` also takes a recorded tanpura array, looped with crossfades by `loop_drone`. A low (male) line is lifted by octaves above the drone's register (`floor_midi`), where it would otherwise fail `drone_report`.

@@ -490,6 +490,33 @@ def test_sunoapi_audio_input_warns_on_what_upload_cover_cannot_do(mock_make_sess
 
 
 @patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_catalog_match_raises_typed_error(mock_make_session):
+    """A 413 catalog-match refusal raises CatalogMatchError (a RuntimeError)."""
+    from arioso import CatalogMatchError
+
+    mock_session = MagicMock()
+    mock_get_response = MagicMock()
+    mock_get_response.json.return_value = {
+        "code": 200,
+        "data": {
+            "taskId": "task-123",
+            "status": "GENERATE_AUDIO_FAILED",
+            "errorCode": 413,
+            "errorMessage": "This audio matches an existing recording in our catalog.",
+        },
+    }
+    mock_session.get.return_value = mock_get_response
+    mock_make_session.return_value = mock_session
+
+    adapter = Adapter(PLATFORM_CONFIG)
+    with pytest.raises(CatalogMatchError) as exc_info:
+        adapter.get_status("task-123")
+    assert exc_info.value.task_id == "task-123"
+    assert exc_info.value.code == 413
+    assert isinstance(exc_info.value, RuntimeError)
+
+
+@patch("arioso.platforms._base_adapter.make_session")
 def test_sunoapi_custom_controls_reach_payload(mock_make_session):
     mock_session = MagicMock()
     mock_response = MagicMock()

@@ -224,15 +224,19 @@ class _AudiocraftModel:
     sample_rate = SR
     frame_rate = 50
 
-    def __init__(self):
+    def __init__(self, *, channels=1):
         self.params = []
         self.calls = []
+        self.channels = channels
 
     def set_generation_params(self, **params):
         self.params.append(params)
 
     def _out(self):
-        return _Tensor(np.ones((1, 1, 10), np.float32))
+        """Channel ``c`` holds the constant ``c + 1``, so channels can be told apart."""
+        out = np.ones((1, self.channels, 10), np.float32)
+        out *= np.arange(1, self.channels + 1, dtype=np.float32)[None, :, None]
+        return _Tensor(out)
 
     def generate(self, descriptions):
         self.calls.append(("generate", descriptions))
@@ -284,18 +288,38 @@ def test_audiocraft_melody_passes_batched_waveform_and_rate():
     assert rate == ref.sample_rate
 
 
+def test_audiocraft_text_keeps_every_channel():
+    out = _run(AudiocraftBackend(_AudiocraftModel(channels=2)), "text")
+    assert out.shape == (2, 10)
+    np.testing.assert_array_equal(out[0], 1)
+    np.testing.assert_array_equal(out[1], 2)
+
+
+def test_audiocraft_melody_keeps_every_channel():
+    out = _run(AudiocraftBackend(_AudiocraftModel(channels=2)), "melody")
+    assert out.shape == (2, 10)
+
+
+def test_audiocraft_continuation_averages_channels():
+    out = _run(AudiocraftBackend(_AudiocraftModel(channels=2)), "continuation")
+    np.testing.assert_array_equal(out, np.full(10, 1.5, np.float32))
+
+
 # -- loading -----------------------------------------------------------------
 
 
-def test_ensure_model_falls_back_to_transformers(monkeypatch):
-    """Without audiocraft, the adapter loads with transformers once per variant."""
+def _fake_transformers(monkeypatch):
+    """A fake ``transformers`` whose model classes and processor record how they load."""
     loaded = []
 
-    class _ModelClass:
-        @classmethod
-        def from_pretrained(cls, name):
-            loaded.append(("model", name))
-            return types.SimpleNamespace(to=lambda device: ("model", name, device))
+    def model_class(label):
+        class _ModelClass:
+            @classmethod
+            def from_pretrained(cls, name):
+                loaded.append((label, name))
+                return types.SimpleNamespace(to=lambda device: (label, name, device))
+
+        return _ModelClass
 
     class _AutoProcessor:
         @classmethod
@@ -303,23 +327,135 @@ def test_ensure_model_falls_back_to_transformers(monkeypatch):
             loaded.append(("processor", name))
             return ("processor", name)
 
-    transformers = types.SimpleNamespace(
-        AutoProcessor=_AutoProcessor, MusicgenForConditionalGeneration=_ModelClass
+    monkeypatch.setitem(
+        sys.modules,
+        "transformers",
+        types.SimpleNamespace(
+            AutoProcessor=_AutoProcessor,
+            MusicgenForConditionalGeneration=model_class("text-model"),
+            MusicgenMelodyForConditionalGeneration=model_class("melody-model"),
+        ),
     )
+    return loaded
+
+
+def _fake_audiocraft(monkeypatch) -> list:
+    """A fake ``audiocraft.models``; the returned list collects the checkpoint names asked for."""
+    asked = []
+    models = types.SimpleNamespace(
+        MusicGen=types.SimpleNamespace(
+            get_pretrained=lambda name: asked.append(name) or "model"
+        )
+    )
+    monkeypatch.setitem(sys.modules, "audiocraft", types.SimpleNamespace(models=models))
+    monkeypatch.setitem(sys.modules, "audiocraft.models", models)
+    return asked
+
+
+def _without_audiocraft(monkeypatch):
     monkeypatch.setitem(sys.modules, "audiocraft", None)  # import raises ImportError
     monkeypatch.setitem(sys.modules, "audiocraft.models", None)  # even if already imported
-    monkeypatch.setitem(sys.modules, "transformers", transformers)
+
+
+def test_adapter_falls_back_to_transformers_and_loads_once_per_variant(monkeypatch):
+    loaded = _fake_transformers(monkeypatch)
+    _without_audiocraft(monkeypatch)
     monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
 
     adapter = Adapter(PLATFORM_CONFIG)
-    adapter._ensure_model("facebook/musicgen-small")
-    adapter._ensure_model("facebook/musicgen-small")
+    backend = adapter._backend("facebook/musicgen-small")
+    assert adapter._backend("facebook/musicgen-small") is backend
 
     assert loaded == [
-        ("model", "facebook/musicgen-small"),
+        ("text-model", "facebook/musicgen-small"),
         ("processor", "facebook/musicgen-small"),
     ]
-    assert adapter._use_transformers is True
-    assert adapter._model == ("model", "facebook/musicgen-small", DEVICE)
-    assert adapter._processor == ("processor", "facebook/musicgen-small")
-    assert isinstance(adapter._backend("facebook/musicgen-small"), TransformersBackend)
+    assert isinstance(backend, TransformersBackend)
+    assert backend.model == ("text-model", "facebook/musicgen-small", DEVICE)
+    assert backend.processor == ("processor", "facebook/musicgen-small")
+
+
+def test_adapter_reloads_when_the_variant_changes(monkeypatch):
+    loaded = _fake_transformers(monkeypatch)
+    _without_audiocraft(monkeypatch)
+    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
+
+    adapter = Adapter(PLATFORM_CONFIG)
+    adapter._backend("facebook/musicgen-small")
+    adapter._backend("facebook/musicgen-large")
+
+    assert [name for kind, name in loaded if kind == "text-model"] == [
+        "facebook/musicgen-small",
+        "facebook/musicgen-large",
+    ]
+
+
+@pytest.mark.parametrize(
+    "variant, label",
+    [
+        ("facebook/musicgen-small", "text-model"),
+        ("facebook/musicgen-melody", "melody-model"),
+    ],
+)
+def test_transformers_load_picks_the_model_class_of_the_variant(
+    monkeypatch, variant, label
+):
+    loaded = _fake_transformers(monkeypatch)
+    monkeypatch.setenv("ARIOSO_TORCH_DEVICE", DEVICE)
+    TransformersBackend.load(variant)
+    assert loaded[0] == (label, variant)
+
+
+def test_audiocraft_load_asks_for_the_checkpoint_by_name(monkeypatch):
+    asked = _fake_audiocraft(monkeypatch)
+
+    backend = AudiocraftBackend.load("facebook/musicgen-melody")
+
+    assert asked == ["facebook/musicgen-melody"]
+    assert backend.model == "model"
+
+
+def test_adapter_prefers_audiocraft(monkeypatch):
+    _fake_audiocraft(monkeypatch)
+    backend = Adapter(PLATFORM_CONFIG)._backend("facebook/musicgen-small")
+    assert isinstance(backend, AudiocraftBackend)
+
+
+# -- device ------------------------------------------------------------------
+
+
+def _torch_with(monkeypatch, *, cuda, mps):
+    """A fake torch; ``mps=None`` is a build without the MPS backend."""
+    mps_backend = {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
+    torch = types.SimpleNamespace(
+        cuda=types.SimpleNamespace(is_available=lambda: cuda),
+        backends=types.SimpleNamespace(**mps_backend),
+    )
+    monkeypatch.setitem(sys.modules, "torch", torch)
+
+
+@pytest.mark.parametrize(
+    "env, cuda, mps, expected",
+    [
+        ("forced", True, True, "forced"),  # the variable beats every probe
+        (None, True, True, "cuda"),  # then CUDA beats MPS
+        (None, False, True, "mps"),
+        (None, False, False, "cpu"),
+    ],
+)
+def test_device_order(monkeypatch, env, cuda, mps, expected):
+    from arioso.platforms.musicgen.backends import _device
+
+    monkeypatch.delenv("ARIOSO_TORCH_DEVICE", raising=False)
+    if env:
+        monkeypatch.setenv("ARIOSO_TORCH_DEVICE", env)
+    _torch_with(monkeypatch, cuda=cuda, mps=mps)
+    assert _device() == expected
+
+
+def test_device_without_an_mps_backend_is_cpu(monkeypatch):
+    from arioso.platforms.musicgen.backends import _device
+
+    monkeypatch.delenv("ARIOSO_TORCH_DEVICE", raising=False)
+    _torch_with(monkeypatch, cuda=False, mps=None)
+    assert _device() == "cpu"

@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 
 import arioso.platforms.musicgen.adapter as mg_adapter
 from arioso.platforms.musicgen.adapter import Adapter
+from arioso.platforms.musicgen.backends import AudiocraftBackend
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG
 
 
@@ -25,18 +26,15 @@ def test_config_declares_melody():
 
 
 def test_melody_switches_model_and_calls_chroma(monkeypatch):
-    adapter = Adapter(PLATFORM_CONFIG)
     loaded = {}
     fake_model = MagicMock()
     fake_model.sample_rate = 32000
 
-    def fake_ensure(self, model_variant="facebook/musicgen-small"):
+    def fake_load(model_variant):
         loaded["model"] = model_variant
-        self._model = fake_model
-        self._model_name = model_variant
-        self._use_transformers = False
+        return AudiocraftBackend(fake_model)
 
-    monkeypatch.setattr(Adapter, "_ensure_model", fake_ensure)
+    adapter = Adapter(PLATFORM_CONFIG, load_backend=fake_load)
     _stub_ingress(monkeypatch)
 
     song = adapter.generate("happy rock", melody="tune.wav")
@@ -47,20 +45,18 @@ def test_melody_switches_model_and_calls_chroma(monkeypatch):
     assert fake_model.generate_with_chroma.called
     assert not fake_model.generate.called
     assert song.metadata.get("melody_conditioned") is True
+    # the song reports the variant that ran, not the one asked for
+    assert song.metadata["model"] == "facebook/musicgen-melody"
 
 
-def test_text_only_uses_plain_generate(monkeypatch):
-    adapter = Adapter(PLATFORM_CONFIG)
+def test_text_only_uses_plain_generate():
     fake_model = MagicMock()
     fake_model.sample_rate = 32000
     fake_model.generate.return_value = [MagicMock()]
 
-    def fake_ensure(self, model_variant="facebook/musicgen-small"):
-        self._model = fake_model
-        self._model_name = model_variant
-        self._use_transformers = False
-
-    monkeypatch.setattr(Adapter, "_ensure_model", fake_ensure)
+    adapter = Adapter(
+        PLATFORM_CONFIG, load_backend=lambda variant: AudiocraftBackend(fake_model)
+    )
 
     adapter.generate("happy rock")
 

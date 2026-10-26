@@ -546,27 +546,65 @@ def varispeed(
     return np.fft.irfft(spectrum, n=n_out) * (n_out / len(y))
 
 
+def drone_tonic(
+    y: np.ndarray, sr: int, *, sa: str | None = None, band_midi: tuple = (36, 72)
+) -> float:
+    """The tonic of a drone recording as a fractional pitch class (0 = C, 4.45 = E 45 cents
+    sharp): ``drone_report``'s Sa (or the given ``sa`` name), refined to the strongest spectral
+    peak within half a semitone of it in ``band_midi``, interpolated between bins."""
+    pc = (
+        pitch_class(sa) if sa is not None else pitch_class(drone_report(y, sr).drone[0])
+    )
+    spectrum = np.abs(np.fft.rfft(np.asarray(y, dtype=float) * np.hanning(len(y))))
+    midi = hz_to_midi(np.fft.rfftfreq(len(y), 1 / sr))
+    near = (midi >= band_midi[0]) & (midi < band_midi[1])
+    near &= np.abs((midi - pc + 6) % 12 - 6) < 0.5
+    if not near.any():
+        return float(pc)
+    k = int(np.flatnonzero(near)[np.argmax(spectrum[near])])
+    a, b, c = np.log(spectrum[k - 1 : k + 2] + 1e-12)
+    bin_offset = 0.5 * (a - c) / (a - 2 * b + c) if a - 2 * b + c else 0.0
+    hz = (k + bin_offset) * sr / len(y)
+    return float(hz_to_midi(hz) % 12)
+
+
 def recorded_drone(
-    y: np.ndarray, sr: int, *, max_shift: float = 2.0, crossfade_s: float = 1.0
+    y: np.ndarray,
+    sr: int,
+    *,
+    rec_sa: str | None = None,
+    max_shift: float = 2.0,
+    min_on_drone: float = 0.6,
+    crossfade_s: float = 1.0,
 ) -> Callable:
     """A ``drone`` for :func:`melody_over_drone` from a recording (a real tanpura sounds less
     synthetic than :func:`tanpura`): ``(sa, *, seconds, sr) -> array``.
 
-    The recording's Sa is read by ``arioso.analysis.drone_report``; the bed is moved to the
-    requested Sa by :func:`varispeed` and looped by :func:`loop_drone`. A move of more than
-    ``max_shift`` semitones raises: it changes the instrument's size, and it sounds it. A CC0
-    recording to start from: "Tanpura in E" by iluppai, https://freesound.org/s/148850/ (22.8 s,
-    Sa and Pa).
+    The recording is read once: its Sa by :func:`drone_tonic` (to the cent, so a tanpura tuned
+    off 12-TET lands on the requested Sa, not a quarter-tone beside it), unless ``rec_sa`` names
+    it; and whether it is a drone at all (``drone_report``'s on-drone share at least
+    ``min_on_drone``; a song with a tanpura in it is not). Each call moves it to the requested
+    Sa by :func:`varispeed` and loops it by :func:`loop_drone`. A move of more than
+    ``max_shift`` semitones raises: it changes the instrument's size, and it sounds it. A Pa
+    string louder than Sa can be read as Sa; ``rec_sa`` settles it. A CC0 recording to start
+    from: "Tanpura in E" by iluppai, https://freesound.org/s/148850/ (22.8 s, Sa and Pa).
     """
     rec, rec_sr = to_audio_ref((y, sr)).as_mono()
+    report = drone_report(rec, rec_sr, sa=rec_sa)
+    if report.on_drone_share < min_on_drone:
+        raise ValueError(
+            f"the recording holds a drone only {report.on_drone_share:.0%} of the time "
+            f"(min_on_drone={min_on_drone}); it is not a drone bed"
+        )
+    tonic = drone_tonic(rec, rec_sr, sa=rec_sa or report.drone[0])
 
     def drone(sa, *, seconds: float, sr: int = rec_sr) -> np.ndarray:
-        name = NOTES[int(round(sa_midi(sa))) % 12]
-        shift = -drone_report(rec, rec_sr, sa=name).sa_offset
+        shift = (sa_midi(sa) - tonic + 6) % 12 - 6
         if abs(shift) > max_shift:
             raise ValueError(
-                f"the recording's Sa is {shift:+d} semitones from {name}; moving it more "
-                f"than max_shift={max_shift} would sound wrong. Use a recording nearer {name}."
+                f"the recording's Sa ({NOTES[round(tonic) % 12]}) is {-shift:+.2f} semitones "
+                f"from the requested one; moving it more than max_shift={max_shift} would "
+                f"sound wrong. Use a recording nearer the Sa you want."
             )
         return loop_drone(
             varispeed(rec, rec_sr, semitones=shift, sr_out=sr),
@@ -578,15 +616,24 @@ def recorded_drone(
     return drone
 
 
+def as_drone(drone, sr: int) -> Callable:
+    """A ``drone`` callable as is, or a recording at ``sr`` made into one by
+    :func:`recorded_drone` (analysed once, here)."""
+    return drone if callable(drone) else recorded_drone(drone, sr)
+
+
 def highpass(
     y: np.ndarray, sr: int, cutoff_hz: float, *, width_hz: float | None = None
 ) -> np.ndarray:
-    """``y`` with everything under ``cutoff_hz`` removed: an FFT mask rising over ``width_hz``
-    (default half the cutoff) with a raised cosine, so there is no ringing edge."""
+    """``y`` with nothing left under ``cutoff_hz``: an FFT mask that is zero up to the cutoff
+    and rises to one over the next ``width_hz`` (default half the cutoff) as a raised cosine, so
+    there is no ringing edge."""
+    if not len(y):
+        raise ValueError("highpass needs a non-empty signal")
     width = cutoff_hz / 2 if width_hz is None else width_hz
     spectrum = np.fft.rfft(y)
     freqs = np.fft.rfftfreq(len(y), 1 / sr)
-    rise = np.clip((freqs - (cutoff_hz - width)) / max(width, 1e-9), 0, 1)
+    rise = np.clip((freqs - cutoff_hz) / max(width, 1e-9), 0, 1)
     return np.fft.irfft(spectrum * np.sin(rise * np.pi / 2) ** 2, n=len(y))
 
 
@@ -674,15 +721,12 @@ def melody_over_drone(
     c = replace(c, midi=np.concatenate([lead, c.midi]))
 
     melody = timbre(c.at_rate(sr), sr)
-    bed = _drone_bed(drone, sa, n=len(melody), sr=sr)
+    bed = _drone_bed(as_drone(drone, sr), sa, n=len(melody), sr=sr)
     return _mix([(melody, melody_db), (bed, drone_db)], sr, peak=peak), sr
 
 
-def _drone_bed(drone, sa, *, n: int, sr: int) -> np.ndarray:
-    """``n`` samples of drone: from the ``drone`` callable, or a recording via
-    :func:`recorded_drone` (retuned to ``sa``)."""
-    if not callable(drone):
-        drone = recorded_drone(drone, sr)
+def _drone_bed(drone: Callable, sa, *, n: int, sr: int) -> np.ndarray:
+    """``n`` samples of ``drone`` on ``sa``, trimmed or padded to length."""
     bed = drone(sa, seconds=n / sr, sr=sr)
     return np.pad(bed[:n], (0, max(0, n - len(bed))))
 
@@ -709,7 +753,9 @@ def musicgen_melody(
     ``audio`` (``arioso.enhance(..., platform="musicgen")``), as mono ``(y, sr)``."""
     import arioso
 
-    song = arioso.enhance((audio, sr), prompt, platform="musicgen", duration=seconds)
+    song = arioso.enhance(
+        (audio, sr), prompt, platform="musicgen", as_="melody", duration=seconds
+    )
     return to_audio_ref(song).as_mono()
 
 
@@ -745,16 +791,20 @@ def musicgen_variation(
         sr: The voice's sample rate when ``voice`` is a bare array.
         transpose: Semitones to move the voice onto Sa (pitch only, ``librosa``).
         slow: Stretch the voice by this factor (1.25 is a quarter slower; ``librosa``).
-        drone: A ``(sa, *, seconds, sr)`` callable or a recording (see :func:`melody_over_drone`).
+        drone: A ``(sa, *, seconds, sr)`` callable, or a recording at the voice's rate (see
+            :func:`recorded_drone`).
         voice_db, drone_db: Levels in the conditioning mix and of the drone under the result.
         seconds: Length to generate; default the voice's, up to ``max_seconds`` (MusicGen's
             window).
-        highpass_hz: The generated take loses everything under this, by default the band
-            ``drone_report`` reads, where its own bass would move the harmony.
+        highpass_hz: The generated take keeps nothing under this, by default the top of the
+            band ``drone_report`` reads, where its own bass and tenor would move the harmony. A
+            take that follows a low (male) voice in its octave loses that melody too: move the
+            voice up with ``transpose``.
         generate: ``(audio, sr, *, prompt, seconds) -> (y, sr)``; default :func:`musicgen_melody`.
         peak: Peak level of the result.
     """
     v, rate = to_audio_ref(voice if sr is None else (voice, sr)).as_mono()
+    drone = as_drone(drone, rate)
     if transpose or slow != 1:
         import librosa
 

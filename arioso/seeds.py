@@ -550,22 +550,42 @@ def drone_tonic(
     y: np.ndarray, sr: int, *, sa: str | None = None, band_midi: tuple = (36, 72)
 ) -> float:
     """The tonic of a drone recording as a fractional pitch class (0 = C, 4.45 = E 45 cents
-    sharp): ``drone_report``'s Sa (or the given ``sa`` name), refined to the strongest spectral
-    peak within half a semitone of it in ``band_midi``, interpolated between bins."""
-    pc = (
-        pitch_class(sa) if sa is not None else pitch_class(drone_report(y, sr).drone[0])
-    )
+    sharp): the Sa of :func:`drone_sa` (or the given ``sa`` name), refined to the strongest
+    spectral peak within half a semitone of it in ``band_midi``, interpolated between bins.
+
+    Raises when there is no peak there (silence, or an ``sa`` the recording does not play):
+    the strongest bin would then sit on the window's edge and the estimate would be a guess.
+    """
+    pc = pitch_class(sa) if sa is not None else pitch_class(drone_sa(y, sr))
     spectrum = np.abs(np.fft.rfft(np.asarray(y, dtype=float) * np.hanning(len(y))))
     midi = hz_to_midi(np.fft.rfftfreq(len(y), 1 / sr))
     near = (midi >= band_midi[0]) & (midi < band_midi[1])
     near &= np.abs((midi - pc + 6) % 12 - 6) < 0.5
-    if not near.any():
-        return float(pc)
-    k = int(np.flatnonzero(near)[np.argmax(spectrum[near])])
+    near[[0, -1]] = False  # a peak needs a bin on each side
+    k = int(np.flatnonzero(near)[np.argmax(spectrum[near])]) if near.any() else 0
+    if not k or not (spectrum[k] > spectrum[k - 1] and spectrum[k] > spectrum[k + 1]):
+        raise ValueError(f"no spectral peak at {NOTES[pc]} in the recording")
     a, b, c = np.log(spectrum[k - 1 : k + 2] + 1e-12)
-    bin_offset = 0.5 * (a - c) / (a - 2 * b + c) if a - 2 * b + c else 0.0
-    hz = (k + bin_offset) * sr / len(y)
-    return float(hz_to_midi(hz) % 12)
+    bin_offset = float(np.clip(0.5 * (a - c) / (a - 2 * b + c), -0.5, 0.5))
+    return float(hz_to_midi((k + bin_offset) * sr / len(y)) % 12)
+
+
+def drone_sa(y: np.ndarray, sr: int) -> str:
+    """The Sa of a drone recording, assuming the usual Pa tuning: of the two notes
+    ``drone_report`` finds a fifth apart, the lower one of the fifth (whichever string is
+    louder). A Ma-tuned recording reads as its Ma; name its Sa instead."""
+    a, b = (pitch_class(n) for n in drone_report(y, sr).drone)
+    return NOTES[a if (b - a) % 12 == 7 else b]
+
+
+def _loud_span(y: np.ndarray, sr: int, *, floor_db: float, frame_s: float = 0.05):
+    """``y`` from its first to its last frame within ``floor_db`` of the 95th-percentile
+    frame level: a recording without its fade-in, fade-out and silences at either end."""
+    hop = max(1, int(frame_s * sr))
+    frames = y[: len(y) // hop * hop].reshape(-1, hop)
+    level = np.sqrt(np.mean(frames**2, axis=1))
+    loud = np.flatnonzero(level >= np.percentile(level, 95) * 10 ** (floor_db / 20))
+    return y[loud[0] * hop : (loud[-1] + 1) * hop] if len(loud) else y
 
 
 def recorded_drone(
@@ -575,28 +595,42 @@ def recorded_drone(
     rec_sa: str | None = None,
     max_shift: float = 2.0,
     min_on_drone: float = 0.6,
+    trim_db: float = -6.0,
     crossfade_s: float = 1.0,
 ) -> Callable:
     """A ``drone`` for :func:`melody_over_drone` from a recording (a real tanpura sounds less
     synthetic than :func:`tanpura`): ``(sa, *, seconds, sr) -> array``.
 
-    The recording is read once: its Sa by :func:`drone_tonic` (to the cent, so a tanpura tuned
-    off 12-TET lands on the requested Sa, not a quarter-tone beside it), unless ``rec_sa`` names
-    it; and whether it is a drone at all (``drone_report``'s on-drone share at least
-    ``min_on_drone``; a song with a tanpura in it is not). Each call moves it to the requested
-    Sa by :func:`varispeed` and loops it by :func:`loop_drone`. A move of more than
-    ``max_shift`` semitones raises: it changes the instrument's size, and it sounds it. A Pa
-    string louder than Sa can be read as Sa; ``rec_sa`` settles it. A CC0 recording to start
-    from: "Tanpura in E" by iluppai, https://freesound.org/s/148850/ (22.8 s, Sa and Pa).
+    The recording is read once:
+
+    - whether it is a drone at all: ``drone_report``'s on-drone share at least
+      ``min_on_drone`` (a song with a tanpura in it is not);
+    - its Sa: :func:`drone_sa` (Pa tuning assumed; a louder Pa string does not fool it), or
+      ``rec_sa``, which must be one of the two notes it plays; then to the cent by
+      :func:`drone_tonic`, so a tanpura tuned off 12-TET lands on the requested Sa, not a
+      quarter-tone beside it;
+    - its steady part: fades and silences at either end, quieter than ``trim_db`` under its
+      level, are cut, or every loop would dip.
+
+    Each call moves it to the requested Sa by :func:`varispeed` and loops it by
+    :func:`loop_drone`. A move of more than ``max_shift`` semitones (at most 6 can be asked:
+    the nearest Sa is never further) raises: it changes the instrument's size, and it sounds
+    it. A CC0 recording to start from: "Tanpura in E" by iluppai,
+    https://freesound.org/s/148850/ (22.8 s, Sa and Pa).
     """
     rec, rec_sr = to_audio_ref((y, sr)).as_mono()
-    report = drone_report(rec, rec_sr, sa=rec_sa)
+    report = drone_report(rec, rec_sr)
     if report.on_drone_share < min_on_drone:
         raise ValueError(
             f"the recording holds a drone only {report.on_drone_share:.0%} of the time "
             f"(min_on_drone={min_on_drone}); it is not a drone bed"
         )
-    tonic = drone_tonic(rec, rec_sr, sa=rec_sa or report.drone[0])
+    if rec_sa is not None and pitch_class(rec_sa) not in map(pitch_class, report.drone):
+        raise ValueError(
+            f"rec_sa={rec_sa!r} is not one of the notes the recording plays: {report.drone}"
+        )
+    tonic = drone_tonic(rec, rec_sr, sa=rec_sa or drone_sa(rec, rec_sr))
+    rec = _loud_span(rec, rec_sr, floor_db=trim_db)
 
     def drone(sa, *, seconds: float, sr: int = rec_sr) -> np.ndarray:
         shift = (sa_midi(sa) - tonic + 6) % 12 - 6
@@ -616,10 +650,14 @@ def recorded_drone(
     return drone
 
 
-def as_drone(drone, sr: int) -> Callable:
-    """A ``drone`` callable as is, or a recording at ``sr`` made into one by
-    :func:`recorded_drone` (analysed once, here)."""
-    return drone if callable(drone) else recorded_drone(drone, sr)
+def _as_drone(drone, sr: int) -> Callable:
+    """A ``drone`` callable as is; a recording as ``(y, its_sr)``, or a bare array taken to be
+    at ``sr``, made into one by :func:`recorded_drone` (analysed once, here)."""
+    if callable(drone):
+        return drone
+    if isinstance(drone, tuple):
+        return recorded_drone(*drone)
+    return recorded_drone(drone, sr)
 
 
 def highpass(
@@ -701,8 +739,9 @@ def melody_over_drone(
         contour: The melody (:func:`melody_contour`), already in Sa's key.
         sa: The drone's tonic, a note name or MIDI number.
         sr: Output sample rate.
-        drone: ``(sa, *, seconds, sr) -> array`` (default :func:`tanpura`), or a recorded drone
-            array at ``sr``, retuned to ``sa`` and looped by :func:`recorded_drone`.
+        drone: ``(sa, *, seconds, sr) -> array`` (default :func:`tanpura`), or a recording,
+            ``(y, its_sr)`` or an array at ``sr``, retuned to ``sa`` and looped by
+            :func:`recorded_drone`.
         timbre: ``(pitch_per_sample, sr) -> array`` (default :func:`bowed`).
         transpose: Semitones to move the melody before rendering.
         floor_midi: Lift the melody by octaves until its median pitch is at least this. The
@@ -721,7 +760,7 @@ def melody_over_drone(
     c = replace(c, midi=np.concatenate([lead, c.midi]))
 
     melody = timbre(c.at_rate(sr), sr)
-    bed = _drone_bed(as_drone(drone, sr), sa, n=len(melody), sr=sr)
+    bed = _drone_bed(_as_drone(drone, sr), sa, n=len(melody), sr=sr)
     return _mix([(melody, melody_db), (bed, drone_db)], sr, peak=peak), sr
 
 
@@ -791,8 +830,8 @@ def musicgen_variation(
         sr: The voice's sample rate when ``voice`` is a bare array.
         transpose: Semitones to move the voice onto Sa (pitch only, ``librosa``).
         slow: Stretch the voice by this factor (1.25 is a quarter slower; ``librosa``).
-        drone: A ``(sa, *, seconds, sr)`` callable, or a recording at the voice's rate (see
-            :func:`recorded_drone`).
+        drone: A ``(sa, *, seconds, sr)`` callable, or a recording, ``(y, its_sr)`` or an array
+            at the voice's rate (see :func:`recorded_drone`).
         voice_db, drone_db: Levels in the conditioning mix and of the drone under the result.
         seconds: Length to generate; default the voice's, up to ``max_seconds`` (MusicGen's
             window).
@@ -804,7 +843,7 @@ def musicgen_variation(
         peak: Peak level of the result.
     """
     v, rate = to_audio_ref(voice if sr is None else (voice, sr)).as_mono()
-    drone = as_drone(drone, rate)
+    drone = _as_drone(drone, rate)
     if transpose or slow != 1:
         import librosa
 

@@ -10,6 +10,8 @@ import pytest
 
 from arioso.analysis import drone_report
 from arioso.seeds import (
+    drone_sa,
+    musicgen_melody,
     drone_tonic,
     highpass,
     musicgen_variation,
@@ -389,3 +391,70 @@ def test_musicgen_variation_conditions_on_voice_and_drone_then_drops_the_bass():
     assert sr == 2 * SR and len(y) == 30 * sr
     r = drone_report(y, sr, sa="D")
     assert r.drone == ("D", "A") and r.holds()  # the take's own bass and tenor are gone
+
+
+def _strings(notes_and_gains, seconds=8, sr=SR):
+    """A steady drone of harmonic tones, (MIDI pitch, gain) each, with a weak fundamental."""
+    t = np.arange(int(seconds * sr)) / sr
+    y = 0
+    for midi, gain in notes_and_gains:
+        f0 = 440 * 2 ** ((midi - 69) / 12)
+        y = y + gain * sum(
+            h**-0.5 * np.sin(2 * np.pi * h * f0 * t) * (0.3 if h == 1 else 1)
+            for h in range(1, 8)
+            if h * f0 < sr / 2
+        )
+    return y / np.max(np.abs(y))
+
+
+def test_drone_sa_assumes_pa_tuning_even_when_pa_is_louder():
+    # Sa E2/E3 soft, Pa B2 loud: "the stronger of the pair" would say B
+    y = _strings([(40, 0.4), (52, 0.4), (47, 1.0)])
+    assert set(drone_report(y, SR).drone) == {"E", "B"}
+    assert drone_sa(y, SR) == "E"
+
+
+def test_recorded_drone_checks_rec_sa_and_the_peak():
+    rec = tanpura("E", seconds=6, sr=SR)
+    with pytest.raises(ValueError, match="not one of the notes"):
+        recorded_drone(rec, SR, rec_sa="F")
+    with pytest.raises(ValueError, match="no spectral peak"):
+        drone_tonic(np.zeros(4 * SR), SR, sa="E")
+
+
+def test_recorded_drone_cuts_fades_before_looping():
+    rec = tanpura("E", seconds=12, sr=SR)
+    fade = np.linspace(0, 1, 3 * SR)
+    rec[: 3 * SR] *= fade
+    rec[-3 * SR :] *= fade[::-1]
+    bed = recorded_drone(rec, SR)("E", seconds=40, sr=SR)
+    hop = SR // 4
+    level = np.sqrt(np.mean(bed[: len(bed) // hop * hop].reshape(-1, hop) ** 2, axis=1))
+    assert 20 * np.log10(level.min() / np.median(level)) > -6  # no dip at the joins
+
+
+def test_a_recording_with_its_own_rate_is_a_drone():
+    rec = tanpura("D", seconds=6, sr=2 * SR)  # recorded at twice the output rate
+    y, _ = melody_over_drone(_tune(), "D", sr=SR, drone=(rec, 2 * SR), lead_in_s=0)
+    r = drone_report(y, SR, sa="D")
+    assert r.drone == ("D", "A") and r.sa_offset == 0  # not an octave down
+
+
+def test_musicgen_melody_routes_through_the_melody_affordance(monkeypatch):
+    import arioso
+    from arioso.base import AudioResult, Song
+
+    calls = {}
+
+    def enhance(audio, prompt, **kwargs):
+        calls.update(audio=audio, prompt=prompt, **kwargs)
+        out = np.ones((2, 3200)) * 0.5  # stereo at 32 kHz
+        return Song(
+            audio=AudioResult(audio_array=out, sample_rate=32000), platform="musicgen"
+        )
+
+    monkeypatch.setattr(arioso, "enhance", enhance)
+    y, sr = musicgen_melody(np.zeros(SR), SR, prompt="sarangi", seconds=1.0)
+    assert calls["platform"] == "musicgen" and calls["as_"] == "melody"
+    assert calls["duration"] == 1.0 and calls["prompt"] == "sarangi"
+    assert sr == 32000 and y.shape == (3200,)

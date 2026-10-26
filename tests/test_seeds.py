@@ -478,3 +478,46 @@ def test_audio_contour_takes_denote_shaped_results():
     c = audio_contour((np.ones((SR, 2)), SR), separator=separate, f0_tracker=get_pitch)
     assert c.fps == pytest.approx(fps)
     assert np.allclose(c.midi[:40], 57.0) and np.all(np.isnan(c.midi[40:60]))
+
+
+def test_audio_contour_follows_the_trackers_own_times():
+    from types import SimpleNamespace
+
+    rate, hop = 44100, 512  # 86.13 fps: no whole number of samples per frame drift
+    n = int(300 * rate / hop)  # five minutes
+    times = np.arange(n) * hop / rate + 0.5  # and a first frame half a second in
+    f0 = np.full(n, 220.0)
+    f0[::7] = 0.0  # some trackers mark unvoiced frames with 0, not NaN
+    y = np.zeros(300 * rate + rate)
+    loud_from = 200 * rate  # the recording is silent until 200 s
+    y[loud_from:] = 1.0
+
+    def get_pitch(y, sr):
+        return SimpleNamespace(times=times, frequencies=f0)
+
+    c = audio_contour((y, rate), separator=None, f0_tracker=get_pitch, min_note_s=0)
+    t = np.arange(len(c.midi)) / c.fps
+    voiced = ~np.isnan(c.midi)
+    assert not voiced[t < 199.9].any()  # the gate holds to the true silence, no drift
+    assert voiced[(t > 200.2) & (t < 300)].mean() > 0.8
+    assert np.all(np.isnan(c.midi[: int(0.5 * c.fps)]))  # shifted onto its first time
+    assert np.isfinite(c.midi[voiced]).all()  # 0 Hz is unvoiced, not -inf
+
+
+@pytest.mark.parametrize(
+    "result, match",
+    [
+        ({"times": np.arange(5) / 100, "frequencies": np.ones(4)}, "per frame"),
+        ({"times": np.zeros(5), "frequencies": np.ones(5)}, "increasing"),
+        ({"times": np.arange(1) / 100, "frequencies": np.ones(1)}, "two or more"),
+    ],
+)
+def test_audio_contour_names_a_bad_tracker_result(result, match):
+    from types import SimpleNamespace
+
+    with pytest.raises(ValueError, match=match):
+        audio_contour(
+            (np.ones(SR), SR),
+            separator=None,
+            f0_tracker=lambda y, sr: SimpleNamespace(**result),
+        )

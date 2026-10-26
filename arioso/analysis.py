@@ -1,5 +1,6 @@
 """
-Check generated music before anyone listens to it. First check: does a take hold one drone?
+Check generated music before anyone listens to it. Does a take hold one drone (``drone_report``)?
+Does it keep its seed's melody (``melody_match``)?
 
 Generators ignore "no chord changes": asked for one unchanging drone (Hindustani raga music, say),
 they still move the harmony in blocks. ``drone_report`` measures it from the bass alone:
@@ -14,6 +15,12 @@ they still move the harmony in blocks. ``drone_report`` measures it from the bas
 
 A held drone scores ``off_ratio == 0`` with no runs. Pure numpy over a mono float array; read files
 with ``arioso.scoring.read_audio``.
+
+``melody_match`` compares the treble (C4 to B6) chroma of a take and of its seed, each pitch class
+less its steady background so the drone does not count, aligned by dynamic time warping, and
+returns their mean cosine similarity along the path. On a melody-over-drone seed: the separated
+voice it was made from scored 0.88, a slower re-timbred render 0.94, another song's seed or the
+drone alone about 0.43. It needs ``librosa`` for the warping.
 
 >>> sr = 4000
 >>> t = np.arange(20 * sr) / sr
@@ -31,6 +38,7 @@ import numpy as np
 NOTES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 _FLATS = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "H": "B"}
 C1_HZ = 32.703
+C4_HZ = 261.626
 
 
 @dataclass
@@ -117,11 +125,20 @@ def _median_filter_rows(x: np.ndarray, n: int) -> np.ndarray:
     return np.median(np.lib.stride_tricks.sliding_window_view(pad, n, axis=1), axis=2)
 
 
-def _runs(mask: np.ndarray, fps: float, min_len_s: float) -> list[tuple[float, float]]:
+def index_runs(mask: np.ndarray) -> list[tuple[int, int]]:
+    """``(start, end)`` index pairs of the runs of True in a boolean mask (end exclusive).
+
+    >>> index_runs(np.array([0, 1, 1, 0, 1], bool))
+    [(1, 3), (4, 5)]
+    """
     edges = np.diff(np.concatenate([[0], mask.astype(int), [0]]))
     starts, ends = np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)
+    return [(int(a), int(b)) for a, b in zip(starts, ends)]
+
+
+def _runs(mask: np.ndarray, fps: float, min_len_s: float) -> list[tuple[float, float]]:
     return [
-        (a / fps, b / fps) for a, b in zip(starts, ends) if (b - a) / fps >= min_len_s
+        (a / fps, b / fps) for a, b in index_runs(mask) if (b - a) / fps >= min_len_s
     ]
 
 
@@ -180,3 +197,71 @@ def drone_report(
         fps=fps,
         chroma=chroma,
     )
+
+
+#: DTW steps for melody_match: without single steps the path's slope stays within [1/2, 2], so a
+#: take may run at half to double its seed's tempo but cannot sit on one frame (as in denote.align).
+_MELODY_STEPS = np.array([[1, 1], [1, 2], [2, 1]])
+
+
+def melody_match(
+    take: np.ndarray,
+    seed: np.ndarray,
+    sr: int,
+    *,
+    seed_sr: int | None = None,
+    fmin_hz: float = C4_HZ,
+    octaves: int = 3,
+    window_s: float = 0.2,
+    hop_s: float = 0.1,
+    loud_rel: float = 0.05,
+    background_pct: float = 20.0,
+) -> float:
+    """How well a take keeps its seed's melody: mean cosine similarity of their treble chroma
+    along a DTW alignment, so tempo drift does not count against it.
+
+    The shorter of the two is aligned as a subsequence of the longer (both ways, keeping the
+    better, when they are as long), so the score does not depend on argument order and an intro
+    or outro on the longer side does not count against it. A take that holds only part of its
+    seed's melody, inside material of its own, scores lower.
+
+    Each pitch class's ``background_pct`` percentile over time is removed first: a drone's
+    partials reach the treble band and sit there throughout, and without this a take with the
+    drone and no melody scores nearly as well as a real one. (A low percentile, not the median,
+    so the melody's most-held note, often Sa, is not removed with the drone.)
+
+    Args:
+        take: Mono audio of the generated take.
+        seed: Mono audio of the seed it covered.
+        sr: The take's sample rate (and the seed's, unless ``seed_sr`` is given).
+        fmin_hz, octaves: The band read, C4 up three octaves by default: above the drone, where
+            the melody is.
+        window_s, hop_s: Chroma frame length and step.
+        loud_rel: Frames quieter than this fraction of the 95th-percentile level are dropped.
+        background_pct: Percentile of each pitch class removed as the steady background.
+    """
+    import librosa
+
+    def melody_chroma(y, rate):
+        chroma, _ = bass_chroma(
+            y, rate, octaves=octaves, fmin_hz=fmin_hz, window_s=window_s, hop_s=hop_s
+        )
+        level = chroma.sum(0)
+        chroma = chroma[:, level > loud_rel * np.percentile(level, 95)]
+        background = np.percentile(chroma, background_pct, axis=1, keepdims=True)
+        chroma = np.maximum(chroma - background, 0)
+        return chroma / np.maximum(np.linalg.norm(chroma, axis=0), 1e-12)
+
+    def inside(query, ref):  # query no longer than ref, or librosa transposes the path
+        similarity = query.T @ ref
+        _, path = librosa.sequence.dtw(
+            C=1 - similarity, subseq=True, step_sizes_sigma=_MELODY_STEPS
+        )
+        return float(np.mean(similarity[path[:, 0], path[:, 1]]))
+
+    a, b = melody_chroma(take, sr), melody_chroma(seed, seed_sr or sr)
+    if a.shape[1] < 2 or b.shape[1] < 2:
+        raise ValueError("take or seed has fewer than two playing frames to compare")
+    if a.shape[1] == b.shape[1]:
+        return max(inside(a, b), inside(b, a))
+    return inside(*sorted((a, b), key=lambda c: c.shape[1]))

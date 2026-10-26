@@ -255,6 +255,8 @@ time (raised as `arioso.CatalogMatchError`, a `RuntimeError` subclass with `.tas
 recording, so no re-render or re-performance gets through. The fal-hosted
 platforms did not check (2026-10). Why, and what to expect: [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/music-gen-upload-copyright-detection.md).
 
+**To keep a melody but not its harmony** (a raga-style take over one drone), cover a seed that has no harmony: `arioso.seeds.melody_over_drone(melody_contour(source), sa)` renders the melody of a MIDI track or of a recording's separated voice as a bowed line over a tanpura (`pip install 'arioso[seeds]'`). Covers of such a seed hold the drone; check each take with `arioso.analysis.drone_report(take, sr, sa=...)` and `melody_match(take, seed, sr)` (about 0.9 for the tune itself, 0.45 for another song or the drone alone).
+
 ## Music under a narration (a bed for an audiobook, podcast or voice-over)
 
 When the music goes *under speech*, the work is mostly fitting and post-production, not generation. Read the [research note](https://github.com/thorwhalen/arioso/blob/main/misc/docs/research/general/scoring-narration.md) before choosing a route; in short:

@@ -233,12 +233,14 @@ def test_transformers_compensates_delay_frames(monkeypatch, fake_torch):
 
 
 def test_transformers_refuses_melody_checkpoint(monkeypatch, fake_torch):
+    monkeypatch.setattr("importlib.util.find_spec", lambda name: None)
     adapter = _adapter(monkeypatch, _TransformersModel(), transformers=True)
 
     with pytest.raises(ValueError, match="non-melody checkpoint"):
         adapter.generate(
             "x", continue_from=_source(3), model="facebook/musicgen-melody"
         )
+    assert adapter.loaded == []  # refused before loading a multi-GB checkpoint
 
 
 @pytest.mark.parametrize(
@@ -331,3 +333,49 @@ def test_services_keep_warning_on_a_non_id_for_hosted_continue_from():
             PLATFORM_CONFIG["param_map"],
             "musicgen",
         )
+
+
+def test_frames_are_rounded_not_truncated(monkeypatch, fake_torch):
+    model = _TransformersModel()
+    adapter = _adapter(monkeypatch, model, transformers=True)
+
+    # int(2.3 * 50) == 114: truncating would lose a frame
+    song = adapter.generate("x", continue_from=_source(3), extend_seconds=2.3)
+
+    assert model.calls[0]["max_new_tokens"] == 115 + 3
+    assert song.metadata["continuation"].duration_seconds == 2.3
+
+
+def test_a_clip_id_gets_a_clear_error(monkeypatch):
+    adapter = _adapter(monkeypatch, _AudiocraftModel())
+
+    with pytest.raises(ValueError, match="not a hosted clip id"):
+        adapter.generate("x", continue_from="clip-123abc")
+
+
+def test_int_pcm_source_is_scaled(monkeypatch, fake_torch):
+    model = _AudiocraftModel()
+    adapter = _adapter(monkeypatch, model)
+    pcm = np.full(3 * SR, 16384, np.int16)
+
+    song = adapter.generate("x", continue_from=(pcm, SR), extend_seconds=1)
+
+    assert np.allclose(song.audio.audio_array[: 2 * SR], 16384 / 32767)
+
+
+def test_hosted_continue_from_platforms_narrow_the_type():
+    # config modules only: going through the registry would load every adapter
+    import importlib
+    import pkgutil
+
+    import arioso.platforms
+
+    for info in pkgutil.iter_modules(arioso.platforms.__path__):
+        if not info.ispkg:
+            continue
+        config = importlib.import_module(
+            f"arioso.platforms.{info.name}.config"
+        ).PLATFORM_CONFIG
+        if "continue_from" in config.get("supported_affordances", []):
+            mapping = config.get("param_map", {}).get("continue_from") or {}
+            assert mapping.get("type") or mapping.get("adapter_handled"), info.name

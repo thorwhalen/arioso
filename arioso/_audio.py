@@ -147,7 +147,10 @@ class AudioRef:
         """
         import numpy as np
 
-        audio = np.asarray(self.as_array(), dtype=np.float32)
+        audio = np.asarray(self.as_array())
+        if np.issubdtype(audio.dtype, np.integer):  # PCM -> [-1, 1]
+            audio = audio / np.iinfo(audio.dtype).max
+        audio = audio.astype(np.float32)
         sample_rate = self.sample_rate
         if audio.ndim > 1:  # (frames, channels) or (channels, frames)
             audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)

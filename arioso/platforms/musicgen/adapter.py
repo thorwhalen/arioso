@@ -104,7 +104,9 @@ class Adapter:
             continue_from: Optional audio to extend, in any of the forms
                 ``melody`` accepts. The result is this audio followed by its
                 continuation (mono, at the model's sample rate); the
-                continuation alone is in ``metadata['continuation']``.
+                continuation alone is in ``metadata['continuation']``. Each
+                seam crossfades over 10 ms into the model's re-decoded prompt,
+                so join the result, not the original plus the continuation.
             continue_at: Continue from this time (seconds) in
                 ``continue_from`` instead of from its end; what follows it is
                 dropped.
@@ -277,13 +279,17 @@ class Adapter:
         )
 
     def _set_audiocraft_params(self, *, duration, temperature, top_k, top_p, guidance):
-        """Sampling settings for the next audiocraft ``generate*`` call."""
+        """Sampling settings for the next audiocraft ``generate*`` call.
+
+        audiocraft generates ``int(duration * frame_rate)`` frames, so the
+        duration is aimed mid-frame: float error can then never drop the last
+        frame (``int(2.3 * 50)`` is 114)."""
         self._model.set_generation_params(
             use_sampling=True,
             top_k=top_k,
             top_p=top_p,
             temperature=temperature,
-            duration=duration,
+            duration=(self._frames(duration) + 0.5) / self._frame_rate(),
             cfg_coef=guidance,
         )
 
@@ -298,7 +304,7 @@ class Adapter:
         with torch.no_grad():
             return self._model.generate(
                 **inputs,
-                max_new_tokens=int(seconds * self._frame_rate()) + self._delay_frames(),
+                max_new_tokens=self._frames(seconds) + self._delay_frames(),
                 temperature=temperature,
                 do_sample=True,
                 top_k=top_k,
@@ -322,15 +328,26 @@ class Adapter:
         guidance,
     ) -> Song:
         """Extend *source* by ``rounds`` chained audio-prompted generations."""
+        import importlib.util
+        import os
+
         _check_continuation_window(prompt_seconds, extend_seconds, rounds)
-        self._ensure_model(model)
-        if self._use_transformers and "melody" in self._model_name:
+        if isinstance(source, str) and not os.path.exists(source):
             raise ValueError(
-                f"musicgen: {self._model_name!r} cannot continue audio with "
+                f"musicgen: continue_from={source!r} is not a file. musicgen "
+                f"runs locally and continues the audio itself (a path, bytes, "
+                f"Song or (array, sample_rate)), not a hosted clip id or URL."
+            )
+        # transformers is the fallback when audiocraft is missing; refuse before
+        # loading a multi-GB checkpoint that cannot do this
+        if "melody" in model and importlib.util.find_spec("audiocraft") is None:
+            raise ValueError(
+                f"musicgen: {model!r} cannot continue audio with "
                 f"transformers (its audio input is melody chroma, not a prompt "
                 f"to extend). Use a non-melody checkpoint such as "
                 f"'facebook/musicgen-small'."
             )
+        self._ensure_model(model)
         sample_rate = self._sample_rate()
         # Prompt lengths are whole codec frames, so the model re-decodes the
         # prompt to exactly as many samples as it was given, and dropping that
@@ -410,15 +427,8 @@ class Adapter:
                 top_k=top_k,
                 top_p=top_p,
                 guidance=guidance,
-                # audiocraft's duration covers the prompt and the continuation;
-                # it takes int(duration * frame_rate) frames, so aim mid-frame
-                # to keep float error from losing the last one.
-                duration=(
-                    len(tail) * self._frame_rate() // self._sample_rate()
-                    + round(extend_seconds * self._frame_rate())
-                    + 0.5
-                )
-                / self._frame_rate(),
+                # audiocraft's duration covers the prompt and the continuation
+                duration=len(tail) / self._sample_rate() + extend_seconds,
             )
             prompt_wav = torch.from_numpy(tail).float()[None, None]
             wav = self._model.generate_continuation(
@@ -442,6 +452,10 @@ class Adapter:
         if self._use_transformers:
             return int(self._model.config.audio_encoder.sampling_rate)
         return int(self._model.sample_rate)
+
+    def _frames(self, seconds: float) -> int:
+        """Whole codec frames in *seconds*, rounded (not truncated)."""
+        return round(seconds * self._frame_rate())
 
     def _frame_rate(self) -> int:
         """Codec frames per second (50 for every MusicGen checkpoint)."""

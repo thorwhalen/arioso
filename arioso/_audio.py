@@ -147,13 +147,8 @@ class AudioRef:
         """
         import numpy as np
 
-        audio = np.asarray(self.as_array())
-        if np.issubdtype(audio.dtype, np.integer):  # PCM -> [-1, 1]
-            audio = audio / np.iinfo(audio.dtype).max
-        audio = audio.astype(np.float32)
+        audio = _channels_first(self.as_array()).mean(axis=0)
         sample_rate = self.sample_rate
-        if audio.ndim > 1:  # (frames, channels) or (channels, frames)
-            audio = audio.mean(axis=1 if audio.shape[0] > audio.shape[1] else 0)
         if target_rate and sample_rate != target_rate:
             try:
                 import librosa
@@ -170,7 +165,7 @@ class AudioRef:
 
         This is the form neural backends want (``stable_audio``'s
         ``initial_audio_waveforms``, ``musicgen`` melody chroma). Mono audio is
-        returned as ``(1, frames)``.
+        returned as ``(1, frames)``; a 2-D array may be either way round.
         """
         try:
             import torch
@@ -178,15 +173,7 @@ class AudioRef:
             raise ImportError(
                 "Building a waveform tensor needs 'torch' (pip install torch)."
             ) from e
-        array = self.as_array()
-        tensor = torch.as_tensor(array, dtype=torch.float32)
-        if tensor.ndim == 1:  # (frames,) -> (1, frames)
-            tensor = tensor.unsqueeze(0)
-        elif (
-            tensor.ndim == 2
-        ):  # soundfile gives (frames, channels) -> (channels, frames)
-            tensor = tensor.transpose(0, 1).contiguous()
-        return tensor
+        return torch.as_tensor(_channels_first(self.as_array()))
 
     def cleanup(self) -> None:
         """Remove any temp file this ref created via :meth:`as_path`."""
@@ -195,6 +182,23 @@ class AudioRef:
                 os.remove(self._tmp_path)
             finally:
                 self._tmp_path = None
+
+
+def _channels_first(array) -> Any:
+    """``array`` as float32 ``(channels, frames)``, integer PCM scaled to [-1, 1].
+
+    soundfile gives ``(frames, channels)``; librosa, torchaudio and arioso's own
+    adapters give ``(channels, frames)``. The longer axis is taken to be time,
+    so a clip shorter than its channel count is read the wrong way round (a
+    shape cannot tell those apart).
+    """
+    import numpy as np
+
+    audio = np.asarray(array)
+    if np.issubdtype(audio.dtype, np.integer):  # PCM -> [-1, 1]
+        audio = audio / np.iinfo(audio.dtype).max
+    audio = np.atleast_2d(audio.astype(np.float32))
+    return np.ascontiguousarray(audio.T if audio.shape[0] > audio.shape[1] else audio)
 
 
 def to_audio_ref(value: Any) -> AudioRef:

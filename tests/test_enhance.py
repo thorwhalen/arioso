@@ -184,3 +184,33 @@ def test_audio_ref_as_mono_downmixes_either_orientation_to_float32():
     audio, sr = to_audio_ref((mono, 8000)).as_mono()  # no target: rate kept
     assert sr == 8000
     assert audio.dtype == np.float32 and np.array_equal(audio, mono)
+
+
+@pytest.mark.parametrize(
+    "shape, expected",
+    [
+        ((2, 1000), (2, 1000)),  # librosa / torchaudio
+        ((1, 1000), (1, 1000)),  # musicgen's own mono output
+        ((1000, 2), (2, 1000)),  # soundfile
+        ((1000,), (1, 1000)),
+    ],
+)
+def test_audio_ref_as_waveform_is_channels_first_from_either_orientation(
+    shape, expected
+):
+    pytest.importorskip("torch")
+    np = pytest.importorskip("numpy")
+    from arioso._audio import to_audio_ref
+
+    wave = to_audio_ref((np.zeros(shape, dtype="float32"), 44100)).as_waveform()
+    assert tuple(wave.shape) == expected
+
+
+def test_audio_ref_as_waveform_scales_int_pcm():
+    pytest.importorskip("torch")
+    np = pytest.importorskip("numpy")
+    from arioso._audio import to_audio_ref
+
+    pcm = np.full((1000, 2), 16384, dtype="int16")
+    wave = to_audio_ref((pcm, 44100)).as_waveform()
+    assert float(wave.max()) == pytest.approx(16384 / 32767)

@@ -52,6 +52,13 @@ scoring = [
 analysis = [
     "numpy",
 ]
+# arioso.seeds: a melody over a tanpura drone as a cover source. The default voice separator
+# (hdemucs_vocals) also needs torch and torchaudio.
+seeds = [
+    "numpy",
+    "librosa>=0.10",
+    "pretty_midi",
+]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

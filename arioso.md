@@ -1,4 +1,4 @@
-> built 2026-10-26 10:32 UTC from 59eda57 (main) · arioso 0.0.33. Details: build_info.json
+> built 2026-10-26 11:22 UTC from 2148b50 (main) · arioso 0.0.34. Details: build_info.json
 
 # index.html.md
 
@@ -112,7 +112,11 @@ drone_report(take, sr, sa="C#").holds()  # does a take hold the drone?
 melody_match(take, seed, sr)  # does it keep the tune? (~0.9 vs ~0.45 for another song)
 ```
 
-Every step is a seam: `audio_contour(..., separator=, f0_tracker=)`, `melody_over_drone(..., drone=, timbre=)`. `drone=` also takes a recorded tanpura array, looped with crossfades by `loop_drone`. A low (male) line is lifted by octaves above the drone’s register (`floor_midi`), where it would otherwise fail `drone_report`.
+Every step is a seam: `audio_contour(..., separator=, f0_tracker=)`, `melody_over_drone(..., drone=, timbre=)`. A low (male) line is lifted by octaves above the drone’s register (`floor_midi`), where it would otherwise fail `drone_report`.
+
+A real tanpura sounds less synthetic than `tanpura()`: pass a recording as `drone=` (or `drone=recorded_drone(y, sr)`). It is retuned to Sa by varispeed (up to `max_shift`, 2 semitones by default) and looped with crossfades. A CC0 one to start from: [“Tanpura in E”](https://freesound.org/s/148850/) on Freesound.
+
+For a source in a generator’s own phrasing, `musicgen_variation(voice, "C#", prompt="slow sarangi", transpose=..., slow=1.2)` runs MusicGen-melody on the voice over the drone, high-passes its take below the drone’s band, and puts the drone back underneath.
 
 ## Platforms
 
@@ -2468,7 +2472,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-26 10:32 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/59eda576533c70c0d9df5025d90ece8e4729e04d"><code>59eda57</code></a> on branch <code>main</code>, for **arioso 0.0.33** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 11:22 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/2148b5021981057bf3cc10e1b5683c7fda30e1de"><code>2148b50</code></a> on branch <code>main</code>, for **arioso 0.0.34** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2477,9 +2481,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/59eda576533c70c0d9df5025d90ece8e4729e04d"><code>59eda576533c70c0d9df5025d90ece8e4729e04d</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/2148b5021981057bf3cc10e1b5683c7fda30e1de"><code>2148b5021981057bf3cc10e1b5683c7fda30e1de</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.33</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.34</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2488,9 +2492,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40308001865">40308001865</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40314332614">40314332614</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>01dfc81d4002401bf21a6da41e18622e10bbffaa</code> (in the history of the built commit) |
+| Event commit | <code>5ff49440efc32ea6f27cddcb817542d519b001c0</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2515,13 +2519,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.33/">0.0.33</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.34/">0.0.34</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 59eda576533c70c0d9df5025d90ece8e4729e04d
+git checkout 2148b5021981057bf3cc10e1b5683c7fda30e1de
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

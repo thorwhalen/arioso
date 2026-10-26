@@ -108,7 +108,11 @@ drone_report(take, sr, sa="C#").holds()  # does a take hold the drone?
 melody_match(take, seed, sr)  # does it keep the tune? (~0.9 vs ~0.45 for another song)
 ```
 
-Every step is a seam: `audio_contour(..., separator=, f0_tracker=)`, `melody_over_drone(..., drone=, timbre=)`. `drone=` also takes a recorded tanpura array, looped with crossfades by `loop_drone`. A low (male) line is lifted by octaves above the drone’s register (`floor_midi`), where it would otherwise fail `drone_report`.
+Every step is a seam: `audio_contour(..., separator=, f0_tracker=)`, `melody_over_drone(..., drone=, timbre=)`. A low (male) line is lifted by octaves above the drone’s register (`floor_midi`), where it would otherwise fail `drone_report`.
+
+A real tanpura sounds less synthetic than `tanpura()`: pass a recording as `drone=` (or `drone=recorded_drone(y, sr)`). It is retuned to Sa by varispeed (up to `max_shift`, 2 semitones by default) and looped with crossfades. A CC0 one to start from: [“Tanpura in E”](https://freesound.org/s/148850/) on Freesound.
+
+For a source in a generator’s own phrasing, `musicgen_variation(voice, "C#", prompt="slow sarangi", transpose=..., slow=1.2)` runs MusicGen-melody on the voice over the drone, high-passes its take below the drone’s band, and puts the drone back underneath.
 
 ## Platforms
 

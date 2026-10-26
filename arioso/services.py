@@ -329,9 +329,14 @@ def _validate_kwargs(
         if value is None:
             continue
 
-        # Type check against AFFORDANCES (soft warning)
-        if key in AFFORDANCES:
-            expected_type = AFFORDANCES[key].type
+        # Type check against the platform's own "type" for the parameter, else
+        # AFFORDANCES (soft warning). An affordance whose form differs between
+        # platforms (continue_from: a clip id here, audio there) is typed
+        # loosely in AFFORDANCES and narrowed in each platform's param_map.
+        expected_type = param_map.get(key, {}).get("type") or getattr(
+            AFFORDANCES.get(key), "type", None
+        )
+        if expected_type is not None:
             if not isinstance(value, expected_type):
                 # Allow int where float is expected
                 if not (expected_type is float and isinstance(value, int)):

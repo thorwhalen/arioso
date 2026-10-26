@@ -19,6 +19,9 @@ from arioso._audio import to_audio_ref
 #: MusicGen's context window in seconds: an audio prompt plus the new audio it
 #: generates must fit in it (transformers caps generation at 1500 frames).
 WINDOW_SECONDS = 30.0
+#: Crossfade from the original audio into the model's re-decoded prompt at each
+#: seam, hiding the codec's reconstruction error there (a click otherwise).
+SEAM_CROSSFADE_SECONDS = 0.01
 
 
 class Adapter:
@@ -367,6 +370,11 @@ class Adapter:
             ref.as_array(), ref.sample_rate, target_rate=sample_rate
         )
         if continue_at is not None:
+            if not 0 < continue_at <= len(audio) / sample_rate:
+                raise ValueError(
+                    f"musicgen: continue_at={continue_at} is outside the "
+                    f"{len(audio) / sample_rate:.2f} s of continue_from."
+                )
             audio = audio[: int(continue_at * sample_rate)]
         if len(audio) < hop:
             raise ValueError(
@@ -378,13 +386,15 @@ class Adapter:
             temperature=temperature, top_k=top_k, top_p=top_p, guidance=guidance
         )
 
+        crossfade = int(SEAM_CROSSFADE_SECONDS * sample_rate)
+        used_prompt = min(prompt_len, len(audio) // hop * hop)
         stitched = audio
         for _ in range(rounds):
             n = min(prompt_len, len(stitched) // hop * hop)
-            new = self._continuation_round(
+            out = self._continuation_round(
                 prompt, stitched[-n:], extend_seconds=extend_seconds, **sampling
             )
-            stitched = np.concatenate([stitched, new.astype(stitched.dtype)])
+            stitched = _splice(stitched, out, n, crossfade=crossfade)
 
         continuation = stitched[len(audio) :]
         return Song(
@@ -401,7 +411,7 @@ class Adapter:
                 "temperature": temperature,
                 "continued": True,
                 "continue_from_seconds": len(audio) / sample_rate,
-                "prompt_seconds": prompt_len / sample_rate,
+                "prompt_seconds": used_prompt / sample_rate,
                 "extend_seconds": extend_seconds,
                 "rounds": rounds,
                 "continuation": AudioResult(
@@ -416,12 +426,15 @@ class Adapter:
     def _continuation_round(
         self, prompt, tail, *, extend_seconds, temperature, top_k, top_p, guidance
     ):
-        """One audio-prompted call: the new samples that follow *tail* (mono)."""
+        """One audio-prompted call: the re-decoded *tail* followed by the new
+        audio, mono."""
+        import numpy as np
         import torch
 
         if self._use_transformers:
+            stereo = getattr(self._model.decoder.config, "audio_channels", 1) == 2
             inputs = self._processor(
-                audio=tail,
+                audio=[np.stack([tail, tail]) if stereo else tail],
                 sampling_rate=self._sample_rate(),
                 text=[prompt],
                 padding=True,
@@ -445,8 +458,15 @@ class Adapter:
                 top_k=top_k,
                 top_p=top_p,
                 temperature=temperature,
-                # audiocraft's duration covers the prompt and the continuation
-                duration=len(tail) / self._sample_rate() + extend_seconds,
+                # audiocraft's duration covers the prompt and the continuation;
+                # it takes int(duration * frame_rate) frames, so aim mid-frame
+                # to keep float error from losing the last one.
+                duration=(
+                    len(tail) * self._frame_rate() // self._sample_rate()
+                    + round(extend_seconds * self._frame_rate())
+                    + 0.5
+                )
+                / self._frame_rate(),
                 cfg_coef=guidance,
             )
             prompt_wav = torch.from_numpy(tail).float()[None, None]
@@ -454,8 +474,7 @@ class Adapter:
                 prompt_wav, self._sample_rate(), descriptions=[prompt]
             )
             out = wav[0].cpu().numpy()
-        # (channels, frames) -> mono, then drop the re-decoded prompt
-        return out.mean(axis=0)[len(tail) :]
+        return out.mean(axis=0)  # (channels, frames) -> mono
 
     def _delay_frames(self) -> int:
         """Frames the codebook delay pattern consumes from ``max_new_tokens``
@@ -480,6 +499,21 @@ class Adapter:
         else:
             rate = getattr(self._model, "frame_rate", None)
         return int(rate) if isinstance(rate, (int, float)) and rate else 50
+
+
+def _splice(audio, out, n, *, crossfade):
+    """Append the continuation in *out* (whose first *n* samples re-decode the
+    prompt, the last *n* of *audio*), crossfading into the re-decoded prompt
+    over the last *crossfade* samples of *audio*."""
+    import numpy as np
+
+    decoded, new = out[:n], out[n:]
+    audio = audio.copy()
+    xf = min(crossfade, n)
+    if xf:
+        ramp = np.linspace(0.0, 1.0, xf, dtype=audio.dtype)
+        audio[-xf:] = audio[-xf:] * (1 - ramp) + decoded[-xf:] * ramp
+    return np.concatenate([audio, new.astype(audio.dtype)])
 
 
 def _check_continuation_window(

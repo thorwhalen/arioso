@@ -66,7 +66,8 @@ class _AudiocraftModel:
         assert prompt_sample_rate == SR
         tail = prompt.array[0, 0]
         self.prompts.append(tail.copy())
-        total = int(round(self.params[-1]["duration"] * SR))
+        # audiocraft generates int(duration * frame_rate) frames
+        total = int(self.params[-1]["duration"] * self.frame_rate) * HOP
         new = np.full(total - len(tail), float(len(self.prompts)), np.float32)
         return _Tensor(np.concatenate([tail, new])[None, None])
 
@@ -76,20 +77,27 @@ class _TransformersModel:
 
     device = "cpu"
 
-    def __init__(self, *, codebooks=4):
+    def __init__(self, *, codebooks=4, channels=1):
         self.config = types.SimpleNamespace(
             audio_encoder=types.SimpleNamespace(sampling_rate=SR, frame_rate=50)
         )
         self.decoder = types.SimpleNamespace(
-            config=types.SimpleNamespace(num_codebooks=codebooks, audio_channels=1)
+            config=types.SimpleNamespace(
+                num_codebooks=codebooks * channels, audio_channels=channels
+            )
         )
         self.calls = []
 
     def generate(self, *, audio, max_new_tokens, **kwargs):
+        (audio,) = audio  # a batch of one
+        channels = self.decoder.config.audio_channels
+        assert audio.shape[0] == 2 if channels == 2 else audio.ndim == 1
         self.calls.append(dict(kwargs, max_new_tokens=max_new_tokens))
-        frames = max_new_tokens - (self.decoder.config.num_codebooks - 1)
+        codebooks = self.decoder.config.num_codebooks // channels
+        frames = max_new_tokens - (codebooks - 1)
         new = np.full(frames * HOP, float(len(self.calls)), np.float32)
-        return _Tensor(np.concatenate([audio, new])[None, None])
+        out = np.concatenate([np.atleast_2d(audio)[0], new])
+        return _Tensor(np.stack([out] * channels)[None])
 
 
 class _Inputs(dict):
@@ -160,8 +168,8 @@ def test_audiocraft_chains_rounds_and_stitches(monkeypatch, fake_torch):
     assert np.all(audio[: 3 * SR] == 0.25)
     assert np.all(audio[3 * SR : int(4.5 * SR)] == 1.0)
     assert np.all(audio[int(4.5 * SR) :] == 2.0)
-    # audiocraft's duration is prompt + continuation
-    assert [p["duration"] for p in model.params] == [3.5, 3.5]
+    # audiocraft's duration is prompt + continuation (aimed mid-frame)
+    assert [p["duration"] for p in model.params] == [3.51, 3.51]
     # round 2 is prompted by the tail of the audio so far, round 1's output in it
     assert len(model.prompts[1]) == 2 * SR
     assert np.all(model.prompts[1][-int(1.5 * SR) :] == 1.0)
@@ -254,3 +262,72 @@ def test_melody_and_continue_from_are_exclusive(monkeypatch):
 
     with pytest.raises(ValueError, match="cannot be combined"):
         adapter.generate("x", continue_from=_source(3), melody=_source(3))
+
+
+def test_audiocraft_odd_frame_prompt_keeps_every_frame(monkeypatch, fake_torch):
+    model = _AudiocraftModel()
+    adapter = _adapter(monkeypatch, model)
+
+    # a one-frame source: int((1 + 200) / 50 * 50) would lose a frame to float error
+    song = adapter.generate("x", continue_from=_source(HOP / SR), extend_seconds=4.0)
+
+    assert song.metadata["continuation"].duration_seconds == 4.0
+    assert song.metadata["prompt_seconds"] == HOP / SR
+
+
+def test_transformers_stereo_checkpoint_gets_two_channels(monkeypatch, fake_torch):
+    model = _TransformersModel(channels=2)
+    adapter = _adapter(monkeypatch, model, transformers=True)
+
+    song = adapter.generate("x", continue_from=_source(3), extend_seconds=2)
+
+    assert model.calls[0]["max_new_tokens"] == 103
+    assert song.metadata["continuation"].duration_seconds == 2
+
+
+@pytest.mark.parametrize("continue_at", [-1.0, 0.0, 3.5])
+def test_continue_at_outside_the_source_raises(monkeypatch, fake_torch, continue_at):
+    adapter = _adapter(monkeypatch, _AudiocraftModel())
+
+    with pytest.raises(ValueError, match="continue_at"):
+        adapter.generate("x", continue_from=_source(3), continue_at=continue_at)
+
+
+def test_seam_crossfades_into_the_decoded_prompt(monkeypatch, fake_torch):
+    model = _AudiocraftModel()
+    adapter = _adapter(monkeypatch, model)
+    decoded = 0.5  # the codec's reconstruction of a 0.25 source, off at the seam
+
+    def generate_continuation(prompt, prompt_sample_rate, descriptions):
+        tail = np.full_like(prompt.array[0, 0], decoded)
+        new = np.full(SR, decoded, np.float32)
+        return _Tensor(np.concatenate([tail, new])[None, None])
+
+    model.generate_continuation = generate_continuation
+    song = adapter.generate("x", continue_from=_source(3), extend_seconds=1)
+
+    audio = song.audio.audio_array
+    seam = 3 * SR
+    assert np.all(audio[: seam - int(0.01 * SR)] == 0.25)  # original untouched
+    assert np.max(np.abs(np.diff(audio[seam - 400 : seam + 400]))) < 0.01  # no jump
+
+
+def test_services_keep_warning_on_a_non_id_for_hosted_continue_from():
+    from arioso.services import _validate_kwargs
+    from arioso.platforms.sunoapi.config import PLATFORM_CONFIG as SUNO
+
+    with pytest.warns(UserWarning, match="continue_from"):
+        _validate_kwargs(
+            {"continue_from": np.zeros(3)},
+            set(SUNO["supported_affordances"]),
+            SUNO["param_map"],
+            "sunoapi",
+        )
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        _validate_kwargs(
+            {"continue_from": np.zeros(3)},
+            set(PLATFORM_CONFIG["supported_affordances"]),
+            PLATFORM_CONFIG["param_map"],
+            "musicgen",
+        )

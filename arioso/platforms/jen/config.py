@@ -19,7 +19,7 @@ PLATFORM_CONFIG = {
             "choices": ["mp3", "wav"],
             "native_default": "mp3",
         },
-        "continue_from": {"native_name": "continue_from"},
+        "continue_from": {"native_name": "continue_from", "type": str},
     },
     "supported_affordances": [
         "prompt",

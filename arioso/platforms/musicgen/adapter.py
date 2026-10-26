@@ -1,5 +1,7 @@
 """MusicGen adapter using audiocraft (preferred) or transformers.
 
+The adapter holds the modes; ``backends.py`` holds how each library runs them.
+
 Supports text-to-music generation and, via ``facebook/musicgen-melody``,
 melody-conditioned generation (the ``melody`` affordance / ``arioso.enhance``
 stage): the output follows the pitch contour of an input audio while taking its
@@ -15,12 +17,15 @@ composition; thorwhalen/arioso#29).
 
 from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
+from arioso.platforms.musicgen.backends import (
+    AudiocraftBackend,
+    Sampling,
+    TransformersBackend,
+)
 
 #: MusicGen's context window in seconds: an audio prompt plus the new audio it
 #: generates must fit in it (transformers caps generation at 1500 frames).
 WINDOW_SECONDS = 30.0
-#: Codec frames per second, used when a model does not report its own.
-DEFAULT_FRAME_RATE = 50
 #: Crossfade from the original audio into the model's re-decoded prompt at each
 #: seam, hiding the codec's reconstruction error there (a click otherwise).
 SEAM_CROSSFADE_SECONDS = 0.01
@@ -122,6 +127,9 @@ class Adapter:
         Returns:
             A Song with audio_array populated.
         """
+        sampling = Sampling(
+            temperature=temperature, top_k=top_k, top_p=top_p, guidance=guidance
+        )
         if continue_from is not None:
             if melody is not None:
                 raise ValueError(
@@ -137,180 +145,32 @@ class Adapter:
                 extend_seconds=duration if extend_seconds is None else extend_seconds,
                 rounds=rounds,
                 model=model,
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                guidance=guidance,
+                sampling=sampling,
             )
 
         if melody is not None and "melody" not in model:
             model = "facebook/musicgen-melody"
+        backend = self._backend(model)
+        if melody is None:
+            audio, extra = backend.text(prompt, seconds=duration, sampling=sampling), {}
+        else:
+            ref = to_audio_ref(melody)
+            audio = backend.melody(prompt, ref, seconds=duration, sampling=sampling)
+            extra = {"melody_conditioned": True}
+        return _song(
+            audio,
+            backend.sample_rate,
+            model=self._model_name,
+            temperature=temperature,
+            **extra,
+        )
+
+    def _backend(self, model: str):
+        """The loaded *model* behind the interface of its library."""
         self._ensure_model(model)
-
-        if melody is not None:
-            if self._use_transformers:
-                return self._generate_transformers_melody(
-                    prompt,
-                    melody,
-                    duration=duration,
-                    temperature=temperature,
-                    top_k=top_k,
-                    top_p=top_p,
-                    guidance=guidance,
-                )
-            return self._generate_audiocraft_melody(
-                prompt,
-                melody,
-                duration=duration,
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                guidance=guidance,
-            )
-
         if self._use_transformers:
-            return self._generate_transformers(
-                prompt,
-                duration=duration,
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                guidance=guidance,
-            )
-        return self._generate_audiocraft(
-            prompt,
-            duration=duration,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            guidance=guidance,
-        )
-
-    def _generate_audiocraft(
-        self, prompt, *, duration, temperature, top_k, top_p, guidance
-    ) -> Song:
-        self._set_audiocraft_params(
-            duration=duration,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            guidance=guidance,
-        )
-        wav = self._model.generate([prompt])
-        return _song(
-            wav[0].cpu().numpy(),
-            self._model.sample_rate,
-            model=self._model_name,
-            temperature=temperature,
-        )
-
-    def _generate_transformers(
-        self, prompt, *, duration, temperature, top_k, top_p, guidance
-    ) -> Song:
-        inputs = self._processor(text=[prompt], padding=True, return_tensors="pt").to(
-            self._model.device
-        )
-        audio_values = self._transformers_generate(
-            inputs,
-            seconds=duration,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            guidance=guidance,
-        )
-        return _song(
-            audio_values[0, 0].cpu().numpy(),
-            self._sample_rate(),
-            model=self._model_name,
-            temperature=temperature,
-        )
-
-    def _generate_audiocraft_melody(
-        self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
-    ) -> Song:
-        self._set_audiocraft_params(
-            duration=duration,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            guidance=guidance,
-        )
-        ref = to_audio_ref(melody)
-        melody_wav = ref.as_waveform()  # (channels, frames)
-        # generate_with_chroma wants (batch, channels, frames)
-        wav = self._model.generate_with_chroma(
-            [prompt], melody_wav[None], ref.sample_rate
-        )
-        return _song(
-            wav[0].cpu().numpy(),
-            self._model.sample_rate,
-            model=self._model_name,
-            temperature=temperature,
-            melody_conditioned=True,
-        )
-
-    def _generate_transformers_melody(
-        self, prompt, melody, *, duration, temperature, top_k, top_p, guidance
-    ) -> Song:
-        audio, sample_rate = to_audio_ref(melody).as_mono(
-            target_rate=self._processor.feature_extractor.sampling_rate
-        )
-        inputs = self._processor(
-            audio=audio,
-            sampling_rate=sample_rate,
-            text=[prompt],
-            padding=True,
-            return_tensors="pt",
-        ).to(self._model.device)
-        audio_values = self._transformers_generate(
-            inputs,
-            seconds=duration,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            guidance=guidance,
-        )
-        return _song(
-            audio_values[0, 0].cpu().numpy(),
-            self._sample_rate(),
-            model=self._model_name,
-            temperature=temperature,
-            melody_conditioned=True,
-        )
-
-    def _set_audiocraft_params(self, *, duration, temperature, top_k, top_p, guidance):
-        """Sampling settings for the next audiocraft ``generate*`` call.
-
-        audiocraft generates ``int(duration * frame_rate)`` frames, so the
-        duration is aimed mid-frame: float error can then never drop the last
-        frame (``int(2.3 * 50)`` is 114)."""
-        self._model.set_generation_params(
-            use_sampling=True,
-            top_k=top_k,
-            top_p=top_p,
-            temperature=temperature,
-            duration=(self._frames(duration) + 0.5) / self._frame_rate(),
-            cfg_coef=guidance,
-        )
-
-    def _transformers_generate(
-        self, inputs, *, seconds, temperature, top_k, top_p, guidance
-    ):
-        """Sample *seconds* of new audio with transformers; returns the
-        ``(batch, channels, frames)`` tensor. ``max_new_tokens`` adds the
-        frames the delay pattern consumes, so the output is the full length."""
-        import torch
-
-        with torch.no_grad():
-            return self._model.generate(
-                **inputs,
-                max_new_tokens=self._frames(seconds) + self._delay_frames(),
-                temperature=temperature,
-                do_sample=True,
-                top_k=top_k,
-                top_p=top_p if top_p > 0 else None,
-                guidance_scale=guidance,
-            )
+            return TransformersBackend(self._model, self._processor)
+        return AudiocraftBackend(self._model)
 
     def _continue(
         self,
@@ -322,10 +182,7 @@ class Adapter:
         extend_seconds,
         rounds,
         model,
-        temperature,
-        top_k,
-        top_p,
-        guidance,
+        sampling: Sampling,
     ) -> Song:
         """Extend *source* by ``rounds`` chained audio-prompted generations."""
         import importlib.util
@@ -347,12 +204,12 @@ class Adapter:
                 f"to extend). Use a non-melody checkpoint such as "
                 f"'facebook/musicgen-small'."
             )
-        self._ensure_model(model)
-        sample_rate = self._sample_rate()
+        backend = self._backend(model)
+        sample_rate = backend.sample_rate
         # Prompt lengths are whole codec frames, so the model re-decodes the
         # prompt to exactly as many samples as it was given, and dropping that
         # many from the output leaves the continuation alone.
-        hop = sample_rate // self._frame_rate()
+        hop = sample_rate // backend.frame_rate
 
         audio, _ = to_audio_ref(source).as_mono(target_rate=sample_rate)
         if continue_at is not None:
@@ -368,17 +225,14 @@ class Adapter:
                 f"from; at least one codec frame ({hop} samples) is needed."
             )
         prompt_len = max(hop, int(prompt_seconds * sample_rate) // hop * hop)
-        sampling = dict(
-            temperature=temperature, top_k=top_k, top_p=top_p, guidance=guidance
-        )
 
         crossfade = int(SEAM_CROSSFADE_SECONDS * sample_rate)
         used_prompt = min(prompt_len, len(audio) // hop * hop)
         stitched = audio
         for _ in range(rounds):
             n = min(prompt_len, len(stitched) // hop * hop)
-            out = self._continuation_round(
-                prompt, stitched[-n:], extend_seconds=extend_seconds, **sampling
+            out = backend.continuation(
+                prompt, stitched[-n:], seconds=extend_seconds, sampling=sampling
             )
             stitched = _splice(stitched, out, n, crossfade=crossfade)
 
@@ -386,7 +240,7 @@ class Adapter:
             stitched,
             sample_rate,
             model=self._model_name,
-            temperature=temperature,
+            temperature=sampling.temperature,
             continued=True,
             continue_from_seconds=len(audio) / sample_rate,
             prompt_seconds=used_prompt / sample_rate,
@@ -394,78 +248,6 @@ class Adapter:
             rounds=rounds,
             continuation=_audio_result(stitched[len(audio) :], sample_rate),
         )
-
-    def _continuation_round(
-        self, prompt, tail, *, extend_seconds, temperature, top_k, top_p, guidance
-    ):
-        """One audio-prompted call: the re-decoded *tail* followed by the new
-        audio, mono."""
-        import numpy as np
-        import torch
-
-        if self._use_transformers:
-            stereo = getattr(self._model.decoder.config, "audio_channels", 1) == 2
-            inputs = self._processor(
-                audio=[np.stack([tail, tail]) if stereo else tail],
-                sampling_rate=self._sample_rate(),
-                text=[prompt],
-                padding=True,
-                return_tensors="pt",
-            ).to(self._model.device)
-            audio_values = self._transformers_generate(
-                inputs,
-                seconds=extend_seconds,
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                guidance=guidance,
-            )
-            out = audio_values[0].cpu().numpy()
-        else:
-            self._set_audiocraft_params(
-                temperature=temperature,
-                top_k=top_k,
-                top_p=top_p,
-                guidance=guidance,
-                # audiocraft's duration covers the prompt and the continuation
-                duration=len(tail) / self._sample_rate() + extend_seconds,
-            )
-            prompt_wav = torch.from_numpy(tail).float()[None, None]
-            wav = self._model.generate_continuation(
-                prompt_wav, self._sample_rate(), descriptions=[prompt]
-            )
-            out = wav[0].cpu().numpy()
-        return out.mean(axis=0)  # (channels, frames) -> mono
-
-    def _delay_frames(self) -> int:
-        """Frames the codebook delay pattern consumes from ``max_new_tokens``
-        on the transformers path (3 for the 4-codebook checkpoints), so a
-        call yields the seconds asked for."""
-        decoder_config = getattr(self._model.decoder, "config", None)
-        codebooks = getattr(decoder_config, "num_codebooks", None)
-        channels = getattr(decoder_config, "audio_channels", 1)
-        if not isinstance(codebooks, int) or not isinstance(channels, int):
-            return 0
-        return max(codebooks // max(channels, 1) - 1, 0)
-
-    def _sample_rate(self) -> int:
-        if self._use_transformers:
-            return int(self._model.config.audio_encoder.sampling_rate)
-        return int(self._model.sample_rate)
-
-    def _frames(self, seconds: float) -> int:
-        """Whole codec frames in *seconds*, rounded (not truncated)."""
-        return round(seconds * self._frame_rate())
-
-    def _frame_rate(self) -> int:
-        """Codec frames per second (50 for every MusicGen checkpoint)."""
-        if self._use_transformers:
-            rate = getattr(self._model.config.audio_encoder, "frame_rate", None)
-        else:
-            rate = getattr(self._model, "frame_rate", None)
-        if isinstance(rate, (int, float)) and rate:
-            return int(rate)
-        return DEFAULT_FRAME_RATE
 
 
 def _splice(audio, out, n, *, crossfade):

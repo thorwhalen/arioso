@@ -191,6 +191,27 @@ def _frame_rms(y: np.ndarray, hop: int, n_frames: int, *, win: int) -> np.ndarra
     return np.sqrt(np.maximum(energy[starts + win] - energy[starts], 0) / win)
 
 
+def _separated(result) -> tuple:
+    """A separator's ``(voice, sr)``, from the pair or from a result with ``.vocals`` and
+    ``.sr`` (``denote.separate``'s ``SeparationResult``)."""
+    if hasattr(result, "vocals") and hasattr(result, "sr"):
+        return result.vocals, result.sr
+    return result
+
+
+def _tracked(result) -> tuple:
+    """An f0 tracker's ``(f0_hz, voiced, fps)``, from the triple or from a result with
+    ``.times`` and ``.frequencies``, NaN where unvoiced (``denote.get_pitch``'s
+    ``PitchResult``)."""
+    if hasattr(result, "frequencies") and hasattr(result, "times"):
+        f0 = np.asarray(result.frequencies, dtype=float)
+        times = np.asarray(result.times, dtype=float)
+        if len(times) < 2:
+            raise ValueError("the f0 tracker returned fewer than two frames")
+        return f0, ~np.isnan(f0), 1.0 / float(np.median(np.diff(times)))
+    return result
+
+
 def drop_blips(midi: np.ndarray, fps: float, *, min_s: float = 0.12) -> np.ndarray:
     """Silence voiced stretches shorter than ``min_s`` (tracker noise, consonants)."""
     out = midi.copy()
@@ -245,10 +266,13 @@ def audio_contour(
         audio: The recording: an ``(array, sample_rate)`` pair, an array with ``sr``, or any form
             ``arioso._audio.to_audio_ref`` accepts (path, bytes, Song).
         sr: The sample rate when ``audio`` is a bare array.
-        separator: ``(y, sr) -> (voice, sr)``. The default, :func:`hdemucs_vocals`, isolates the
-            voice of a mix; pass ``None`` for a recording that is already one line.
-        f0_tracker: ``(y, sr) -> (f0_hz, voiced, fps)``. Default :func:`pyin_f0`; a
-            ``denote.get_pitch`` backend fits behind a two-line lambda.
+        separator: ``(y, sr) -> (voice, sr)``, or a result with ``.vocals`` and ``.sr``. The
+            default, :func:`hdemucs_vocals`, isolates the voice of a mix; pass ``None`` for a
+            recording that is already one line. ``lambda y, sr: denote.separate(y, sr=sr)``
+            plugs in denote's separators.
+        f0_tracker: ``(y, sr) -> (f0_hz, voiced, fps)``, or a result with ``.times`` and
+            ``.frequencies`` (NaN where unvoiced). Default :func:`pyin_f0`;
+            ``lambda y, sr: denote.get_pitch(y, sr=sr)`` plugs in denote's trackers.
         gate_db: Frames quieter than this, relative to the 95th-percentile frame level, are
             silent whatever the tracker says (reverb tails, bleed).
         min_note_s: Voiced stretches shorter than this are dropped (:func:`drop_blips`).
@@ -258,9 +282,9 @@ def audio_contour(
     ref = to_audio_ref(audio if sr is None else (audio, sr))
     y, rate = ref.as_array(), ref.sample_rate
     if separator is not None:
-        y, rate = separator(y, rate)
+        y, rate = _separated(separator(y, rate))
     y = _mono(y, rate)
-    f0, voiced, fps = f0_tracker(y, rate)
+    f0, voiced, fps = _tracked(f0_tracker(y, rate))
     midi = np.where(np.asarray(voiced, dtype=bool), hz_to_midi(f0), np.nan)
 
     hop = int(round(rate / fps))

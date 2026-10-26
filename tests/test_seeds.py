@@ -458,3 +458,23 @@ def test_musicgen_melody_routes_through_the_melody_affordance(monkeypatch):
     assert calls["platform"] == "musicgen" and calls["as_"] == "melody"
     assert calls["duration"] == 1.0 and calls["prompt"] == "sarangi"
     assert sr == 32000 and y.shape == (3200,)
+
+
+def test_audio_contour_takes_denote_shaped_results():
+    from types import SimpleNamespace
+
+    n, fps = 100, 100.0
+    f0 = np.full(n, 220.0)
+    f0[40:60] = np.nan  # unvoiced, as denote marks it
+
+    def separate(y, sr):
+        return SimpleNamespace(vocals=np.ones(SR), sr=SR, stems={})
+
+    def get_pitch(y, sr):
+        return SimpleNamespace(
+            times=np.arange(n) / fps, frequencies=f0, confidence=np.ones(n)
+        )
+
+    c = audio_contour((np.ones((SR, 2)), SR), separator=separate, f0_tracker=get_pitch)
+    assert c.fps == pytest.approx(fps)
+    assert np.allclose(c.midi[:40], 57.0) and np.all(np.isnan(c.midi[40:60]))

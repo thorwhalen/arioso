@@ -65,8 +65,13 @@ To *extend* a recording rather than transform it, pass it as `continue_from` to 
 
 ```python
 longer = arioso.generate(
-    "warm piano trio", platform="musicgen", model="facebook/musicgen-medium",
-    continue_from="take.wav", prompt_seconds=10, extend_seconds=20, rounds=2,
+    "warm piano trio",
+    platform="musicgen",
+    model="facebook/musicgen-medium",
+    continue_from="take.wav",
+    prompt_seconds=10,
+    extend_seconds=20,
+    rounds=2,
 )
 ```
 

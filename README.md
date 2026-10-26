@@ -61,6 +61,15 @@ arioso.supports_audio_input("stable_audio")  # True
 arioso.supports_audio_input("mubert")  # False
 ```
 
+To *extend* a recording rather than transform it, pass it as `continue_from` to `musicgen`. The last `prompt_seconds` (default 10) of the audio prompt the model, which writes `extend_seconds` (default `duration`) of what comes next, chained over `rounds` calls. The result is the original followed by the continuation; the continuation alone is in `song.metadata["continuation"]`. It runs locally, so it also extends audio that a hosted extend route refuses (Suno's `upload_extend` rejects uploads that match a catalogued composition).
+
+```python
+longer = arioso.generate(
+    "warm piano trio", platform="musicgen", model="facebook/musicgen-medium",
+    continue_from="take.wav", prompt_seconds=10, extend_seconds=20, rounds=2,
+)
+```
+
 `enhance(audio, prompt='', *, platform='stable_audio', strength=None, as_='auto')`
 routes your audio into the platform's audio-conditioning affordance
 (`audio_input`, `melody`, or `reference_audio`) and generates. Input audio is

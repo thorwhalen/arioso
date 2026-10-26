@@ -4,10 +4,21 @@ Supports text-to-music generation and, via ``facebook/musicgen-melody``,
 melody-conditioned generation (the ``melody`` affordance / ``arioso.enhance``
 stage): the output follows the pitch contour of an input audio while taking its
 style from the text prompt.
+
+It also *continues* a recording (the ``continue_from`` affordance): the last
+``prompt_seconds`` of the audio are fed to the model as an audio prompt and it
+generates what comes next, chained over ``rounds`` calls for longer extensions.
+This is the local fallback for extending audio that a hosted extend route
+refuses (``sunoapi.upload_extend`` rejects uploads matching a catalogued
+composition; thorwhalen/arioso#29).
 """
 
 from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
+
+#: MusicGen's context window in seconds: an audio prompt plus the new audio it
+#: generates must fit in it (transformers caps generation at 1500 frames).
+WINDOW_SECONDS = 30.0
 
 
 class Adapter:
@@ -62,9 +73,15 @@ class Adapter:
         guidance: float = 3.0,
         model: str = "facebook/musicgen-small",
         melody=None,
+        continue_from=None,
+        continue_at: float | None = None,
+        prompt_seconds: float = 10.0,
+        extend_seconds: float | None = None,
+        rounds: int = 1,
         **kwargs,
     ) -> Song:
-        """Generate music from a text prompt, optionally following a melody.
+        """Generate music from a text prompt, optionally following a melody or
+        continuing a recording.
 
         Args:
             prompt: Text description of desired music.
@@ -79,10 +96,46 @@ class Adapter:
             melody: Optional input audio whose pitch contour the output follows
                 (a Song/AudioResult/bytes/path/(array, sample_rate)/waveform).
                 This is the ``arioso.enhance`` path for musicgen.
+            continue_from: Optional audio to extend, in any of the forms
+                ``melody`` accepts. The result is this audio followed by its
+                continuation (mono, at the model's sample rate); the
+                continuation alone is in ``metadata['continuation']``.
+            continue_at: Continue from this time (seconds) in
+                ``continue_from`` instead of from its end; what follows it is
+                dropped.
+            prompt_seconds: Length of the tail of the audio fed to the model as
+                the prompt for each round.
+            extend_seconds: New audio per round, in seconds (default
+                ``duration``). ``prompt_seconds + extend_seconds`` must fit in
+                :data:`WINDOW_SECONDS`.
+            rounds: Number of chained continuation calls, each prompted by the
+                tail of the audio so far, so the extension totals
+                ``rounds * extend_seconds``.
 
         Returns:
             A Song with audio_array populated.
         """
+        if continue_from is not None:
+            if melody is not None:
+                raise ValueError(
+                    "musicgen: melody and continue_from cannot be combined -- "
+                    "MusicGen continues an audio prompt or follows a melody's "
+                    "chroma, not both in one call."
+                )
+            return self._continue(
+                prompt,
+                continue_from,
+                continue_at=continue_at,
+                prompt_seconds=prompt_seconds,
+                extend_seconds=duration if extend_seconds is None else extend_seconds,
+                rounds=rounds,
+                model=model,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                guidance=guidance,
+            )
+
         if melody is not None and "melody" not in model:
             model = "facebook/musicgen-melody"
         self._ensure_model(model)
@@ -232,7 +285,7 @@ class Adapter:
         import torch
 
         ref = to_audio_ref(melody)
-        audio, sample_rate = _melody_input(
+        audio, sample_rate = _mono_at_rate(
             ref.as_array(),
             ref.sample_rate,
             target_rate=self._processor.feature_extractor.sampling_rate,
@@ -276,9 +329,181 @@ class Adapter:
             },
         )
 
+    def _continue(
+        self,
+        prompt,
+        source,
+        *,
+        continue_at,
+        prompt_seconds,
+        extend_seconds,
+        rounds,
+        model,
+        temperature,
+        top_k,
+        top_p,
+        guidance,
+    ) -> Song:
+        """Extend *source* by ``rounds`` chained audio-prompted generations."""
+        import numpy as np
 
-def _melody_input(array, sample_rate, *, target_rate):
-    """Mono float32 audio at the feature extractor's rate.
+        _check_continuation_window(prompt_seconds, extend_seconds, rounds)
+        self._ensure_model(model)
+        if self._use_transformers and "melody" in self._model_name:
+            raise ValueError(
+                f"musicgen: {self._model_name!r} cannot continue audio with "
+                f"transformers (its audio input is melody chroma, not a prompt "
+                f"to extend). Use a non-melody checkpoint such as "
+                f"'facebook/musicgen-small'."
+            )
+        sample_rate = self._sample_rate()
+        # Prompt lengths are whole codec frames, so the model re-decodes the
+        # prompt to exactly as many samples as it was given, and dropping that
+        # many from the output leaves the continuation alone.
+        hop = sample_rate // self._frame_rate()
+
+        ref = to_audio_ref(source)
+        audio, _ = _mono_at_rate(
+            ref.as_array(), ref.sample_rate, target_rate=sample_rate
+        )
+        if continue_at is not None:
+            audio = audio[: int(continue_at * sample_rate)]
+        if len(audio) < hop:
+            raise ValueError(
+                f"musicgen: continue_from has {len(audio)} samples to continue "
+                f"from; at least one codec frame ({hop} samples) is needed."
+            )
+        prompt_len = max(hop, int(prompt_seconds * sample_rate) // hop * hop)
+        sampling = dict(
+            temperature=temperature, top_k=top_k, top_p=top_p, guidance=guidance
+        )
+
+        stitched = audio
+        for _ in range(rounds):
+            n = min(prompt_len, len(stitched) // hop * hop)
+            new = self._continuation_round(
+                prompt, stitched[-n:], extend_seconds=extend_seconds, **sampling
+            )
+            stitched = np.concatenate([stitched, new.astype(stitched.dtype)])
+
+        continuation = stitched[len(audio) :]
+        return Song(
+            audio=AudioResult(
+                audio_array=stitched,
+                sample_rate=sample_rate,
+                format="wav",
+                duration_seconds=len(stitched) / sample_rate,
+            ),
+            platform="musicgen",
+            status="complete",
+            metadata={
+                "model": self._model_name,
+                "temperature": temperature,
+                "continued": True,
+                "continue_from_seconds": len(audio) / sample_rate,
+                "prompt_seconds": prompt_len / sample_rate,
+                "extend_seconds": extend_seconds,
+                "rounds": rounds,
+                "continuation": AudioResult(
+                    audio_array=continuation,
+                    sample_rate=sample_rate,
+                    format="wav",
+                    duration_seconds=len(continuation) / sample_rate,
+                ),
+            },
+        )
+
+    def _continuation_round(
+        self, prompt, tail, *, extend_seconds, temperature, top_k, top_p, guidance
+    ):
+        """One audio-prompted call: the new samples that follow *tail* (mono)."""
+        import torch
+
+        if self._use_transformers:
+            inputs = self._processor(
+                audio=tail,
+                sampling_rate=self._sample_rate(),
+                text=[prompt],
+                padding=True,
+                return_tensors="pt",
+            ).to(self._model.device)
+            with torch.no_grad():
+                audio_values = self._model.generate(
+                    **inputs,
+                    max_new_tokens=int(extend_seconds * self._frame_rate())
+                    + self._delay_frames(),
+                    temperature=temperature,
+                    do_sample=True,
+                    top_k=top_k,
+                    top_p=top_p if top_p > 0 else None,
+                    guidance_scale=guidance,
+                )
+            out = audio_values[0].cpu().numpy()
+        else:
+            self._model.set_generation_params(
+                use_sampling=True,
+                top_k=top_k,
+                top_p=top_p,
+                temperature=temperature,
+                # audiocraft's duration covers the prompt and the continuation
+                duration=len(tail) / self._sample_rate() + extend_seconds,
+                cfg_coef=guidance,
+            )
+            prompt_wav = torch.from_numpy(tail).float()[None, None]
+            wav = self._model.generate_continuation(
+                prompt_wav, self._sample_rate(), descriptions=[prompt]
+            )
+            out = wav[0].cpu().numpy()
+        # (channels, frames) -> mono, then drop the re-decoded prompt
+        return out.mean(axis=0)[len(tail) :]
+
+    def _delay_frames(self) -> int:
+        """Frames the codebook delay pattern consumes from ``max_new_tokens``
+        on the transformers path (3 for the 4-codebook checkpoints), so a
+        round yields the ``extend_seconds`` asked for."""
+        decoder_config = getattr(self._model.decoder, "config", None)
+        codebooks = getattr(decoder_config, "num_codebooks", None)
+        channels = getattr(decoder_config, "audio_channels", 1)
+        if not isinstance(codebooks, int) or not isinstance(channels, int):
+            return 0
+        return max(codebooks // max(channels, 1) - 1, 0)
+
+    def _sample_rate(self) -> int:
+        if self._use_transformers:
+            return int(self._model.config.audio_encoder.sampling_rate)
+        return int(self._model.sample_rate)
+
+    def _frame_rate(self) -> int:
+        """Codec frames per second (50 for every MusicGen checkpoint)."""
+        if self._use_transformers:
+            rate = getattr(self._model.config.audio_encoder, "frame_rate", None)
+        else:
+            rate = getattr(self._model, "frame_rate", None)
+        return int(rate) if isinstance(rate, (int, float)) and rate else 50
+
+
+def _check_continuation_window(
+    prompt_seconds, extend_seconds, rounds, *, window=WINDOW_SECONDS
+):
+    """Raise early, before a model loads, on a continuation that cannot run."""
+    if prompt_seconds <= 0 or extend_seconds <= 0:
+        raise ValueError(
+            f"musicgen: prompt_seconds and extend_seconds must be positive, got "
+            f"{prompt_seconds} and {extend_seconds}."
+        )
+    if prompt_seconds + extend_seconds > window:
+        raise ValueError(
+            f"musicgen: prompt_seconds + extend_seconds = "
+            f"{prompt_seconds + extend_seconds} exceeds MusicGen's {window} s "
+            f"window. Extend in shorter steps with rounds=N instead (each round "
+            f"adds extend_seconds)."
+        )
+    if not isinstance(rounds, int) or rounds < 1:
+        raise ValueError(f"musicgen: rounds must be a positive int, got {rounds!r}.")
+
+
+def _mono_at_rate(array, sample_rate, *, target_rate):
+    """Mono float32 audio at *target_rate* (melody input and continuation).
 
     The transformers MusicGen-melody feature extractor resamples with
     torchaudio, which fails on the float64 NumPy arrays soundfile returns

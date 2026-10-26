@@ -172,7 +172,12 @@ AFFORDANCES: dict[str, Affordance] = {
         "Style/timbre reference audio (guides sound/production without "
         "reproducing the take). Same accepted forms as audio_input",
     ),
-    "continue_from": Affordance("continue_from", str, "ID/URL of track to extend from"),
+    "continue_from": Affordance(
+        "continue_from",
+        object,
+        "Track to extend: a clip ID/URL on hosted platforms, or the audio "
+        "itself (same accepted forms as audio_input) on local ones (musicgen)",
+    ),
     "continue_at": Affordance(
         "continue_at", float, "Timestamp in seconds to continue from"
     ),

@@ -38,8 +38,22 @@ from dataclasses import dataclass, replace
 
 import numpy as np
 
-from arioso._audio import to_audio_ref
-from arioso.analysis import NOTES, drone_report, index_runs, pitch_class
+from arioso._audio import (  # noqa: F401  (re-exported: these lived here before)
+    highpass,
+    hz_to_midi,
+    loop_drone,
+    midi_to_hz,
+    to_audio_ref,
+    varispeed,
+)
+from arioso.analysis import (  # noqa: F401  (drone_sa, drone_tonic re-exported)
+    NOTES,
+    drone_report,
+    drone_sa,
+    drone_tonic,
+    index_runs,
+    pitch_class,
+)
 from arioso.scoring import SILENCE_DB, active_db
 
 #: drone_report reads the bass from C1 up three octaves, so a melody whose median sits under C4
@@ -75,15 +89,6 @@ class Contour:
 
 # --------------------------------------------------------------------------------------------
 # From a recording
-
-
-def hz_to_midi(hz: np.ndarray) -> np.ndarray:
-    with np.errstate(divide="ignore", invalid="ignore"):
-        return 69.0 + 12.0 * np.log2(np.asarray(hz, dtype=float) / 440.0)
-
-
-def midi_to_hz(midi: np.ndarray) -> np.ndarray:
-    return 440.0 * 2.0 ** ((np.asarray(midi, dtype=float) - 69.0) / 12.0)
 
 
 def pyin_f0(
@@ -506,80 +511,6 @@ def tanpura(
     return _peak(out[:n])
 
 
-def loop_drone(
-    y: np.ndarray, sr: int, seconds: float, *, crossfade_s: float = 1.0
-) -> np.ndarray:
-    """A recorded drone repeated to ``seconds`` with equal-power crossfades at the joins."""
-    y = _mono(y, sr)
-    n, fade = int(seconds * sr), int(crossfade_s * sr)
-    if len(y) <= 2 * fade:
-        raise ValueError(
-            f"a {len(y) / sr:.1f} s drone is too short for {crossfade_s} s crossfades"
-        )
-    theta = np.linspace(0, np.pi / 2, fade)
-    fade_in, fade_out = np.sin(theta), np.cos(theta)  # equal power: squares sum to 1
-    step = len(y) - fade
-    out = np.zeros(n + len(y))
-    for start in range(0, n, step):
-        piece = y.copy()
-        if start:
-            piece[:fade] *= fade_in
-            out[start : start + fade] *= fade_out
-        out[start : start + len(y)] += piece
-    return out[:n].astype(y.dtype)
-
-
-def varispeed(
-    y: np.ndarray, sr: int, *, semitones: float = 0.0, sr_out: int | None = None
-) -> np.ndarray:
-    """``y`` played ``semitones`` higher (pitch and tempo move together, a tape sped up) and
-    resampled to ``sr_out``, in one band-limited FFT resampling.
-
-    For a drone this beats a phase vocoder: no smearing of the strings' attacks, and a cycle a
-    few percent faster or slower goes unnoticed.
-    """
-    ratio = (sr / (sr_out or sr)) * 2 ** (
-        semitones / 12
-    )  # input samples per output sample
-    if ratio == 1:
-        return np.asarray(y, dtype=float)
-    n_out = int(round(len(y) / ratio))
-    spectrum = np.fft.rfft(y)[: n_out // 2 + 1]
-    return np.fft.irfft(spectrum, n=n_out) * (n_out / len(y))
-
-
-def drone_tonic(
-    y: np.ndarray, sr: int, *, sa: str | None = None, band_midi: tuple = (36, 72)
-) -> float:
-    """The tonic of a drone recording as a fractional pitch class (0 = C, 4.45 = E 45 cents
-    sharp): the Sa of :func:`drone_sa` (or the given ``sa`` name), refined to the strongest
-    spectral peak within half a semitone of it in ``band_midi``, interpolated between bins.
-
-    Raises when there is no peak there (silence, or an ``sa`` the recording does not play):
-    the strongest bin would then sit on the window's edge and the estimate would be a guess.
-    """
-    pc = pitch_class(sa) if sa is not None else pitch_class(drone_sa(y, sr))
-    spectrum = np.abs(np.fft.rfft(np.asarray(y, dtype=float) * np.hanning(len(y))))
-    midi = hz_to_midi(np.fft.rfftfreq(len(y), 1 / sr))
-    near = (midi >= band_midi[0]) & (midi < band_midi[1])
-    near &= np.abs((midi - pc + 6) % 12 - 6) < 0.5
-    near[[0, -1]] = False  # a peak needs a bin on each side
-    k = int(np.flatnonzero(near)[np.argmax(spectrum[near])]) if near.any() else 0
-    if not k or not (spectrum[k] > spectrum[k - 1] and spectrum[k] > spectrum[k + 1]):
-        raise ValueError(f"no spectral peak at {NOTES[pc]} in the recording")
-    a, b, c = np.log(spectrum[k - 1 : k + 2] + 1e-12)
-    bin_offset = float(np.clip(0.5 * (a - c) / (a - 2 * b + c), -0.5, 0.5))
-    return float(hz_to_midi((k + bin_offset) * sr / len(y)) % 12)
-
-
-def drone_sa(y: np.ndarray, sr: int) -> str:
-    """The Sa of a drone recording, assuming the usual Pa tuning: of the two notes
-    ``drone_report`` finds a fifth apart, the lower one of the fifth (whichever string is
-    louder). A Ma-tuned recording reads as its Ma; name its Sa instead."""
-    a, b = (pitch_class(n) for n in drone_report(y, sr).drone)
-    return NOTES[a if (b - a) % 12 == 7 else b]
-
-
 def _loud_span(y: np.ndarray, sr: int, *, floor_db: float, frame_s: float = 0.05):
     """``y`` from its first to its last frame within ``floor_db`` of the 95th-percentile
     frame level: a recording without its fade-in, fade-out and silences at either end."""
@@ -660,21 +591,6 @@ def _as_drone(drone, sr: int) -> Callable:
     if isinstance(drone, tuple):
         return recorded_drone(*drone)
     return recorded_drone(drone, sr)
-
-
-def highpass(
-    y: np.ndarray, sr: int, cutoff_hz: float, *, width_hz: float | None = None
-) -> np.ndarray:
-    """``y`` with nothing left under ``cutoff_hz``: an FFT mask that is zero up to the cutoff
-    and rises to one over the next ``width_hz`` (default half the cutoff) as a raised cosine, so
-    there is no ringing edge."""
-    if not len(y):
-        raise ValueError("highpass needs a non-empty signal")
-    width = cutoff_hz / 2 if width_hz is None else width_hz
-    spectrum = np.fft.rfft(y)
-    freqs = np.fft.rfftfreq(len(y), 1 / sr)
-    rise = np.clip((freqs - cutoff_hz) / max(width, 1e-9), 0, 1)
-    return np.fft.irfft(spectrum * np.sin(rise * np.pi / 2) ** 2, n=len(y))
 
 
 # --------------------------------------------------------------------------------------------

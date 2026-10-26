@@ -259,3 +259,85 @@ def to_audio_ref(value: Any) -> AudioRef:
         "AudioResult, bytes, a file path, an (array, sample_rate) pair, or a "
         "NumPy waveform array."
     )
+
+
+# --------------------------------------------------------------------------------------------
+# Pitch and DSP primitives (numpy is imported where used, so ``import arioso`` stays light)
+
+
+def hz_to_midi(hz):
+    """Fractional MIDI number of a frequency in Hz (NaN for 0 Hz and under)."""
+    import numpy as np
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return 69.0 + 12.0 * np.log2(np.asarray(hz, dtype=float) / 440.0)
+
+
+def midi_to_hz(midi):
+    """Frequency in Hz of a (fractional) MIDI number."""
+    import numpy as np
+
+    return 440.0 * 2.0 ** ((np.asarray(midi, dtype=float) - 69.0) / 12.0)
+
+
+def loop_drone(
+    y: np.ndarray, sr: int, seconds: float, *, crossfade_s: float = 1.0
+) -> np.ndarray:
+    """A recorded drone repeated to ``seconds`` with equal-power crossfades at the joins."""
+    import numpy as np
+
+    y = to_audio_ref((y, sr)).as_mono()[0]
+    n, fade = int(seconds * sr), int(crossfade_s * sr)
+    if len(y) <= 2 * fade:
+        raise ValueError(
+            f"a {len(y) / sr:.1f} s drone is too short for {crossfade_s} s crossfades"
+        )
+    theta = np.linspace(0, np.pi / 2, fade)
+    fade_in, fade_out = np.sin(theta), np.cos(theta)  # equal power: squares sum to 1
+    step = len(y) - fade
+    out = np.zeros(n + len(y))
+    for start in range(0, n, step):
+        piece = y.copy()
+        if start:
+            piece[:fade] *= fade_in
+            out[start : start + fade] *= fade_out
+        out[start : start + len(y)] += piece
+    return out[:n].astype(y.dtype)
+
+
+def varispeed(
+    y: np.ndarray, sr: int, *, semitones: float = 0.0, sr_out: int | None = None
+) -> np.ndarray:
+    """``y`` played ``semitones`` higher (pitch and tempo move together, a tape sped up) and
+    resampled to ``sr_out``, in one band-limited FFT resampling.
+
+    For a drone this beats a phase vocoder: no smearing of the strings' attacks, and a cycle a
+    few percent faster or slower goes unnoticed.
+    """
+    import numpy as np
+
+    ratio = (sr / (sr_out or sr)) * 2 ** (
+        semitones / 12
+    )  # input samples per output sample
+    if ratio == 1:
+        return np.asarray(y, dtype=float)
+    n_out = int(round(len(y) / ratio))
+    spectrum = np.fft.rfft(y)[: n_out // 2 + 1]
+    return np.fft.irfft(spectrum, n=n_out) * (n_out / len(y))
+
+
+def highpass(
+    y: np.ndarray, sr: int, cutoff_hz: float, *, width_hz: float | None = None
+) -> np.ndarray:
+    """``y`` with nothing left under ``cutoff_hz``: an FFT mask that is zero up to the cutoff
+    and rises to one over the next ``width_hz`` (default half the cutoff) as a raised cosine, so
+    there is no ringing edge."""
+    import numpy as np
+
+    if not len(y):
+        raise ValueError("highpass needs a non-empty signal")
+    width = cutoff_hz / 2 if width_hz is None else width_hz
+    spectrum = np.fft.rfft(y)
+    freqs = np.fft.rfftfreq(len(y), 1 / sr)
+    rise = np.clip((freqs - cutoff_hz) / max(width, 1e-9), 0, 1)
+    return np.fft.irfft(spectrum * np.sin(rise * np.pi / 2) ** 2, n=len(y))

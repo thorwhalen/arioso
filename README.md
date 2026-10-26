@@ -86,7 +86,7 @@ strength-controlled transform use `stable_audio_25`.
 
 ## Seeds: a melody over a drone
 
-To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source's harmony static, so a source with no harmony gives takes that hold the drone. `arioso.seeds` builds that source from a recording or a score (`pip install 'arioso[seeds]'`; separating a voice from a mix also needs `torch` and `torchaudio`).
+To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source's harmony static, so a source with no harmony gives takes that hold the drone. `arioso.seeds` builds that source from a recording or a score (`pip install 'arioso[seeds]'`; separating a voice from a mix goes through `denote`, which also needs `torch` and `torchaudio`).
 
 ```python
 from arioso.seeds import melody_contour, melody_over_drone

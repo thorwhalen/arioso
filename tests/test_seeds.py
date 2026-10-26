@@ -230,6 +230,27 @@ def test_hdemucs_rejects_a_segment_shorter_than_its_overlap():
         hdemucs_vocals(np.zeros(SR), SR, segment_s=1.0, overlap_s=1.0)
 
 
+def test_hdemucs_vocals_delegates_to_denote_separate(monkeypatch):
+    import types
+
+    import denote
+
+    seen = {}
+
+    def fake_separate(y, **kwargs):
+        seen.update(kwargs)
+        return types.SimpleNamespace(vocals=np.ones(3), sr=44100)
+
+    monkeypatch.setattr(denote, "separate", fake_separate)
+    voice, sr = hdemucs_vocals(
+        np.zeros(SR), SR, segment_s=5.0, overlap_s=0.0, device="cuda"
+    )
+    assert (voice.tolist(), sr) == ([1.0, 1.0, 1.0], 44100)
+    assert seen == dict(
+        sr=SR, sources=("vocals",), segment_s=5.0, overlap_s=0.0, device="cuda"
+    )
+
+
 def test_overlapping_same_pitch_notes_do_not_depend_on_order():
     notes = [(0.0, 1.0, 60), (0.5, 2.0, 60)]
     a = notes_contour(notes, fps=100, vibrato_semitones=0)

@@ -21,7 +21,7 @@ Three steps, each a function whose seams are keyword arguments:
   its bass removed (``highpass``) so the drone carries the bottom.
 
 The core is numpy. ``librosa`` (the default f0 tracker), ``pretty_midi`` (reading MIDI) and
-``torch``/``torchaudio`` (the default voice separator) are imported only when used.
+``denote`` (the default voice separator, with ``torch``/``torchaudio``) are imported only when used.
 
 >>> notes = [(0.0, 1.0, 62), (1.0, 2.0, 64)]  # (start s, end s, MIDI pitch)
 >>> c = notes_contour(notes, fps=100)
@@ -35,7 +35,6 @@ The core is numpy. ``librosa`` (the default f0 tracker), ``pretty_midi`` (readin
 import os
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
-from functools import lru_cache
 
 import numpy as np
 
@@ -109,19 +108,6 @@ def pyin_f0(
     return f0, voiced, sr / hop
 
 
-#: Sample rate of torchaudio's HDEMUCS_HIGH_MUSDB_PLUS (checked when the model loads).
-HDEMUCS_SR = 44100
-
-
-@lru_cache(maxsize=2)
-def _hdemucs(device: str):
-    import torchaudio
-
-    bundle = torchaudio.pipelines.HDEMUCS_HIGH_MUSDB_PLUS
-    assert bundle.sample_rate == HDEMUCS_SR, bundle.sample_rate
-    return bundle.get_model().to(device).eval(), bundle.sample_rate
-
-
 def hdemucs_vocals(
     y: np.ndarray,
     sr: int,
@@ -130,52 +116,25 @@ def hdemucs_vocals(
     overlap_s: float = 1.0,
     device: str = "cpu",
 ) -> tuple[np.ndarray, int]:
-    """The voice of a mix, by torchaudio's Hybrid Demucs (``HDEMUCS_HIGH_MUSDB_PLUS``).
+    """The voice of a mix, by torchaudio's Hybrid Demucs, through ``denote.separate``.
 
-    The default ``separator``. Runs in ``segment_s`` chunks overlap-added with linear crossfades
-    of ``overlap_s``, so memory stays flat on a long recording. Returns mono vocals at the
-    model's rate (44.1 kHz). Needs ``torch`` and ``torchaudio``; the weights (torchaudio's
-    bundle, trained on MUSDB-HQ plus extra data) download once; check their terms before
-    commercial use.
+    The default ``separator``. ``denote`` runs the model in ``segment_s`` chunks overlap-added
+    with crossfades of ``overlap_s``, so memory stays flat on a long recording. Returns mono
+    vocals at the model's rate (44.1 kHz). Needs ``denote`` with ``torch`` and ``torchaudio``
+    (the ``seeds`` extra); the weights (torchaudio's bundle, trained on MUSDB-HQ plus extra
+    data) download once; check their terms before commercial use.
     """
-    seg, ov = int(segment_s * HDEMUCS_SR), int(overlap_s * HDEMUCS_SR)
-    if seg <= ov:  # in samples: the loop would never advance
-        raise ValueError(
-            f"segment_s ({segment_s}) must be longer than overlap_s ({overlap_s})"
-        )
-    import torch
-    import torchaudio
+    import denote
 
-    model, model_sr = _hdemucs(device)
-    x = to_audio_ref((y, sr)).as_waveform().float()
-    if x.shape[0] == 1:
-        x = x.repeat(2, 1)
-    x = torchaudio.functional.resample(x[:2], sr, model_sr)
-    mean, std = x.mean(), x.std() + 1e-8
-    x = (x - mean) / std
-
-    n = x.shape[1]
-    out = torch.zeros(n)
-    weight = torch.zeros(n)
-    vocals = model.sources.index("vocals")
-    start = 0
-    with torch.no_grad():
-        while start < n:
-            end = min(n, start + seg)
-            chunk = x[:, start:end][None].to(device)
-            est = model(chunk)[0, vocals].mean(0).cpu()
-            w = torch.ones(end - start)
-            ramp = torch.linspace(0, 1, min(ov, end - start) + 2)[1:-1]
-            if start > 0:
-                w[: len(ramp)] = ramp
-            if end < n:
-                w[-len(ramp) :] = ramp.flip(0)
-            out[start:end] += est * w
-            weight[start:end] += w
-            if end == n:
-                break
-            start = end - ov
-    return (out / weight.clamp_min(1e-8) * std + mean).numpy(), model_sr
+    result = denote.separate(
+        y,
+        sr=sr,
+        sources=("vocals",),
+        segment_s=segment_s,
+        overlap_s=overlap_s,
+        device=device,
+    )
+    return result.vocals, result.sr
 
 
 def _mono(y: np.ndarray, sr: int) -> np.ndarray:

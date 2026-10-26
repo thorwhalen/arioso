@@ -37,9 +37,7 @@ def test_chord_change_is_one_run():
 
 
 def test_off_key_drone_reports_offset():
-    r = drone_report(
-        _tones([_hz(36), _hz(43), _hz(48)], 20), SR, sa="B"
-    )  # a held C drone
+    r = drone_report(_tones([_hz(36), _hz(43), _hz(48)], 20), SR, sa="B")  # a held C drone
     assert r.drone == ("C", "G") and r.sa_offset == 1 and r.holds()
 
 

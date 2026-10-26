@@ -113,6 +113,7 @@ class TestSunoTasksMapping:
 
 
 class TestSunoTasksFilteredViews:
+
     def _populate(self, store):
         """Add a mix of tasks with different statuses and times."""
         now = datetime.now(timezone.utc)
@@ -121,9 +122,7 @@ class TestSunoTasksFilteredViews:
             _make_record("t2", operation="generate", status="PENDING"),
             _make_record("t3", operation="upload_extend", status="CREATE_TASK_FAILED"),
             _make_record("t4", operation="generate", status="SUCCESS"),
-            _make_record(
-                "t5", operation="upload_cover", status="GENERATE_AUDIO_FAILED"
-            ),
+            _make_record("t5", operation="upload_cover", status="GENERATE_AUDIO_FAILED"),
         ]
         # Stagger created_at so ordering is deterministic
         for i, rec in enumerate(records):
@@ -208,6 +207,7 @@ class TestSunoTasksFilteredViews:
 
 
 class TestRecordHelpers:
+
     def test_make_record(self):
         r = _make_record(
             "tid-1",

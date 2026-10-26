@@ -24,17 +24,18 @@ composition; thorwhalen/arioso#29).
 
 ### Classes
 
-| [`Adapter`](#arioso.platforms.musicgen.adapter.Adapter)(config)   | MusicGen adapter with lazy model loading.   |
-|--------------------------------------------------------------------|---------------------------------------------|
+| [`Adapter`](#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, load_backend])   | MusicGen adapter with lazy model loading.   |
+|----------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* arioso.platforms.musicgen.adapter.Adapter(config)
+### *class* arioso.platforms.musicgen.adapter.Adapter(config, \*, load_backend=<function \_load_backend>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 MusicGen adapter with lazy model loading.
 
 Tries `audiocraft` first; if unavailable, falls back to the
-HuggingFace `transformers` pipeline.
+HuggingFace `transformers` pipeline. `load_backend` (model variant ->
+`Backend`) replaces that choice.
 
 #### generate(prompt, , duration=8.0, temperature=1.0, top_k=250, top_p=0.0, guidance=3.0, model='facebook/musicgen-small', melody=None, continue_from=None, continue_at=None, prompt_seconds=10.0, extend_seconds=None, rounds=1, \*\*kwargs)
 

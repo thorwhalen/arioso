@@ -1,4 +1,4 @@
-> built 2026-10-26 13:50 UTC from f7d850c (main) · arioso 0.0.38. Details: build_info.json
+> built 2026-10-26 14:00 UTC from a591b24 (main) · arioso 0.0.39. Details: build_info.json
 
 # index.html.md
 
@@ -1619,17 +1619,18 @@ composition; thorwhalen/arioso#29).
 
 ### Classes
 
-| [`Adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.Adapter)(config)   | MusicGen adapter with lazy model loading.   |
-|--------------------------------------------------------------------|---------------------------------------------|
+| [`Adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#arioso.platforms.musicgen.adapter.Adapter)(config, \*[, load_backend])   | MusicGen adapter with lazy model loading.   |
+|----------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* arioso.platforms.musicgen.adapter.Adapter(config)
+### *class* arioso.platforms.musicgen.adapter.Adapter(config, \*, load_backend=<function \_load_backend>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 MusicGen adapter with lazy model loading.
 
 Tries `audiocraft` first; if unavailable, falls back to the
-HuggingFace `transformers` pipeline.
+HuggingFace `transformers` pipeline. `load_backend` (model variant ->
+`Backend`) replaces that choice.
 
 #### generate(prompt, , duration=8.0, temperature=1.0, top_k=250, top_p=0.0, guidance=3.0, model='facebook/musicgen-small', melody=None, continue_from=None, continue_at=None, prompt_seconds=10.0, extend_seconds=None, rounds=1, \*\*kwargs)
 
@@ -2688,7 +2689,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-26 13:50 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/f7d850c34834c25979b4bbc0206e826077e00078"><code>f7d850c</code></a> on branch <code>main</code>, for **arioso 0.0.38** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 14:00 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/a591b245eceb50b3fcde62945b172f64324012da"><code>a591b24</code></a> on branch <code>main</code>, for **arioso 0.0.39** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -2697,9 +2698,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/f7d850c34834c25979b4bbc0206e826077e00078"><code>f7d850c34834c25979b4bbc0206e826077e00078</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/a591b245eceb50b3fcde62945b172f64324012da"><code>a591b245eceb50b3fcde62945b172f64324012da</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.38</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.39</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2708,9 +2709,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40333707580">40333707580</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40335318544">40335318544</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>9346bf8b8353971f556dc9a313dc851d899020f7</code> (in the history of the built commit) |
+| Event commit | <code>7eee2fa47b23a6c852d2eff28c17ce8e56f36c0f</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2735,13 +2736,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.38/">0.0.38</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.39/">0.0.39</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout f7d850c34834c25979b4bbc0206e826077e00078
+git checkout a591b245eceb50b3fcde62945b172f64324012da
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

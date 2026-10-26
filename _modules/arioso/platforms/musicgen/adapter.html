@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../_static/documentation_options.js?v=423071ad"></script>
+    <script src="../../../../_static/documentation_options.js?v=e648f5b4"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.38" />
+  <meta name="docsearch:version" content="0.0.39" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -732,6 +732,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">composition; thorwhalen/arioso#29).</span>
 <span class="sd">"""</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_audio_ref</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.musicgen.backends</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -749,36 +753,32 @@ window.runMermaid = runMermaid;</script>
 <span class="n">SEAM_CROSSFADE_SECONDS</span> <span class="o">=</span> <span class="mf">0.01</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_backend</span><span class="p">(</span><span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Load *model_variant* with audiocraft, or with transformers when audiocraft is</span>
+<span class="sd">    not installed."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AudiocraftBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TransformersBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="Adapter">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Adapter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""MusicGen adapter with lazy model loading.</span>
 
 <span class="sd">    Tries ``audiocraft`` first; if unavailable, falls back to the</span>
-<span class="sd">    HuggingFace ``transformers`` pipeline.</span>
+<span class="sd">    HuggingFace ``transformers`` pipeline. ``load_backend`` (model variant -&gt;</span>
+<span class="sd">    :class:`Backend`) replaces that choice.</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">load_backend</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Backend</span><span class="p">]</span> <span class="o">=</span> <span class="n">_load_backend</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"facebook/musicgen-small"</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Lazy-load the model only when first generation is requested."""</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">==</span> <span class="n">model_variant</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="c1"># The model, processor and library flag stay adapter attributes (rather than</span>
-        <span class="c1"># the backend itself) because tests monkeypatch this method or set them.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">AudiocraftBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="n">TransformersBackend</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">processor</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="n">model_variant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span> <span class="o">=</span> <span class="n">load_backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Adapter.generate">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter.generate">[docs]</a>
@@ -877,11 +877,11 @@ window.runMermaid = runMermaid;</script>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""The loaded *model* behind the interface of its library."""</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_transformers</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">TransformersBackend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">AudiocraftBackend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""The *model* loaded (once per variant) behind the interface of its library."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">!=</span> <span class="n">model</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_continue</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

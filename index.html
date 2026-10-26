@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="_static/documentation_options.js?v=aa2ad26f"></script>
+    <script src="_static/documentation_options.js?v=423071ad"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.37" />
+  <meta name="docsearch:version" content="0.0.38" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -417,7 +417,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </section>
 <section id="seeds-a-melody-over-a-drone">
 <h2>Seeds: a melody over a drone<a class="headerlink" href="#seeds-a-melody-over-a-drone" title="Link to this heading">#</a></h2>
-<p>To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source’s harmony static, so a source with no harmony gives takes that hold the drone. <code class="docutils literal notranslate"><span class="pre">arioso.seeds</span></code> builds that source from a recording or a score (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'arioso[seeds]'</span></code>; separating a voice from a mix also needs <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>).</p>
+<p>To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source’s harmony static, so a source with no harmony gives takes that hold the drone. <code class="docutils literal notranslate"><span class="pre">arioso.seeds</span></code> builds that source from a recording or a score (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'arioso[seeds]'</span></code>; separating a voice from a mix goes through <code class="docutils literal notranslate"><span class="pre">denote</span></code>, which also needs <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">arioso.seeds</span><span class="w"> </span><span class="kn">import</span> <span class="n">melody_contour</span><span class="p">,</span> <span class="n">melody_over_drone</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">drone_report</span><span class="p">,</span> <span class="n">melody_match</span>
 
@@ -950,7 +950,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-26 11:53 UTC from <a href="https://github.com/thorwhalen/arioso/commit/4be1f33fddf4408336831682f8ec261be4110ac0">4be1f33</a> (main) · arioso 0.0.37 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-26 13:50 UTC from <a href="https://github.com/thorwhalen/arioso/commit/f7d850c34834c25979b4bbc0206e826077e00078">f7d850c</a> (main) · arioso 0.0.38 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

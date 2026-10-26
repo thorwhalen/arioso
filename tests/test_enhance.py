@@ -169,3 +169,18 @@ def test_audio_ref_sample_rate_unknown_raises():
     ref = AudioRef(array=np.zeros(10))
     with pytest.raises(ValueError):
         _ = ref.sample_rate
+
+
+def test_audio_ref_as_mono_downmixes_either_orientation_to_float32():
+    np = pytest.importorskip("numpy")
+    left, right = np.zeros(100), np.ones(100)  # float64, as soundfile returns
+    for arr in (np.stack([left, right], axis=1), np.stack([left, right])):
+        audio, sr = AudioRef(array=arr, sample_rate=16000).as_mono(target_rate=16000)
+        assert sr == 16000
+        assert audio.dtype == np.float32
+        assert audio.shape == (100,)
+        assert np.allclose(audio, 0.5)
+    mono = np.arange(10, dtype="float64")
+    audio, sr = to_audio_ref((mono, 8000)).as_mono()  # no target: rate kept
+    assert sr == 8000
+    assert audio.dtype == np.float32 and np.array_equal(audio, mono)

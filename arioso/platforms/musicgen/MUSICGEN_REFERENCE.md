@@ -144,6 +144,16 @@ None required.
 | `top_p`       | float  | 0.0                          | Nucleus sampling threshold (0 = disabled) |
 | `guidance`    | float  | 3.0                          | Classifier-free guidance scale |
 | `model`       | str    | `"facebook/musicgen-small"`  | Model variant: small / medium / large / melody |
+| `melody`      | audio  | None                         | Follow this audio's pitch contour (switches to `musicgen-melody`) |
+| `continue_from` | audio | None                        | Extend this audio (audio-prompted generation) |
+| `continue_at` | float  | None                         | Continue from this time in `continue_from` instead of its end |
+| `prompt_seconds` | float | 10.0                       | Tail of the audio fed as the prompt each round |
+| `extend_seconds` | float | `duration`                 | New audio per round; `prompt_seconds + extend_seconds` <= 30 |
+| `rounds`      | int    | 1                            | Chained continuation calls |
+
+### Continuation (`continue_from`)
+
+The last `prompt_seconds` of the audio (rounded down to whole 20 ms codec frames) are passed as an audio prompt: `model.generate_continuation(prompt, sr, descriptions=[prompt])` with audiocraft, `processor(audio=tail, sampling_rate=sr, text=[prompt])` then `model.generate(...)` with transformers. Both return the re-decoded prompt followed by the continuation; the adapter drops the prompt and appends the rest, then repeats from the new tail for each of `rounds`. The returned Song is the original (mono, resampled to 32 kHz) followed by every continuation; `metadata["continuation"]` is an `AudioResult` of the new audio alone. On the transformers path a melody checkpoint cannot continue (its audio input is chroma conditioning), so use small / medium / large there. transformers loses `num_codebooks - 1` frames to the delay pattern, which the adapter adds back to `max_new_tokens` so a round is the length asked for.
 
 ---
 

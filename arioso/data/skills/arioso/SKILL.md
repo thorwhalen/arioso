@@ -243,8 +243,10 @@ or a waveform. Only some platforms take input audio — check
 
 Audio-in platforms: `stable_audio` (local, no strength knob), `stable_audio_25`
 (fal; `strength` 0-1, lower keeps more of the input), `ace_step` (fal remix),
-`musicgen` (melody only, local, 30 s max), `sunoapi` (`upload_cover` /
+`musicgen` (melody, or continuation via `continue_from`; local, 30 s window), `sunoapi` (`upload_cover` /
 `upload_extend`), `yue` (vocal prompt), `udio`.
+
+To extend a recording that Suno refuses, continue it locally: `arioso.generate(prompt, platform="musicgen", continue_from=audio, prompt_seconds=10, extend_seconds=20, rounds=2)` returns the original plus 40 s; `song.metadata["continuation"]` holds the new part alone. `prompt_seconds + extend_seconds` must fit in 30 s.
 
 **Suno refuses copyrighted material on upload**, and not only the recording:
 an upload-cover of a synthesized render of a copyrighted *score* fails too,

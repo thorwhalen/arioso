@@ -99,8 +99,9 @@ def generate_many(prompt: str, *, platform: str = "musicgen", **kwargs) -> list[
 
 
 #: Affordances that carry caller-supplied *input* audio (used by :func:`enhance`).
-#: Distinct from clip-extension affordances like ``continue_from`` (which
-#: reference a prior generation by id/URL rather than uploaded audio).
+#: Distinct from the clip-extension affordance ``continue_from``, which extends
+#: a track rather than conditioning on one (a prior generation's id/URL on
+#: hosted platforms, the audio itself on musicgen).
 AUDIO_INPUT_AFFORDANCES = ("audio_input", "melody", "reference_audio")
 
 

@@ -35,7 +35,7 @@ PLATFORM_CONFIG = {
             "default_env_var": "SUNO_DEFAULT_MODEL",
         },
         "duration": {"native_name": "duration", "adapter_handled": True},
-        "continue_from": {"native_name": "continue_clip_id"},
+        "continue_from": {"native_name": "continue_clip_id", "type": str},
         "continue_at": {"native_name": "continue_at"},
     },
     "supported_affordances": [

@@ -24,6 +24,16 @@ PLATFORM_CONFIG = {
             "native_name": "melody",
             "adapter_handled": True,
         },
+        # Audio continuation (thorwhalen/arioso#29): the audio itself, not a
+        # clip id, since the model runs locally.
+        "continue_from": {
+            "native_name": "continue_from",
+            "adapter_handled": True,
+        },
+        "continue_at": {
+            "native_name": "continue_at",
+            "adapter_handled": True,
+        },
     },
     # batch_size and extend_stride are not listed: the adapter never read them,
     # so they were silently dropped on every path (thorwhalen/arioso#15). Add
@@ -37,7 +47,12 @@ PLATFORM_CONFIG = {
         "guidance",
         "model",
         "melody",
+        "continue_from",
+        "continue_at",
     ],
+    # Continuation knobs with no unified affordance: tail length fed as the
+    # prompt, new audio per call, and how many calls to chain.
+    "adapter_params": ["prompt_seconds", "extend_seconds", "rounds"],
     "on_unsupported_param": "warn",
     "output": {
         "default_format": "wav",

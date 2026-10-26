@@ -12,11 +12,14 @@ from arioso.analysis import drone_report
 from arioso.seeds import (
     Contour,
     audio_contour,
+    bowed,
     drop_blips,
     fix_octaves,
+    hdemucs_vocals,
     loop_drone,
     melody_contour,
     melody_over_drone,
+    mono_share,
     notes_contour,
     sa_midi,
     tanpura,
@@ -68,8 +71,11 @@ def test_audio_contour_gates_cleans_and_retunes():
     )
 
     assert c.fps == fps and len(c.midi) == n
-    assert np.allclose(c.midi[:200][~np.isnan(c.midi[:200])], 69.0)
-    assert np.all(np.isnan(c.midi[260:]))
+    kept = ~np.isnan(c.midi[:200])
+    assert kept.sum() >= 195  # the octave slip is folded back, not dropped
+    assert np.allclose(c.midi[:200][kept], 69.0)  # and retuned onto A4
+    assert not np.isnan(c.midi[240])  # loud frames before the cut stay
+    assert np.all(np.isnan(c.midi[260:]))  # the silence is gated
 
 
 def test_audio_contour_runs_the_separator():
@@ -128,10 +134,12 @@ def test_tanpura_ma_tuning():
 
 def test_loop_drone_length_and_smooth_joins():
     t = np.arange(3 * SR) / SR
-    y = np.sin(2 * np.pi * 110 * t) * (0.5 + 0.1 * t)  # rises: joins must not jump
+    y = np.sin(2 * np.pi * 110.3 * t) * (0.5 + 0.1 * t)  # no whole cycles, and it rises
     out = loop_drone(y, SR, 10, crossfade_s=0.5)
     assert len(out) == 10 * SR
-    assert np.max(np.abs(np.diff(out))) < 2 * np.max(np.abs(np.diff(y)))
+    plain = np.tile(y, 4)[: 10 * SR]  # a splice with no crossfade jumps at each join
+    assert np.max(np.abs(np.diff(plain))) > 3 * np.max(np.abs(np.diff(y)))
+    assert np.max(np.abs(np.diff(out))) < 1.2 * np.max(np.abs(np.diff(y)))
     with pytest.raises(ValueError):
         loop_drone(y[: SR // 2], SR, 10, crossfade_s=0.5)
 
@@ -155,10 +163,20 @@ def test_melody_over_drone_lifts_a_low_line_out_of_the_drone():
     assert not drone_report(low, SR, sa="D").holds()
 
 
+def _energy_at(y, hz):
+    spectrum = np.abs(np.fft.rfft(y))
+    return spectrum[int(round(hz * len(y) / SR))] / spectrum.sum()
+
+
 def test_melody_over_drone_takes_a_recorded_bed():
-    bed = tanpura("D", seconds=4, sr=SR)  # shorter than the melody: looped
+    t = np.arange(4 * SR) / SR
+    bed = np.sin(
+        2 * np.pi * 1500 * t
+    )  # shorter than the melody: looped; far from any note
     y, _ = melody_over_drone(_tune(), "D", sr=SR, drone=bed, lead_in_s=0)
     assert len(y) == pytest.approx(_tune().seconds * SR, abs=2)
+    default, _ = melody_over_drone(_tune(), "D", sr=SR, lead_in_s=0)
+    assert _energy_at(y, 1500) > 20 * _energy_at(default, 1500)
 
 
 def test_contour_at_rate_holds_into_silence():
@@ -181,4 +199,75 @@ def test_melody_match_ranks_the_right_seed():
         for i, s in enumerate([7, 0, 9, 3, 11, 1, 8, 2])
     ]
     other, _ = melody_over_drone(notes_contour(other_notes), "D", sr=SR)
-    assert melody_match(take, seed, sr) > melody_match(other, seed, sr) + 0.1
+    drone_only = tanpura("D", seconds=len(seed) / sr, sr=sr)
+    true = melody_match(take, seed, sr)
+    assert true > melody_match(other, seed, sr) + 0.2
+    assert true > melody_match(drone_only, seed, sr) + 0.2  # the drone is not the tune
+
+
+def test_fix_octaves_keeps_real_leaps():
+    midi = np.full(100, 60.0)
+    midi[40:55] = 67.0  # a fifth up for 0.15 s: a leap, not a tracker slip
+    midi[70:85] = 69.0  # a sixth
+    assert np.array_equal(fix_octaves(midi, fps=100), midi)
+
+
+def test_audio_contour_raises_when_nothing_is_voiced():
+    track = _fake_tracker(np.full(100, 220.0), np.zeros(100, bool))
+    with pytest.raises(ValueError, match="no melody"):
+        audio_contour((np.ones(SR), SR), separator=None, f0_tracker=track)
+
+
+def test_hdemucs_rejects_a_segment_shorter_than_its_overlap():
+    with pytest.raises(ValueError, match="overlap"):
+        hdemucs_vocals(np.zeros(SR), SR, segment_s=1.0, overlap_s=1.0)
+
+
+def test_repeated_touching_notes_are_restruck():
+    c = notes_contour([(0.0, 1.0, 60), (1.0, 2.0, 60)], fps=100, vibrato_semitones=0)
+    assert np.isnan(c.midi[99]) and c.midi[100] == 60 and c.midi[98] == 60
+
+
+class _Note:
+    def __init__(self, start, end, pitch=70):
+        self.start, self.end, self.pitch = start, end, pitch
+
+
+def _track(notes, name="", is_drum=False):
+    return type("Instrument", (), {"notes": notes, "name": name, "is_drum": is_drum})
+
+
+def test_mono_share():
+    assert mono_share([_Note(i * 0.5, i * 0.5 + 0.4) for i in range(10)]) == 1.0
+    chords = [_Note(i, i + 1.0) for i in range(5) for _ in range(3)]
+    assert mono_share(chords) == 0.0
+
+
+def test_default_track_is_the_line_above_the_bass():
+    from arioso.seeds import _melody_track
+
+    line = _track([_Note(i * 0.5, i * 0.5 + 0.4, 72) for i in range(40)], "flute")
+    pad = _track([_Note(i, i + 1.0, 64) for i in range(20) for _ in range(3)], "pad")
+    bass = _track([_Note(i * 0.4, i * 0.4 + 0.3, 40) for i in range(90)], "bass")
+    picked = _melody_track([pad, bass, line], min_mono=0.95, min_median_midi=55)
+    assert picked.name == "flute"
+    with pytest.raises(ValueError, match="pass track="):
+        _melody_track([pad, bass], min_mono=0.95, min_median_midi=55)
+
+
+def test_bowed_enters_on_the_new_pitch():
+    sr = SR
+    pitch = np.concatenate(
+        [np.full(sr, 57.0), np.full(sr // 2, np.nan), np.full(sr, 69.0)]
+    )
+    y = bowed(pitch, sr, harmonics=1, fade_s=0.04)
+    entry = y[int(1.5 * sr) - 160 : int(1.5 * sr)]  # the fade-in before the note starts
+    # its zero crossings run at the new note's rate (440 Hz), not the old one's (220 Hz)
+    crossings = np.sum(np.diff(np.sign(entry)) != 0) / (len(entry) / sr) / 2
+    assert crossings == pytest.approx(440, rel=0.3)
+
+
+def test_tanpura_plucks_end_without_a_tick():
+    y = tanpura("C#", seconds=12, sr=SR)
+    curvature = np.abs(np.diff(y, 2))
+    assert curvature.max() < 3 * np.percentile(curvature, 99.9)

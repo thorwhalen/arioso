@@ -16,10 +16,11 @@ they still move the harmony in blocks. ``drone_report`` measures it from the bas
 A held drone scores ``off_ratio == 0`` with no runs. Pure numpy over a mono float array; read files
 with ``arioso.scoring.read_audio``.
 
-``melody_match`` compares the treble (C4 to B6) chroma of a take and of its seed, aligned by dynamic
-time warping, and returns their mean cosine similarity along the path (takes of a melody-over-drone
-seed scored 0.82-0.84 against their own seed, 0.62-0.68 against another song's). It needs
-``librosa`` for the warping.
+``melody_match`` compares the treble (C4 to B6) chroma of a take and of its seed, each pitch class
+centered on its median so the drone does not count, aligned by dynamic time warping, and returns
+their mean cosine similarity along the path. On a melody-over-drone seed: the separated voice it
+was made from scored 0.85, a slower re-timbred render 0.92, another song's seed or the drone alone
+about 0.35. It needs ``librosa`` for the warping.
 
 >>> sr = 4000
 >>> t = np.arange(20 * sr) / sr
@@ -124,11 +125,20 @@ def _median_filter_rows(x: np.ndarray, n: int) -> np.ndarray:
     return np.median(np.lib.stride_tricks.sliding_window_view(pad, n, axis=1), axis=2)
 
 
-def _runs(mask: np.ndarray, fps: float, min_len_s: float) -> list[tuple[float, float]]:
+def index_runs(mask: np.ndarray) -> list[tuple[int, int]]:
+    """``(start, end)`` index pairs of the runs of True in a boolean mask (end exclusive).
+
+    >>> index_runs(np.array([0, 1, 1, 0, 1], bool))
+    [(1, 3), (4, 5)]
+    """
     edges = np.diff(np.concatenate([[0], mask.astype(int), [0]]))
     starts, ends = np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)
+    return [(int(a), int(b)) for a, b in zip(starts, ends)]
+
+
+def _runs(mask: np.ndarray, fps: float, min_len_s: float) -> list[tuple[float, float]]:
     return [
-        (a / fps, b / fps) for a, b in zip(starts, ends) if (b - a) / fps >= min_len_s
+        (a / fps, b / fps) for a, b in index_runs(mask) if (b - a) / fps >= min_len_s
     ]
 
 
@@ -189,6 +199,11 @@ def drone_report(
     )
 
 
+#: DTW steps for melody_match: without single steps the path's slope stays within [1/2, 2], so a
+#: take may run at half to double its seed's tempo but cannot sit on one frame (as in denote.align).
+_MELODY_STEPS = np.array([[1, 1], [1, 2], [2, 1]])
+
+
 def melody_match(
     take: np.ndarray,
     seed: np.ndarray,
@@ -201,8 +216,13 @@ def melody_match(
     hop_s: float = 0.1,
     loud_rel: float = 0.05,
 ) -> float:
-    """How well a take keeps its seed's melody: mean cosine similarity (0-1) of their treble
-    chroma along a DTW alignment, so tempo drift and an added intro do not count against it.
+    """How well a take keeps its seed's melody: mean cosine similarity of their treble chroma
+    along a DTW alignment, so tempo drift does not count against it, nor does an intro or outro
+    around the melody (the shorter of the two is matched as a subsequence of the longer).
+
+    Each pitch class's median over time is removed first: a drone's partials reach the treble
+    band and sit there throughout, and without this a take with the drone and no melody scores
+    nearly as well as a real one.
 
     Args:
         take: Mono audio of the generated take.
@@ -215,17 +235,26 @@ def melody_match(
     """
     import librosa
 
-    def unit_chroma(y, rate):
+    def melody_chroma(y, rate):
         chroma, _ = bass_chroma(
             y, rate, octaves=octaves, fmin_hz=fmin_hz, window_s=window_s, hop_s=hop_s
         )
         level = chroma.sum(0)
         chroma = chroma[:, level > loud_rel * np.percentile(level, 95)]
+        chroma = np.maximum(chroma - np.median(chroma, axis=1, keepdims=True), 0)
         return chroma / np.maximum(np.linalg.norm(chroma, axis=0), 1e-12)
 
-    a, b = unit_chroma(take, sr), unit_chroma(seed, seed_sr or sr)
+    a, b = melody_chroma(take, sr), melody_chroma(seed, seed_sr or sr)
     if a.shape[1] < 2 or b.shape[1] < 2:
         raise ValueError("take or seed has fewer than two playing frames to compare")
-    similarity = a.T @ b
-    _, path = librosa.sequence.dtw(C=1 - similarity)
+    query, ref = (a, b) if a.shape[1] <= b.shape[1] else (b, a)
+    similarity = query.T @ ref
+    try:
+        _, path = librosa.sequence.dtw(
+            C=1 - similarity, subseq=True, step_sizes_sigma=_MELODY_STEPS
+        )
+    except librosa.util.exceptions.ParameterError as exc:
+        raise ValueError(
+            "no alignment between take and seed within half to double speed"
+        ) from exc
     return float(np.mean(similarity[path[:, 0], path[:, 1]]))

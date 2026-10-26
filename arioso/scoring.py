@@ -108,9 +108,21 @@ def loudness_db(y: np.ndarray, sr: int, *, frame_s: float = FRAME_S) -> np.ndarr
     return np.maximum(20 * np.log10(rms + 1e-12), SILENCE_DB)
 
 
-def active_db(y: np.ndarray, sr: int, *, floor_db: float = -45.0) -> float:
-    """RMS level (dBFS) over the frames that are not near-silent: the level of the sound itself."""
+def active_db(
+    y: np.ndarray,
+    sr: int,
+    *,
+    floor_db: float = -45.0,
+    floor_rel_db: float | None = None,
+) -> float:
+    """RMS level (dBFS) over the frames that are not near-silent: the level of the sound itself.
+
+    The floor is ``floor_db`` dBFS, or ``floor_rel_db`` below the loudest frame when given (a line
+    with rests is then leveled by its notes, whatever its absolute level).
+    """
     db = loudness_db(y, sr)
+    if floor_rel_db is not None:
+        floor_db = db.max() + floor_rel_db
     active = db[db > floor_db]
     if not len(active):
         return SILENCE_DB

@@ -36,7 +36,9 @@ from functools import lru_cache
 
 import numpy as np
 
-from arioso.analysis import pitch_class
+from arioso._audio import to_audio_ref
+from arioso.analysis import index_runs, pitch_class
+from arioso.scoring import SILENCE_DB, active_db
 
 #: drone_report reads the bass from C1 up three octaves, so a melody whose median sits under C4
 #: (MIDI 60) reads as part of the drone. melody_over_drone lifts it above this by octaves.
@@ -128,13 +130,19 @@ def hdemucs_vocals(
 
     The default ``separator``. Runs in ``segment_s`` chunks overlap-added with linear crossfades
     of ``overlap_s``, so memory stays flat on a long recording. Returns mono vocals at the
-    model's rate (44.1 kHz). Needs ``torch`` and ``torchaudio``; the weights download once.
+    model's rate (44.1 kHz). Needs ``torch`` and ``torchaudio``; the weights (torchaudio's
+    bundle, trained on MUSDB-HQ plus extra data) download once; check their terms before
+    commercial use.
     """
+    if segment_s <= overlap_s:
+        raise ValueError(
+            f"segment_s ({segment_s}) must be longer than overlap_s ({overlap_s})"
+        )
     import torch
     import torchaudio
 
     model, model_sr = _hdemucs(device)
-    x = torch.as_tensor(_channels_first(y), dtype=torch.float32)
+    x = to_audio_ref((y, sr)).as_waveform().float()
     if x.shape[0] == 1:
         x = x.repeat(2, 1)
     x = torchaudio.functional.resample(x[:2], sr, model_sr)
@@ -166,50 +174,43 @@ def hdemucs_vocals(
     return (out / weight.clamp_min(1e-8) * std + mean).numpy(), model_sr
 
 
-def _channels_first(y: np.ndarray) -> np.ndarray:
-    y = np.asarray(y, dtype=np.float32)
-    if y.ndim == 1:
-        return y[None]
-    # soundfile gives (frames, channels); a waveform is (channels, frames)
-    return y.T if y.shape[0] > y.shape[1] else y
-
-
-def _mono(y: np.ndarray) -> np.ndarray:
-    return _channels_first(y).mean(0)
+def _mono(y: np.ndarray, sr: int) -> np.ndarray:
+    return to_audio_ref((y, sr)).as_mono()[0]
 
 
 def _frame_rms(y: np.ndarray, hop: int, n_frames: int, *, win: int) -> np.ndarray:
-    """RMS of ``win``-sample frames centered every ``hop`` samples (as pYIN frames them)."""
-    padded = np.pad(y, (win // 2, win // 2 + hop * n_frames))
-    frames = np.lib.stride_tricks.sliding_window_view(padded, win)[::hop][:n_frames]
-    return np.sqrt(np.mean(frames**2, axis=1))
-
-
-def _runs_of(mask: np.ndarray) -> list[tuple[int, int]]:
-    edges = np.diff(np.concatenate([[0], mask.astype(int), [0]]))
-    return list(zip(np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)))
+    """RMS of ``win``-sample frames centered every ``hop`` samples (as pYIN frames them), from a
+    running sum of squares so a long recording needs no frames-by-window array."""
+    padded = np.pad(np.asarray(y, dtype=float), (win // 2, win // 2 + hop * n_frames))
+    energy = np.concatenate([[0.0], np.cumsum(padded**2)])
+    starts = np.arange(n_frames) * hop
+    return np.sqrt(np.maximum(energy[starts + win] - energy[starts], 0) / win)
 
 
 def drop_blips(midi: np.ndarray, fps: float, *, min_s: float = 0.12) -> np.ndarray:
     """Silence voiced stretches shorter than ``min_s`` (tracker noise, consonants)."""
     out = midi.copy()
-    for a, b in _runs_of(~np.isnan(midi)):
+    for a, b in index_runs(~np.isnan(midi)):
         if (b - a) / fps < min_s:
             out[a:b] = np.nan
     return out
 
 
-def fix_octaves(midi: np.ndarray, fps: float, *, window_s: float = 0.5) -> np.ndarray:
+def fix_octaves(
+    midi: np.ndarray, fps: float, *, window_s: float = 0.5, min_jump: float = 9.5
+) -> np.ndarray:
     """Move frames an octave (or two) away from the local median back next to it.
 
-    f0 trackers jump an octave on breathy or loud notes; a real melodic leap of more than 9
-    semitones inside ``window_s`` is rare enough to sacrifice.
+    f0 trackers jump an octave on breathy or loud notes. Only frames at least ``min_jump``
+    semitones from the median of the surrounding ``window_s`` move, so a real leap of a fifth or
+    a sixth stays; a real leap of a seventh or more inside the window is rare enough to sacrifice.
     """
     out = midi.copy()
     half = max(1, int(window_s * fps) // 2)
     for i in np.flatnonzero(~np.isnan(midi)):
-        med = np.nanmedian(midi[max(0, i - half) : i + half + 1])
-        out[i] = midi[i] - 12 * np.round((midi[i] - med) / 12)
+        dev = midi[i] - np.nanmedian(midi[max(0, i - half) : i + half + 1])
+        if abs(dev) >= min_jump:
+            out[i] = midi[i] - 12 * np.round(dev / 12)
     return out
 
 
@@ -250,13 +251,11 @@ def audio_contour(
         octave_window_s: Window of the octave-jump fix (:func:`fix_octaves`).
         retune: Shift the whole line onto 12-TET by its :func:`tuning_offset`.
     """
-    from arioso._audio import to_audio_ref
-
     ref = to_audio_ref(audio if sr is None else (audio, sr))
     y, rate = ref.as_array(), ref.sample_rate
     if separator is not None:
         y, rate = separator(y, rate)
-    y = _mono(y)
+    y = _mono(y, rate)
     f0, voiced, fps = f0_tracker(y, rate)
     midi = np.where(np.asarray(voiced, dtype=bool), hz_to_midi(f0), np.nan)
 
@@ -267,6 +266,11 @@ def audio_contour(
 
     midi = drop_blips(midi, fps, min_s=min_note_s)
     midi = fix_octaves(midi, fps, window_s=octave_window_s)
+    if np.all(np.isnan(midi)):
+        raise ValueError(
+            "no melody found: nothing in the recording is voiced and loud enough (with a "
+            "separator, it may have found no voice; try separator=None or a lower gate_db)"
+        )
     if retune:
         midi = midi - tuning_offset(midi)
     return Contour(midi=midi, fps=fps)
@@ -303,6 +307,12 @@ def notes_contour(
     for k, (start, end, p) in enumerate(notes):
         a, b = int(round(start * fps)), int(round(end * fps))
         pitch[a:b], owner[a:b] = p, k
+    # a note that starts where one of the same pitch ends would merge into one tone: give it
+    # a one-frame breath so the rhythm survives
+    restrike = np.flatnonzero(
+        (owner[1:] != owner[:-1]) & (owner[:-1] >= 0) & (pitch[1:] == pitch[:-1])
+    )
+    pitch[restrike], owner[restrike] = np.nan, -1
 
     midi = pitch.copy()
     segments = [
@@ -327,12 +337,22 @@ def _segments(owner: np.ndarray) -> list[tuple[int, int]]:
     return list(zip(bounds[:-1], bounds[1:]))
 
 
-def midi_contour(midi, *, track: int | str | None = None, **kwargs) -> Contour:
+def midi_contour(
+    midi,
+    *,
+    track: int | str | None = None,
+    min_mono: float = 0.95,
+    min_median_midi: float = 55.0,
+    **kwargs,
+) -> Contour:
     """The melody of one track of a MIDI file as a :class:`Contour` (see :func:`notes_contour`).
 
     Args:
         midi: A path, the file's bytes, or a ``pretty_midi.PrettyMIDI``.
-        track: The instrument's index or name; default the non-drum track with the most notes.
+        track: The instrument's index or name. By default, the track with the most notes among
+            those that play one note at a time (at least ``min_mono`` of their sounding time)
+            above the bass (median pitch at least ``min_median_midi``); when none qualifies, a
+            ``ValueError`` lists the tracks so you can name one.
         **kwargs: Passed to :func:`notes_contour` (``fps``, ``glide_s``, vibrato knobs).
     """
     import io
@@ -343,11 +363,10 @@ def midi_contour(midi, *, track: int | str | None = None, **kwargs) -> Contour:
         midi = pretty_midi.PrettyMIDI(io.BytesIO(midi))
     elif not isinstance(midi, pretty_midi.PrettyMIDI):
         midi = pretty_midi.PrettyMIDI(str(midi))
-    tracks = [i for i in midi.instruments if not i.is_drum and i.notes]
-    if not tracks:
-        raise ValueError("the MIDI file has no pitched notes")
     if track is None:
-        inst = max(tracks, key=lambda i: len(i.notes))
+        inst = _melody_track(
+            midi.instruments, min_mono=min_mono, min_median_midi=min_median_midi
+        )
     elif isinstance(track, int):
         inst = midi.instruments[track]
     else:
@@ -357,6 +376,43 @@ def midi_contour(midi, *, track: int | str | None = None, **kwargs) -> Contour:
             raise ValueError(f"no track named {track!r}; tracks: {names}")
         inst = named[0]
     return notes_contour(((n.start, n.end, n.pitch) for n in inst.notes), **kwargs)
+
+
+def _melody_track(instruments, *, min_mono: float, min_median_midi: float):
+    stats = [
+        (k, inst, len(inst.notes), mono_share(inst.notes), _median_pitch(inst.notes))
+        for k, inst in enumerate(instruments)
+        if not inst.is_drum and inst.notes
+    ]
+    if not stats:
+        raise ValueError("the MIDI file has no pitched notes")
+    lines = [s for s in stats if s[3] >= min_mono and s[4] >= min_median_midi]
+    if not lines:
+        table = "\n".join(
+            f"  {k}: {inst.name!r} notes={n} mono={mono:.2f} median={med:.0f}"
+            for k, inst, n, mono, med in stats
+        )
+        raise ValueError(
+            f"no track is a single line above the bass (mono >= {min_mono}, median >= "
+            f"{min_median_midi}); pass track= one of:\n{table}"
+        )
+    return max(lines, key=lambda s: s[2])[1]
+
+
+def _median_pitch(notes) -> float:
+    return float(np.median([n.pitch for n in notes]))
+
+
+def mono_share(notes, *, fps: float = 20.0) -> float:
+    """Share of the sounding time of ``notes`` (objects with ``start`` and ``end`` in seconds)
+    when exactly one of them sounds: 1 for a melodic line, about 0.3 for a three-note pad."""
+    notes = [(n.start, n.end) for n in notes]
+    count = np.zeros(int(np.ceil(max(end for _, end in notes) * fps)) + 1)
+    for start, end in notes:
+        a = int(start * fps)
+        count[a : max(a + 1, int(end * fps))] += 1
+    sounding = count > 0
+    return float(np.mean(count[sounding] == 1)) if sounding.any() else 0.0
 
 
 def _is_midi(source) -> bool:
@@ -427,9 +483,13 @@ def tanpura(
                 break
             bloom = 1 - np.exp(-t / (0.01 + 0.25 * h / harmonics))
             wave += (
-                h**-0.9 * bloom * np.sin(2 * np.pi * h * f0 * t + rng.uniform(0, 6.3))
+                h**-0.9
+                * bloom
+                * np.sin(2 * np.pi * h * f0 * t + rng.uniform(0, 2 * np.pi))
             )
         wave *= np.exp(-t / decay_s)
+        tail = pluck_len // 4  # fade the last quarter, so a pluck never ends in a tick
+        wave[-tail:] *= np.cos(np.linspace(0, np.pi / 2, tail)) ** 2
         for start in np.arange(k * cycle_s / 4, seconds, cycle_s):
             i = int(start * sr)
             out[i : i + pluck_len] += wave
@@ -440,18 +500,23 @@ def loop_drone(
     y: np.ndarray, sr: int, seconds: float, *, crossfade_s: float = 1.0
 ) -> np.ndarray:
     """A recorded drone repeated to ``seconds`` with equal-power crossfades at the joins."""
-    y = _mono(y)
+    y = _mono(y, sr)
     n, fade = int(seconds * sr), int(crossfade_s * sr)
     if len(y) <= 2 * fade:
         raise ValueError(
             f"a {len(y) / sr:.1f} s drone is too short for {crossfade_s} s crossfades"
         )
-    ramp = np.sin(np.linspace(0, np.pi / 2, fade)) ** 2
-    out = y.copy()
-    while len(out) < n:
-        joint = out[-fade:] * ramp[::-1] ** 0.5 + y[:fade] * ramp**0.5
-        out = np.concatenate([out[:-fade], joint, y[fade:]])
-    return out[:n]
+    theta = np.linspace(0, np.pi / 2, fade)
+    fade_in, fade_out = np.sin(theta), np.cos(theta)  # equal power: squares sum to 1
+    step = len(y) - fade
+    out = np.zeros(n + len(y))
+    for start in range(0, n, step):
+        piece = y.copy()
+        if start:
+            piece[:fade] *= fade_in
+            out[start : start + fade] *= fade_out
+        out[start : start + len(y)] += piece
+    return out[:n].astype(y.dtype)
 
 
 # --------------------------------------------------------------------------------------------
@@ -474,11 +539,14 @@ def bowed(
     voiced = ~np.isnan(pitch)
     if not voiced.any():
         return np.zeros(len(pitch))
-    # carry the pitch through silences so the phase never jumps
-    idx = np.where(voiced, np.arange(len(pitch)), 0)
-    np.maximum.accumulate(idx, out=idx)
-    filled = pitch[idx]
-    filled[: np.argmax(voiced)] = pitch[np.argmax(voiced)]
+    # carry a pitch through silences so the phase never jumps: the last note's for the first
+    # half of a rest, the next note's for the second, so the fade-in already sounds the entry
+    filled = pitch.copy()
+    for a, b in index_runs(~voiced):
+        before = pitch[a - 1] if a else pitch[b]
+        after = pitch[b] if b < len(pitch) else before
+        mid = a if not a else (a + b) // 2
+        filled[a:mid], filled[mid:b] = before, after
     f0 = midi_to_hz(filled)
     phase = 2 * np.pi * np.cumsum(f0) / sr
     y = sum(
@@ -488,20 +556,6 @@ def bowed(
     w = max(1, int(fade_s * sr))
     env = np.convolve(voiced.astype(float), np.ones(w) / w, mode="same")
     return y * env
-
-
-def active_rms(
-    y: np.ndarray, sr: int, *, gate_db: float = -40.0, frame_s: float = 0.05
-) -> float:
-    """RMS over the frames that are playing (within ``gate_db`` of the loudest), so a line with
-    rests is leveled by its notes, not diluted by its silences."""
-    hop = max(1, int(frame_s * sr))
-    frames = y[: len(y) // hop * hop].reshape(-1, hop)
-    if not len(frames):
-        return 0.0
-    level = np.sqrt(np.mean(frames**2, axis=1))
-    playing = level >= level.max() * 10 ** (gate_db / 20)
-    return float(np.sqrt(np.mean(level[playing] ** 2))) if level.max() > 0 else 0.0
 
 
 def _peak(y: np.ndarray, peak: float = 0.9) -> np.ndarray:
@@ -536,7 +590,8 @@ def melody_over_drone(
         floor_midi: Lift the melody by octaves until its median pitch is at least this. The
             default keeps it above the bass band ``drone_report`` reads, where a low (male) line
             would otherwise sit inside the drone and fail the check. ``None`` turns it off.
-        melody_db, drone_db: Levels, as active RMS (:func:`active_rms`) relative to each other.
+        melody_db, drone_db: Levels, as active RMS (``arioso.scoring.active_db``, frames
+            within 40 dB of the loudest) relative to each other.
         lead_in_s: Drone alone before the melody starts, to set Sa.
         peak: Peak level of the mix.
     """
@@ -556,7 +611,7 @@ def melody_over_drone(
     bed = np.pad(bed[: len(melody)], (0, max(0, len(melody) - len(bed))))
 
     def at(y, db):
-        level = active_rms(y, sr)
-        return y * (10 ** (db / 20) / level) if level > 0 else y
+        level = active_db(y, sr, floor_rel_db=-40.0)
+        return y * 10 ** ((db - level) / 20) if level > SILENCE_DB else y
 
     return _peak(at(melody, melody_db) + at(bed, drone_db), peak), sr

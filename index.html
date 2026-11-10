@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=eb4c61eb"></script>
+    <script src="_static/documentation_options.js?v=4f34e5f2"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.46" />
+  <meta name="docsearch:version" content="0.0.47" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -372,7 +372,7 @@ from local open-source models to commercial REST APIs — behind a single <code 
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">generate</span></code> writes the audio and prints the path it wrote. A waveform from a local model is written as WAV (with <code class="docutils literal notranslate"><span class="pre">soundfile</span></code> when installed, else the standard library’s <code class="docutils literal notranslate"><span class="pre">wave</span></code>); encoded audio from a hosted platform keeps its format, and the file’s suffix follows it. <code class="docutils literal notranslate"><span class="pre">--model</span></code> and <code class="docutils literal notranslate"><span class="pre">--seed</span></code> are passed on only when given.</p>
-<p><code class="docutils literal notranslate"><span class="pre">platforms</span></code> lists every platform with its access type, weights licence and whether its output may be used commercially (<code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">no</span></code>, <code class="docutils literal notranslate"><span class="pre">conditional</span></code>, or <code class="docutils literal notranslate"><span class="pre">provider</span> <span class="pre">terms</span></code> for hosted models whose service terms decide). The same table is <code class="docutils literal notranslate"><span class="pre">arioso.platform_table()</span></code> in Python, and each platform’s <code class="docutils literal notranslate"><span class="pre">weights_license</span></code> and <code class="docutils literal notranslate"><span class="pre">commercial_use</span></code> are in <code class="docutils literal notranslate"><span class="pre">arioso.get_platform_info(name)</span></code>. MusicGen’s weights are CC-BY-NC-4.0, so its output is not for commercial use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">platforms</span></code> lists every platform with its access type, weights licence and whether its output may be used commercially (<code class="docutils literal notranslate"><span class="pre">yes</span></code>, <code class="docutils literal notranslate"><span class="pre">no</span></code>, <code class="docutils literal notranslate"><span class="pre">conditional</span></code>, <code class="docutils literal notranslate"><span class="pre">unclear</span></code> when the terms are not settled (licence unstated, disputed or withdrawn, or a doubtful training-data chain), or <code class="docutils literal notranslate"><span class="pre">provider</span> <span class="pre">terms</span></code> for hosted models whose service terms decide). The same table is <code class="docutils literal notranslate"><span class="pre">arioso.platform_table()</span></code> in Python, and each platform’s <code class="docutils literal notranslate"><span class="pre">weights_license</span></code> and <code class="docutils literal notranslate"><span class="pre">commercial_use</span></code> are in <code class="docutils literal notranslate"><span class="pre">arioso.get_platform_info(name)</span></code>. MusicGen’s weights are CC-BY-NC-4.0, so its output is not for commercial use.</p>
 <p>Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set <code class="docutils literal notranslate"><span class="pre">ARIOSO_TORCH_DEVICE</span></code> to force one.</p>
 <section id="comparing-platforms">
 <h3>Comparing platforms<a class="headerlink" href="#comparing-platforms" title="Link to this heading">#</a></h3>
@@ -1036,7 +1036,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-10 10:24 UTC from <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07">ffd0943</a> (main) · arioso 0.0.46 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-10 10:34 UTC from <a href="https://github.com/thorwhalen/arioso/commit/39336124074a3a554f14ea55d2d29585ea62a8e1">3933612</a> (main) · arioso 0.0.47 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

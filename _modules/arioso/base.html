@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=eb4c61eb"></script>
+    <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.46" />
+  <meta name="docsearch:version" content="0.0.47" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -946,9 +946,13 @@ window.runMermaid = runMermaid;</script>
 <span class="c1">#: What a platform's ``commercial_use`` config field may say, about using its</span>
 <span class="c1">#: output commercially: the weights' licence allows it (``"yes"``), forbids it</span>
 <span class="c1">#: (``"no"``), allows it under conditions such as a revenue cap or use</span>
-<span class="c1">#: restrictions (``"conditional"``), or the weights are not public and the</span>
-<span class="c1">#: hosted service's own terms decide (``"provider terms"``).</span>
-<span class="n">COMMERCIAL_USE_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"yes"</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">,</span> <span class="s2">"conditional"</span><span class="p">,</span> <span class="s2">"provider terms"</span><span class="p">)</span>
+<span class="c1">#: restrictions (``"conditional"``), the weights are not public and the</span>
+<span class="c1">#: hosted service's own terms decide (``"provider terms"``), or the terms are</span>
+<span class="c1">#: not settled: the licence is unstated, disputed or withdrawn, or the</span>
+<span class="c1">#: training-data chain is doubtful (``"unclear"``). Obligations on</span>
+<span class="c1">#: redistributing the weights themselves (LGPL, attribution) belong in</span>
+<span class="c1">#: ``weights_license``, not here. denote's backends use the same values.</span>
+<span class="n">COMMERCIAL_USE_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"yes"</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">,</span> <span class="s2">"conditional"</span><span class="p">,</span> <span class="s2">"unclear"</span><span class="p">,</span> <span class="s2">"provider terms"</span><span class="p">)</span>
 </pre></div>
 
                 </article>

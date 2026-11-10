@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=eb4c61eb"></script>
+    <script src="../_static/documentation_options.js?v=4f34e5f2"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.46" />
+  <meta name="docsearch:version" content="0.0.47" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -423,7 +423,7 @@ set of affordance names that all platform adapters map to.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#arioso.base.COMMERCIAL_USE_VALUES" title="arioso.base.COMMERCIAL_USE_VALUES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMMERCIAL_USE_VALUES</span></code></a></p></td>
-<td><p>What a platform's <code class="docutils literal notranslate"><span class="pre">commercial_use</span></code> config field may say, about using its output commercially: the weights' licence allows it (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>), forbids it (<code class="docutils literal notranslate"><span class="pre">&quot;no&quot;</span></code>), allows it under conditions such as a revenue cap or use restrictions (<code class="docutils literal notranslate"><span class="pre">&quot;conditional&quot;</span></code>), or the weights are not public and the hosted service's own terms decide (<code class="docutils literal notranslate"><span class="pre">&quot;provider</span> <span class="pre">terms&quot;</span></code>).</p></td>
+<td><p>What a platform's <code class="docutils literal notranslate"><span class="pre">commercial_use</span></code> config field may say, about using its output commercially: the weights' licence allows it (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>), forbids it (<code class="docutils literal notranslate"><span class="pre">&quot;no&quot;</span></code>), allows it under conditions such as a revenue cap or use restrictions (<code class="docutils literal notranslate"><span class="pre">&quot;conditional&quot;</span></code>), the weights are not public and the hosted service's own terms decide (<code class="docutils literal notranslate"><span class="pre">&quot;provider</span> <span class="pre">terms&quot;</span></code>), or the terms are not settled: the licence is unstated, disputed or withdrawn, or the training-data chain is doubtful (<code class="docutils literal notranslate"><span class="pre">&quot;unclear&quot;</span></code>).</p></td>
 </tr>
 </tbody>
 </table>
@@ -585,12 +585,16 @@ be done on demand by the caller.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="arioso.base.COMMERCIAL_USE_VALUES">
-<span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">COMMERCIAL_USE_VALUES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('yes',</span> <span class="pre">'no',</span> <span class="pre">'conditional',</span> <span class="pre">'provider</span> <span class="pre">terms')</span></span><a class="headerlink" href="#arioso.base.COMMERCIAL_USE_VALUES" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">arioso.base.</span></span><span class="sig-name descname"><span class="pre">COMMERCIAL_USE_VALUES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('yes',</span> <span class="pre">'no',</span> <span class="pre">'conditional',</span> <span class="pre">'unclear',</span> <span class="pre">'provider</span> <span class="pre">terms')</span></span><a class="headerlink" href="#arioso.base.COMMERCIAL_USE_VALUES" title="Link to this definition">#</a></dt>
 <dd><p>What a platform’s <code class="docutils literal notranslate"><span class="pre">commercial_use</span></code> config field may say, about using its
 output commercially: the weights’ licence allows it (<code class="docutils literal notranslate"><span class="pre">&quot;yes&quot;</span></code>), forbids it
 (<code class="docutils literal notranslate"><span class="pre">&quot;no&quot;</span></code>), allows it under conditions such as a revenue cap or use
-restrictions (<code class="docutils literal notranslate"><span class="pre">&quot;conditional&quot;</span></code>), or the weights are not public and the
-hosted service’s own terms decide (<code class="docutils literal notranslate"><span class="pre">&quot;provider</span> <span class="pre">terms&quot;</span></code>).</p>
+restrictions (<code class="docutils literal notranslate"><span class="pre">&quot;conditional&quot;</span></code>), the weights are not public and the
+hosted service’s own terms decide (<code class="docutils literal notranslate"><span class="pre">&quot;provider</span> <span class="pre">terms&quot;</span></code>), or the terms are
+not settled: the licence is unstated, disputed or withdrawn, or the
+training-data chain is doubtful (<code class="docutils literal notranslate"><span class="pre">&quot;unclear&quot;</span></code>). Obligations on
+redistributing the weights themselves (LGPL, attribution) belong in
+<code class="docutils literal notranslate"><span class="pre">weights_license</span></code>, not here. denote’s backends use the same values.</p>
 </dd></dl>
 
 <dl class="py exception">

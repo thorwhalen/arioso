@@ -1,4 +1,4 @@
-> built 2026-11-10 10:24 UTC from ffd0943 (main) · arioso 0.0.46. Details: build_info.json
+> built 2026-11-10 10:34 UTC from 3933612 (main) · arioso 0.0.47. Details: build_info.json
 
 # index.html.md
 
@@ -46,7 +46,7 @@ arioso platforms
 
 `generate` writes the audio and prints the path it wrote. A waveform from a local model is written as WAV (with `soundfile` when installed, else the standard library’s `wave`); encoded audio from a hosted platform keeps its format, and the file’s suffix follows it. `--model` and `--seed` are passed on only when given.
 
-`platforms` lists every platform with its access type, weights licence and whether its output may be used commercially (`yes`, `no`, `conditional`, or `provider terms` for hosted models whose service terms decide). The same table is `arioso.platform_table()` in Python, and each platform’s `weights_license` and `commercial_use` are in `arioso.get_platform_info(name)`. MusicGen’s weights are CC-BY-NC-4.0, so its output is not for commercial use.
+`platforms` lists every platform with its access type, weights licence and whether its output may be used commercially (`yes`, `no`, `conditional`, `unclear` when the terms are not settled (licence unstated, disputed or withdrawn, or a doubtful training-data chain), or `provider terms` for hosted models whose service terms decide). The same table is `arioso.platform_table()` in Python, and each platform’s `weights_license` and `commercial_use` are in `arioso.get_platform_info(name)`. MusicGen’s weights are CC-BY-NC-4.0, so its output is not for commercial use.
 
 Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set `ARIOSO_TORCH_DEVICE` to force one.
 
@@ -565,8 +565,8 @@ set of affordance names that all platform adapters map to.
 
 ### Module Attributes
 
-| [`COMMERCIAL_USE_VALUES`](_autosummary/arioso.base.html.md#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), or the weights are not public and the hosted service's own terms decide (`"provider terms"`).   |
-|--------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`COMMERCIAL_USE_VALUES`](_autosummary/arioso.base.html.md#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), the weights are not public and the hosted service's own terms decide (`"provider terms"`), or the terms are not settled: the licence is unstated, disputed or withdrawn, or the training-data chain is doubtful (`"unclear"`).   |
+|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ### Classes
 
@@ -666,13 +666,17 @@ Duration of the audio in seconds.
 * **Type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'provider terms')*
+### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'unclear', 'provider terms')*
 
 What a platform’s `commercial_use` config field may say, about using its
 output commercially: the weights’ licence allows it (`"yes"`), forbids it
 (`"no"`), allows it under conditions such as a revenue cap or use
-restrictions (`"conditional"`), or the weights are not public and the
-hosted service’s own terms decide (`"provider terms"`).
+restrictions (`"conditional"`), the weights are not public and the
+hosted service’s own terms decide (`"provider terms"`), or the terms are
+not settled: the licence is unstated, disputed or withdrawn, or the
+training-data chain is doubtful (`"unclear"`). Obligations on
+redistributing the weights themselves (LGPL, attribution) belong in
+`weights_license`, not here. denote’s backends use the same values.
 
 ### *exception* arioso.base.CatalogMatchError(message, , task_id=None, code=None)
 
@@ -3553,20 +3557,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 10:24 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07"><code>ffd0943</code></a> on branch <code>main</code>, for **arioso 0.0.46** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 10:34 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/39336124074a3a554f14ea55d2d29585ea62a8e1"><code>3933612</code></a> on branch <code>main</code>, for **arioso 0.0.47** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.46) is ahead of the latest release on PyPI (0.0.45): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07"><code>ffd094361041e6aac8081ca9311c5dcca445ef07</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/39336124074a3a554f14ea55d2d29585ea62a8e1"><code>39336124074a3a554f14ea55d2d29585ea62a8e1</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.46</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.47</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3575,9 +3577,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42798499635">42798499635</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42799829485">42799829485</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0c96fdd25c29bc16b250db3a06c3ab1c1b481d18</code> (in the history of the built commit) |
+| Event commit | <code>b1d4e292d0614b58d5c22228598fbaa542fe9a4b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3602,13 +3604,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.45/">0.0.45</a>, older than the documented version (0.0.46).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.47/">0.0.47</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout ffd094361041e6aac8081ca9311c5dcca445ef07
+git checkout 39336124074a3a554f14ea55d2d29585ea62a8e1
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

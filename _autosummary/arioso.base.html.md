@@ -7,8 +7,8 @@ set of affordance names that all platform adapters map to.
 
 ### Module Attributes
 
-| [`COMMERCIAL_USE_VALUES`](#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), or the weights are not public and the hosted service's own terms decide (`"provider terms"`).   |
-|--------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`COMMERCIAL_USE_VALUES`](#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), the weights are not public and the hosted service's own terms decide (`"provider terms"`), or the terms are not settled: the licence is unstated, disputed or withdrawn, or the training-data chain is doubtful (`"unclear"`).   |
+|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ### Classes
 
@@ -108,13 +108,17 @@ Duration of the audio in seconds.
 * **Type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'provider terms')*
+### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'unclear', 'provider terms')*
 
 What a platform’s `commercial_use` config field may say, about using its
 output commercially: the weights’ licence allows it (`"yes"`), forbids it
 (`"no"`), allows it under conditions such as a revenue cap or use
-restrictions (`"conditional"`), or the weights are not public and the
-hosted service’s own terms decide (`"provider terms"`).
+restrictions (`"conditional"`), the weights are not public and the
+hosted service’s own terms decide (`"provider terms"`), or the terms are
+not settled: the licence is unstated, disputed or withdrawn, or the
+training-data chain is doubtful (`"unclear"`). Obligations on
+redistributing the weights themselves (LGPL, attribution) belong in
+`weights_license`, not here. denote’s backends use the same values.
 
 ### *exception* arioso.base.CatalogMatchError(message, , task_id=None, code=None)
 

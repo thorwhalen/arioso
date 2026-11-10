@@ -82,7 +82,9 @@ def fake_port(monkeypatch):
 
 @pytest.fixture
 def runtime_dir(tmp_path, monkeypatch):
-    """An 'installed' mlx-examples runtime (its interpreter path exists)."""
+    """An 'installed' mlx-examples runtime (its interpreter path exists; the pinned-commit
+    check is skipped, as the folder is not a checkout: tests/test_isolated.py has it)."""
+    monkeypatch.setattr("ps.isolated.check_git_source", lambda source, path, **kw: path)
     rt = PLATFORM_CONFIG["mlx_runtime"]
     python = tmp_path / rt["python"]
     python.parent.mkdir(parents=True)
@@ -158,7 +160,7 @@ def test_a_missing_runtime_says_how_to_install_it(tmp_path, monkeypatch):
     )
     with pytest.raises(
         RuntimeNotInstalled,
-        match="git clone --depth 1 https://github.com/ml-explore/mlx-examples",
+        match="fetch --quiet --depth 1 https://github.com/ml-explore/mlx-examples [0-9a-f]{40}",
     ):
         MlxBackend.load("facebook/musicgen-small", make_worker=_InProcessWorker)
 

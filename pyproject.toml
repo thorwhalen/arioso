@@ -37,7 +37,7 @@ dependencies = [
     "dol>=0.0.1",
     "config2py>=0.0.1",
     "cw>=0.1,<0.2",
-    "ps>=0.1.15",  # ps.isolated: local runtimes in their own environments
+    "ps>=0.1.17",  # ps.isolated (GitSource): local runtimes in their own environments
 ]
 
 [project.scripts]

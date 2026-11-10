@@ -7,6 +7,8 @@ Gemma terms for the T5Gemma text encoder). Verified against the checkout's
 ``scripts/sa3_mlx.py`` and the model card on 2026-11-10.
 """
 
+from arioso._isolated import GitSource
+
 PLATFORM_CONFIG = {
     "name": "stable_audio_3",
     "display_name": "Stable Audio 3 (local, MLX)",
@@ -23,8 +25,13 @@ PLATFORM_CONFIG = {
         "env_var": "ARIOSO_SA3_DIR",
         "python": "optimized/mlx/.venv/bin/python",
         "cwd": "optimized/mlx",
+        # the commit measured on 2026-11-10 (thorwhalen/arioso#63): the hint checks it
+        # out, and a checkout at another commit is refused
+        "source": GitSource(
+            "https://github.com/Stability-AI/stable-audio-3",
+            "790793b89ddceea612be9ce42ff6830d18f6fa57",
+        ),
         "setup": (
-            "git clone --depth 1 https://github.com/Stability-AI/stable-audio-3 {root}\n"
             "cd {root}/optimized/mlx && uv venv .venv --python 3.11 "
             "&& uv pip install --python .venv/bin/python -r requirements.txt"
         ),

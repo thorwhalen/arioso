@@ -35,7 +35,12 @@ def _write_wav(path, frames=441, rate=44100):
 
 @pytest.fixture
 def installed(monkeypatch, tmp_path):
-    """Make every runtime look installed under tmp_path (an empty interpreter file)."""
+    """Make every runtime look installed under tmp_path (an empty interpreter file).
+
+    The pinned-commit check is skipped (these roots are not checkouts); it has its own
+    tests in tests/test_isolated.py.
+    """
+    monkeypatch.setattr("ps.isolated.check_git_source", lambda source, path, **kw: path)
 
     def make(config):
         rt = config["runtime"]

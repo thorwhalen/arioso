@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "arioso"
-version = "0.0.43"
+version = "0.0.44"
 description = "Make tunes"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -63,6 +63,11 @@ seeds = [
     "librosa>=0.10",
     "pretty_midi",
     "denote>=0.0.9",
+]
+# arioso.compare: objective checks (level, clipping; tempo and key through denote).
+compare = [
+    "numpy",
+    "denote>=0.0.10",  # get_key
 ]
 test = [
     "pytest>=7.0",

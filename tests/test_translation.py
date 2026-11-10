@@ -136,7 +136,10 @@ def test_check_supported_params_lyrics_ok_when_platform_supports_it():
 def test_multiple_params():
     param_map = {
         "prompt": {"native_name": "prompt", "required": True},
-        "duration": {"native_name": "music_length_ms", "coerce": lambda x: int(x * 1000)},
+        "duration": {
+            "native_name": "music_length_ms",
+            "coerce": lambda x: int(x * 1000),
+        },
         "instrumental": {"native_name": "force_instrumental"},
     }
     trans = make_kwargs_trans(param_map)

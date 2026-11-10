@@ -70,7 +70,11 @@ def test_sunoapi_generate_with_lyrics(mock_make_session):
     mock_session = MagicMock()
     mock_response = MagicMock()
     mock_response.json.return_value = [
-        {"id": "song-1", "title": "My Song", "audio_url": "https://cdn.sunoapi.org/song1.mp3"},
+        {
+            "id": "song-1",
+            "title": "My Song",
+            "audio_url": "https://cdn.sunoapi.org/song1.mp3",
+        },
     ]
     mock_session.post.return_value = mock_response
     mock_make_session.return_value = mock_session
@@ -341,8 +345,20 @@ def test_sunoapi_get_timestamped_lyrics(mock_make_session):
         "msg": "success",
         "data": {
             "alignedWords": [
-                {"word": "[Intro]\nカ ", "success": True, "startS": 2.87, "endS": 3.43, "palign": 0},
-                {"word": "ン\n", "success": True, "startS": 5.19, "endS": 7.58, "palign": 0},
+                {
+                    "word": "[Intro]\nカ ",
+                    "success": True,
+                    "startS": 2.87,
+                    "endS": 3.43,
+                    "palign": 0,
+                },
+                {
+                    "word": "ン\n",
+                    "success": True,
+                    "startS": 5.19,
+                    "endS": 7.58,
+                    "palign": 0,
+                },
             ],
             "hootCer": 0.43,
         },
@@ -351,12 +367,20 @@ def test_sunoapi_get_timestamped_lyrics(mock_make_session):
     mock_make_session.return_value = mock_session
 
     adapter = Adapter(PLATFORM_CONFIG)
-    song = Song(id="audio-1", platform="sunoapi", status="complete", metadata={"task_id": "task-1"})
+    song = Song(
+        id="audio-1",
+        platform="sunoapi",
+        status="complete",
+        metadata={"task_id": "task-1"},
+    )
     out = adapter.get_timestamped_lyrics(song)
 
     url = mock_session.post.call_args[0][0]
     assert url.endswith("/api/v1/generate/get-timestamped-lyrics")
-    assert mock_session.post.call_args[1]["json"] == {"taskId": "task-1", "audioId": "audio-1"}
+    assert mock_session.post.call_args[1]["json"] == {
+        "taskId": "task-1",
+        "audioId": "audio-1",
+    }
     assert out["hoot_cer"] == 0.43
     assert [w["text"] for w in out["aligned_words"]] == ["カ", "ン"]
     assert [w["line_end"] for w in out["aligned_words"]] == [False, True]
@@ -373,7 +397,11 @@ def test_sunoapi_get_timestamped_lyrics_refuses_pending_and_empty(mock_make_sess
     mock_make_session.return_value = mock_session
     adapter = Adapter(PLATFORM_CONFIG)
     with pytest.raises(ValueError, match="complete"):
-        adapter.get_timestamped_lyrics(Song(id="t", platform="sunoapi", status="pending", metadata={"task_id": "t"}))
+        adapter.get_timestamped_lyrics(
+            Song(
+                id="t", platform="sunoapi", status="pending", metadata={"task_id": "t"}
+            )
+        )
     with pytest.raises(ValueError, match="no aligned words"):
         adapter.get_timestamped_lyrics("task-1", "audio-1")
 
@@ -385,7 +413,9 @@ def test_sunoapi_get_timestamped_lyrics_needs_task_id(mock_make_session):
     mock_make_session.return_value = MagicMock()
     adapter = Adapter(PLATFORM_CONFIG)
     with pytest.raises(ValueError, match="task_id"):
-        adapter.get_timestamped_lyrics(Song(id="audio-1", platform="sunoapi", status="complete"))
+        adapter.get_timestamped_lyrics(
+            Song(id="audio-1", platform="sunoapi", status="complete")
+        )
 
 
 # --- audio_input routes to upload-cover (thorwhalen/arioso#15) ---------------
@@ -436,7 +466,11 @@ def test_sunoapi_audio_input_keeps_generate_custom_mode_rules(mock_make_session)
     )
     payload = session.post.call_args[1]["json"]
     assert payload["customMode"] is True
-    assert (payload["style"], payload["prompt"], payload["title"]) == ("folk", "la la la", "T")
+    assert (payload["style"], payload["prompt"], payload["title"]) == (
+        "folk",
+        "la la la",
+        "T",
+    )
     assert "audioWeight" not in payload  # 0 leaves it to the API
 
 
@@ -459,16 +493,25 @@ def test_sunoapi_audio_input_accepts_the_affordance_forms(mock_make_session, tmp
     session = _cover_session(mock_make_session)
     adapter = Adapter(PLATFORM_CONFIG)
     uploaded = []
-    adapter.upload_file = lambda path: (uploaded.append(path), "https://files.example/up.wav")[1]
+    adapter.upload_file = lambda path: (
+        uploaded.append(path),
+        "https://files.example/up.wav",
+    )[1]
 
-    remote = Song(audio=AudioResult(audio_url="https://cdn.example/s.mp3"), platform="sunoapi")
+    remote = Song(
+        audio=AudioResult(audio_url="https://cdn.example/s.mp3"), platform="sunoapi"
+    )
     adapter.generate("x", audio_input=remote, callback_url=CALLBACK_URL)
     assert session.post.call_args[1]["json"]["uploadUrl"] == "https://cdn.example/s.mp3"
     assert uploaded == []
 
     adapter.generate("x", audio_input=b"RIFF....", callback_url=CALLBACK_URL)
-    assert session.post.call_args[1]["json"]["uploadUrl"] == "https://files.example/up.wav"
-    assert len(uploaded) == 1 and not os.path.exists(uploaded[0]), "temp file cleaned up"
+    assert (
+        session.post.call_args[1]["json"]["uploadUrl"] == "https://files.example/up.wav"
+    )
+    assert len(uploaded) == 1 and not os.path.exists(uploaded[0]), (
+        "temp file cleaned up"
+    )
 
     clip = tmp_path / "seed.wav"
     clip.write_bytes(b"RIFF....")
@@ -526,12 +569,28 @@ def test_sunoapi_custom_controls_reach_payload(mock_make_session):
     import arioso
 
     with warnings.catch_warnings():
-        warnings.simplefilter("error")  # the Suno-only controls must not warn as unsupported
-        arioso.generate("calm drone", platform="sunoapi", genre="meditative chamber", title="T",
-                        instrumental=True, duration=300, style_weight=0.75, weirdness=0.25, variety=1)
+        warnings.simplefilter(
+            "error"
+        )  # the Suno-only controls must not warn as unsupported
+        arioso.generate(
+            "calm drone",
+            platform="sunoapi",
+            genre="meditative chamber",
+            title="T",
+            instrumental=True,
+            duration=300,
+            style_weight=0.75,
+            weirdness=0.25,
+            variety=1,
+        )
     payload = mock_session.post.call_args[1]["json"]
     assert payload["model"] == "V6" and payload["customMode"] is True
-    assert (payload["duration"], payload["styleWeight"], payload["weirdnessConstraint"], payload["variety"]) == (300, 0.75, 0.25, 1)
+    assert (
+        payload["duration"],
+        payload["styleWeight"],
+        payload["weirdnessConstraint"],
+        payload["variety"],
+    ) == (300, 0.75, 0.25, 1)
 
 
 def test_sunoapi_custom_controls_validate():

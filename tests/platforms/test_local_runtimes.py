@@ -66,13 +66,17 @@ def _flag(cmd, name):
 def test_sa3_maps_model_to_dit_and_decoder_and_records_a_drawn_seed(installed):
     root = installed(SA3_CONFIG)
     runner = _FakeRunner()
-    song = Sa3Adapter(runner=runner, is_supported=lambda: True).generate("lofi loop", duration=4, model="medium")
+    song = Sa3Adapter(runner=runner, is_supported=lambda: True).generate(
+        "lofi loop", duration=4, model="medium"
+    )
     cmd = runner.calls[0]["cmd"]
     assert (_flag(cmd, "--dit"), _flag(cmd, "--decoder")) == ("medium", "same-l")
     assert _flag(cmd, "--seconds") == "4.0" and "--prompt=lofi loop" in cmd
     assert runner.calls[0]["cwd"] == root / "optimized/mlx"
     assert song.status == "complete" and song.sample_rate == 44100
-    assert isinstance(song.metadata["seed"], int) and _flag(cmd, "--seed") == str(song.metadata["seed"])
+    assert isinstance(song.metadata["seed"], int) and _flag(cmd, "--seed") == str(
+        song.metadata["seed"]
+    )
 
 
 def test_sa3_passes_audio_to_audio_and_inpainting(installed, tmp_path):
@@ -80,9 +84,13 @@ def test_sa3_passes_audio_to_audio_and_inpainting(installed, tmp_path):
     runner = _FakeRunner()
     src = _write_wav(tmp_path / "src.wav")
     Sa3Adapter(runner=runner, is_supported=lambda: True).generate(
-        "drums", audio_input=src, audio_input_strength=0.4, inpaint_range=(1, 2), seed=7)
+        "drums", audio_input=src, audio_input_strength=0.4, inpaint_range=(1, 2), seed=7
+    )
     cmd = runner.calls[0]["cmd"]
-    assert _flag(cmd, "--init-noise-level") == "0.4" and _flag(cmd, "--inpaint-range") == "1,2"
+    assert (
+        _flag(cmd, "--init-noise-level") == "0.4"
+        and _flag(cmd, "--inpaint-range") == "1,2"
+    )
     assert _flag(cmd, "--seed") == "7"
 
 
@@ -115,7 +123,9 @@ def test_sa3_rejects_inpainting_without_audio_and_unknown_models(installed):
 
 def test_sa3_failure_carries_the_tool_log(installed):
     installed(SA3_CONFIG)
-    a = Sa3Adapter(runner=_FakeRunner(code=2, log="\x1b[31mboom\x1b[0m"), is_supported=lambda: True)
+    a = Sa3Adapter(
+        runner=_FakeRunner(code=2, log="\x1b[31mboom\x1b[0m"), is_supported=lambda: True
+    )
     with pytest.raises(RuntimeError, match="(?s)exit 2.*boom"):
         a.generate("x")
 
@@ -142,8 +152,14 @@ class _FakeWorker:
     def call(self, req):
         self.requests.append(req)
         if "out_dir" in req:  # ace_step
-            return {"out": _write_wav(f"{req['out_dir']}/a.wav", rate=48000), "params": {"bpm": req["bpm"]}}
-        return {"out": _write_wav(req["out"], rate=48000), "frames": round(req["seconds"] * 25)}
+            return {
+                "out": _write_wav(f"{req['out_dir']}/a.wav", rate=48000),
+                "params": {"bpm": req["bpm"]},
+            }
+        return {
+            "out": _write_wav(req["out"], rate=48000),
+            "frames": round(req["seconds"] * 25),
+        }
 
     def close(self):
         self.closed = True
@@ -165,10 +181,16 @@ def test_magenta_rt_renders_through_one_worker_with_its_home(installed, monkeypa
     assert w.closed and a._worker is None
 
 
-def test_ace_step_defaults_to_fal_and_env_can_make_local_the_default(installed, monkeypatch):
+def test_ace_step_defaults_to_fal_and_env_can_make_local_the_default(
+    installed, monkeypatch
+):
     installed(ACE_CONFIG)
     seen = []
-    monkeypatch.setattr(ace_mod, "fal_run", lambda endpoint, arguments: seen.append(endpoint) or {"audio": {"url": "u"}})
+    monkeypatch.setattr(
+        ace_mod,
+        "fal_run",
+        lambda endpoint, arguments: seen.append(endpoint) or {"audio": {"url": "u"}},
+    )
     monkeypatch.delenv("ARIOSO_ACE_STEP_RUNTIME", raising=False)
     a = ace_mod.Adapter()
     with pytest.warns(UserWarning, match="no bpm"):
@@ -176,19 +198,34 @@ def test_ace_step_defaults_to_fal_and_env_can_make_local_the_default(installed, 
     assert seen == ["fal-ai/ace-step"]
     monkeypatch.setenv("ARIOSO_ACE_STEP_RUNTIME", "local")
     local = ace_mod.LocalAceStep(ACE_CONFIG, make_worker=_FakeWorker)
-    song = ace_mod.Adapter(local=local).generate("jazz", bpm=120, key="C Major", duration=10)
+    song = ace_mod.Adapter(local=local).generate(
+        "jazz", bpm=120, key="C Major", duration=10
+    )
     req = local._worker.requests[0]
-    assert (req["caption"], req["bpm"], req["key"], req["lyrics"]) == ("jazz", 120, "C Major", "[Instrumental]")
-    assert song.metadata["runtime"] == "local" and isinstance(song.metadata["seed"], int)
+    assert (req["caption"], req["bpm"], req["key"], req["lyrics"]) == (
+        "jazz",
+        120,
+        "C Major",
+        "[Instrumental]",
+    )
+    assert song.metadata["runtime"] == "local" and isinstance(
+        song.metadata["seed"], int
+    )
 
 
 def test_ace_step_local_cover_from_audio_input(installed, tmp_path):
     installed(ACE_CONFIG)
     local = ace_mod.LocalAceStep(ACE_CONFIG, make_worker=_FakeWorker)
     src = _write_wav(tmp_path / "melody.wav")
-    ace_mod.Adapter(local=local).generate("piano", runtime="local", audio_input=src, audio_input_strength=0.3)
+    ace_mod.Adapter(local=local).generate(
+        "piano", runtime="local", audio_input=src, audio_input_strength=0.3
+    )
     req = local._worker.requests[0]
-    assert req["task_type"] == "cover" and req["cover_strength"] == 0.3 and req["src_audio"].endswith(".wav")
+    assert (
+        req["task_type"] == "cover"
+        and req["cover_strength"] == 0.3
+        and req["src_audio"].endswith(".wav")
+    )
 
 
 def test_ace_step_rejects_an_unknown_runtime(monkeypatch):
@@ -247,24 +284,60 @@ def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
 
     def generate_music(dit_h, llm_h, *, params, config, save_dir):
         out = _write_wav(tmp_path / "ace.wav", rate=48000)
-        return type("R", (), {"success": True, "audios": [{"path": out, "key": "C", "params": {"bpm": 100}}],
-                              "status_message": "", "error": None})()
+        return type(
+            "R",
+            (),
+            {
+                "success": True,
+                "audios": [{"path": out, "key": "C", "params": {"bpm": 100}}],
+                "status_message": "",
+                "error": None,
+            },
+        )()
 
-    _install_fake_modules(monkeypatch, {
-        "acestep": {}, "acestep.handler": {"AceStepHandler": Handler},
-        "acestep.inference": {"GenerationParams": Params, "GenerationConfig": Config, "generate_music": generate_music},
-    })
+    _install_fake_modules(
+        monkeypatch,
+        {
+            "acestep": {},
+            "acestep.handler": {"AceStepHandler": Handler},
+            "acestep.inference": {
+                "GenerationParams": Params,
+                "GenerationConfig": Config,
+                "generate_music": generate_music,
+            },
+        },
+    )
     from arioso.platforms.ace_step import _driver
 
     monkeypatch.setattr(_driver, "_handlers", {})
-    out = _driver.handle({"caption": "funk", "seconds": 10.0, "steps": 8, "guidance": 7.0, "seed": 123,
-                          "dit": "acestep-v15-turbo", "lm": None, "bpm": 100, "key": "C Major", "out_dir": str(tmp_path)})
-    assert seen["config"]["use_random_seed"] is False and seen["config"]["seeds"] == [123]
-    assert seen["params"]["seed"] == 123 and seen["params"]["bpm"] == 100 and seen["params"]["thinking"] is False
+    out = _driver.handle(
+        {
+            "caption": "funk",
+            "seconds": 10.0,
+            "steps": 8,
+            "guidance": 7.0,
+            "seed": 123,
+            "dit": "acestep-v15-turbo",
+            "lm": None,
+            "bpm": 100,
+            "key": "C Major",
+            "out_dir": str(tmp_path),
+        }
+    )
+    assert seen["config"]["use_random_seed"] is False and seen["config"]["seeds"] == [
+        123
+    ]
+    assert (
+        seen["params"]["seed"] == 123
+        and seen["params"]["bpm"] == 100
+        and seen["params"]["thinking"] is False
+    )
     assert out["out"].endswith("ace.wav")
 
 
-def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(monkeypatch, tmp_path):
+def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(
+    monkeypatch, tmp_path
+):
     built, calls = [], []
 
     class Model:
@@ -276,17 +349,33 @@ def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(monkeypatch,
 
         def generate(self, *, conditioning, cfg_scales, temperature, top_k, frames):
             calls.append((cfg_scales["musiccoca"], temperature, top_k, frames))
-            wav = type("W", (), {"sample_rate": 48000, "write": lambda self, p: _write_wav(p, rate=48000)})()
+            wav = type(
+                "W",
+                (),
+                {
+                    "sample_rate": 48000,
+                    "write": lambda self, p: _write_wav(p, rate=48000),
+                },
+            )()
             return wav, None
 
-    _install_fake_modules(monkeypatch, {
-        "magenta_rt": {"MagentaRT2StdMlxfn": Model, "audio": None},
-        "magenta_rt.config": {"MUSICCOCA": type("M", (), {"key": "musiccoca"})},
-    })
+    _install_fake_modules(
+        monkeypatch,
+        {
+            "magenta_rt": {"MagentaRT2StdMlxfn": Model, "audio": None},
+            "magenta_rt.config": {"MUSICCOCA": type("M", (), {"key": "musiccoca"})},
+        },
+    )
     from arioso.platforms.magenta_rt import _driver
 
     monkeypatch.setattr(_driver, "_models", {})
-    base = {"prompt": "funk", "seconds": 2.0, "size": "mrt2_small", "top_k": 40, "out": str(tmp_path / "o.wav")}
+    base = {
+        "prompt": "funk",
+        "seconds": 2.0,
+        "size": "mrt2_small",
+        "top_k": 40,
+        "out": str(tmp_path / "o.wav"),
+    }
     _driver.handle({**base, "temperature": 1.3, "guidance": 3.0})
     _driver.handle({**base, "temperature": 0.9, "guidance": 5.0})
     assert built == ["mrt2_small"]
@@ -309,14 +398,24 @@ def _skip_unless_installed(config):
 
     rt = Runtime(**config["runtime"])
     if not os.environ.get("ARIOSO_RUN_INTEGRATION"):
-        return pytest.mark.skip(reason="set ARIOSO_RUN_INTEGRATION=1 to render with installed runtimes")
-    return pytest.mark.skipif(not rt.installed(), reason=f"{rt.name} runtime not installed ({rt.root()})")
+        return pytest.mark.skip(
+            reason="set ARIOSO_RUN_INTEGRATION=1 to render with installed runtimes"
+        )
+    return pytest.mark.skipif(
+        not rt.installed(), reason=f"{rt.name} runtime not installed ({rt.root()})"
+    )
 
 
 @_skip_unless_installed(SA3_CONFIG)
 def test_sa3_renders_for_real():
-    song = arioso.generate("lo-fi hip hop loop, 85 BPM", platform="stable_audio_3", duration=2, seed=1)
-    assert song.status == "complete" and song.sample_rate == 44100 and len(song.audio_bytes) > 1000
+    song = arioso.generate(
+        "lo-fi hip hop loop, 85 BPM", platform="stable_audio_3", duration=2, seed=1
+    )
+    assert (
+        song.status == "complete"
+        and song.sample_rate == 44100
+        and len(song.audio_bytes) > 1000
+    )
 
 
 @_skip_unless_installed(MRT_CONFIG)
@@ -327,5 +426,12 @@ def test_magenta_rt_renders_for_real():
 
 @_skip_unless_installed(ACE_CONFIG)
 def test_ace_step_local_renders_for_real():
-    song = arioso.generate("funk groove", platform="ace_step", runtime="local", duration=10, bpm=100, seed=1)
+    song = arioso.generate(
+        "funk groove",
+        platform="ace_step",
+        runtime="local",
+        duration=10,
+        bpm=100,
+        seed=1,
+    )
     assert song.status == "complete" and song.audio_bytes

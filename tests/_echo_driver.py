@@ -11,7 +11,9 @@ def handle(req):
     if req.get("fail"):
         raise ValueError("asked to fail")
     if req.get("garble"):
-        sys.__stdout__.write("not json\n")  # fd 1 now points at stderr, so this is harmless
+        sys.__stdout__.write(
+            "not json\n"
+        )  # fd 1 now points at stderr, so this is harmless
     return {"echo": req, "pythonpath": os.environ.get("PYTHONPATH", "")}
 
 

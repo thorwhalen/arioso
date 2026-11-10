@@ -25,7 +25,10 @@ def test_every_platform_declares_its_licence(name):
 )
 def test_known_licences(name, license, commercial_use):
     config = arioso.get_platform_info(name)
-    assert (config["weights_license"], config["commercial_use"]) == (license, commercial_use)
+    assert (config["weights_license"], config["commercial_use"]) == (
+        license,
+        commercial_use,
+    )
 
 
 def test_platform_table_has_one_row_per_platform_with_the_licence_columns():

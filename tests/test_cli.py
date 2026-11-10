@@ -43,7 +43,9 @@ def fake_platform():
         "commercial_use": "yes",
         "supported_affordances": ["prompt", "duration", "model", "seed"],
     }
-    adapter = _FakeAdapter(AudioResult(audio_array=_stereo_wave(), sample_rate=SAMPLE_RATE))
+    adapter = _FakeAdapter(
+        AudioResult(audio_array=_stereo_wave(), sample_rate=SAMPLE_RATE)
+    )
     register_platform("fake", config, adapter)
     yield adapter
     _registry.pop("fake", None)
@@ -52,12 +54,28 @@ def fake_platform():
 def test_generate_writes_a_wav_and_prints_its_path(fake_platform, tmp_path, capsys):
     out = tmp_path / "take.wav"
 
-    code = main(["generate", "warm piano", "--platform", "fake", "--duration", "3",
-                 "-o", str(out), "--model", "m1", "--seed", "42"])
+    code = main(
+        [
+            "generate",
+            "warm piano",
+            "--platform",
+            "fake",
+            "--duration",
+            "3",
+            "-o",
+            str(out),
+            "--model",
+            "m1",
+            "--seed",
+            "42",
+        ]
+    )
 
     assert code == 0
     assert capsys.readouterr().out.strip() == str(out)
-    assert fake_platform.calls == [("warm piano", {"duration": 3.0, "model": "m1", "seed": 42})]
+    assert fake_platform.calls == [
+        ("warm piano", {"duration": 3.0, "model": "m1", "seed": 42})
+    ]
     with wave.open(str(out)) as w:
         assert (w.getnchannels(), w.getframerate()) == (2, SAMPLE_RATE)
         assert w.getnframes() == SAMPLE_RATE // 2
@@ -98,7 +116,12 @@ def test_an_internal_bug_keeps_its_traceback(fake_platform, monkeypatch):
 def test_platforms_lists_name_access_licence_and_commercial_use(capsys):
     assert main(["platforms"]) == 0
     lines = capsys.readouterr().out.splitlines()
-    assert lines[0].split() == ["name", "access_type", "weights_license", "commercial_use"]
+    assert lines[0].split() == [
+        "name",
+        "access_type",
+        "weights_license",
+        "commercial_use",
+    ]
     musicgen = next(line for line in lines if line.startswith("musicgen "))
     assert musicgen.split() == ["musicgen", "python_lib", "CC-BY-NC-4.0", "no"]
 
@@ -138,13 +161,19 @@ def test_write_wav_layouts(tmp_path, array):
 
 
 def test_write_wav_falls_back_to_the_stdlib(tmp_path, monkeypatch):
-    monkeypatch.setitem(sys.modules, "soundfile", None)  # import soundfile -> ImportError
+    monkeypatch.setitem(
+        sys.modules, "soundfile", None
+    )  # import soundfile -> ImportError
     mono = np.linspace(-1, 1, SAMPLE_RATE, dtype=np.float32)
 
     path = write_wav(mono, SAMPLE_RATE, tmp_path / "x.wav")
 
     with wave.open(path) as w:
-        assert (w.getnchannels(), w.getsampwidth(), w.getnframes()) == (1, 2, SAMPLE_RATE)
+        assert (w.getnchannels(), w.getsampwidth(), w.getnframes()) == (
+            1,
+            2,
+            SAMPLE_RATE,
+        )
         frames = np.frombuffer(w.readframes(SAMPLE_RATE), dtype="<i2")
     assert frames[0] == -32767 and frames[-1] == 32767
 
@@ -160,7 +189,9 @@ def test_save_song_names_a_waveform_wav(tmp_path):
 
 
 def test_save_song_keeps_encoded_bytes_and_their_format(tmp_path):
-    song = Song(audio=AudioResult(audio_bytes=b"ID3fake", format="mp3"), status="complete")
+    song = Song(
+        audio=AudioResult(audio_bytes=b"ID3fake", format="mp3"), status="complete"
+    )
 
     path = save_song(song, tmp_path / "out.wav")
 

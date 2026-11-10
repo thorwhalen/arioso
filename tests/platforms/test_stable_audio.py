@@ -175,7 +175,10 @@ def test_model_is_a_supported_affordance(monkeypatch):
     monkeypatch.setitem(
         _registry,
         "stable_audio",
-        {"config": PLATFORM_CONFIG, "adapter": _adapter_with_fake_pipe(monkeypatch, capture)},
+        {
+            "config": PLATFORM_CONFIG,
+            "adapter": _adapter_with_fake_pipe(monkeypatch, capture),
+        },
     )
     with warnings.catch_warnings():
         warnings.simplefilter("error")  # an unsupported kwarg would warn
@@ -194,7 +197,9 @@ def test_pipeline_loads_in_float16_only_on_cuda(monkeypatch):
             return types.SimpleNamespace(to=lambda device: ("on", device))
 
     monkeypatch.setitem(
-        sys.modules, "diffusers", types.SimpleNamespace(StableAudioPipeline=FakePipeline)
+        sys.modules,
+        "diffusers",
+        types.SimpleNamespace(StableAudioPipeline=FakePipeline),
     )
     monkeypatch.setitem(
         sys.modules, "torch", types.SimpleNamespace(float16="f16", float32="f32")

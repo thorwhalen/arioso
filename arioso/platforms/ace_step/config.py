@@ -6,6 +6,8 @@ https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api. Local runtime: the
 ``docs/en/INFERENCE.md`` and ``acestep.inference.GenerationParams`` on 2026-11-10.
 """
 
+from arioso._isolated import GitSource
+
 PLATFORM_CONFIG = {
     "name": "ace_step",
     "display_name": "ACE-Step (fal.ai, or local ACE-Step 1.5)",
@@ -21,9 +23,13 @@ PLATFORM_CONFIG = {
     "runtime": {
         "name": "ace-step-1.5",
         "env_var": "ARIOSO_ACE_STEP_DIR",
+        # the commit measured on 2026-11-10 (thorwhalen/arioso#63)
+        "source": GitSource(
+            "https://github.com/ACE-Step/ACE-Step-1.5",
+            "ca1e85fe9430179831e6bc6be790c332190a3866",
+        ),
         "setup": (
-            "git clone --depth 1 https://github.com/ACE-Step/ACE-Step-1.5 {root}\n"
-            "cd {root} && uv sync   # checkpoints (about 9.4 GB) download on first use"
+            "cd {root} && uv sync --frozen   # checkpoints (about 9.4 GB) download on first use"
         ),
     },
     "worker": "ace_step",  # arioso/_workers/ace_step_worker.py

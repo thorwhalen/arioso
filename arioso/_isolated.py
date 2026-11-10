@@ -7,6 +7,9 @@ lives in :mod:`ps.isolated`; this module adds arioso's conventions:
 - :class:`Runtime` says where such an environment lives (``$<env_var>``, else
   ``$ARIOSO_RUNTIMES_DIR/<name>``, else ``~/.local/share/arioso/runtimes/<name>``) and how to
   install it; a missing one raises :class:`RuntimeNotInstalled` carrying the commands.
+  A runtime that is a git checkout names its :class:`GitSource` (``source=``, a full
+  commit SHA): the commands check that commit out, and a root at another commit or
+  with edits raises :class:`SourceMismatch`, so every machine runs the same code.
 - :class:`Worker` keeps one process of that environment alive, running a **worker file**
   from ``arioso/_workers/`` (:func:`worker_file`): ``load(**init)`` keeps the model, one
   operation per render. Worker files import nothing from arioso (the environment need not
@@ -24,16 +27,26 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from ps.isolated import Runner, RuntimeNotInstalled, Worker, WorkerError, run_process
+from ps.isolated import (
+    GitSource,
+    Runner,
+    RuntimeNotInstalled,
+    SourceMismatch,
+    Worker,
+    WorkerError,
+    run_process,
+)
 from ps.isolated import Runtime as _Runtime
 
 __all__ = [
     "DFLT_RUNTIMES_DIR",
+    "GitSource",
     "RUNTIMES_DIR_VAR",
     "WORKERS_DIR",
     "Runner",
     "Runtime",
     "RuntimeNotInstalled",
+    "SourceMismatch",
     "Worker",
     "WorkerError",
     "draw_seed",
@@ -57,7 +70,8 @@ class Runtime(_Runtime):
     """A :class:`ps.isolated.Runtime` located under arioso's runtimes folder by default.
 
     Built from a platform config's ``runtime`` dict: ``name``, ``env_var``, ``setup`` and
-    optionally ``python`` (the interpreter, relative to the root) and ``cwd``.
+    optionally ``python`` (the interpreter, relative to the root), ``cwd`` and ``source``
+    (the :class:`GitSource` the root is a checkout of).
     """
 
     default_dir: str = DFLT_RUNTIMES_DIR

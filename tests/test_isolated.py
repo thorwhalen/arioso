@@ -103,3 +103,53 @@ def test_read_wav_gives_the_rate_without_soundfile(tmp_path, monkeypatch):
         ),
     )
     assert read_wav(_write_wav(tmp_path / "y.wav")) == (None, 8000)
+
+
+# The runtimes that are git checkouts, each pinned to one commit (thorwhalen/arioso#63).
+def _checkout_runtimes():
+    from arioso.platforms.ace_step.config import PLATFORM_CONFIG as ace_step
+    from arioso.platforms.musicgen.config import PLATFORM_CONFIG as musicgen
+    from arioso.platforms.stable_audio_3.config import PLATFORM_CONFIG as sa3
+
+    return {
+        "stable_audio_3": sa3["runtime"],
+        "ace_step": ace_step["runtime"],
+        "musicgen_mlx": musicgen["mlx_runtime"],
+    }
+
+
+@pytest.mark.parametrize("name", sorted(_checkout_runtimes()))
+def test_checkout_runtimes_are_pinned_to_a_commit(name, monkeypatch, tmp_path):
+    from arioso._isolated import GitSource
+
+    config = _checkout_runtimes()[name]
+    assert isinstance(config["source"], GitSource)  # a full SHA, checked on creation
+    rt = Runtime(**config)
+    monkeypatch.setenv(rt.env_var, str(tmp_path / "none"))
+    hint = rt.hint()
+    assert "git clone" not in hint  # an unpinned clone would follow upstream's tip
+    assert f"{config['source'].url} {config['source'].commit}" in hint
+    assert hint.index("checkout") < hint.index("uv ")  # checked out before installing
+
+
+def test_a_checkout_at_another_commit_is_refused(monkeypatch, tmp_path):
+    import subprocess
+
+    from arioso._isolated import GitSource, SourceMismatch
+
+    repo = tmp_path / "rt"  # under default_dir: the root arioso would choose
+    git = ["git", "-c", "user.name=t", "-c", "user.email=t@t"]
+    subprocess.run([*git, "init", "--quiet", str(repo)], check=True)
+    (repo / "bin").mkdir()
+    (repo / "bin" / "python").write_text("")
+    subprocess.run([*git, "-C", str(repo), "commit", "--quiet", "--allow-empty", "-m", "x"], check=True)
+    monkeypatch.delenv("ARIOSO_TOY_DIR", raising=False)
+    monkeypatch.delenv("ARIOSO_RUNTIMES_DIR", raising=False)
+    pinned = GitSource("https://example.org/toy", "0" * 40)
+    rt = Runtime(name="rt", env_var="ARIOSO_TOY_DIR", setup="", python="bin/python",
+                 default_dir=str(tmp_path), source=pinned)
+    with pytest.raises(SourceMismatch, match="not the pinned 000000000000"):
+        rt.interpreter()  # a root arioso chose: refused
+    monkeypatch.setenv("ARIOSO_TOY_DIR", str(repo))
+    with pytest.warns(UserWarning, match="ARIOSO_TOY_DIR names a runtime that is not the pinned one"):
+        assert rt.interpreter() == repo / "bin" / "python"  # the user's own: used, with a warning

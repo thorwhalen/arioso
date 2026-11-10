@@ -1,5 +1,7 @@
 """MusicGen platform configuration."""
 
+from arioso._isolated import GitSource
+
 PLATFORM_CONFIG = {
     "name": "musicgen",
     "display_name": "MusicGen (Meta)",
@@ -67,8 +69,12 @@ PLATFORM_CONFIG = {
         "env_var": "ARIOSO_MLX_EXAMPLES_DIR",
         "python": "musicgen/.venv/bin/python",
         "cwd": "musicgen",
+        # the commit verified on 2026-11-10 (thorwhalen/arioso#63)
+        "source": GitSource(
+            "https://github.com/ml-explore/mlx-examples",
+            "796f5b53cab69a3d48a44233ce21aae889e94a08",
+        ),
         "setup": (
-            "git clone --depth 1 https://github.com/ml-explore/mlx-examples {root}\n"
             "cd {root}/musicgen && uv venv .venv --python 3.12 "
             "&& uv pip install --python .venv/bin/python -r requirements.txt"
         ),

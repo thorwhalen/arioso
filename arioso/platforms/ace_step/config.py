@@ -29,7 +29,7 @@ PLATFORM_CONFIG = {
             "ca1e85fe9430179831e6bc6be790c332190a3866",
         ),
         "setup": (
-            "cd {root} && uv sync   # checkpoints (about 9.4 GB) download on first use"
+            "cd {root} && uv sync --frozen   # checkpoints (about 9.4 GB) download on first use"
         ),
     },
     "worker": "ace_step",  # arioso/_workers/ace_step_worker.py

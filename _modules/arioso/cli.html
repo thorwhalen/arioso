@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=78cc6f98"></script>
+    <script src="../../_static/documentation_options.js?v=dcb4eb81"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.44" />
+  <meta name="docsearch:version" content="0.0.45" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -785,8 +785,90 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="compare">
+<a class="viewcode-back" href="../../_autosummary/arioso.cli.html#arioso.cli.compare">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span>
+    <span class="n">contenders</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arioso_compare"</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">allow_hosted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_free_gb</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">preload</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">no_page</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Render the same prompts with several platforms; time, measure and check each take.</span>
+
+<span class="sd">    Each contender runs in its own process, one after the other, with one progress line per</span>
+<span class="sd">    take on stderr. Takes go to ``&lt;out_dir&gt;/&lt;run&gt;/&lt;contender&gt;/``, one JSON line per take to</span>
+<span class="sd">    ``&lt;out_dir&gt;/results.jsonl``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contenders: Comma-separated platforms, each optionally with options:</span>
+<span class="sd">            ``stable_audio_3,magenta_rt,ace_step:runtime=local``.</span>
+<span class="sd">        prompts: A JSON file holding a list of prompts (``text``, and optionally ``id``,</span>
+<span class="sd">            ``bpm``, ``key``, ``melody``, ``duration``); default: three built-in prompts.</span>
+<span class="sd">        duration: Seconds asked of each take.</span>
+<span class="sd">        seed: Random seed, on platforms that take one.</span>
+<span class="sd">        out_dir: Where takes, records and the page go.</span>
+<span class="sd">        warmup: Seconds generated once per contender before the timed takes (0: none).</span>
+<span class="sd">        allow_hosted: Allow platforms that call a paid hosted service.</span>
+<span class="sd">        min_free_gb: Skip a contender when less memory than this is available.</span>
+<span class="sd">        timeout: Seconds a contender may run before it is killed (with its workers).</span>
+<span class="sd">        preload: Comma-separated modules (``module`` or ``module:function``) that</span>
+<span class="sd">            register third-party platforms.</span>
+<span class="sd">        no_page: Do not write ``&lt;out_dir&gt;/&lt;run&gt;/index.html`` (a page of players).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A summary table, one line per contender, then the paths written.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: When every take failed (the command exits 1).</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare</span> <span class="k">as</span> <span class="n">ac</span>
+
+    <span class="n">prompt_list</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">load_prompts</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">ac</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span>
+        <span class="n">contenders</span><span class="p">,</span>
+        <span class="n">prompt_list</span><span class="p">,</span>
+        <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">warmup</span><span class="o">=</span><span class="n">warmup</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_hosted</span><span class="o">=</span><span class="n">allow_hosted</span><span class="p">,</span>
+        <span class="n">min_free_gb</span><span class="o">=</span><span class="n">min_free_gb</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="n">preload</span><span class="o">=</span><span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="p">(</span><span class="n">preload</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">strip</span><span class="p">()],</span>
+    <span class="p">):</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"error"</span><span class="p">)</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'gen_s'</span><span class="p">)</span><span class="si">}</span><span class="s2"> s, RTF </span><span class="si">{</span><span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'rtf'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">'contender'</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">'prompt'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">records</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="s2">"error"</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"every take failed:</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ac</span><span class="o">.</span><span class="n">summary_lines</span><span class="p">(</span><span class="n">records</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">summary_lines</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">ac</span><span class="o">.</span><span class="n">RESULTS_FILE</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">no_page</span> <span class="ow">and</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"run_id"</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">ac</span><span class="o">.</span><span class="n">compare_page</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">run_dir</span> <span class="o">/</span> <span class="s2">"index.html"</span><span class="p">,</span> <span class="n">prompts</span><span class="o">=</span><span class="n">prompt_list</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
 <span class="c1">#: The commands of the ``arioso`` command line (the SSOT its parser is built from).</span>
-<span class="n">commands</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"generate"</span><span class="p">:</span> <span class="n">generate</span><span class="p">,</span> <span class="s2">"platforms"</span><span class="p">:</span> <span class="n">platforms</span><span class="p">}</span>
+<span class="n">commands</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"generate"</span><span class="p">:</span> <span class="n">generate</span><span class="p">,</span> <span class="s2">"platforms"</span><span class="p">:</span> <span class="n">platforms</span><span class="p">,</span> <span class="s2">"compare"</span><span class="p">:</span> <span class="n">compare</span><span class="p">}</span>
 </pre></div>
 
                 </article>

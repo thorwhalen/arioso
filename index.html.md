@@ -46,6 +46,22 @@ arioso platforms
 
 Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set `ARIOSO_TORCH_DEVICE` to force one.
 
+### Comparing platforms
+
+`compare` renders the same prompts with several platforms and measures each take:
+
+```default
+arioso compare stable_audio_3,magenta_rt,ace_step:runtime=local --prompts prompts.json --duration 10
+```
+
+A contender is a platform with optional `key=value` options (`musicgen:model=facebook/musicgen-small`). Each one runs in a fresh process, one after the other, so only one model is in memory at a time and its peak memory is its own: on macOS the peak physical footprint, which counts Metal allocations, on Linux the peak resident set, in GB (10^9 bytes), for the process and, sampled while it runs, for the processes it starts (a runtime’s worker, or one process per take). Every take becomes one JSON line in `<out_dir>/results.jsonl`: model load plus warm-up time, generation time, real-time factor (generation time over the seconds that came back), peak memory, available memory before the run, the weights licence, and objective checks: peak level and clipping (takes are kept as float WAVs, so a peak over full scale shows), and, when `denote` is installed, the detected tempo against the prompt’s `bpm` (half and double time forgiven) and the estimated key against its `key`. A check that cannot run says why under `checks_skipped`. Takes of one run go to `<out_dir>/<run id>/<contender>/<prompt id>.wav` with a page of players beside them (`index.html`), and the command prints a progress line per take, then a summary per contender.
+
+Load times compare like with like only between runtimes of the same kind: a runtime that keeps a worker (Magenta RealTime, ACE-Step) loads once, in the warm-up, while one that starts a process per take (Stable Audio 3) loads in every take, so its load is inside its real-time factor.
+
+Without `--prompts` it uses three built-in prompts (a groove at 100 BPM, an accompaniment in C major, a loop at 85 BPM). A prompts file is a JSON list of `{"id", "text", "bpm", "key", "melody", "duration"}` (only `text` is required; a `melody` path is passed to platforms that take one). Platforms that may call a paid hosted service are refused unless you pass `--allow-hosted`: anything that is not a `python_lib` or `local_runtime`, has provider terms, or takes any credential (even an optional one, as `yue` takes a fal key); `runtime=local` counts as local only on a platform that has a local runtime (`ace_step`). `--min-free-gb` skips a contender when the machine is short of memory.
+
+In Python, `arioso.compare.compare(contenders, prompts)` yields the same records. Its seams are `runner=` (how a contender is run and measured: `in_child_process`, with `python=`, or `in_this_process`), `scorer=` (audio to a dict of checks), `preload=` (modules that register third-party platforms, run here and in each child; `--preload` on the command line) and `timeout=` (seconds before a contender is killed with every process it started; `--timeout`). A killed or crashing contender keeps the takes it finished. Worker memory is sampled every 0.1 s, so it is a lower bound: memory a process takes just before exiting can be missed.
+
 ## Enhance existing audio (audio-to-audio)
 
 Beyond text-to-music, arioso can transform audio you already have – e.g. turn a

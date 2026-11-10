@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=78cc6f98"></script>
+    <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,12 +53,12 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="arioso.named_prompts" href="arioso.named_prompts.html" />
+    <link rel="next" title="arioso.compare" href="arioso.compare.html" />
     <link rel="prev" title="arioso.base" href="arioso.base.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.44" />
+  <meta name="docsearch:version" content="0.0.45" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -322,6 +322,7 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="arioso.html">arioso</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="arioso.base.html">arioso.base</a></li>
 <li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">arioso.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.compare.html">arioso.compare</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.named_prompts.html">arioso.named_prompts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="arioso.platforms.html">arioso.platforms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.ace_step.html">arioso.platforms.ace_step</a></li>
@@ -430,10 +431,13 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.cli.generate" title="arioso.cli.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(prompt, *[, platform, duration, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.cli.compare" title="arioso.cli.compare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare</span></code></a>(contenders, *[, prompts, duration, ...])</p></td>
+<td><p>Render the same prompts with several platforms; time, measure and check each take.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.cli.generate" title="arioso.cli.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(prompt, *[, platform, duration, ...])</p></td>
 <td><p>Generate music from a text prompt and write it to a file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#arioso.cli.platforms" title="arioso.cli.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.cli.platforms" title="arioso.cli.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a>()</p></td>
 <td><p>List the platforms with their access type, weights licence and commercial use.</p></td>
 </tr>
 </tbody>
@@ -441,8 +445,46 @@
 </div>
 <dl class="py data">
 <dt class="sig sig-object py" id="arioso.cli.commands">
-<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">commands</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'generate':</span> <span class="pre">&lt;function</span> <span class="pre">generate&gt;,</span> <span class="pre">'platforms':</span> <span class="pre">&lt;function</span> <span class="pre">platforms&gt;}</span></span><a class="headerlink" href="#arioso.cli.commands" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">commands</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'compare':</span> <span class="pre">&lt;function</span> <span class="pre">compare&gt;,</span> <span class="pre">'generate':</span> <span class="pre">&lt;function</span> <span class="pre">generate&gt;,</span> <span class="pre">'platforms':</span> <span class="pre">&lt;function</span> <span class="pre">platforms&gt;}</span></span><a class="headerlink" href="#arioso.cli.commands" title="Link to this definition">#</a></dt>
 <dd><p>The commands of the <code class="docutils literal notranslate"><span class="pre">arioso</span></code> command line (the SSOT its parser is built from).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.cli.compare">
+<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">compare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contenders</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arioso_compare'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_hosted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_free_gb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_page</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/cli.html#compare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.cli.compare" title="Link to this definition">#</a></dt>
+<dd><p>Render the same prompts with several platforms; time, measure and check each take.</p>
+<p>Each contender runs in its own process, one after the other, with one progress line per
+take on stderr. Takes go to <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/&lt;run&gt;/&lt;contender&gt;/</span></code>, one JSON line per take to
+<code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/results.jsonl</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contenders</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Comma-separated platforms, each optionally with options:
+<code class="docutils literal notranslate"><span class="pre">stable_audio_3,magenta_rt,ace_step:runtime=local</span></code>.</p></li>
+<li><p><strong>prompts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – A JSON file holding a list of prompts (<code class="docutils literal notranslate"><span class="pre">text</span></code>, and optionally <code class="docutils literal notranslate"><span class="pre">id</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bpm</span></code>, <code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">melody</span></code>, <code class="docutils literal notranslate"><span class="pre">duration</span></code>); default: three built-in prompts.</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Seconds asked of each take.</p></li>
+<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Random seed, on platforms that take one.</p></li>
+<li><p><strong>out_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Where takes, records and the page go.</p></li>
+<li><p><strong>warmup</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Seconds generated once per contender before the timed takes (0: none).</p></li>
+<li><p><strong>allow_hosted</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Allow platforms that call a paid hosted service.</p></li>
+<li><p><strong>min_free_gb</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Skip a contender when less memory than this is available.</p></li>
+<li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Seconds a contender may run before it is killed (with its workers).</p></li>
+<li><p><strong>preload</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Comma-separated modules (<code class="docutils literal notranslate"><span class="pre">module</span></code> or <code class="docutils literal notranslate"><span class="pre">module:function</span></code>) that
+register third-party platforms.</p></li>
+<li><p><strong>no_page</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Do not write <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;/&lt;run&gt;/index.html</span></code> (a page of players).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A summary table, one line per contender, then the paths written.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – When every take failed (the command exits 1).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -507,11 +549,11 @@ way the suffix follows the format.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="arioso.named_prompts.html"
+       href="arioso.compare.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">arioso.named_prompts</p>
+        <p class="prev-next-title">arioso.compare</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -535,6 +577,7 @@ way the suffix follows the format.</p></li>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.commands"><code class="docutils literal notranslate"><span class="pre">commands</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.compare"><code class="docutils literal notranslate"><span class="pre">compare()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.platforms"><code class="docutils literal notranslate"><span class="pre">platforms()</span></code></a></li>
 </ul>

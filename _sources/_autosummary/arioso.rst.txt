@@ -34,6 +34,7 @@
    analysis
    base
    cli
+   compare
    named_prompts
    platforms
    registry

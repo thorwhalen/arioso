@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=78cc6f98"></script>
+    <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.44" />
+  <meta name="docsearch:version" content="0.0.45" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -322,6 +322,7 @@
 <li class="toctree-l1 current active has-children"><a aria-current="page" class="current reference internal" href="#">arioso</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="arioso.base.html">arioso.base</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.cli.html">arioso.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.compare.html">arioso.compare</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.named_prompts.html">arioso.named_prompts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="arioso.platforms.html">arioso.platforms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.ace_step.html">arioso.platforms.ace_step</a></li>
@@ -711,22 +712,25 @@ is loaded. <code class="docutils literal notranslate"><span class="pre">commerci
 <tr class="row-even"><td><p><a class="reference internal" href="arioso.cli.html#module-arioso.cli" title="arioso.cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cli</span></code></a></p></td>
 <td><p>The functions behind the <code class="docutils literal notranslate"><span class="pre">arioso</span></code> command line.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="arioso.named_prompts.html#module-arioso.named_prompts" title="arioso.named_prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_prompts</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.compare.html#module-arioso.compare" title="arioso.compare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare</span></code></a></p></td>
+<td><p>Compare platforms on the same prompts: time, memory and objective checks, as records.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.named_prompts.html#module-arioso.named_prompts" title="arioso.named_prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named_prompts</span></code></a></p></td>
 <td><p>Named prompts: a ledger of (name, prompt_text) pairs organized by category.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="arioso.platforms.html#module-arioso.platforms" title="arioso.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.platforms.html#module-arioso.platforms" title="arioso.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a></p></td>
 <td><p>Platform packages for arioso.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="arioso.registry.html#module-arioso.registry" title="arioso.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.registry.html#module-arioso.registry" title="arioso.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
 <td><p>Platform registry with auto-discovery and lazy loading.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="arioso.services.html#arioso.services" title="arioso.services"><code class="xref py py-obj docutils literal notranslate"><span class="pre">services</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.services.html#arioso.services" title="arioso.services"><code class="xref py py-obj docutils literal notranslate"><span class="pre">services</span></code></a></p></td>
 <td><p>Lazy mapping of platform names to <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceHandle</span></code> objects.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="arioso.tools.html#module-arioso.tools" title="arioso.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.tools.html#module-arioso.tools" title="arioso.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
 <td><p>High-level tools for common arioso workflows (submit, poll, download).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="arioso.translation.html#module-arioso.translation" title="arioso.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.translation.html#module-arioso.translation" title="arioso.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a></p></td>
 <td><p>Parameter translation layer.</p></td>
 </tr>
 </tbody>

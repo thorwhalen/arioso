@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="alternate" type="text/markdown" href="compare.html.md">
+<link rel="describedby" href="../../llms.txt" type="text/markdown">
+    <title>arioso.compare &#8212; arioso</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/epythet.css?v=3baad687" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/arioso/compare';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.45" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">arioso</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../arioso.html" class="nav-link">arioso</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">arioso.compare</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for arioso.compare</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Compare platforms on the same prompts: time, memory and objective checks, as records.</span>
+
+<span class="sd">Choosing a local model is a measurement. :func:`compare` renders every prompt with every</span>
+<span class="sd">contender and yields one flat record per take: wall time (model load plus warm-up, then per</span>
+<span class="sd">take), real-time factor, peak memory, and objective checks of the audio (detected tempo</span>
+<span class="sd">against the BPM asked for, estimated key against the key asked for, clipping, level)::</span>
+
+<span class="sd">    import arioso.compare as ac</span>
+
+<span class="sd">    records = list(ac.compare(["stable_audio_3", "magenta_rt", "ace_step:runtime=local"]))</span>
+<span class="sd">    ac.compare_page(records, "arioso_compare/index.html")</span>
+
+<span class="sd">or, from the shell::</span>
+
+<span class="sd">    arioso compare stable_audio_3,magenta_rt,ace_step:runtime=local --prompts prompts.json</span>
+
+<span class="sd">The records are the single source of truth: they are appended to ``&lt;out_dir&gt;/results.jsonl``</span>
+<span class="sd">as they come, the command prints a summary of them, and :func:`compare_page` renders them as a</span>
+<span class="sd">page of players. Each contender runs in a fresh child process (see :func:`in_child_process`),</span>
+<span class="sd">one after the other, so only one model is in memory at a time and each one's peak memory is</span>
+<span class="sd">its own.</span>
+
+<span class="sd">A **contender** is a platform plus the options it is called with, written</span>
+<span class="sd">``platform[:key=value[:key=value...]]`` (values are read as JSON when they parse, so</span>
+<span class="sd">``num_steps=8`` is an int): ``ace_step:runtime=local``, ``musicgen:model=facebook/musicgen-small``.</span>
+
+<span class="sd">A **prompt** is a dict: ``text`` (required), ``id``, and optionally ``bpm``, ``key`` (``"C</span>
+<span class="sd">major"``), ``melody`` (an audio file, passed to platforms that take a melody) and</span>
+<span class="sd">``duration``. :data:`DFLT_PROMPTS` is a small set covering a groove, an accompaniment and a</span>
+<span class="sd">loop.</span>
+
+<span class="sd">Hosted platforms cost money per call, so :func:`compare` refuses them unless</span>
+<span class="sd">``allow_hosted=True`` (:func:`is_hosted` says which those are).</span>
+
+<span class="sd">Seams, all keyword arguments: ``runner`` (how one contender is run and measured:</span>
+<span class="sd">:func:`in_child_process` or :func:`in_this_process`), ``scorer`` (audio to a dict of checks:</span>
+<span class="sd">:func:`objective_checks`), and ``min_free_gb`` (refuse to start a contender when the machine</span>
+<span class="sd">has less memory available than that).</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="c1">#: Prompts covering three common asks: a groove at a tempo, an accompaniment in a key, a loop.</span>
+<span class="n">DFLT_PROMPTS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"groove100"</span><span class="p">,</span>
+        <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"funky drum and bass groove at 100 BPM, tight hi-hats, punchy kick, "</span>
+        <span class="s2">"warm electric bass, steady pocket, instrumental"</span><span class="p">,</span>
+        <span class="s2">"bpm"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"accomp"</span><span class="p">,</span>
+        <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"gentle acoustic guitar and soft piano accompaniment, 100 BPM, C major, "</span>
+        <span class="s2">"warm and simple, instrumental"</span><span class="p">,</span>
+        <span class="s2">"bpm"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">"key"</span><span class="p">:</span> <span class="s2">"C major"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"loop85"</span><span class="p">,</span>
+        <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"4-bar lo-fi hip hop loop, 85 BPM, mellow Rhodes chords, dusty drums, "</span>
+        <span class="s2">"vinyl crackle, seamless loop, instrumental"</span><span class="p">,</span>
+        <span class="s2">"bpm"</span><span class="p">:</span> <span class="mi">85</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">DFLT_OUT_DIR</span> <span class="o">=</span> <span class="s2">"arioso_compare"</span>
+<span class="n">DFLT_DURATION</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="c1">#: Seconds of audio generated once before the timed takes, so load is not counted in them.</span>
+<span class="n">DFLT_WARMUP</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">RESULTS_FILE</span> <span class="o">=</span> <span class="s2">"results.jsonl"</span>
+<span class="c1">#: The ``access_type`` values of platforms that run on this machine.</span>
+<span class="n">LOCAL_ACCESS_TYPES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"python_lib"</span><span class="p">,</span> <span class="s2">"local_runtime"</span><span class="p">})</span>
+<span class="n">_GB</span> <span class="o">=</span> <span class="mf">1e9</span>  <span class="c1"># GB, not GiB</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------------</span>
+<span class="c1"># Contenders and prompts</span>
+
+
+<div class="viewcode-block" id="Contender">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.Contender">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Contender</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A platform and the options it is called with; ``label`` names it in records."""</span>
+
+    <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">options</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="n">opts</span> <span class="o">=</span> <span class="s2">":"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">opts</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">opts</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="Contender.parse">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.Contender.parse">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="s2">"str | Contender"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Contender"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""``"ace_step:runtime=local:num_steps=8"`` -&gt; ``Contender("ace_step", {...})``.</span>
+
+<span class="sd">        &gt;&gt;&gt; Contender.parse("ace_step:runtime=local:num_steps=8").options</span>
+<span class="sd">        {'runtime': 'local', 'num_steps': 8}</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Contender</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">spec</span>
+        <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">"="</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sep</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Contender </span><span class="si">{</span><span class="n">spec</span><span class="si">!r}</span><span class="s2">: options are written key=value, got </span><span class="si">{</span><span class="n">pair</span><span class="si">!r}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="parse_contenders">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.parse_contenders">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_contenders</span><span class="p">(</span><span class="n">specs</span><span class="p">:</span> <span class="s2">"str | Iterable[str | Contender]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Contender</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Contenders from a comma-separated string or an iterable of specs."""</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">specs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">specs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="n">contenders</span> <span class="o">=</span> <span class="p">[</span><span class="n">Contender</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contenders</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Contender labels must be unique, got </span><span class="si">{</span><span class="n">labels</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">_check_unique_slugs</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s2">"Contender labels"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">contenders</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_unique_slugs</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Names become folder and file names: two that map to one would overwrite each other."""</span>
+    <span class="n">slugs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_slug</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">slugs</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slugs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2"> collide as file names </span><span class="si">{</span><span class="n">slugs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_prompts">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.load_prompts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_prompts</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Prompts from a JSON file (a list of dicts), a list, or :data:`DFLT_PROMPTS`.</span>
+
+<span class="sd">    A ``melody`` path in a file is read relative to that file. Prompts without an ``id``</span>
+<span class="sd">    get ``p0``, ``p1``...</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">prompts</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">DFLT_PROMPTS</span><span class="p">],</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">)):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">prompts</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()),</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">prompts</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">source</span><span class="p">],</span> <span class="kc">None</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prompts</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Prompt </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> has no 'text': </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"melody"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">"melody"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">((</span><span class="n">base</span> <span class="o">/</span> <span class="n">p</span><span class="p">[</span><span class="s2">"melody"</span><span class="p">])</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Prompt ids must be unique, got </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">_check_unique_slugs</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="s2">"Prompt ids"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="is_hosted">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.is_hosted">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_hosted</span><span class="p">(</span><span class="n">contender</span><span class="p">:</span> <span class="s2">"str | Contender"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Whether a contender may call a hosted (paid, per call) service rather than a local model.</span>
+
+<span class="sd">    Errs on the side of caution. Local means: ``access_type`` is ``python_lib`` or</span>
+<span class="sd">    ``local_runtime`` (a missing one is the translation layer's ``rest_api``), the terms are</span>
+<span class="sd">    not the provider's, no credential is taken (even an optional one: ``yue`` calls fal.ai</span>
+<span class="sd">    whenever ``FAL_KEY`` is set), and no fal model is declared. Anything else is hosted,</span>
+<span class="sd">    unless the contender asks for ``runtime="local"`` *and* the platform declares a local</span>
+<span class="sd">    runtime (``ace_step``); on any other platform that option is ignored, so it changes</span>
+<span class="sd">    nothing here either.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_hosted("elevenlabs"), is_hosted("stable_audio_3"), is_hosted("ace_step:runtime=local")</span>
+<span class="sd">    (True, False, False)</span>
+<span class="sd">    &gt;&gt;&gt; is_hosted("elevenlabs:runtime=local")</span>
+<span class="sd">    True</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Contender</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">contender</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"runtime"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"local"</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"runtime"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"access_type"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">LOCAL_ACCESS_TYPES</span>
+        <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"commercial_use"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"provider terms"</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"auth"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"none"</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fal"</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------------------------</span>
+<span class="c1"># Running one contender</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_supported</span><span class="p">(</span><span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">get_config</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"supported_affordances"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_slug</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^A-Za-z0-9._-]+"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"contender"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate</span><span class="p">(</span><span class="n">contender</span><span class="p">:</span> <span class="n">Contender</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One take as ``(array, sample_rate, used)``; ``used`` says which asks were passed on."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
+
+    <span class="n">supported</span> <span class="o">=</span> <span class="n">_supported</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">used</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">asks</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"duration"</span><span class="p">:</span> <span class="n">prompt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">duration</span><span class="p">),</span>
+        <span class="s2">"seed"</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+        <span class="s2">"melody"</span><span class="p">:</span> <span class="n">prompt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"melody"</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">asks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">supported</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">used</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_used"</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">kwargs</span>
+    <span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">platform</span><span class="o">=</span><span class="n">contender</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">song</span><span class="o">.</span><span class="n">is_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="n">song</span><span class="o">.</span><span class="n">error_message</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">contender</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2"> returned an error"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">song</span><span class="o">.</span><span class="n">audio_array</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">contender</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2"> returned no waveform (status </span><span class="si">{</span><span class="n">song</span><span class="o">.</span><span class="n">status</span><span class="si">!r}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">song</span><span class="o">.</span><span class="n">audio_array</span><span class="p">,</span> <span class="n">song</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">used</span>
+
+
+<div class="viewcode-block" id="in_this_process">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.in_this_process">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_this_process</span><span class="p">(</span>
+    <span class="n">contender</span><span class="p">:</span> <span class="n">Contender</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">on_record</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Run ``contender`` on ``prompts`` here; one record per prompt, audio under ``out_dir``.</span>
+
+<span class="sd">    A take that fails becomes a record with an ``error`` (the others still run); a contender</span>
+<span class="sd">    that fails its warm-up makes every record an error. ``peak_memory_gb`` is this process's</span>
+<span class="sd">    lifetime peak, so run each contender in a fresh process (:func:`in_child_process`) to</span>
+<span class="sd">    attribute it; ``workers_peak_memory_gb`` is the peak of the processes it started (a local</span>
+<span class="sd">    runtime's worker, or one process per take), sampled while it ran (see</span>
+<span class="sd">    :class:`~arioso._measure.PeakSampler`; here its exit-time floor also covers children of</span>
+<span class="sd">    earlier contenders run in this process). ``on_record`` is called with each take's record</span>
+<span class="sd">    as soon as it is made, before the memory figures are added at the end.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._measure</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeakSampler</span>
+
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">_slug</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">load_s</span><span class="p">,</span> <span class="n">load_error</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="n">PeakSampler</span><span class="p">()</span> <span class="k">as</span> <span class="n">sampler</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">warmup</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_generate</span><span class="p">(</span>
+                    <span class="n">contender</span><span class="p">,</span>
+                    <span class="nb">dict</span><span class="p">(</span><span class="n">prompts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">warmup</span><span class="p">),</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="n">warmup</span><span class="p">,</span>
+                    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - recorded, not raised</span>
+                <span class="n">load_error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">load_s</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prompts</span><span class="p">:</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">_take</span><span class="p">(</span>
+                <span class="n">contender</span><span class="p">,</span>
+                <span class="n">p</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+                <span class="n">load_error</span><span class="o">=</span><span class="n">load_error</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">on_record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">on_record</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">rec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">load_s</span><span class="o">=</span><span class="n">load_s</span><span class="p">,</span>
+            <span class="n">peak_memory_gb</span><span class="o">=</span><span class="n">_gb</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">peak_self</span><span class="p">),</span>
+            <span class="n">workers_peak_memory_gb</span><span class="o">=</span><span class="n">_gb</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">peak_descendants</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">records</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_gb</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">_GB</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_take</span><span class="p">(</span><span class="n">contender</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">load_error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One prompt's record: the take written to ``out_dir`` and timed, or an ``error``."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">_channels_first</span>
+
+    <span class="n">rec</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+        <span class="s2">"seconds_requested"</span><span class="p">:</span> <span class="n">prompt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">duration</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">load_error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"warm-up failed: </span><span class="si">{</span><span class="n">load_error</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">audio</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">used</span> <span class="o">=</span> <span class="n">_generate</span><span class="p">(</span><span class="n">contender</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - recorded, not raised</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">rec</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">gen_s</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="n">gen_s</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">audio</span> <span class="o">=</span> <span class="n">_channels_first</span><span class="p">(</span><span class="n">_drop_batch_axes</span><span class="p">(</span><span class="n">audio</span><span class="p">))</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_write_take</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_slug</span><span class="p">(</span><span class="n">prompt</span><span class="p">[</span><span class="s1">'id'</span><span class="p">])</span><span class="si">}</span><span class="s2">.wav"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="sa">f</span><span class="s2">"writing the take: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">seconds_out</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">sr</span> <span class="k">if</span> <span class="n">sr</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">rec</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">used</span><span class="p">,</span>
+        <span class="n">seconds_out</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">seconds_out</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">seconds_out</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="o">=</span><span class="n">sr</span><span class="p">,</span>
+        <span class="n">gen_s</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">gen_s</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">rtf</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">gen_s</span> <span class="o">/</span> <span class="n">seconds_out</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">if</span> <span class="n">seconds_out</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_drop_batch_axes</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``audio`` without leading axes of size 1 (``(1, channels, frames)`` from some models)."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">audio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">audio</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">audio</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">audio</span> <span class="o">=</span> <span class="n">audio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">audio</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_take</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">sr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Write a take as float WAV, so the checks see peaks above full scale (soundfile).</span>
+
+<span class="sd">    Without soundfile, :func:`arioso._audio.write_wav` writes 16-bit PCM, which clamps them.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">_channels_first</span><span class="p">,</span> <span class="n">write_wav</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">write_wav</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+    <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">_channels_first</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sr</span><span class="p">),</span> <span class="n">subtype</span><span class="o">=</span><span class="s2">"FLOAT"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+
+<div class="viewcode-block" id="in_child_process">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.in_child_process">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_child_process</span><span class="p">(</span>
+    <span class="n">contender</span><span class="p">:</span> <span class="n">Contender</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">python</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">preload</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Run ``contender`` in a fresh ``python -m arioso.compare`` process (the default runner).</span>
+
+<span class="sd">    A fresh process per contender frees the previous model's memory before the next loads,</span>
+<span class="sd">    and makes the process's lifetime peak memory that contender's own. ``python`` is the</span>
+<span class="sd">    interpreter (default: this one); ``preload`` names what the child runs first, to make</span>
+<span class="sd">    third-party platforms known: ``"module"`` is imported, ``"module:function"`` is imported</span>
+<span class="sd">    and ``function()`` called. The child's output goes to ``&lt;out_dir&gt;/&lt;contender&gt;/child.log``.</span>
+<span class="sd">    The child writes each take's record as soon as it is made, so a child killed after</span>
+<span class="sd">    ``timeout`` seconds (with every process it started) or exiting non-zero still returns</span>
+<span class="sd">    the takes it finished, each marked with ``child_exit``; prompts it never reached get an</span>
+<span class="sd">    ``error``.</span>
+<span class="sd">    """</span>
+    <span class="n">log_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">_slug</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"child.log"</span>
+    <span class="n">log_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"contender"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"platform"</span><span class="p">:</span> <span class="n">contender</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+            <span class="s2">"options"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">options</span><span class="p">),</span>
+            <span class="s2">"label"</span><span class="p">:</span> <span class="n">contender</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"prompts"</span><span class="p">:</span> <span class="n">prompts</span><span class="p">,</span>
+        <span class="s2">"duration"</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+        <span class="s2">"seed"</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+        <span class="s2">"out_dir"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span>
+        <span class="s2">"warmup"</span><span class="p">:</span> <span class="n">warmup</span><span class="p">,</span>
+        <span class="s2">"preload"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">preload</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"arioso_compare_"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="n">job_path</span><span class="p">,</span> <span class="n">out_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"job.json"</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"records.jsonl"</span>
+        <span class="n">job_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">job</span><span class="p">))</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">python</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+            <span class="s2">"-m"</span><span class="p">,</span>
+            <span class="s2">"arioso.compare"</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">job_path</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">log</span><span class="p">:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">_run_child</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">out_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">out_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># the last line per prompt wins: the final one carries the memory figures</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">records</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rec</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="s2">" | "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="o">-</span><span class="mi">15</span><span class="p">:])</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"child process failed (exit </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">; log </span><span class="si">{</span><span class="n">log_path</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]],</span> <span class="n">child_exit</span><span class="o">=</span><span class="n">code</span><span class="p">)</span> <span class="k">if</span> <span class="n">code</span> <span class="k">else</span> <span class="n">records</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="ow">in</span> <span class="n">records</span>
+        <span class="k">else</span> <span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="s2">"error"</span><span class="p">:</span> <span class="n">error</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prompts</span>
+    <span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_child</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"int | str"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+
+    <span class="n">posix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"posix"</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">start_new_session</span><span class="o">=</span><span class="n">posix</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">posix</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">killpg</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGKILL</span><span class="p">)</span>  <span class="c1"># its runtime workers too</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"killed after </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2"> s"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_preload</span><span class="p">(</span><span class="n">specs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Import each ``"module"``; for ``"module:function"`` also call ``function()``."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">function</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">function</span><span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">loaded</span><span class="p">,</span> <span class="n">function</span><span class="p">)()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_child_main</span><span class="p">(</span><span class="n">job_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">job_path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+    <span class="n">_run_preload</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"preload"</span><span class="p">,</span> <span class="p">()))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">"contender"</span><span class="p">]</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="n">in_this_process</span><span class="p">(</span>
+        <span class="n">Contender</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"platform"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"options"</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]),</span>
+        <span class="n">job</span><span class="p">[</span><span class="s2">"prompts"</span><span class="p">],</span>
+        <span class="n">duration</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">],</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">],</span>
+        <span class="n">out_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s2">"out_dir"</span><span class="p">]),</span>
+        <span class="n">warmup</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s2">"warmup"</span><span class="p">],</span>
+        <span class="n">on_record</span><span class="o">=</span><span class="n">append</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>  <span class="c1"># again, now with the memory figures</span>
+        <span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------------</span>
+<span class="c1"># Objective checks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_key_parts</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""``"C# minor"`` -&gt; ``(1, "minor")``; ``None`` when it does not parse."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">pitch_class</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">"\s*([A-Ga-gH][#b]?)\s*(major|minor|maj|min|m)?\s*$"</span><span class="p">,</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"major"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="s2">"minor"</span> <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"minor"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"major"</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pitch_class</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()),</span> <span class="n">mode</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="key_agreement">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.key_agreement">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">key_agreement</span><span class="p">(</span><span class="n">detected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">asked</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""``"exact"``, ``"relative"`` (C major vs A minor), ``"other"``, or ``None`` if unparsable.</span>
+
+<span class="sd">    &gt;&gt;&gt; key_agreement("A minor", "C major"), key_agreement("c major", "C Major")</span>
+<span class="sd">    ('relative', 'exact')</span>
+<span class="sd">    """</span>
+    <span class="n">d</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">_key_parts</span><span class="p">(</span><span class="n">detected</span><span class="p">),</span> <span class="n">_key_parts</span><span class="p">(</span><span class="n">asked</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"exact"</span>
+    <span class="n">major</span><span class="p">,</span> <span class="n">minor</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"major"</span> <span class="k">else</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">major</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"major"</span> <span class="ow">and</span> <span class="n">minor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"minor"</span> <span class="ow">and</span> <span class="p">(</span><span class="n">major</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="mi">12</span> <span class="o">==</span> <span class="n">minor</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="s2">"relative"</span>
+    <span class="k">return</span> <span class="s2">"other"</span></div>
+
+
+
+<div class="viewcode-block" id="tempo_error">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.tempo_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tempo_error</span><span class="p">(</span><span class="n">detected</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">asked</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Relative tempo error, forgiving the half/double-time slips beat trackers make.</span>
+
+<span class="sd">    &gt;&gt;&gt; tempo_error(50, 100), tempo_error(110, 100)</span>
+<span class="sd">    (0.0, 0.1)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">detected</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">asked</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">detected</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">asked</span><span class="p">)</span> <span class="o">/</span> <span class="n">asked</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="mi">3</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="objective_checks">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.objective_checks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective_checks</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Checks a listener would otherwise make by ear: level, clipping, tempo, key.</span>
+
+<span class="sd">    Level and clipping need numpy only. Tempo comes from ``denote.get_beats`` and key from</span>
+<span class="sd">    ``denote.get_key`` when ``denote`` provides them; a check that cannot run goes into</span>
+<span class="sd">    ``checks_skipped`` (check name to reason) instead of failing the take.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._audio</span><span class="w"> </span><span class="kn">import</span> <span class="n">_channels_first</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">_channels_first</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># mono, whichever way round the channels come</span>
+    <span class="n">rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"peak_abs"</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"clip_frac"</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">0.999</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"rms_dbfs"</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rms</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)),</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">skipped</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">denote</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="s2">"denote is not installed"</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">checks_skipped</span><span class="o">=</span><span class="p">{</span><span class="s2">"tempo"</span><span class="p">:</span> <span class="n">reason</span><span class="p">,</span> <span class="s2">"key"</span><span class="p">:</span> <span class="n">reason</span><span class="p">})</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">beats</span> <span class="o">=</span> <span class="n">denote</span><span class="o">.</span><span class="n">get_beats</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">sr</span><span class="p">)</span>
+        <span class="n">tempo</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">beats</span><span class="o">.</span><span class="n">tempo</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">beats</span><span class="o">.</span><span class="n">tempo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">ibi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">beats</span><span class="o">.</span><span class="n">beats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">tempo_detected</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">tempo</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">tempo</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">tempo_err</span><span class="o">=</span><span class="n">tempo_error</span><span class="p">(</span><span class="n">tempo</span><span class="p">,</span> <span class="n">prompt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bpm"</span><span class="p">)),</span>
+            <span class="n">beat_cv</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ibi</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">ibi</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ibi</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - recorded with its reason</span>
+        <span class="n">skipped</span><span class="p">[</span><span class="s2">"tempo"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">get_key</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">denote</span><span class="p">,</span> <span class="s2">"get_key"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">get_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">skipped</span><span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"this denote has no get_key (denote&gt;=0.0.10 has)"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">get_key</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">sr</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">key_confidence</span><span class="o">=</span><span class="n">_round</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"confidence"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">prompt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"key"</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">"key_agreement"</span><span class="p">]</span> <span class="o">=</span> <span class="n">key_agreement</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">prompt</span><span class="p">[</span><span class="s2">"key"</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - e.g. a take too quiet for a key</span>
+            <span class="n">skipped</span><span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">skipped</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"checks_skipped"</span><span class="p">]</span> <span class="o">=</span> <span class="n">skipped</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_take</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""A take written by :func:`_write_take`: ``(frames,)`` or ``(frames, channels)`` float32, rate."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">wave</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+        <span class="k">with</span> <span class="n">wave</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+            <span class="n">sr</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">getframerate</span><span class="p">(),</span> <span class="n">w</span><span class="o">.</span><span class="n">getnchannels</span><span class="p">(),</span> <span class="n">w</span><span class="o">.</span><span class="n">getnframes</span><span class="p">()</span>
+            <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">readframes</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"&lt;i2"</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mi">32768</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pcm</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span> <span class="k">if</span> <span class="n">ch</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">pcm</span><span class="p">),</span> <span class="n">sr</span>
+    <span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">sr</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------------------------</span>
+<span class="c1"># The comparison</span>
+
+
+<div class="viewcode-block" id="compare">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.compare">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span>
+    <span class="n">contenders</span><span class="p">:</span> <span class="s2">"str | Iterable[str | Contender]"</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_DURATION</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="s2">"str | os.PathLike"</span> <span class="o">=</span> <span class="n">DFLT_OUT_DIR</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_WARMUP</span><span class="p">,</span>
+    <span class="n">runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">scorer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="n">objective_checks</span><span class="p">,</span>
+    <span class="n">allow_hosted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_free_gb</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">preload</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Render every prompt with every contender; yield one record per take.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contenders: Platform specs (``"ace_step:runtime=local"``, see :class:`Contender`),</span>
+<span class="sd">            comma-separated or as an iterable.</span>
+<span class="sd">        prompts: A JSON file, a list of prompt dicts, or ``None`` for :data:`DFLT_PROMPTS`.</span>
+<span class="sd">        duration: Seconds asked of each take (a prompt's own ``duration`` wins).</span>
+<span class="sd">        seed: Passed to platforms that take one (``None``: don't).</span>
+<span class="sd">        out_dir: Takes go to ``&lt;out_dir&gt;/&lt;run_id&gt;/&lt;contender&gt;/&lt;prompt id&gt;.wav``; records</span>
+<span class="sd">            are appended to ``&lt;out_dir&gt;/results.jsonl`` (one file for every run).</span>
+<span class="sd">        warmup: Seconds generated once per contender before the timed takes (``0``/``None``:</span>
+<span class="sd">            no warm-up, so the first take's time includes loading the model).</span>
+<span class="sd">        runner: Runs one contender: :func:`in_child_process` (``None``, the default) or</span>
+<span class="sd">            :func:`in_this_process`, or any callable with their signature.</span>
+<span class="sd">        scorer: ``(audio, sample_rate, prompt) -&gt; dict`` merged into each record; ``None``</span>
+<span class="sd">            for no checks.</span>
+<span class="sd">        allow_hosted: Allow contenders that call paid hosted services (:func:`is_hosted`).</span>
+<span class="sd">        min_free_gb: When the machine has less memory available than this before a</span>
+<span class="sd">            contender starts, record that contender as an error instead of running it.</span>
+<span class="sd">        preload: Modules (``"module"`` or ``"module:function"``) that make third-party</span>
+<span class="sd">            platforms known, run here before anything is checked and passed to a runner</span>
+<span class="sd">            that takes ``preload`` (the child process runs them too).</span>
+<span class="sd">        timeout: Seconds a contender may run before it is killed with every process it</span>
+<span class="sd">            started, passed to a runner that takes ``timeout`` (the default one does).</span>
+<span class="sd">        run_id: Names this run in its records and its folder (default: the start time).</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        Flat dicts: ``contender``, ``platform``, ``options``, ``prompt``, timings</span>
+<span class="sd">        (``load_s``, ``gen_s``, ``rtf``), memory (``peak_memory_gb``,</span>
+<span class="sd">        ``workers_peak_memory_gb``, ``available_memory_gb``), ``path``, the scorer's</span>
+<span class="sd">        checks, ``error`` when a take failed, and the machine.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._measure</span><span class="w"> </span><span class="kn">import</span> <span class="n">available_memory</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span>
+
+    <span class="n">preload</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">preload</span><span class="p">)</span>
+    <span class="n">_run_preload</span><span class="p">(</span><span class="n">preload</span><span class="p">)</span>
+    <span class="n">contenders</span> <span class="o">=</span> <span class="n">parse_contenders</span><span class="p">(</span><span class="n">contenders</span><span class="p">)</span>
+    <span class="n">prompts</span> <span class="o">=</span> <span class="n">load_prompts</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+    <span class="n">unknown</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contenders</span><span class="p">:</span>  <span class="c1"># fail before anything runs</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">get_config</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">unknown</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Unknown platforms </span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">. See `arioso platforms` for the list."</span>
+        <span class="p">)</span>
+    <span class="n">hosted</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contenders</span> <span class="k">if</span> <span class="n">is_hosted</span><span class="p">(</span><span class="n">c</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">hosted</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">allow_hosted</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Hosted (paid, per call) contenders: </span><span class="si">{</span><span class="n">hosted</span><span class="si">}</span><span class="s2">. Pass allow_hosted=True "</span>
+            <span class="s2">"(--allow-hosted) to compare them anyway."</span>
+        <span class="p">)</span>
+    <span class="n">runner</span> <span class="o">=</span> <span class="n">runner</span> <span class="ow">or</span> <span class="n">in_child_process</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">accepted</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">accepted</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">given</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"preload"</span><span class="p">:</span> <span class="n">preload</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"timeout"</span><span class="p">:</span> <span class="n">timeout</span><span class="p">}</span>
+    <span class="n">runner_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">given</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">accepted</span><span class="p">}</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    <span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y%m</span><span class="si">%d</span><span class="s2">-%H%M%S"</span><span class="p">)</span>
+    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="n">_slug</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+    <span class="n">run_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">machine</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"machine"</span><span class="p">:</span> <span class="n">_platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span> <span class="s2">"system"</span><span class="p">:</span> <span class="n">_platform</span><span class="o">.</span><span class="n">system</span><span class="p">()}</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contenders</span><span class="p">:</span>
+        <span class="n">avail</span> <span class="o">=</span> <span class="n">available_memory</span><span class="p">()</span>
+        <span class="n">avail_gb</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">avail</span> <span class="o">/</span> <span class="n">_GB</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">avail</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">process_s</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">min_free_gb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">avail_gb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">avail_gb</span> <span class="o">&lt;</span> <span class="n">min_free_gb</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"skipped: </span><span class="si">{</span><span class="n">avail_gb</span><span class="si">}</span><span class="s2"> GB available, under min_free_gb=</span><span class="si">{</span><span class="n">min_free_gb</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="s2">"error"</span><span class="p">:</span> <span class="n">error</span><span class="p">}</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prompts</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+            <span class="n">records</span> <span class="o">=</span> <span class="n">runner</span><span class="p">(</span>
+                <span class="n">c</span><span class="p">,</span>
+                <span class="n">prompts</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">out_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span>
+                <span class="n">warmup</span><span class="o">=</span><span class="n">warmup</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">runner_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">process_s</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"run_id"</span><span class="p">:</span> <span class="n">run_id</span><span class="p">,</span>
+                <span class="s2">"contender"</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="s2">"platform"</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span>
+                <span class="s2">"options"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">options</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">rec</span><span class="p">,</span>
+                <span class="s2">"available_memory_gb"</span><span class="p">:</span> <span class="n">avail_gb</span><span class="p">,</span>
+                <span class="s2">"weights_license"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"weights_license"</span><span class="p">),</span>
+                <span class="s2">"commercial_use"</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"commercial_use"</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">machine</span><span class="p">,</span>
+                <span class="s2">"when"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S"</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">process_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rec</span><span class="p">[</span><span class="s2">"process_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">process_s</span>
+            <span class="k">if</span> <span class="n">scorer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"path"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"error"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
+                <span class="n">prompt</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prompts</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="o">==</span> <span class="n">rec</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">y</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">_read_take</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s2">"path"</span><span class="p">])</span>
+                    <span class="n">rec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">scorer</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">prompt</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="s2">"score_error"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">/</span> <span class="n">RESULTS_FILE</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">rec</span></div>
+
+
+
+<div class="viewcode-block" id="read_records">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.read_records">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_records</span><span class="p">(</span><span class="n">out_dir</span><span class="p">:</span> <span class="s2">"str | os.PathLike"</span> <span class="o">=</span> <span class="n">DFLT_OUT_DIR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The records in ``&lt;out_dir&gt;/results.jsonl``, keeping the latest per (contender, prompt)."""</span>
+    <span class="n">latest</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">RESULTS_FILE</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">():</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">latest</span><span class="p">[(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"contender"</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">))]</span> <span class="o">=</span> <span class="n">r</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">latest</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------------------------</span>
+<span class="c1"># Summaries</span>
+
+
+<div class="viewcode-block" id="summarize">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.summarize">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""One row per contender: takes, failures, median RTF, load, peak memory, check rates."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">median</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">if</span> <span class="n">xs</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"contender"</span><span class="p">],</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">rs</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span> <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="p">]</span>
+        <span class="n">keyed</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"key_agreement"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ok</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"key_agreement"</span><span class="p">)]</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"contender"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+                <span class="s2">"takes"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ok</span><span class="p">),</span>
+                <span class="s2">"failed"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ok</span><span class="p">),</span>
+                <span class="s2">"rtf"</span><span class="p">:</span> <span class="n">median</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rtf"</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ok</span><span class="p">),</span>
+                <span class="s2">"load_s"</span><span class="p">:</span> <span class="n">median</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"load_s"</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ok</span><span class="p">),</span>
+                <span class="s2">"peak_memory_gb"</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"peak_memory_gb"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"workers_peak_memory_gb"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ok</span>
+                    <span class="p">),</span>
+                    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">"tempo_err"</span><span class="p">:</span> <span class="n">median</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tempo_err"</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ok</span><span class="p">),</span>
+                <span class="s2">"key_hits"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">keyed</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">'exact'</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">keyed</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">keyed</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">"weights_license"</span><span class="p">:</span> <span class="n">rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"weights_license"</span><span class="p">),</span>
+                <span class="s2">"first_error"</span><span class="p">:</span> <span class="nb">next</span><span class="p">((</span><span class="n">r</span><span class="p">[</span><span class="s2">"error"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span> <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">in</span> <span class="n">r</span><span class="p">),</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="summary_lines">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.summary_lines">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">summary_lines</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">""":func:`summarize` as aligned text lines, a header first."""</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"contender"</span><span class="p">,</span>
+        <span class="s2">"takes"</span><span class="p">,</span>
+        <span class="s2">"failed"</span><span class="p">,</span>
+        <span class="s2">"rtf"</span><span class="p">,</span>
+        <span class="s2">"load_s"</span><span class="p">,</span>
+        <span class="s2">"peak_memory_gb"</span><span class="p">,</span>
+        <span class="s2">"tempo_err"</span><span class="p">,</span>
+        <span class="s2">"key_hits"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">summarize</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="p">[</span><span class="n">fields</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="s2">"-"</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">f</span><span class="p">])</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span>
+    <span class="p">]</span>
+    <span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">))]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">widths</span><span class="p">))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span>
+    <span class="p">]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'contender'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'first_error'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"first_error"</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="compare_page">
+<a class="viewcode-back" href="../../_autosummary/arioso.compare.html#arioso.compare.compare_page">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_page</span><span class="p">(</span>
+    <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">],</span>
+    <span class="n">path</span><span class="p">:</span> <span class="s2">"str | os.PathLike"</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">DFLT_OUT_DIR</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"index.html"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Music generation compared"</span><span class="p">,</span>
+    <span class="n">prompts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Write a self-contained HTML page: a summary table, then each prompt's takes as players.</span>
+
+<span class="sd">    Audio is linked relative to the page, so keep the page beside the takes (the default</span>
+<span class="sd">    ``&lt;out_dir&gt;/index.html``) and publish the folder.</span>
+<span class="sd">    """</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">esc</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">escape</span>
+    <span class="n">texts</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]:</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">prompts</span> <span class="ow">or</span> <span class="p">())}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cell</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"-"</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">esc</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="n">summary</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">"&lt;tr&gt;"</span> <span class="o">+</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;td&gt;</span><span class="si">{</span><span class="n">cell</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">f</span><span class="p">])</span><span class="si">}</span><span class="s2">&lt;/td&gt;"</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_PAGE_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"&lt;/tr&gt;"</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">summarize</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">by_prompt</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">by_prompt</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">],</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">rs</span> <span class="ow">in</span> <span class="n">by_prompt</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">takes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"&lt;div class=err&gt;</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">'error'</span><span class="p">][:</span><span class="mi">300</span><span class="p">])</span><span class="si">}</span><span class="s2">&lt;/div&gt;"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"path"</span><span class="p">],</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"path"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
+                <span class="n">chips</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'gen_s'</span><span class="p">)</span><span class="si">}</span><span class="s2">s for </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'seconds_out'</span><span class="p">)</span><span class="si">}</span><span class="s2">s (RTF </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'rtf'</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tempo_detected"</span><span class="p">):</span>
+                    <span class="n">chips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"tempo </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'tempo_detected'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="o">+</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">", err </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'tempo_err'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+                            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tempo_err"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                            <span class="k">else</span> <span class="s2">""</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"key"</span><span class="p">):</span>
+                    <span class="n">chips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"key </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">" (</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'key_agreement'</span><span class="p">]</span><span class="si">}</span><span class="s2">)"</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"key_agreement"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"clip_frac"</span><span class="p">):</span>
+                    <span class="n">chips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"clipped </span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="s1">'clip_frac'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"&lt;audio controls preload=none src='</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">src</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span><span class="si">}</span><span class="s2">'&gt;&lt;/audio&gt;"</span>
+                    <span class="sa">f</span><span class="s2">"&lt;div class=chips&gt;</span><span class="si">{</span><span class="s1">' · '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">esc</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">chips</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/div&gt;"</span>
+                <span class="p">)</span>
+            <span class="n">takes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"&lt;div class=take&gt;&lt;div class=who&gt;</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">'contender'</span><span class="p">])</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span><span class="si">{</span><span class="n">body</span><span class="si">}</span><span class="s2">&lt;/div&gt;"</span>
+            <span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">texts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"&lt;section&gt;&lt;h2&gt;</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/h2&gt;"</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;p class=prompt&gt;</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/p&gt;"</span> <span class="k">if</span> <span class="n">text</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">takes</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">"&lt;/section&gt;"</span>
+        <span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"&lt;th&gt;</span><span class="si">{</span><span class="n">esc</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/th&gt;"</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_PAGE_FIELDS</span><span class="p">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="n">_PAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">esc</span><span class="p">(</span><span class="n">title</span><span class="p">),</span>
+            <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
+            <span class="n">summary</span><span class="o">=</span><span class="n">summary</span><span class="p">,</span>
+            <span class="n">sections</span><span class="o">=</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sections</span><span class="p">),</span>
+            <span class="n">when</span><span class="o">=</span><span class="n">esc</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M"</span><span class="p">)),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+
+<span class="n">_PAGE_FIELDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"contender"</span><span class="p">,</span>
+    <span class="s2">"takes"</span><span class="p">,</span>
+    <span class="s2">"failed"</span><span class="p">,</span>
+    <span class="s2">"rtf"</span><span class="p">,</span>
+    <span class="s2">"load_s"</span><span class="p">,</span>
+    <span class="s2">"peak_memory_gb"</span><span class="p">,</span>
+    <span class="s2">"tempo_err"</span><span class="p">,</span>
+    <span class="s2">"key_hits"</span><span class="p">,</span>
+    <span class="s2">"weights_license"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">_PAGE</span> <span class="o">=</span> <span class="s2">"""&lt;!doctype html&gt;</span>
+<span class="s2">&lt;html lang="en"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</span>
+<span class="s2">&lt;title&gt;</span><span class="si">{title}</span><span class="s2">&lt;/title&gt;</span>
+<span class="s2">&lt;style&gt;</span>
+<span class="s2">:root {{ --bg:#fbfaf7; --fg:#1d1c1a; --muted:#6b675f; --line:#e3dfd6; --card:#fff; --err:#a33; }}</span>
+<span class="s2">@media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{ --bg:#141413; --fg:#ecebe6; --muted:#a29e94; --line:#2c2b28; --card:#1c1b19; --err:#e88; }} }}</span>
+<span class="s2">:root[data-theme="dark"] {{ --bg:#141413; --fg:#ecebe6; --muted:#a29e94; --line:#2c2b28; --card:#1c1b19; --err:#e88; }}</span>
+<span class="s2">* {{ box-sizing:border-box; }}</span>
+<span class="s2">body {{ background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; margin:0 auto; padding:16px; max-width:860px; }}</span>
+<span class="s2">h1 {{ font-size:1.4rem; }} h2 {{ font-size:1.1rem; border-bottom:1px solid var(--line); margin-top:1.5em; }}</span>
+<span class="s2">.wrap {{ overflow-x:auto; }} table {{ border-collapse:collapse; width:100%; font-size:.85rem; }}</span>
+<span class="s2">th, td {{ text-align:left; padding:5px 7px; border-bottom:1px solid var(--line); white-space:nowrap; }}</span>
+<span class="s2">.prompt, .chips, small {{ color:var(--muted); }} .prompt {{ font-style:italic; }}</span>
+<span class="s2">.take {{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:10px 0; }}</span>
+<span class="s2">.who {{ font-weight:600; }} audio {{ width:100%; }} .chips {{ font-size:.85rem; }} .err {{ color:var(--err); font-size:.85rem; }}</span>
+<span class="s2">&lt;/style&gt;&lt;/head&gt;&lt;body&gt;</span>
+<span class="s2">&lt;h1&gt;</span><span class="si">{title}</span><span class="s2">&lt;/h1&gt;&lt;p&gt;&lt;small&gt;</span><span class="si">{when}</span><span class="s2"> · rtf: generation time over audio length (under 1 is faster than real time) · tempo_err: relative error against the BPM asked, half/double time forgiven · key_hits: exact key matches over the prompts that asked for a key&lt;/small&gt;&lt;/p&gt;</span>
+<span class="s2">&lt;div class=wrap&gt;&lt;table&gt;&lt;tr&gt;</span><span class="si">{head}</span><span class="s2">&lt;/tr&gt;</span><span class="si">{summary}</span><span class="s2">&lt;/table&gt;&lt;/div&gt;</span>
+<span class="si">{sections}</span>
+<span class="s2">&lt;/body&gt;&lt;/html&gt;</span>
+<span class="s2">"""</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">_child_main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

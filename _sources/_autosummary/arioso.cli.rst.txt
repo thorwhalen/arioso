@@ -14,6 +14,7 @@ arioso.cli
 
    .. autosummary::
    
+      compare
       generate
       platforms
    

@@ -1,0 +1,38 @@
+arioso.compare
+==============
+
+.. automodule:: arioso.compare
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_PROMPTS
+      DFLT_WARMUP
+      LOCAL_ACCESS_TYPES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      compare
+      compare_page
+      in_child_process
+      in_this_process
+      is_hosted
+      key_agreement
+      load_prompts
+      objective_checks
+      parse_contenders
+      read_records
+      summarize
+      summary_lines
+      tempo_error
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Contender
+   

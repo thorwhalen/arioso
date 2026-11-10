@@ -10,6 +10,7 @@
 - [arioso](_autosummary/arioso.html.md): Arioso - Unified facade for AI music generation platforms.
 - [arioso.base](_autosummary/arioso.base.html.md): Core types and constants for arioso.
 - [arioso.cli](_autosummary/arioso.cli.html.md): The functions behind the &#96;arioso&#96; command line.
+- [arioso.compare](_autosummary/arioso.compare.html.md): Compare platforms on the same prompts: time, memory and objective checks, as records.
 - [arioso.named_prompts](_autosummary/arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
 - [arioso.platforms](_autosummary/arioso.platforms.html.md): Platform packages for arioso.
 - [arioso.platforms.ace_step](_autosummary/arioso.platforms.ace_step.html.md): ACE-Step (hosted on fal.ai) platform for arioso.
@@ -73,7 +74,7 @@
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
 - [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 10:04 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 10:21 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

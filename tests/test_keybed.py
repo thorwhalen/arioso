@@ -3,6 +3,7 @@ fake model, cut at the right times, and written as an SF2 a SoundFont synth can 
 
 import json
 import os
+import shutil
 import struct
 
 import numpy as np
@@ -12,6 +13,7 @@ from arioso.base import AudioResult, Song
 from arioso.keybed import (
     GAP_SECONDS,
     NOTE_SECONDS,
+    chunks,
     keybed_instrument,
     keybed_prompt,
     note_name,
@@ -34,7 +36,8 @@ class FakeModel:
 
     def __call__(self, prompt, *, duration, seed):
         self.calls.append((prompt, duration, seed))
-        names = prompt.split("Note Sequence, ")[1].split(", ")
+        tail = "Note Sequence, " if "Note Sequence" in prompt else "Target Note, "
+        names = prompt.split(tail)[1].split(", ")
         by_name = {note_name(k): k for k in range(128)}
         audio = np.zeros(int(round(duration * RATE)), dtype=np.float32)
         t = np.arange(int(NOTE_SECONDS * RATE)) / RATE
@@ -57,15 +60,16 @@ def test_note_names_follow_c4_is_60():
 def test_keys_are_rendered_in_chunks_of_six_with_one_seed():
     model = FakeModel()
     keys = list(range(60, 68))  # 8 keys: a chunk of 6, then 2
-    notes, seed = render_keybed("Rhodes Piano, Warm", keys, generate=model)
+    notes, info = render_keybed("Rhodes Piano, Warm", keys, generate=model)
     assert sorted(notes) == keys
     prompts, durations, seeds = zip(*model.calls)
     assert prompts == (
-        keybed_prompt("Rhodes Piano, Warm", keys[:6]),
-        keybed_prompt("Rhodes Piano, Warm", keys[6:]),
-    )
-    assert durations == pytest.approx((6 * 3.0 + 5 * 0.25, 2 * 3.0 + 0.25))
-    assert set(seeds) == {seed}
+        keybed_prompt("Rhodes Piano, Warm", keys[:4]),
+        keybed_prompt("Rhodes Piano, Warm", keys[4:]),
+    )  # balanced: 4 + 4, not 6 + 2
+    assert durations == pytest.approx((4 * 3.0 + 3 * 0.25,) * 2)
+    assert set(seeds) == {info["seed"]}
+    assert [c["keys"] for c in info["chunks"]] == [keys[:4], keys[4:]]
 
 
 def test_each_note_is_cut_from_its_own_slot():
@@ -82,7 +86,7 @@ def test_a_render_too_short_for_its_notes_is_refused():
     def short(prompt, *, duration, seed):
         return Song(audio=AudioResult(audio_array=np.zeros(RATE), sample_rate=RATE))
 
-    with pytest.raises(ValueError, match="too short"):
+    with pytest.raises(ValueError, match="short of note"):
         render_keybed("Pad", [60, 61, 62], generate=short, seed=1)
 
 
@@ -112,7 +116,7 @@ def _riff_chunks(data, offset=12, end=None):
 
 
 def test_the_sf2_maps_each_sample_to_its_root_key_and_range(tmp_path):
-    notes, _ = render_keybed("Pad", [48, 60, 72], generate=FakeModel(), seed=3)
+    notes, _ = render_keybed("Pad", [48, 60, 72], generate=FakeModel(), seed=3, chunk=1)
     data = write_sf2(notes, tmp_path / "pad.sf2", name="Pad", program=5).read_bytes()
     assert data[:4] == b"RIFF" and data[8:12] == b"sfbk"
     assert struct.unpack("<I", data[4:8])[0] == len(data) - 8
@@ -144,10 +148,12 @@ def test_the_instrument_folder_has_sf2_sfz_wavs_and_metadata(tmp_path):
     )
     assert paths["sf2"].name == "Rhodes Piano.sf2"
     sfz = paths["sfz"].read_text()
-    assert "sample=samples/060.wav pitch_keycenter=60 lokey=0 hikey=62" in sfz
-    assert (tmp_path / "samples" / "064.wav").is_file()
+    assert "sample=Rhodes Piano/060.wav pitch_keycenter=60 lokey=0 hikey=62" in sfz
+    assert (tmp_path / "Rhodes Piano" / "064.wav").is_file()
     meta = json.loads(paths["metadata"].read_text())
     assert meta["seed"] == 11 and meta["keys"] == [60, 64]
+    assert meta["chunks"][0]["prompt"] == keybed_prompt("Rhodes Piano, Warm", [60, 64])
+    assert meta["render"] == {"seed": 11}
 
 
 def test_unknown_formats_are_refused_before_writing(tmp_path):
@@ -156,6 +162,164 @@ def test_unknown_formats_are_refused_before_writing(tmp_path):
     with pytest.raises(ValueError, match="unknown formats"):
         write_instrument({60: (np.zeros(10), RATE)}, tmp_path, formats=["dspreset"])
     assert not list(tmp_path.iterdir())
+
+
+def test_the_prompt_follows_the_models_grammar():
+    assert keybed_prompt("Pad, Warm", [60, 61, 62]) == (
+        "Keybed, Sequence, Timbre Profile, Pad, Warm, Dry, "
+        "Chromatic Chunk, Note Sequence, C4, C#4, D4"
+    )
+    assert "Chromatic Chunk" not in keybed_prompt("Pad", [60, 64])
+    assert keybed_prompt("Pad", [60], wet=True) == (
+        "Keybed, Timbre Profile, Pad, Wet, Target Note, C4"
+    )
+    assert keybed_prompt("Pad, dry", [60, 61]).count("ry") == 1  # theirs, not ours too
+
+
+def test_chunks_are_balanced_and_never_over_the_size():
+    for n in range(1, 40):
+        sizes = [len(c) for c in chunks(range(n), 6)]
+        assert sum(sizes) == n and max(sizes) <= 6 and max(sizes) - min(sizes) <= 1
+
+
+class Markers:
+    """Each note's slot holds a constant unique to it; the gaps hold -1."""
+
+    def __init__(self):
+        self.calls = 0
+
+    def __call__(self, prompt, *, duration, seed):
+        self.calls += 1
+        n = len(prompt.split("Note Sequence, ")[1].split(", "))
+        audio = np.full(int(round(duration * RATE)), -1.0, dtype=np.float32)
+        step, size = (NOTE_SECONDS + GAP_SECONDS) * RATE, int(NOTE_SECONDS * RATE)
+        for i in range(n):
+            start = int(round(i * step))
+            audio[start : start + size] = (i + 1) / 10
+        return Song(audio=AudioResult(audio_array=audio, sample_rate=RATE))
+
+
+def test_each_note_is_exactly_its_slot_no_gap_no_neighbour():
+    notes, _ = render_keybed(
+        "Pad", [60, 61, 62, 63], generate=Markers(), seed=1, peak=None
+    )
+    fade = int(0.02 * RATE)
+    for i, key in enumerate([60, 61, 62, 63]):
+        audio, _ = notes[key]
+        assert len(audio) == NOTE_SECONDS * RATE
+        assert np.all(audio[: len(audio) - fade] == np.float32((i + 1) / 10)), key
+        assert audio[-1] == 0  # faded out
+
+
+def test_one_gain_for_the_whole_keybed_keeps_the_chunks_balance():
+    def levels(prompt, *, duration, seed):  # the second chunk renders half as loud
+        level = 0.2 if "C4" in prompt else 0.1
+        audio = np.full(int(round(duration * RATE)), level, dtype=np.float32)
+        return Song(audio=AudioResult(audio_array=audio, sample_rate=RATE))
+
+    notes, _ = render_keybed(
+        "Pad", [60, 72], generate=levels, seed=1, chunk=1, peak=0.8
+    )
+    assert notes[60][0][0] == pytest.approx(0.8) and notes[72][0][0] == pytest.approx(
+        0.4
+    )
+
+
+def test_a_chunk_past_the_window_is_refused_before_anything_renders():
+    model = FakeModel()
+    with pytest.raises(ValueError, match="window"):
+        render_keybed("Pad", range(60, 67), generate=model, chunk=7, window_seconds=20)
+    assert model.calls == []
+
+
+def _sf2_records(data):
+    chunks_ = _riff_chunks(data)
+
+    def records(tag, size):
+        body = chunks_[tag]
+        assert len(body) % size == 0, tag
+        return [body[i : i + size] for i in range(0, len(body), size)]
+
+    return chunks_, records
+
+
+@pytest.mark.parametrize("name", ["Pad", "Rhodes Piano", "A very long instrument name"])
+def test_the_sf2_is_structurally_valid(tmp_path, name):
+    notes, _ = render_keybed("Pad", [48, 60, 72], generate=FakeModel(), seed=3, chunk=1)
+    data = write_sf2(notes, tmp_path / "x.sf2", name=name, release=0.5).read_bytes()
+    chunks_, records = _sf2_records(data)
+    assert len(chunks_[b"INAM"]) % 2 == 0 and chunks_[b"INAM"].endswith(b"\0")
+    assert struct.unpack("<HH", chunks_[b"ifil"]) == (2, 1)
+    for bag, gen in [(b"pbag", b"pgen"), (b"ibag", b"igen")]:
+        gens = records(gen, 4)
+        assert gens[-1] == bytes(4), f"{gen} terminal record"
+        # the terminal bag points at the terminal generator
+        assert struct.unpack("<HH", records(bag, 4)[-1]) == (len(gens) - 1, 0), bag
+    for tag in (b"pmod", b"imod"):
+        assert chunks_[tag] == bytes(10)
+    shdr = [struct.unpack("<20sIIIIIBbHH", r) for r in records(b"shdr", 46)]
+    assert len({h[0] for h in shdr}) == len(shdr)  # distinct sample names
+    pcm = np.frombuffer(chunks_[b"smpl"], dtype="<i2")
+    for h in shdr[:-1]:
+        start, end, loop_start, loop_end = h[1:5]
+        assert start <= loop_start < loop_end <= end
+        assert not pcm[end : end + 46].any() and len(pcm[end : end + 46]) == 46  # pad
+    igen = [struct.unpack("<HH", r) for r in records(b"igen", 4)]
+    bags = [struct.unpack("<HH", r)[0] for r in records(b"ibag", 4)]
+    zones = [igen[a:b] for a, b in zip(bags, bags[1:])]
+    assert len(zones) == 3
+    for i, zone in enumerate(zones):
+        ops = [op for op, _ in zone]
+        assert (
+            ops[0] == 43 and ops[-1] == 53 and zone[-1][1] == i
+        )  # keyRange first, sampleID last
+        assert (
+            dict(zone)[38] == struct.unpack("<H", struct.pack("<h", -1200))[0]
+        )  # 0.5 s
+
+
+@pytest.mark.skipif(shutil.which("fluidsynth") is None, reason="needs FluidSynth")
+@pytest.mark.parametrize("name", ["Pad", "Rhodes Piano"])  # both INAM parities
+def test_fluidsynth_plays_each_key_at_its_pitch(tmp_path, name):
+    import subprocess
+
+    import mido
+    import soundfile as sf
+
+    notes, _ = render_keybed("Pad", [48, 60, 72], generate=FakeModel(), seed=3, chunk=1)
+    sf2 = write_sf2(notes, tmp_path / "x.sf2", name=name)
+    midi = mido.MidiFile()
+    track = mido.MidiTrack()
+    midi.tracks.append(track)
+    played = [60, 66, 72]  # 66 is 60's sample, shifted
+    for key in played:
+        track.append(mido.Message("note_on", note=key, velocity=100, time=0))
+        track.append(mido.Message("note_off", note=key, time=480))
+    midi.save(tmp_path / "t.mid")
+    out = tmp_path / "out.wav"
+    run = subprocess.run(
+        [
+            "fluidsynth",
+            "-ni",
+            "-q",
+            "-r",
+            "44100",
+            "-F",
+            str(out),
+            str(sf2),
+            str(tmp_path / "t.mid"),
+        ],
+        capture_output=True,
+        text=True,
+        stdin=subprocess.DEVNULL,
+        timeout=60,
+    )
+    assert "Rejecting" not in run.stderr + run.stdout, run.stderr
+    audio, rate = sf.read(out)
+    audio = audio.mean(axis=1) if audio.ndim > 1 else audio
+    for i, key in enumerate(played):
+        segment = audio[int((i * 0.5 + 0.05) * rate) : int((i * 0.5 + 0.4) * rate)]
+        assert _pitch(segment, rate) == pytest.approx(_freq(key), rel=0.02), key
 
 
 def _keybed_weights():
@@ -178,7 +342,7 @@ def test_a_real_keybed_is_three_notes_at_their_pitches(tmp_path):
         60,
         64,
     ):  # the model was asked for these pitches: check it gave them
-        audio, rate = sf.read(tmp_path / "samples" / f"{key:03d}.wav")
+        audio, rate = sf.read(tmp_path / "Grand Piano" / f"{key:03d}.wav")
         assert _pitch(audio[: rate // 2], rate) == pytest.approx(
             _freq(key), rel=0.03
         ), key

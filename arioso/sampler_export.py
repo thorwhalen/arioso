@@ -4,6 +4,10 @@ Generic: takes ``{midi_key: (mono float array, sample_rate)}`` and knows nothing
 how the notes were made. Each sample plays from its own key up to the midpoint with
 its neighbours, at its own pitch at its root key; no loops (one-shots with a release).
 
+Samples are written mono: a phone decodes every sample it plays, and a keybed is
+many of them. Stereo is folded to its mid (L+R)/2, or to its left channel where the
+mid would cancel (anti-phase content).
+
 The SF2 is what browser SoundFont synths load (timbrel takes it through its ``bank``
 seam, as a preset at ``program`` in ``bank``); the SFZ, with one WAV per note, is what
 desktop samplers open.
@@ -43,10 +47,20 @@ def key_ranges(keys) -> dict:
     return ranges
 
 
-def _mono_float(audio) -> np.ndarray:
+def mono(audio) -> np.ndarray:
+    """``audio`` as a 1-d float32 array: the mid of a stereo pair (either orientation),
+    or its first channel when the mid has lost most of the energy (anti-phase).
+
+    >>> t = np.linspace(0, 1, 100)
+    >>> bool(mono(np.stack([t, -t])).max() > 0.9)  # the mid would be silence
+    True
+    """
     a = np.asarray(audio, dtype=np.float32)
-    if a.ndim == 2:  # either orientation: average the shorter axis (the channels)
-        a = a.mean(axis=0 if a.shape[0] < a.shape[1] else 1)
+    if a.ndim == 2:
+        channels = a if a.shape[0] < a.shape[1] else a.T
+        mid = channels.mean(axis=0)
+        energy = float(np.mean(channels**2))
+        a = mid if float(np.mean(mid**2)) >= 0.25 * energy else channels[0]
     if a.ndim != 1 or not len(a):
         raise ValueError(
             f"a sample should be a non-empty mono or stereo array, got {a.shape}"
@@ -60,6 +74,27 @@ def _int16(a: np.ndarray) -> np.ndarray:
 
 def _name(s: str) -> bytes:
     return s.encode("ascii", "replace")[:19].ljust(20, b"\0")
+
+
+def _zstr(s: str, *, limit: int = 256) -> bytes:
+    """A zero-terminated string padded to an even length (SF2 INFO strings must be)."""
+    b = s.encode("ascii", "replace")[: limit - 2] + b"\0"
+    return b + b"\0" * (len(b) % 2)
+
+
+def _timecents(seconds: float) -> int:
+    """``seconds`` as SF2 timecents, within the spec's -12000..8000."""
+    return max(-12000, min(8000, round(1200 * math.log2(max(seconds, 1e-6)))))
+
+
+def safe_name(name: str) -> str:
+    """``name`` usable as a file name: path separators and control characters replaced.
+
+    >>> safe_name("Bass / Sub: Warm")
+    'Bass _ Sub_ Warm'
+    """
+    cleaned = "".join("_" if c in '/\\:*?"<>|' or ord(c) < 32 else c for c in name)
+    return cleaned.strip(" .") or "instrument"
 
 
 def _chunk(tag: bytes, data: bytes) -> bytes:
@@ -89,18 +124,20 @@ def write_sf2(
     smpl, headers = bytearray(), []
     for key in sorted(ranges):
         audio, rate = samples[key]
-        pcm = _int16(_mono_float(audio))
+        pcm = _int16(mono(audio))
         start = len(smpl) // 2
         smpl += pcm.tobytes() + bytes(2 * _SF2_PAD)
         end = start + len(pcm)
+        loop = (
+            (start + 8, end - 8) if len(pcm) > 16 else (start, end)
+        )  # unused: no loop
         headers.append(
             struct.pack(
                 "<20sIIIIIBbHH",
                 _name(f"{name[:12]}-{key}"),
                 start,
                 end,
-                start,
-                end,
+                *loop,
                 int(rate),
                 key,
                 0,
@@ -112,7 +149,7 @@ def write_sf2(
         struct.pack("<20sIIIIIBbHH", _name("EOS"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
     )
 
-    release_tc = round(1200 * math.log2(max(release, 0.001)))
+    release_tc = _timecents(release)
     igen, ibag = bytearray(), bytearray()
     for i, key in enumerate(sorted(ranges)):
         low, high = ranges[key]
@@ -137,7 +174,7 @@ def write_sf2(
         b"INFO",
         _chunk(b"ifil", struct.pack("<HH", 2, 1)),
         _chunk(b"isng", b"EMU8000\0"),
-        _chunk(b"INAM", name.encode("ascii", "replace") + b"\0"),
+        _chunk(b"INAM", _zstr(name)),
     )
     sdta = _list(b"sdta", _chunk(b"smpl", bytes(smpl)))
     pdta = _list(
@@ -158,25 +195,29 @@ def write_sf2(
 
 
 def write_sfz(
-    samples: Mapping[int, tuple], folder, *, name: str = "instrument"
+    samples: Mapping[int, tuple],
+    folder,
+    *,
+    name: str = "instrument",
+    release: float = 0.3,
 ) -> Path:
-    """Write ``samples`` as ``<name>.sfz`` with one WAV per note in ``folder/samples``."""
+    """Write ``samples`` as ``<name>.sfz`` with one WAV per note in ``folder/<name>/``."""
     import soundfile as sf
 
-    folder = Path(folder)
-    (folder / "samples").mkdir(parents=True, exist_ok=True)
+    folder, stem = Path(folder), safe_name(name)
+    (folder / stem).mkdir(parents=True, exist_ok=True)
     lines = [
         f"// {name}: one-shot samples, one region per note",
-        "<group> ampeg_release=0.3",
+        f"<group> ampeg_release={release:g}",
     ]
     for key, (low, high) in key_ranges(samples).items():
         audio, rate = samples[key]
-        wav = f"samples/{key:03d}.wav"
-        sf.write(folder / wav, _mono_float(audio), int(rate), subtype="PCM_16")
+        wav = f"{stem}/{key:03d}.wav"
+        sf.write(folder / wav, mono(audio), int(rate), subtype="PCM_16")
         lines.append(
             f"<region> sample={wav} pitch_keycenter={key} lokey={low} hikey={high}"
         )
-    path = folder / f"{name}.sfz"
+    path = folder / f"{stem}.sfz"
     path.write_text("\n".join(lines) + "\n")
     return path
 

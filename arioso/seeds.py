@@ -203,7 +203,7 @@ def drop_blips(midi: np.ndarray, fps: float, *, min_s: float = 0.12) -> np.ndarr
 
 
 #: Voiced frames per ``fix_octaves`` batch: its working memory is about this many windows.
-FIX_OCTAVES_CHUNK_FRAMES = 65536
+FIX_OCTAVES_CHUNK_FRAMES = 8192
 
 
 def fix_octaves(
@@ -221,8 +221,8 @@ def fix_octaves(
     a sixth stays; a real leap of a seventh or more inside the window is rare enough to sacrifice.
 
     The medians are taken ``chunk_frames`` voiced frames at a time, so working memory is about
-    five ``chunk_frames x window`` float arrays whatever the contour's length (about 130 MB at the
-    defaults and 100 fps, 470 MB with ``window_s=2``); the result does not depend on it.
+    five ``chunk_frames x window`` float arrays whatever the contour's length (about 25 MB at the
+    defaults and 100 fps, 66 MB with ``window_s=2``); the result does not depend on it.
     """
     out = midi.copy()
     half = max(1, int(window_s * fps) // 2)

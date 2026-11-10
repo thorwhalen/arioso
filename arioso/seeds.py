@@ -213,10 +213,17 @@ def fix_octaves(
     """
     out = midi.copy()
     half = max(1, int(window_s * fps) // 2)
-    for i in np.flatnonzero(~np.isnan(midi)):
-        dev = midi[i] - np.nanmedian(midi[max(0, i - half) : i + half + 1])
-        if abs(dev) >= min_jump:
-            out[i] = midi[i] - 12 * np.round(dev / 12)
+    voiced = np.flatnonzero(~np.isnan(midi))
+    if not len(voiced):
+        return out
+    # NaN padding stands in for the window's clipping at the edges (nanmedian skips it), and only
+    # voiced frames are evaluated, so every window holds its own frame and is never all-NaN
+    pad_dtype = midi.dtype if np.issubdtype(midi.dtype, np.floating) else float
+    padded = np.pad(midi.astype(pad_dtype), half, constant_values=np.nan)
+    windows = np.lib.stride_tricks.sliding_window_view(padded, 2 * half + 1)[voiced]
+    dev = midi[voiced] - np.nanmedian(windows, axis=1)
+    jump = np.abs(dev) >= min_jump
+    out[voiced[jump]] = midi[voiced[jump]] - 12 * np.round(dev[jump] / 12)
     return out
 
 

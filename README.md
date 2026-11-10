@@ -146,7 +146,7 @@ For a source in a generator's own phrasing, `musicgen_variation(voice, "C#", pro
 
 ## Platforms
 
-16 platforms are included, spanning local models, REST APIs, and SDK-based services:
+19 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
 | Platform | Access | Auth | Install |
 |----------|--------|------|---------|
@@ -154,6 +154,9 @@ For a source in a generator's own phrasing, `musicgen_variation(voice, "C#", pro
 | **Stable Audio Open** | Local (diffusers) | None | `pip install arioso[stable-audio]` |
 | **Harmonai** | Local (diffusers) | None | `pip install arioso[harmonai]` |
 | **Riffusion** | Local (diffusers) | None | `pip install arioso[riffusion]` |
+| **Stable Audio 3** | Local (MLX runtime, Apple Silicon) | None | runtime: see below |
+| **Magenta RealTime 2** | Local (MLX runtime, Apple Silicon) | None | runtime: see below |
+| **Foundation-1** | Local (stable-audio-tools, own environment) | None | built on first use: see below |
 | **ElevenLabs** | REST API | `ELEVENLABS_API_KEY` | `pip install arioso[elevenlabs]` |
 | **Suno** (via sunoapi.org) | REST API | `SUNO_API_KEY` | `pip install arioso[sunoapi]` |
 | **Google Lyria 2** | REST (Vertex AI) | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]` |
@@ -240,6 +243,35 @@ song = arioso.generate(
 | `stable_audio_3` | Stability AI Community License (+ Gemma terms for its text encoder) | free under US$1M annual revenue |
 | `magenta_rt` | CC-BY-4.0 | yes, with attribution |
 | `ace_step` (local) | MIT | yes |
+| `foundation_1` | Stability AI Community License | free under US$1M annual revenue |
+
+### Foundation-1 (local loops and one-shots, stable-audio-tools)
+
+[Foundation-1](https://huggingface.co/RoyalCities/Foundation-1) is a Stable Audio Open 1.0 fine-tune for instrument loops and one-shots, prompted with tags: instrument family and sub-family, timbre, notation and FX, then bars, tempo and key (`"Synth Lead, Warm, Arp, Medium Reverb, 8 Bars, 140 BPM, E minor"`; the tag list is in the model card's `Master_Tag_Reference.md`). The prompt is passed through; `bpm` and `key` are appended as those tags. With a tempo the clip is exactly `bars` bars of 4/4 (`bars=4` or `8`, else the count nearest to `duration`); without one, `duration` is the clip length (at most 20 s). Three checkpoints share one model: `model="foundation-1"` (loops, the default), `"1.2-samples"` (loops and one-shots) and `"1.2-keybeds"` (pitch-consistent one-shots).
+
+stable-audio-tools pins its own torch and Python 3.10, so arioso builds an environment for it with `uv` on first use (once, under `~/.local/share/arioso/envs/foundation-1`, or `$ARIOSO_ENVS_DIR`) and runs the model in one worker process there; each checkpoint (2.4 GB) downloads once to the Hugging Face cache. It runs on CUDA, Apple MPS or the CPU (`device=` to choose). On MPS it samples with plain classifier-free guidance, as Stable Audio Open does: stable-audio-tools' default adaptive projected guidance computes in float64, which MPS does not support, so it is turned off, and `PYTORCH_ENABLE_MPS_FALLBACK=1` lets any operator MPS lacks run on the CPU.
+
+```python
+import arioso
+
+# A 4-bar loop at 100 BPM in A minor (9.6 s)
+song = arioso.generate(
+    "Rhodes Piano, Warm, Chord Progression, Low Reverb",
+    platform="foundation_1",
+    bpm=100,
+    key="Am",
+    bars=4,
+    seed=7,
+)
+song.metadata["prompt_sent"]  # 'Rhodes Piano, Warm, Chord Progression, Low Reverb, 4 Bars, 100 BPM, A minor'
+
+# A one-shot: no tempo, so duration is the length
+song = arioso.generate("Grand Piano, Near, Bright, Hit", platform="foundation_1", model="1.2-samples", duration=3)
+```
+
+MEASURED_LINE
+
+Building playable sampler instruments from the keybeds checkpoint (many notes from one descriptor, sliced and mapped) is not covered yet: see [#66](https://github.com/thorwhalen/arioso/issues/66).
 
 ### ElevenLabs
 

@@ -424,7 +424,7 @@ def test_magenta_rt_worker_loads_once_per_size_and_samples_per_call(
     assert calls == [(3.0, 1.3, 40, 50), (5.0, 0.9, 40, 50)]
 
 
-WORKERS = ("magenta_rt", "ace_step", "musicgen_mlx")
+WORKERS = ("magenta_rt", "ace_step", "musicgen_mlx", "foundation_1")
 
 
 @pytest.mark.parametrize("name", WORKERS)

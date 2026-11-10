@@ -16,6 +16,10 @@ lives in :mod:`ps.isolated`; this module adds arioso's conventions:
   have it). arioso's workers leave their output on the terminal (``stderr=None``), as
   model downloads and progress bars are worth seeing.
 - :func:`run_process` is the one-shot alternative, for runtimes that are command line tools.
+- :func:`ensure_env` builds an environment from a :class:`EnvSpec` (pinned requirements,
+  installed with ``uv``) once, under :func:`env_dir` (``$ARIOSO_ENVS_DIR/<name>``, else
+  ``~/.local/share/arioso/envs/<name>``), and rebuilds it when the spec changes: for a
+  runtime that is a set of packages rather than a checkout.
 
 The rest are arioso's own helpers for what the runtimes return: :func:`song_from_wav`,
 :func:`read_wav`, :func:`draw_seed`, :func:`is_apple_silicon`.
@@ -23,11 +27,13 @@ The rest are arioso's own helpers for what the runtimes return: :func:`song_from
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 from ps.isolated import (
+    EnvSpec,
     GitSource,
     Runner,
     RuntimeNotInstalled,
@@ -37,9 +43,13 @@ from ps.isolated import (
     run_process,
 )
 from ps.isolated import Runtime as _Runtime
+from ps.isolated import ensure_env as _ensure_env
 
 __all__ = [
+    "DFLT_ENVS_DIR",
     "DFLT_RUNTIMES_DIR",
+    "ENVS_DIR_VAR",
+    "EnvSpec",
     "GitSource",
     "RUNTIMES_DIR_VAR",
     "WORKERS_DIR",
@@ -50,6 +60,8 @@ __all__ = [
     "Worker",
     "WorkerError",
     "draw_seed",
+    "ensure_env",
+    "env_dir",
     "is_apple_silicon",
     "read_wav",
     "run_process",
@@ -61,6 +73,10 @@ __all__ = [
 DFLT_RUNTIMES_DIR = "~/.local/share/arioso/runtimes"
 #: The variable naming the folder that holds every runtime.
 RUNTIMES_DIR_VAR = "ARIOSO_RUNTIMES_DIR"
+#: Where environments built from an :class:`EnvSpec` live, unless ``$ARIOSO_ENVS_DIR`` is set.
+DFLT_ENVS_DIR = "~/.local/share/arioso/envs"
+#: The variable naming the folder that holds the built environments.
+ENVS_DIR_VAR = "ARIOSO_ENVS_DIR"
 #: The worker files, run inside the runtimes' environments.
 WORKERS_DIR = Path(__file__).resolve().parent / "_workers"
 
@@ -91,6 +107,25 @@ def worker_file(name: str) -> Path:
         )
         raise ValueError(f"No worker file {path.name}; known workers: {known}")
     return path
+
+
+def env_dir(name: str) -> Path:
+    """The folder of the built environment ``name``: ``$ARIOSO_ENVS_DIR/<name>``, else the default.
+
+    >>> env_dir("demo").name
+    'demo'
+    """
+    return Path(os.environ.get(ENVS_DIR_VAR) or DFLT_ENVS_DIR).expanduser() / name
+
+
+def ensure_env(spec: EnvSpec, *, path=None, **kwargs) -> Path:
+    """Build ``spec``'s environment (at ``path``, default :func:`env_dir`) unless built; its Python.
+
+    The first call installs the requirements with ``uv`` (a notice with the commands goes to
+    stderr first); later calls only check the marker. ``kwargs`` go to
+    :func:`ps.isolated.ensure_env` (``run=``, ``log=``: the seams).
+    """
+    return _ensure_env(spec, path or env_dir(spec.name), **kwargs)
 
 
 def draw_seed() -> int:

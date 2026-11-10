@@ -7,6 +7,7 @@ so these need no MLX, torch or weights. The tests at the end render real audio o
 """
 
 import ast
+import os
 import sys
 import wave
 
@@ -288,6 +289,12 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
     class Handler:
         def initialize_service(self, **kw):
             seen["dit"] = kw
+            seen["dit_loads"] = seen.get("dit_loads", 0) + 1
+            return "ok", True
+
+    class LLMHandler:
+        def initialize(self, **kw):
+            seen.setdefault("lm", []).append(kw)
             return "ok", True
 
     def generate_music(dit_h, llm_h, *, params, config, save_dir):
@@ -308,6 +315,7 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         {
             "acestep": {},
             "acestep.handler": {"AceStepHandler": Handler},
+            "acestep.llm_inference": {"LLMHandler": LLMHandler},
             "acestep.inference": {
                 "GenerationParams": Params,
                 "GenerationConfig": Config,
@@ -316,11 +324,12 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         },
     )
     monkeypatch.setattr(sys, "path", list(sys.path))  # load() puts the checkout on it
-    monkeypatch.setenv("TOKENIZERS_PARALLELISM", "false")
+    monkeypatch.delenv("TOKENIZERS_PARALLELISM", raising=False)
     monkeypatch.chdir(tmp_path)  # the worker runs in the checkout
     worker = load_worker_module(worker_file("ace_step"))
     state = worker.load()
     assert state["root"] == str(tmp_path) and sys.path[0] == str(tmp_path)
+    assert os.environ["TOKENIZERS_PARALLELISM"] == "false"
     request = {
         "caption": "funk",
         "seconds": 10.0,
@@ -336,7 +345,8 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
     out = worker.render(state, **request)
     worker.render(state, **request)
     assert seen["dit"]["project_root"] == str(tmp_path)
-    assert len(state["handlers"]) == 1, "the DiT loads once and is kept"
+    assert seen["dit_loads"] == 1, "the DiT loads once and is kept"
+    assert "lm" not in seen  # lm=None: no LM
     assert seen["config"]["use_random_seed"] is False and seen["config"]["seeds"] == [
         123
     ]
@@ -346,6 +356,15 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         and seen["params"]["thinking"] is False
     )
     assert out["out"].endswith("ace.wav")
+    # with an LM: MLX on Apple Silicon, PyTorch elsewhere, loaded once per (dit, lm)
+    for apple, backend in ((True, "mlx"), (False, "pt")):
+        monkeypatch.setattr(worker, "_is_apple_silicon", lambda apple=apple: apple)
+        lm = f"lm-{backend}"
+        worker.render(state, **dict(request, lm=lm))
+        worker.render(state, **dict(request, lm=lm))
+        assert seen["lm"][-1]["backend"] == backend
+        assert seen["lm"][-1]["lm_model_path"] == lm
+    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 3
 
 
 def test_magenta_rt_worker_loads_once_per_size_and_samples_per_call(
@@ -413,6 +432,8 @@ def test_worker_files_import_nothing_from_arioso(name):
         if isinstance(node, ast.ImportFrom)
     }
     assert "arioso" not in imported and "ps" not in imported
+    relative = [n for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.level]
+    assert not relative, "a worker file is loaded standalone: no relative imports"
 
 
 def test_the_configs_name_existing_workers():

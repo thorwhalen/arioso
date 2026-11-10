@@ -263,10 +263,17 @@ song = arioso.generate(
     bars=4,
     seed=7,
 )
-song.metadata["prompt_sent"]  # 'Rhodes Piano, Warm, Chord Progression, Low Reverb, 4 Bars, 100 BPM, A minor'
+song.metadata[
+    "prompt_sent"
+]  # 'Rhodes Piano, Warm, Chord Progression, Low Reverb, 4 Bars, 100 BPM, A minor'
 
 # A one-shot: no tempo, so duration is the length
-song = arioso.generate("Grand Piano, Near, Bright, Hit", platform="foundation_1", model="1.2-samples", duration=3)
+song = arioso.generate(
+    "Grand Piano, Near, Bright, Hit",
+    platform="foundation_1",
+    model="1.2-samples",
+    duration=3,
+)
 ```
 
 Measured on an M1 Max (64 GB, MPS, the default 100 steps): a 10 s clip takes 70 s once the model is loaded (92 s for the first, loading included), about 7 times real time, and the worker process peaks at 14 GB.

@@ -137,14 +137,19 @@ def test_a_checkout_at_another_commit_is_refused(monkeypatch, tmp_path):
 
     from arioso._isolated import GitSource, SourceMismatch
 
-    repo = tmp_path / "rt"
+    repo = tmp_path / "rt"  # under default_dir: the root arioso would choose
     git = ["git", "-c", "user.name=t", "-c", "user.email=t@t"]
     subprocess.run([*git, "init", "--quiet", str(repo)], check=True)
     (repo / "bin").mkdir()
     (repo / "bin" / "python").write_text("")
     subprocess.run([*git, "-C", str(repo), "commit", "--quiet", "--allow-empty", "-m", "x"], check=True)
-    monkeypatch.setenv("ARIOSO_TOY_DIR", str(repo))
-    rt = Runtime(name="toy", env_var="ARIOSO_TOY_DIR", setup="", python="bin/python",
-                 source=GitSource("https://example.org/toy", "0" * 40))
+    monkeypatch.delenv("ARIOSO_TOY_DIR", raising=False)
+    monkeypatch.delenv("ARIOSO_RUNTIMES_DIR", raising=False)
+    pinned = GitSource("https://example.org/toy", "0" * 40)
+    rt = Runtime(name="rt", env_var="ARIOSO_TOY_DIR", setup="", python="bin/python",
+                 default_dir=str(tmp_path), source=pinned)
     with pytest.raises(SourceMismatch, match="not the pinned 000000000000"):
-        rt.interpreter()
+        rt.interpreter()  # a root arioso chose: refused
+    monkeypatch.setenv("ARIOSO_TOY_DIR", str(repo))
+    with pytest.warns(UserWarning, match="ARIOSO_TOY_DIR names a runtime that is not the pinned one"):
+        assert rt.interpreter() == repo / "bin" / "python"  # the user's own: used, with a warning

@@ -431,14 +431,27 @@ class MlxBackend:
 
     @classmethod
     def available(cls, model_variant: str) -> bool:
-        """Apple Silicon, a supported checkpoint, and the runtime installed (cheap)."""
-        from arioso._isolated import is_apple_silicon
+        """Apple Silicon, a supported checkpoint, and the runtime installed at its pinned commit.
 
-        return (
-            is_apple_silicon()
-            and cls.supports(model_variant)
-            and cls.runtime().installed()
-        )
+        A runtime at another commit (or with edits) is not available: a warning says
+        how to move it, and selection falls back to the next backend rather than
+        failing a take that another backend can make.
+        """
+        from arioso._isolated import SourceMismatch, is_apple_silicon
+
+        if not (is_apple_silicon() and cls.supports(model_variant)):
+            return False
+        runtime = cls.runtime()
+        if not runtime.installed():
+            return False
+        try:
+            runtime.interpreter()  # checks the pinned commit (two local git calls)
+        except SourceMismatch as error:
+            import warnings
+
+            warnings.warn(f"musicgen: not using MLX: {error}", stacklevel=2)
+            return False
+        return True
 
     @classmethod
     def can_continue(cls, model_variant: str) -> bool:

@@ -319,3 +319,29 @@ def test_a_chooser_taking_keywords_is_told_the_task():
     adapter = Adapter(PLATFORM_CONFIG, backend_for=chooser)
     adapter._class_for("facebook/musicgen-small", "continuation")
     assert seen == [{"task": "continuation"}]
+
+
+def test_a_runtime_off_its_pinned_commit_falls_back_with_a_warning(
+    tmp_path, monkeypatch, apple_silicon
+):
+    from arioso._isolated import SourceMismatch
+
+    rt = PLATFORM_CONFIG["mlx_runtime"]
+    python = tmp_path / rt["python"]
+    python.parent.mkdir(parents=True)
+    python.write_text("")
+    monkeypatch.delenv(rt["env_var"], raising=False)
+    monkeypatch.setenv("ARIOSO_RUNTIMES_DIR", str(tmp_path.parent))
+    monkeypatch.setattr(MlxBackend, "runtime", classmethod(
+        lambda cls: __import__("arioso._isolated", fromlist=["Runtime"]).Runtime(
+            **{**rt, "name": tmp_path.name})))
+    checked = []
+
+    def mismatch(source, path, **kw):
+        checked.append(source)
+        raise SourceMismatch(f"{path} is at 0123, not the pinned one")
+
+    monkeypatch.setattr("ps.isolated.check_git_source", mismatch)
+    with pytest.warns(UserWarning, match="not using MLX"):
+        assert select_backend_class("facebook/musicgen-small") is TransformersBackend
+    assert checked == [rt["source"]]  # the config's pin is what was checked

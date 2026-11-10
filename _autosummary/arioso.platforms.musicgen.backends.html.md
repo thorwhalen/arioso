@@ -190,7 +190,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 MusicGen on MLX, in the `mlx-examples` runtime’s own process (text only).
 
 The model lives in a `Worker` running
-`arioso.platforms.musicgen._mlx_driver`; audio comes back through a `.npy` file.
+`arioso/_workers/musicgen_mlx_worker.py`; audio comes back through a `.npy` file.
 `top_p` has no MLX counterpart (a non-zero one is warned about and ignored).
 
 #### *classmethod* available(model_variant)

@@ -2,8 +2,8 @@
 
 Magenta RealTime 2 adapter: offline renders from a worker in magenta-rt’s own environment.
 
-The model loads once, in a `Worker` running this platform’s
-`_driver` with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
+The model loads once, in a `Worker` running
+`arioso/_workers/magenta_rt_worker.py` with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
 need not share). Style comes from the text `prompt` or a `reference_audio` clip; there
 is no tempo control beyond the words, and no seed (the sampler is not seedable).
 
@@ -12,7 +12,7 @@ is no tempo control beyond the words, and no seed (the sampler is not seedable).
 | [`Adapter`](#arioso.platforms.magenta_rt.adapter.Adapter)([config, make_worker])   | Local Magenta RealTime 2 (MLX) adapter.   |
 |-----------------------------------------------------------------------------------|-------------------------------------------|
 
-### *class* arioso.platforms.magenta_rt.adapter.Adapter(config=None, \*, make_worker=<class 'arioso._isolated.Worker'>)
+### *class* arioso.platforms.magenta_rt.adapter.Adapter(config=None, \*, make_worker=<class 'ps.isolated.Worker'>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

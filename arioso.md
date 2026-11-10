@@ -1,4 +1,4 @@
-> built 2026-11-10 10:34 UTC from 3933612 (main) · arioso 0.0.47. Details: build_info.json
+> built 2026-11-10 11:20 UTC from 56f43eb (main) · arioso 0.0.48. Details: build_info.json
 
 # index.html.md
 
@@ -2060,8 +2060,8 @@ Google Lyria RealTime platform for arioso.
 
 Magenta RealTime 2 adapter: offline renders from a worker in magenta-rt’s own environment.
 
-The model loads once, in a `Worker` running this platform’s
-`_driver` with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
+The model loads once, in a `Worker` running
+`arioso/_workers/magenta_rt_worker.py` with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
 need not share). Style comes from the text `prompt` or a `reference_audio` clip; there
 is no tempo control beyond the words, and no seed (the sampler is not seedable).
 
@@ -2070,7 +2070,7 @@ is no tempo control beyond the words, and no seed (the sampler is not seedable).
 | [`Adapter`](_autosummary/arioso.platforms.magenta_rt.adapter.html.md#arioso.platforms.magenta_rt.adapter.Adapter)([config, make_worker])   | Local Magenta RealTime 2 (MLX) adapter.   |
 |-----------------------------------------------------------------------------------|-------------------------------------------|
 
-### *class* arioso.platforms.magenta_rt.adapter.Adapter(config=None, \*, make_worker=<class 'arioso._isolated.Worker'>)
+### *class* arioso.platforms.magenta_rt.adapter.Adapter(config=None, \*, make_worker=<class 'ps.isolated.Worker'>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2475,7 +2475,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 MusicGen on MLX, in the `mlx-examples` runtime’s own process (text only).
 
 The model lives in a `Worker` running
-`arioso.platforms.musicgen._mlx_driver`; audio comes back through a `.npy` file.
+`arioso/_workers/musicgen_mlx_worker.py`; audio comes back through a `.npy` file.
 `top_p` has no MLX counterpart (a non-zero one is warned about and ignored).
 
 #### *classmethod* available(model_variant)
@@ -3557,18 +3557,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 10:34 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/39336124074a3a554f14ea55d2d29585ea62a8e1"><code>3933612</code></a> on branch <code>main</code>, for **arioso 0.0.47** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 11:20 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/56f43eb16ed4da533f730d0017bf4bd810fd81d8"><code>56f43eb</code></a> on branch <code>main</code>, for **arioso 0.0.48** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.48) is ahead of the latest release on PyPI (0.0.47): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/39336124074a3a554f14ea55d2d29585ea62a8e1"><code>39336124074a3a554f14ea55d2d29585ea62a8e1</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/56f43eb16ed4da533f730d0017bf4bd810fd81d8"><code>56f43eb16ed4da533f730d0017bf4bd810fd81d8</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.47</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.48</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3577,9 +3579,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42799829485">42799829485</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42806324055">42806324055</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>b1d4e292d0614b58d5c22228598fbaa542fe9a4b</code> (in the history of the built commit) |
+| Event commit | <code>c02e47b5f51f0b626f6645546423c75cc5878e04</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3604,13 +3606,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.47/">0.0.47</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.47/">0.0.47</a>, older than the documented version (0.0.48).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 39336124074a3a554f14ea55d2d29585ea62a8e1
+git checkout 56f43eb16ed4da533f730d0017bf4bd810fd81d8
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

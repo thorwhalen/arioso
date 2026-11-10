@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=4f34e5f2"></script>
+    <script src="../_static/documentation_options.js?v=a72e4630"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.47" />
+  <meta name="docsearch:version" content="0.0.48" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -423,8 +423,8 @@
   <section id="module-arioso.platforms.magenta_rt.adapter">
 <span id="arioso-platforms-magenta-rt-adapter"></span><h1>arioso.platforms.magenta_rt.adapter<a class="headerlink" href="#module-arioso.platforms.magenta_rt.adapter" title="Link to this heading">#</a></h1>
 <p>Magenta RealTime 2 adapter: offline renders from a worker in magenta-rt’s own environment.</p>
-<p>The model loads once, in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Worker</span></code> running this platform’s
-<code class="docutils literal notranslate"><span class="pre">_driver</span></code> with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
+<p>The model loads once, in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Worker</span></code> running
+<code class="docutils literal notranslate"><span class="pre">arioso/_workers/magenta_rt_worker.py</span></code> with the runtime’s Python (MLX pinned below 0.32, which arioso’s environment
 need not share). Style comes from the text <code class="docutils literal notranslate"><span class="pre">prompt</span></code> or a <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code> clip; there
 is no tempo control beyond the words, and no seed (the sampler is not seedable).</p>
 <p class="rubric">Classes</p>
@@ -438,7 +438,7 @@ is no tempo control beyond the words, and no seed (the sampler is not seedable).
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.magenta_rt.adapter.Adapter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.magenta_rt.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_worker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'arioso._isolated.Worker'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/magenta_rt/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.magenta_rt.adapter.Adapter" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.magenta_rt.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_worker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'ps.isolated.Worker'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/magenta_rt/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.magenta_rt.adapter.Adapter" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Local Magenta RealTime 2 (MLX) adapter.</p>
 <dl class="field-list simple">

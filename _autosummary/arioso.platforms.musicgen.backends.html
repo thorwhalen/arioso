@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=4f34e5f2"></script>
+    <script src="../_static/documentation_options.js?v=a72e4630"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.47" />
+  <meta name="docsearch:version" content="0.0.48" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -710,7 +710,7 @@ mono for a continuation; MLX returns <code class="docutils literal notranslate">
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>MusicGen on MLX, in the <code class="docutils literal notranslate"><span class="pre">mlx-examples</span></code> runtime’s own process (text only).</p>
 <p>The model lives in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Worker</span></code> running
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">arioso.platforms.musicgen._mlx_driver</span></code>; audio comes back through a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> file.
+<code class="docutils literal notranslate"><span class="pre">arioso/_workers/musicgen_mlx_worker.py</span></code>; audio comes back through a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> file.
 <code class="docutils literal notranslate"><span class="pre">top_p</span></code> has no MLX counterpart (a non-zero one is warned about and ignored).</p>
 <dl class="field-list simple">
 </dl>

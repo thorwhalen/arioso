@@ -67,7 +67,7 @@ seeds = [
 # arioso.compare: objective checks (level, clipping; tempo and key through denote).
 compare = [
     "numpy",
-    "denote>=0.0.9",
+    "denote>=0.0.10",  # get_key
 ]
 test = [
     "pytest>=7.0",

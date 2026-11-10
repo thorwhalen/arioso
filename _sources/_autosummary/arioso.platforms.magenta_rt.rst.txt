@@ -1,0 +1,14 @@
+arioso.platforms.magenta\_rt
+============================
+
+.. automodule:: arioso.platforms.magenta_rt
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

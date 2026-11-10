@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-10T08:03:27Z",
+  "built_at": "2026-11-10T08:09:18Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.42",
+    "version": "0.0.43",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "ee7abe5f725a35bc8eb5a277365565eb94a04fa4",
-    "short_commit": "ee7abe5",
+    "commit": "ce6b5eabcc6b2d1aeeff887e1054eaf130f80653",
+    "short_commit": "ce6b5ea",
     "branch": "main",
     "tags": [
-      "0.0.42"
+      "0.0.43"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/ee7abe5f725a35bc8eb5a277365565eb94a04fa4",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/ce6b5eabcc6b2d1aeeff887e1054eaf130f80653",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "87abd18fc105437d3bb6a54f33c1c7d306b75e6b",
+    "sha": "6728c1d93ecb576a2d31d234d1ef359eed1a4e00",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "42779414678",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/42779414678",
+    "run_id": "42780087162",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/42780087162",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -57,21 +57,21 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 59,
-    "objects_documented": 146
+    "modules_documented": 65,
+    "objects_documented": 156
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.41",
+    "latest": "0.0.42",
     "relation": "ahead",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout ee7abe5f725a35bc8eb5a277365565eb94a04fa4\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout ce6b5eabcc6b2d1aeeff887e1054eaf130f80653\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.42) is ahead of the latest release on PyPI (0.0.41): these docs describe unreleased code."
+      "The documented version (0.0.43) is ahead of the latest release on PyPI (0.0.42): these docs describe unreleased code."
     ]
   }
 }

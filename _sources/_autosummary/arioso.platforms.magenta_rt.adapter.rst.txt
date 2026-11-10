@@ -1,0 +1,12 @@
+arioso.platforms.magenta\_rt.adapter
+====================================
+
+.. automodule:: arioso.platforms.magenta_rt.adapter
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

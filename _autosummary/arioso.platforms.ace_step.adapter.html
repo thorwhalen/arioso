@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=173d7b4c"></script>
+    <script src="../_static/documentation_options.js?v=b345ff55"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.42" />
+  <meta name="docsearch:version" content="0.0.43" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -332,11 +332,13 @@
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.loudly.html">arioso.platforms.loudly</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria2.html">arioso.platforms.lyria2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.magenta_rt.html">arioso.platforms.magenta_rt</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.mubert.html">arioso.platforms.mubert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.musicgen.html">arioso.platforms.musicgen</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.riffusion.html">arioso.platforms.riffusion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio.html">arioso.platforms.stable_audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio_25.html">arioso.platforms.stable_audio_25</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio_3.html">arioso.platforms.stable_audio_3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.sunoapi.html">arioso.platforms.sunoapi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.udio.html">arioso.platforms.udio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.yue.html">arioso.platforms.yue</a></li>
@@ -419,27 +421,68 @@
                   
   <section id="module-arioso.platforms.ace_step.adapter">
 <span id="arioso-platforms-ace-step-adapter"></span><h1>arioso.platforms.ace_step.adapter<a class="headerlink" href="#module-arioso.platforms.ace_step.adapter" title="Link to this heading">#</a></h1>
-<p>ACE-Step adapter: a thin shim over the config-driven <code class="xref py py-class docutils literal notranslate"><span class="pre">arioso._fal.FalAdapter</span></code>.</p>
-<p>The mapping from unified affordances to fal arguments lives in this platform’s
-<code class="docutils literal notranslate"><span class="pre">config.py</span></code> (<code class="docutils literal notranslate"><span class="pre">PLATFORM_CONFIG[&quot;fal&quot;]</span></code>); nothing here is platform-specific. The
-module-level <code class="docutils literal notranslate"><span class="pre">fal_run</span></code> / <code class="docutils literal notranslate"><span class="pre">fal_upload_audio</span></code> are looked up at call time, so tests
-can patch them here.</p>
+<p>ACE-Step adapter: fal.ai’s hosted endpoint, or ACE-Step 1.5 run locally.</p>
+<p><code class="docutils literal notranslate"><span class="pre">runtime=&quot;fal&quot;</span></code> (the default) is the config-driven <code class="xref py py-class docutils literal notranslate"><span class="pre">arioso._fal.FalAdapter</span></code> (the
+mapping lives in this platform’s <code class="docutils literal notranslate"><span class="pre">config.py</span></code>); <code class="docutils literal notranslate"><span class="pre">runtime=&quot;local&quot;</span></code> runs ACE-Step 1.5 in
+its own environment (<code class="xref py py-mod docutils literal notranslate"><span class="pre">arioso.platforms.ace_step._local</span></code>). <code class="docutils literal notranslate"><span class="pre">$ARIOSO_ACE_STEP_RUNTIME</span></code>
+changes the default, e.g. to <code class="docutils literal notranslate"><span class="pre">local</span></code> on a machine with the runtime installed. The module-level <code class="docutils literal notranslate"><span class="pre">fal_run</span></code> /
+<code class="docutils literal notranslate"><span class="pre">fal_upload_audio</span></code> are looked up at call time, so tests can patch them here.</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.ace_step.adapter.LOCAL_ONLY" title="arioso.platforms.ace_step.adapter.LOCAL_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LOCAL_ONLY</span></code></a></p></td>
+<td><p>Keywords only the local runtime understands (fal's endpoint has no such controls).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.ace_step.adapter.Adapter" title="arioso.platforms.ace_step.adapter.Adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adapter</span></code></a>([config])</p></td>
-<td><p>fal.ai ACE-Step adapter.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.ace_step.adapter.Adapter" title="arioso.platforms.ace_step.adapter.Adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adapter</span></code></a>([config, local])</p></td>
+<td><p>ACE-Step adapter (fal.ai hosted, or local ACE-Step 1.5).</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.ace_step.adapter.Adapter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.ace_step.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/ace_step/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.ace_step.adapter.Adapter" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.ace_step.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/ace_step/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.ace_step.adapter.Adapter" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FalAdapter</span></code></p>
-<p>fal.ai ACE-Step adapter.</p>
+<p>ACE-Step adapter (fal.ai hosted, or local ACE-Step 1.5).</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.ace_step.adapter.Adapter.accepted_params">
+<span class="sig-name descname"><span class="pre">accepted_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/ace_step/adapter.html#Adapter.accepted_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.ace_step.adapter.Adapter.accepted_params" title="Link to this definition">#</a></dt>
+<dd><p>fal’s keywords plus the local runtime’s own controls and <code class="docutils literal notranslate"><span class="pre">runtime</span></code> itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.ace_step.adapter.Adapter.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/ace_step/adapter.html#Adapter.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.ace_step.adapter.Adapter.generate" title="Link to this definition">#</a></dt>
+<dd><p>Generate with fal or locally; see the module docstring for how <code class="docutils literal notranslate"><span class="pre">runtime</span></code> resolves.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.platforms.ace_step.adapter.Adapter.local">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">local</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LocalAceStep</span></span><a class="headerlink" href="#arioso.platforms.ace_step.adapter.Adapter.local" title="Link to this definition">#</a></dt>
+<dd><p>The local runtime (built on first use; its worker starts on the first call).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.ace_step.adapter.LOCAL_ONLY">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.ace_step.adapter.</span></span><span class="sig-name descname"><span class="pre">LOCAL_ONLY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('bpm',</span> <span class="pre">'key',</span> <span class="pre">'model',</span> <span class="pre">'lm_model',</span> <span class="pre">'audio_input_strength',</span> <span class="pre">'reference_audio',</span> <span class="pre">'timesignature')</span></span><a class="headerlink" href="#arioso.platforms.ace_step.adapter.LOCAL_ONLY" title="Link to this definition">#</a></dt>
+<dd><p>Keywords only the local runtime understands (fal’s endpoint has no such controls).</p>
 </dd></dl>
 
 </section>
@@ -491,7 +534,13 @@ can patch them here.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.Adapter.accepted_params"><code class="docutils literal notranslate"><span class="pre">Adapter.accepted_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.Adapter.generate"><code class="docutils literal notranslate"><span class="pre">Adapter.generate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.Adapter.local"><code class="docutils literal notranslate"><span class="pre">Adapter.local</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.adapter.LOCAL_ONLY"><code class="docutils literal notranslate"><span class="pre">LOCAL_ONLY</span></code></a></li>
 </ul>
   </nav></div>
 

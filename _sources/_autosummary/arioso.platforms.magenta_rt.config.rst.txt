@@ -1,0 +1,6 @@
+arioso.platforms.magenta\_rt.config
+===================================
+
+.. automodule:: arioso.platforms.magenta_rt.config
+
+   

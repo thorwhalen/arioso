@@ -1,23 +1,58 @@
-"""ACE-Step adapter: a thin shim over the config-driven :class:`arioso._fal.FalAdapter`.
+"""ACE-Step adapter: fal.ai's hosted endpoint, or ACE-Step 1.5 run locally.
 
-The mapping from unified affordances to fal arguments lives in this platform's
-``config.py`` (``PLATFORM_CONFIG["fal"]``); nothing here is platform-specific. The
-module-level ``fal_run`` / ``fal_upload_audio`` are looked up at call time, so tests
-can patch them here.
+``runtime="fal"`` is the config-driven :class:`arioso._fal.FalAdapter` (the mapping lives
+in this platform's ``config.py``); ``runtime="local"`` runs ACE-Step 1.5 in its own
+environment (:mod:`arioso.platforms.ace_step._local`). With no ``runtime``, fal is used
+when ``$FAL_KEY`` is set (paid), local otherwise. The module-level ``fal_run`` /
+``fal_upload_audio`` are looked up at call time, so tests can patch them here.
 """
 
 from __future__ import annotations
 
+import os
+import warnings
+
 from arioso._fal import FalAdapter, fal_run, fal_upload_audio
+from arioso.platforms.ace_step._local import LocalAceStep
 from arioso.platforms.ace_step.config import PLATFORM_CONFIG
+
+#: Keywords only the local runtime understands (fal's endpoint has no such controls).
+LOCAL_ONLY = ("bpm", "key", "model", "lm_model", "reference_audio", "audio_input_strength", "timesignature")
 
 
 class Adapter(FalAdapter):
-    """fal.ai ACE-Step adapter."""
+    """ACE-Step adapter (fal.ai hosted, or local ACE-Step 1.5)."""
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict = None, *, local=None):
+        config = config if config and "fal" in config else PLATFORM_CONFIG
         super().__init__(
-            config if config and "fal" in config else PLATFORM_CONFIG,
+            config,
             run=lambda endpoint, arguments: fal_run(endpoint, arguments),
             upload=lambda audio: fal_upload_audio(audio),
         )
+        self._local = local
+
+    @property
+    def local(self) -> LocalAceStep:
+        """The local runtime (built on first use; its worker starts on the first call)."""
+        if self._local is None:
+            self._local = LocalAceStep(self.config)
+        return self._local
+
+    def accepted_params(self) -> frozenset:
+        """fal's keywords plus the local runtime's own controls and ``runtime`` itself."""
+        return super().accepted_params() | set(LOCAL_ONLY) | {"runtime"}
+
+    def generate(self, prompt: str = "", *, runtime: str = None, **params):
+        """Generate with fal or locally; see the module docstring for how ``runtime`` resolves."""
+        runtime = runtime or ("fal" if os.environ.get("FAL_KEY") else "local")
+        if runtime == "local":
+            params.pop("fetch", None)
+            return self.local.generate(prompt, **params)
+        if runtime != "fal":
+            raise ValueError(f"ace_step: runtime must be 'fal' or 'local', not {runtime!r}")
+        dropped = [k for k in LOCAL_ONLY if params.pop(k, None) is not None]
+        if dropped:
+            warnings.warn(f"ace_step (fal) has no {', '.join(dropped)} control; ignored "
+                          "(runtime='local' supports them)", stacklevel=2)
+        return super().generate(prompt, **params)

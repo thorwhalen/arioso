@@ -159,6 +159,29 @@ song = arioso.generate(
 )
 ```
 
+### Local models in their own environments (Stable Audio 3, Magenta RealTime 2, ACE-Step 1.5)
+
+Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform's own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`) points elsewhere. Magenta RealTime and ACE-Step keep one worker process alive, so the model loads once per session.
+
+```python
+import arioso
+
+# Stable Audio 3 (Stability's MLX build, Apple Silicon): small-music, sm-sfx or medium
+song = arioso.generate("lo-fi hip hop loop, 85 BPM, mellow Rhodes", platform="stable_audio_3", duration=11.29, seed=1)
+
+# Magenta RealTime 2 (MLX, Apple Silicon): style from text or from a reference clip
+song = arioso.generate("funky drum and bass groove", platform="magenta_rt", duration=10)
+
+# ACE-Step 1.5 run locally (fal.ai stays the default when FAL_KEY is set): explicit BPM and key
+song = arioso.generate("acoustic guitar and soft piano", platform="ace_step", runtime="local", bpm=100, key="C Major", duration=30)
+```
+
+| platform | weights licence | commercial use |
+|---|---|---|
+| `stable_audio_3` | Stability AI Community License (+ Gemma terms for its text encoder) | free under US$1M annual revenue |
+| `magenta_rt` | CC-BY-4.0 | yes, with attribution |
+| `ace_step` (local) | MIT | yes |
+
 ### ElevenLabs
 
 Needs `ELEVENLABS_API_KEY` environment variable.

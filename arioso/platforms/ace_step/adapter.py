@@ -9,6 +9,7 @@ changes the default, e.g. to ``local`` on a machine with the runtime installed. 
 
 from __future__ import annotations
 
+import inspect
 import os
 import warnings
 
@@ -16,8 +17,16 @@ from arioso._fal import FalAdapter, fal_run, fal_upload_audio
 from arioso.platforms.ace_step._local import LocalAceStep
 from arioso.platforms.ace_step.config import PLATFORM_CONFIG
 
+def _local_only() -> tuple:
+    """Keywords the local runtime reads that fal's mapping does not (from the signature)."""
+    fal_names = {name for rule in PLATFORM_CONFIG["fal"]["shared"].values() for name in rule.get("from", ())}
+    fal_names |= {"prompt", "genre", "instrumental", "duration", "audio_input"}
+    params = inspect.signature(LocalAceStep.generate).parameters.values()
+    return tuple(p.name for p in params if p.kind is p.KEYWORD_ONLY and p.name not in fal_names)
+
+
 #: Keywords only the local runtime understands (fal's endpoint has no such controls).
-LOCAL_ONLY = ("bpm", "key", "model", "lm_model", "reference_audio", "audio_input_strength", "timesignature")
+LOCAL_ONLY = _local_only()
 
 
 class Adapter(FalAdapter):
@@ -45,12 +54,13 @@ class Adapter(FalAdapter):
 
     def generate(self, prompt: str = "", *, runtime: str = None, **params):
         """Generate with fal or locally; see the module docstring for how ``runtime`` resolves."""
+        source = "runtime" if runtime else "$ARIOSO_ACE_STEP_RUNTIME"
         runtime = runtime or os.environ.get("ARIOSO_ACE_STEP_RUNTIME") or "fal"
         if runtime == "local":
             params.pop("fetch", None)
             return self.local.generate(prompt, **params)
         if runtime != "fal":
-            raise ValueError(f"ace_step: runtime must be 'fal' or 'local', not {runtime!r}")
+            raise ValueError(f"ace_step: {source} must be 'fal' or 'local', not {runtime!r}")
         dropped = [k for k in LOCAL_ONLY if params.pop(k, None) is not None]
         if dropped:
             warnings.warn(f"ace_step (fal) has no {', '.join(dropped)} control; ignored "

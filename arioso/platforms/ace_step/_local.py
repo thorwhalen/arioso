@@ -8,6 +8,7 @@ caption, ``bpm``/``key`` are explicit controls, ``audio_input`` is the source of
 from __future__ import annotations
 
 import tempfile
+import warnings
 
 from arioso._audio import to_audio_ref
 from arioso._isolated import Runtime, Worker, draw_seed, song_from_wav
@@ -58,9 +59,12 @@ class LocalAceStep:
         audio_input_strength: float = 1.0,
         reference_audio=None,
         timesignature: str = None,
-        **_ignored,
+        **fal_only,
     ):
-        caption = prompt or genre
+        if fal_only:
+            warnings.warn(f"ace_step (local) has no {', '.join(sorted(fal_only))} control; ignored "
+                          "(those are fal.ai endpoint options)", stacklevel=3)
+        caption = genre or prompt  # the same precedence as the fal mapping (tags: genre, else prompt)
         if not caption:
             raise ValueError("ace_step requires a style prompt (prompt or genre)")
         if instrumental is None:
@@ -72,12 +76,19 @@ class LocalAceStep:
             "timesignature": timesignature, "steps": int(num_steps), "guidance": float(guidance),
             "seed": seed, "dit": model, "lm": lm_model, "out_dir": tempfile.mkdtemp(prefix="arioso_ace_"),
         }
-        if audio_input is not None:
-            req.update(task_type="cover", src_audio=to_audio_ref(audio_input).as_path(suffix=".wav"),
-                       cover_strength=float(audio_input_strength))
-        if reference_audio is not None:
-            req["reference_audio"] = to_audio_ref(reference_audio).as_path(suffix=".wav")
-        result = self._ensure_worker().call(req)
+        refs = []
+        try:
+            if audio_input is not None:
+                refs.append(to_audio_ref(audio_input))
+                req.update(task_type="cover", src_audio=refs[-1].as_path(suffix=".wav"),
+                           cover_strength=float(audio_input_strength))
+            if reference_audio is not None:
+                refs.append(to_audio_ref(reference_audio))
+                req["reference_audio"] = refs[-1].as_path(suffix=".wav")
+            result = self._ensure_worker().call(req)
+        finally:
+            for ref in refs:
+                ref.cleanup()
         meta = {"runtime": "local", "seed": seed, "model": model, "lm_model": lm_model, "bpm": bpm,
                 "key": key, "num_steps": num_steps, "audio_to_audio": audio_input is not None,
                 "ace_step": result.get("params", {})}

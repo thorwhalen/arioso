@@ -9,26 +9,24 @@ is given). ``runner=`` is the process seam.
 
 from __future__ import annotations
 
-import platform
 import re
 import tempfile
 from pathlib import Path
 
 from arioso._audio import to_audio_ref
-from arioso._isolated import Runner, Runtime, draw_seed, run_process, song_from_wav
+from arioso._isolated import Runner, Runtime, draw_seed, is_apple_silicon, run_process, song_from_wav
 from arioso.platforms.stable_audio_3.config import PLATFORM_CONFIG
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
-
-def _is_apple_silicon() -> bool:
-    return platform.system() == "Darwin" and platform.machine() == "arm64"
+#: Noise level for audio-to-audio when none is given; inpainting starts from pure noise (1.0).
+DFLT_A2A_NOISE = 0.7
 
 
 class Adapter:
     """Local Stable Audio 3 (MLX) adapter."""
 
-    def __init__(self, config: dict = None, *, runner: Runner = run_process, is_supported=_is_apple_silicon):
+    def __init__(self, config: dict = None, *, runner: Runner = run_process, is_supported=is_apple_silicon):
         self.config = config or PLATFORM_CONFIG
         self.runtime = Runtime(**self.config["runtime"])
         self._run = runner
@@ -40,11 +38,12 @@ class Adapter:
             dit, decoder = self.config["models"][model]
         except KeyError:
             raise ValueError(f"stable_audio_3: unknown model {model!r}; one of {sorted(self.config['models'])}")
-        cmd = [self.runtime.interpreter(), "scripts/sa3_mlx.py", "--prompt", prompt,
+        # --flag=value keeps a prompt that starts with "-" from being read as an option.
+        cmd = [self.runtime.interpreter(), "scripts/sa3_mlx.py", f"--prompt={prompt}",
                "--dit", dit, "--decoder", decoder, "--seconds", seconds, "--steps", steps,
                "--cfg", guidance, "--seed", seed, "--out", out]
         if negative_prompt:
-            cmd += ["--negative-prompt", negative_prompt]
+            cmd += [f"--negative-prompt={negative_prompt}"]
         if init_audio is not None:
             cmd += ["--init-audio", init_audio, "--init-noise-level", strength]
             if inpaint_range is not None:
@@ -65,7 +64,7 @@ class Adapter:
         seed: int = None,
         negative_prompt: str = None,
         audio_input=None,
-        audio_input_strength: float = 0.7,
+        audio_input_strength: float = None,
         inpaint_range=None,
         timeout: float = None,
         **kwargs,
@@ -82,7 +81,8 @@ class Adapter:
             seed: Seed; a fresh one is drawn and recorded when None.
             negative_prompt: What to steer away from (needs ``guidance`` above 1).
             audio_input: Audio to vary (audio-to-audio) or, with ``inpaint_range``, to inpaint.
-            audio_input_strength: Noise level 0-1 applied to ``audio_input`` (higher = freer).
+            audio_input_strength: Noise level 0-1 applied to ``audio_input`` (higher = freer);
+                default 0.7 for a variation, 1.0 for inpainting (which starts from noise).
             inpaint_range: ``(start, end)`` seconds of ``audio_input`` to regenerate.
             timeout: Seconds before the process is killed.
 
@@ -94,18 +94,23 @@ class Adapter:
         seed = draw_seed() if seed is None else int(seed)
         work = Path(tempfile.mkdtemp(prefix="arioso_sa3_"))
         out = work / "out.wav"
-        init_path = None
-        if audio_input is not None:
-            init_path = to_audio_ref(audio_input).as_path(suffix=".wav")
-        cmd = self._command(prompt, out, model=model, seconds=float(duration), steps=int(num_steps),
-                            guidance=float(guidance), seed=seed, negative_prompt=negative_prompt,
-                            init_audio=init_path, strength=float(audio_input_strength),
-                            inpaint_range=inpaint_range)
-        code, log = self._run(cmd, cwd=self.runtime.workdir(), env=None, timeout=timeout)
+        if audio_input_strength is None:
+            audio_input_strength = 1.0 if inpaint_range is not None else DFLT_A2A_NOISE
+        ref = to_audio_ref(audio_input) if audio_input is not None else None
+        try:
+            cmd = self._command(prompt, out, model=model, seconds=float(duration), steps=int(num_steps),
+                                guidance=float(guidance), seed=seed, negative_prompt=negative_prompt,
+                                init_audio=ref.as_path(suffix=".wav") if ref else None,
+                                strength=float(audio_input_strength), inpaint_range=inpaint_range)
+            code, log = self._run(cmd, cwd=self.runtime.workdir(), env=None, timeout=timeout)
+        finally:
+            if ref is not None:
+                ref.cleanup()
         if code or not out.exists():
             tail = _ANSI.sub("", log)[-2000:]
             raise RuntimeError(f"stable_audio_3 failed (exit {code}):\n{tail}")
         return song_from_wav(out, platform="stable_audio_3", metadata={
             "seed": seed, "model": model, "num_steps": num_steps, "guidance": guidance,
             "audio_to_audio": audio_input is not None, "inpaint_range": inpaint_range,
+            "audio_input_strength": audio_input_strength if audio_input is not None else None,
         })

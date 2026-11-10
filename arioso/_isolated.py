@@ -95,11 +95,28 @@ class Runtime:
         )
 
 
-def _arioso_pythonpath(env: dict) -> str:
-    """``PYTHONPATH`` with this arioso first, so a foreign interpreter imports the same code."""
-    here = str(Path(__file__).resolve().parent.parent)
-    rest = env.get("PYTHONPATH")
-    return here + (os.pathsep + rest if rest else "")
+_ARIOSO_ONLY_DIR = None
+
+
+def _arioso_only_dir() -> str:
+    """A directory holding only this ``arioso`` package (a link to it), for a foreign ``PYTHONPATH``.
+
+    Putting arioso's parent directory on the path would, for a regular install, expose the
+    host's whole site-packages (its numpy, torch...) to an environment built to pin its own.
+    """
+    global _ARIOSO_ONLY_DIR
+    if _ARIOSO_ONLY_DIR is None:
+        import shutil
+        import tempfile
+
+        package = Path(__file__).resolve().parent
+        base = Path(tempfile.mkdtemp(prefix="arioso_path_"))
+        try:
+            (base / "arioso").symlink_to(package, target_is_directory=True)
+        except OSError:  # no symlink rights (e.g. Windows without developer mode)
+            shutil.copytree(package, base / "arioso", ignore=shutil.ignore_patterns("__pycache__"))
+        _ARIOSO_ONLY_DIR = str(base)
+    return _ARIOSO_ONLY_DIR
 
 
 class Worker:
@@ -111,7 +128,8 @@ class Worker:
     Args:
         python: The interpreter to run.
         module: The driver module, run as ``python -m module``; it calls :func:`serve`.
-        env: Extra environment variables for the process.
+        env: Extra environment variables for the process. The host's ``PYTHONPATH`` is not
+            passed on; a ``PYTHONPATH`` given here is appended after arioso's.
         cwd: Its working directory.
         spawn: The process factory (seam; defaults to :class:`subprocess.Popen`).
     """
@@ -132,10 +150,13 @@ class Worker:
         self._spawn = spawn
         self._proc = None
         self._lock = threading.Lock()
+        atexit.register(self.close)
 
     def _start(self):
-        env = {**os.environ, **self.env}
-        env["PYTHONPATH"] = _arioso_pythonpath(env)
+        env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+        env.update(self.env)
+        extra = self.env.get("PYTHONPATH")
+        env["PYTHONPATH"] = _arioso_only_dir() + (os.pathsep + extra if extra else "")
         self._proc = self._spawn(
             [self.python, "-u", "-m", self.module],
             stdin=subprocess.PIPE,
@@ -146,7 +167,6 @@ class Worker:
             text=True,
             bufsize=1,
         )
-        atexit.register(self.close)
 
     @property
     def alive(self) -> bool:
@@ -159,18 +179,36 @@ class Worker:
             if not self.alive:
                 self._start()
             try:
-                self._proc.stdin.write(json.dumps(request) + "\n")
-                self._proc.stdin.flush()
-            except (BrokenPipeError, OSError) as exc:
-                raise WorkerError(f"{self.module} worker is not accepting requests: {exc}")
-            line = self._proc.stdout.readline()
-            if not line:
-                code = self._proc.wait()
-                raise WorkerError(f"{self.module} worker exited (code {code}) before answering")
-            reply = json.loads(line)
+                reply = self._exchange(request)
+            except BaseException:
+                # An interrupted or garbled exchange would leave a reply in the pipe that the
+                # next call would read as its own: stop the worker instead (it restarts lazily).
+                self._kill()
+                raise
             if not reply.get("ok"):
                 raise WorkerError(f"{self.module} worker failed:\n{reply.get('error')}")
             return reply["result"]
+
+    def _exchange(self, request: dict) -> dict:
+        try:
+            self._proc.stdin.write(json.dumps(request) + "\n")
+            self._proc.stdin.flush()
+        except (BrokenPipeError, OSError) as exc:
+            raise WorkerError(f"{self.module} worker is not accepting requests: {exc}")
+        line = self._proc.stdout.readline()
+        if not line:
+            code = self._proc.wait()
+            raise WorkerError(f"{self.module} worker exited (code {code}) before answering")
+        try:
+            return json.loads(line)
+        except json.JSONDecodeError:
+            raise WorkerError(f"{self.module} worker sent a line that is not a reply: {line[:200]!r}")
+
+    def _kill(self):
+        proc, self._proc = self._proc, None
+        if proc is not None and proc.poll() is None:
+            proc.kill()
+            proc.wait()
 
     def close(self):
         """Stop the process (closing its stdin ends :func:`serve`'s loop)."""
@@ -219,6 +257,7 @@ def run_process(cmd, *, cwd, env, timeout=None) -> "tuple[int, str]":
         cwd=cwd,
         env={**os.environ, **(env or {})},
         timeout=timeout,
+        stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,
     )
@@ -235,29 +274,52 @@ def draw_seed() -> int:
 def read_wav(path):
     """``(array, sample_rate)`` from a wav a runtime wrote: soundfile if installed, else bytes.
 
-    Returns ``(None, sample_rate)`` with only the rate (from the header) when soundfile is
-    missing; callers then keep the file's bytes.
+    Returns ``(None, sample_rate)`` when soundfile is missing (callers keep the bytes).
     """
     try:
         import soundfile as sf
     except ImportError:
-        import wave
-
-        with wave.open(str(path)) as w:
-            return None, w.getframerate()
+        return None, _wav_header(path)[0]
     data, sr = sf.read(str(path), dtype="float32")
     return data, sr
 
 
-def song_from_wav(path, *, platform: str, metadata: dict):
-    """A complete :class:`~arioso.base.Song` holding the wav at ``path`` (bytes and array)."""
+def _wav_header(path) -> "tuple[int, float]":
+    """``(sample_rate, seconds)`` from a wav header (stdlib only)."""
+    import wave
+
+    with wave.open(str(path)) as w:
+        return w.getframerate(), w.getnframes() / w.getframerate()
+
+
+def is_apple_silicon() -> bool:
+    """Whether this is an Apple Silicon Mac (where the MLX runtimes run)."""
+    import platform
+
+    return platform.system() == "Darwin" and platform.machine() == "arm64"
+
+
+def song_from_wav(path, *, platform: str, metadata: dict, remove: bool = True):
+    """A complete :class:`~arioso.base.Song` holding the wav at ``path`` (bytes and array).
+
+    The Song holds the audio in memory, so the file (and its directory, when that is left
+    empty) is removed unless ``remove=False``.
+    """
     from arioso.base import AudioResult, Song
 
+    path = Path(path)
     array, sr = read_wav(path)
-    duration = len(array) / sr if array is not None and sr else 0.0
+    duration = len(array) / sr if array is not None and sr else _wav_header(path)[1]
+    data = path.read_bytes()
+    if remove:
+        path.unlink(missing_ok=True)
+        try:
+            path.parent.rmdir()
+        except OSError:
+            pass
     return Song(
         audio=AudioResult(
-            audio_bytes=Path(path).read_bytes(),
+            audio_bytes=data,
             audio_array=array,
             sample_rate=sr,
             format="wav",

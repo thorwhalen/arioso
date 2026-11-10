@@ -46,7 +46,7 @@ PLATFORM_CONFIG = {
         "audio_input": {"native_name": "--init-audio", "adapter_handled": True},
         "audio_input_strength": {
             "native_name": "--init-noise-level",
-            "native_default": 0.7,
+            "native_default": 0.7,  # 1.0 when inpainting
             "adapter_handled": True,
         },
     },
@@ -62,7 +62,8 @@ PLATFORM_CONFIG = {
         "audio_input_strength",
     ],
     # (start, end) seconds of audio_input to regenerate; the rest is kept.
-    "adapter_params": ["inpaint_range"],
+    # timeout: seconds before the process is killed.
+    "adapter_params": ["inpaint_range", "timeout"],
     "on_unsupported_param": "warn",
     "output": {"default_format": "wav", "sample_rate": 44100, "returns": "array"},
 }

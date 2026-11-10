@@ -166,7 +166,7 @@ Some local models pin library versions (MLX, torch) that cannot share an environ
 ```python
 import arioso
 
-# Stable Audio 3 (Stability's MLX build, Apple Silicon): small-music, sm-sfx or medium
+# Stable Audio 3 (Stability's MLX build, Apple Silicon): model="sm-music" (default), "sm-sfx" or "medium"
 song = arioso.generate("lo-fi hip hop loop, 85 BPM, mellow Rhodes", platform="stable_audio_3", duration=11.29, seed=1)
 
 # Magenta RealTime 2 (MLX, Apple Silicon): style from text or from a reference clip

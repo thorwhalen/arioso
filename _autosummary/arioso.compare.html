@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../_static/documentation_options.js?v=73f2ab08"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.51" />
+  <meta name="docsearch:version" content="0.0.52" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -634,7 +634,8 @@ and <code class="docutils literal notranslate"><span class="pre">function()</spa
 The child writes each take’s record as soon as it is made, so a child killed after
 <code class="docutils literal notranslate"><span class="pre">timeout</span></code> seconds (with every process it started) or exiting non-zero still returns
 the takes it finished, each marked with <code class="docutils literal notranslate"><span class="pre">child_exit</span></code>; prompts it never reached get an
-<code class="docutils literal notranslate"><span class="pre">error</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">error</span></code>. Processes the child started are killed when it ends, however it ends; on
+Windows only when it is killed (thorwhalen/ps#25).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</span></p>

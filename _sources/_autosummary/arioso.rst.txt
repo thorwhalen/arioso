@@ -35,9 +35,11 @@
    base
    cli
    compare
+   keybed
    named_prompts
    platforms
    registry
+   sampler_export
    scoring
    seeds
    services

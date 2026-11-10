@@ -1,4 +1,4 @@
-> built 2026-11-10 15:47 UTC from 471a26c (main) · arioso 0.0.51. Details: build_info.json
+> built 2026-11-10 20:45 UTC from 69a62d8 (main) · arioso 0.0.52. Details: build_info.json
 
 # index.html.md
 
@@ -1058,7 +1058,8 @@ and `function()` called. The child’s output goes to `<out_dir>/<contender>/chi
 The child writes each take’s record as soon as it is made, so a child killed after
 `timeout` seconds (with every process it started) or exiting non-zero still returns
 the takes it finished, each marked with `child_exit`; prompts it never reached get an
-`error`.
+`error`. Processes the child started are killed when it ends, however it ends; on
+Windows only when it is killed (thorwhalen/ps#25).
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
@@ -1825,7 +1826,7 @@ Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).
 
 Stop the worker (the loaded model is released).
 
-#### generate(prompt, , duration=None, bpm=None, key=None, bars=None, note=None, model='foundation-1', num_steps=100, guidance=7.0, seed=None, negative_prompt=None, sampler='dpmpp-3m-sde', device=None, \*\*kwargs)
+#### generate(prompt, , duration=None, bpm=None, key=None, bars=None, note=None, model='foundation-1', num_steps=100, guidance=7.0, seed=None, negative_prompt=None, sampler='dpmpp-3m-sde', device=None, normalize=True, \*\*kwargs)
 
 Render a loop or a one-shot for the tag prompt `prompt`.
 
@@ -1849,6 +1850,9 @@ Render a loop or a one-shot for the tag prompt `prompt`.
   * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to steer away from.
   * **sampler** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – stable-audio-tools sampler type.
   * **device** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"mps"`, `"cuda"` or `"cpu"`; default: the best available.
+  * **normalize** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Scale the take to full scale (its peak at 0 dBFS). `False`
+    keeps the model’s own level (written as float, so nothing clips): takes
+    meant to sit side by side, such as a keybed’s chunks, keep their balance.
 * **Returns:**
   A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.
 
@@ -3873,20 +3877,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 15:47 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda"><code>471a26c</code></a> on branch <code>main</code>, for **arioso 0.0.51** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 20:45 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/69a62d8d13aea71cc892f309fbad1ca8e44365db"><code>69a62d8</code></a> on branch <code>main</code>, for **arioso 0.0.52** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.51) is ahead of the latest release on PyPI (0.0.50): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda"><code>471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/69a62d8d13aea71cc892f309fbad1ca8e44365db"><code>69a62d8d13aea71cc892f309fbad1ca8e44365db</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.51</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.52</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3895,9 +3897,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42847384029">42847384029</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42897881576">42897881576</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>75d27d17410399085118f6e165e74491f49fe93d</code> (in the history of the built commit) |
+| Event commit | <code>69b245e8bd19bfeadbcba76e2f34b2e81c6c0588</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3922,13 +3924,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.50/">0.0.50</a>, older than the documented version (0.0.51).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.52/">0.0.52</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda
+git checkout 69a62d8d13aea71cc892f309fbad1ca8e44365db
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -48,7 +48,7 @@ Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).
 
 Stop the worker (the loaded model is released).
 
-#### generate(prompt, , duration=None, bpm=None, key=None, bars=None, note=None, model='foundation-1', num_steps=100, guidance=7.0, seed=None, negative_prompt=None, sampler='dpmpp-3m-sde', device=None, \*\*kwargs)
+#### generate(prompt, , duration=None, bpm=None, key=None, bars=None, note=None, model='foundation-1', num_steps=100, guidance=7.0, seed=None, negative_prompt=None, sampler='dpmpp-3m-sde', device=None, normalize=True, \*\*kwargs)
 
 Render a loop or a one-shot for the tag prompt `prompt`.
 
@@ -72,6 +72,9 @@ Render a loop or a one-shot for the tag prompt `prompt`.
   * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to steer away from.
   * **sampler** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – stable-audio-tools sampler type.
   * **device** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"mps"`, `"cuda"` or `"cpu"`; default: the best available.
+  * **normalize** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Scale the take to full scale (its peak at 0 dBFS). `False`
+    keeps the model’s own level (written as float, so nothing clips): takes
+    meant to sit side by side, such as a keybed’s chunks, keep their balance.
 * **Returns:**
   A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.
 

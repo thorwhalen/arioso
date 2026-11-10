@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../../../../_static/documentation_options.js?v=73f2ab08"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.51" />
+  <meta name="docsearch:version" content="0.0.52" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -1121,6 +1121,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sampler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_SAMPLER</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Render a loop or a one-shot for the tag prompt ``prompt``.</span>
@@ -1145,6 +1146,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            negative_prompt: What to steer away from.</span>
 <span class="sd">            sampler: stable-audio-tools sampler type.</span>
 <span class="sd">            device: ``"mps"``, ``"cuda"`` or ``"cpu"``; default: the best available.</span>
+<span class="sd">            normalize: Scale the take to full scale (its peak at 0 dBFS). ``False``</span>
+<span class="sd">                keeps the model's own level (written as float, so nothing clips): takes</span>
+<span class="sd">                meant to sit side by side, such as a keybed's chunks, keep their balance.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.</span>
@@ -1181,6 +1185,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">sigma_max</span><span class="o">=</span><span class="n">DFLT_SIGMA_MAX</span><span class="p">,</span>
             <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
             <span class="n">out</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">),</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">normalize</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="c1"># the device the worker resolved (None asked for "the best"): asking for it by</span>
         <span class="c1"># name later must not restart the worker and reload the model</span>

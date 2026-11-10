@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../../_static/documentation_options.js?v=73f2ab08"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.51" />
+  <meta name="docsearch:version" content="0.0.52" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1135,7 +1135,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    The child writes each take's record as soon as it is made, so a child killed after</span>
 <span class="sd">    ``timeout`` seconds (with every process it started) or exiting non-zero still returns</span>
 <span class="sd">    the takes it finished, each marked with ``child_exit``; prompts it never reached get an</span>
-<span class="sd">    ``error``.</span>
+<span class="sd">    ``error``. Processes the child started are killed when it ends, however it ends; on</span>
+<span class="sd">    Windows only when it is killed (thorwhalen/ps#25).</span>
 <span class="sd">    """</span>
     <span class="n">log_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">_slug</span><span class="p">(</span><span class="n">contender</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"child.log"</span>
     <span class="n">log_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1182,23 +1183,27 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_run_child</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"int | str"</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started.</span>
+<span class="w">    </span><span class="sd">"""Run ``cmd`` with its output to ``log``; kill everything it started once it ends.</span>
 
-<span class="sd">    Runtime workers start in sessions of their own (ps.isolated), so the child's group</span>
-<span class="sd">    alone would not reach them: :func:`ps.util.kill_process_tree` kills every group in</span>
-<span class="sd">    the tree (``taskkill /T`` on Windows).</span>
+<span class="sd">    Runtime workers start in sessions of their own (ps.isolated) and hold gigabytes, so</span>
+<span class="sd">    they must not outlive the child, however it ends: on timeout, by a crash that skips</span>
+<span class="sd">    its cleanup, or between the timeout and the kill. :func:`ps.util.wait_and_reap`</span>
+<span class="sd">    watches the tree while waiting and kills what is left (``taskkill /T`` on Windows,</span>
+<span class="sd">    on timeout only).</span>
 <span class="sd">    """</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">ps.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEW_PROCESS_GROUP</span><span class="p">,</span> <span class="n">kill_process_tree</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ps.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEW_PROCESS_GROUP</span><span class="p">,</span> <span class="n">kill_process_tree</span><span class="p">,</span> <span class="n">wait_and_reap</span>
 
     <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
         <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="o">**</span><span class="n">NEW_PROCESS_GROUP</span>
     <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wait_and_reap</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"killed after </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2"> s"</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># a bad timeout, say: refused before any wait, child running</span>
         <span class="n">kill_process_tree</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
         <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">"killed after </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2"> s"</span>
+        <span class="k">raise</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_run_preload</span><span class="p">(</span><span class="n">specs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

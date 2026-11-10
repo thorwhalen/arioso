@@ -162,7 +162,8 @@ and `function()` called. The child’s output goes to `<out_dir>/<contender>/chi
 The child writes each take’s record as soon as it is made, so a child killed after
 `timeout` seconds (with every process it started) or exiting non-zero still returns
 the takes it finished, each marked with `child_exit`; prompts it never reached get an
-`error`.
+`error`. Processes the child started are killed when it ends, however it ends; on
+Windows only when it is killed (thorwhalen/ps#25).
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]

@@ -39,6 +39,7 @@ def _run(contenders, tmp_path, **kwargs):
         "warmup": 1.0,
         "out_dir": tmp_path,
         "runner": ac.in_this_process,
+        "run_id": "r1",
         **kwargs,
     }
     return list(ac.compare(contenders, PROMPTS, **kwargs))
@@ -59,7 +60,10 @@ def test_one_record_per_take_with_timings_audio_and_settings_passed(fakes, tmp_p
     assert r["load_s"] is not None  # a warm-up ran
     assert r["duration_used"] and r["seed_used"] and not r["melody_used"]
     assert r["weights_license"] == "MIT" and r["commercial_use"] == "yes"
-    assert Path(r["path"]).is_file()
+    assert Path(r["path"]) == tmp_path / "r1" / "fake_clicks" / "fast.wav"
+    assert Path(r["path"]).is_file() and r["run_id"] == "r1"
+    if sys.platform == "darwin" or sys.platform.startswith("linux"):
+        assert r["available_memory_gb"] > 0
     # warm-up first (1 s), then each prompt at the asked duration and seed
     assert [(c["duration"], c["seed"]) for c in fakes.CALLS] == [
         (1.0, 7),
@@ -74,8 +78,34 @@ def test_checks_find_the_tempo_that_was_rendered(fakes, tmp_path):
     pytest.importorskip("denote")
     pytest.importorskip("librosa")
     fast, slow = _run("fake_clicks", tmp_path)
-    assert fast["tempo_err"] < 0.05 and slow["tempo_err"] < 0.05
+    assert fast["tempo_detected"] == pytest.approx(120, rel=0.03)
+    assert slow["tempo_detected"] == pytest.approx(90, rel=0.03)
+    assert fast["tempo_err"] < 0.03 and slow["tempo_err"] < 0.03
     assert fast["clip_frac"] == 0 and -40 < fast["rms_dbfs"] < 0
+
+
+def test_rtf_divides_by_the_audio_that_came_back(fakes, tmp_path):
+    r = _run("fake_short", tmp_path)[0]
+    assert r["seconds_out"] == 3.5
+    assert r["rtf"] == pytest.approx(r["gen_s"] / 3.5, abs=1e-3)
+
+
+def test_clipping_is_seen_even_above_full_scale(fakes, tmp_path):
+    pytest.importorskip(
+        "soundfile"
+    )  # takes are float WAVs; 16-bit PCM would clamp at 1
+    r = _run("fake_loud", tmp_path)[0]
+    assert r["peak_abs"] == pytest.approx(1.5, abs=0.01)
+    assert r["clip_frac"] > 0
+
+
+def test_a_check_that_cannot_run_says_why(fakes, tmp_path, monkeypatch):
+    monkeypatch.setitem(sys.modules, "denote", None)  # import denote -> ImportError
+    r = _run("fake_clicks", tmp_path)[0]
+    assert r["checks_skipped"] == {
+        "tempo": "denote is not installed",
+        "key": "denote is not installed",
+    }
 
 
 def test_a_failing_platform_is_recorded_not_raised(fakes, tmp_path):
@@ -98,9 +128,15 @@ def test_hosted_contenders_are_refused_unless_allowed(fakes, tmp_path):
     assert len(_run("fake_hosted", tmp_path, allow_hosted=True)) == 2
 
 
-def test_runtime_local_is_not_hosted():
+def test_hosted_errs_on_the_side_of_caution(fakes):
     # ace_step is a hosted (fal) platform unless asked to run its local runtime
     assert ac.is_hosted("ace_step")
+    # runtime=local only counts on a platform that has a local runtime
+    assert ac.is_hosted("elevenlabs:runtime=local")
+    assert ac.is_hosted("yue:runtime=local")
+    assert ac.is_hosted("stable_audio_25:runtime=local")
+    # a config without access_type is a rest_api one to the translation layer
+    assert ac.is_hosted("fake_no_access_type")
     assert ac.is_hosted("yue")  # local code, but takes a fal key: counted as hosted
     assert not any(
         ac.is_hosted(p) for p in ("musicgen", "stable_audio_3", "magenta_rt")
@@ -144,11 +180,15 @@ def test_each_contender_in_its_own_process_measures_peak_memory(
         assert records[0]["peak_memory_gb"] > 0
 
 
-def test_the_peak_of_a_short_lived_process_per_take_is_caught(fakes, tmp_path):
-    from arioso._measure import peak_memory
+def test_the_peak_of_a_short_lived_process_per_take_is_caught(
+    fakes, tmp_path, monkeypatch
+):
+    from arioso import _measure
 
-    if peak_memory() is None:
+    if _measure.peak_memory() is None:
         pytest.skip("no memory probe on this platform")
+    # without the exit-time floor (blind to Metal memory), only the sampler can see it
+    monkeypatch.setattr(_measure, "_children_maxrss", lambda: 0)
     records = _run("fake_oneshot", tmp_path, warmup=None)
     assert (
         records[0]["workers_peak_memory_gb"] >= 0.15
@@ -170,11 +210,59 @@ def test_a_crashing_child_becomes_error_records(fakes, tmp_path):
     )  # the child's last words
 
 
+def test_a_child_that_crashes_at_shutdown_keeps_its_records(
+    fakes, tmp_path, monkeypatch
+):
+    monkeypatch.setenv(
+        "PYTHONPATH", os.pathsep.join([str(REPO), os.environ.get("PYTHONPATH", "")])
+    )
+    preload = [f"{FAKE}:register", f"{FAKE}:exit_badly_at_shutdown"]
+
+    def runner(*args, **kwargs):
+        return ac.in_child_process(*args, preload=preload, **kwargs)
+
+    records = _run("fake_clicks", tmp_path, runner=runner)
+    assert all("error" not in r and r["child_exit"] == 139 for r in records)
+
+
+def test_a_hung_child_is_killed_after_the_timeout(fakes, tmp_path, monkeypatch):
+    monkeypatch.setenv(
+        "PYTHONPATH", os.pathsep.join([str(REPO), os.environ.get("PYTHONPATH", "")])
+    )
+
+    def runner(*args, **kwargs):
+        return ac.in_child_process(
+            *args, preload=[f"{FAKE}:register"], timeout=3, **kwargs
+        )
+
+    records = _run("fake_slow", tmp_path, runner=runner)
+    assert all("killed after 3 s" in r["error"] for r in records)
+
+
+def test_preload_makes_a_third_party_platform_known_here_too(tmp_path):
+    import importlib
+
+    module = importlib.import_module(FAKE)
+    module.unregister()
+    try:
+        records = _run("fake_clicks", tmp_path, preload=[f"{FAKE}:register"])
+        assert [r["prompt"] for r in records] == ["fast", "slow"]
+    finally:
+        module.unregister()
+
+
+def test_names_that_collide_as_files_are_refused():
+    with pytest.raises(ValueError, match="collide"):
+        ac.parse_contenders(["musicgen:model=a/b", "musicgen:model=a_b"])
+    with pytest.raises(ValueError, match="collide"):
+        ac.load_prompts([{"id": "a b", "text": "x"}, {"id": "a_b", "text": "y"}])
+
+
 def test_page_links_audio_relative_to_itself(fakes, tmp_path):
     records = _run("fake_clicks,fake_broken", tmp_path)
     page = ac.compare_page(records, tmp_path / "index.html", prompts=PROMPTS)
     text = page.read_text()
-    assert "src='fake_clicks/fast.wav'" in text
+    assert "src='r1/fake_clicks/fast.wav'" in text
     assert "click track at 120 BPM" in text and "model exploded" in text
 
 
@@ -232,11 +320,18 @@ def test_the_command_prints_a_summary_and_writes_records_and_page(
         ]
     )
 
-    out = capsys.readouterr().out
+    captured = capsys.readouterr()
     assert code == 0
-    assert out.splitlines()[0].startswith("contender")
+    assert captured.out.splitlines()[0].startswith("contender")
+    assert "fake_clicks fast" in captured.err  # one progress line per take
     assert (tmp_path / "out" / "results.jsonl").is_file()
-    assert (tmp_path / "out" / "index.html").is_file()
+    assert len(list((tmp_path / "out").glob("*/index.html"))) == 1
+
+
+def test_the_command_fails_when_every_take_failed(fakes, tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(ac, "in_child_process", ac.in_this_process)
+    code = main(["compare", "fake_broken", "--out-dir", str(tmp_path)])
+    assert code == 1 and "every take failed" in capsys.readouterr().err
 
 
 def test_the_command_refuses_hosted_platforms_in_one_line(fakes, capsys):
@@ -245,7 +340,8 @@ def test_the_command_refuses_hosted_platforms_in_one_line(fakes, capsys):
     assert code == 1 and "--allow-hosted" in err and "Traceback" not in err
 
 
-def test_the_sampler_reads_a_live_child_peak_not_only_the_exit_floor():
+def test_the_sampler_keeps_a_live_child_lifetime_peak():
+    # the child allocated 200 MB and freed it before we look: only its lifetime peak shows it
     # the floor (RUSAGE_CHILDREN) misses Metal memory on macOS, so the live reading must work
     import subprocess
     import time
@@ -254,7 +350,10 @@ def test_the_sampler_reads_a_live_child_peak_not_only_the_exit_floor():
 
     if peak_memory() is None:
         pytest.skip("no memory probe on this platform")
-    code = "b = bytearray(200 * 2**20); b[::4096] = b'x' * len(b[::4096]); print('ready', flush=True); import time; time.sleep(5)"
+    code = (
+        "b = bytearray(200 * 2**20); b[::4096] = b'x' * len(b[::4096]); del b; "
+        "print('ready', flush=True); import time; time.sleep(5)"
+    )
     child = subprocess.Popen(
         [sys.executable, "-c", code], stdout=subprocess.PIPE, text=True
     )
@@ -263,6 +362,7 @@ def test_the_sampler_reads_a_live_child_peak_not_only_the_exit_floor():
         sampler = PeakSampler()
         sampler.sample()  # while the child is alive, before anyone waits for it
         assert sampler.peak_descendants >= 0.15 * 2**30
+        assert sampler.errors == []
     finally:
         child.kill()
         child.wait()

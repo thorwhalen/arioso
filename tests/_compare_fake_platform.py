@@ -8,6 +8,10 @@ in the registry would leak into other tests. A child process gets them with
   ("... 120 BPM ...") over an A tone, so tempo checks have something true to find.
 - ``fake_hosted``: the same audio declared as a hosted ``rest_api`` platform.
 - ``fake_oneshot``: like ``fake_clicks``, but each take runs a short-lived ~200 MB process.
+- ``fake_short``: returns 3.5 s whatever it is asked (real time factors divide by what came back).
+- ``fake_loud``: peaks at 1.5, over full scale (clipping must be seen).
+- ``fake_slow``: sleeps 30 s per call (for timeouts).
+- ``fake_no_access_type``: a plugin config that forgot ``access_type`` (hosted by default).
 - ``fake_broken``: a local platform whose every call fails.
 """
 
@@ -64,6 +68,28 @@ class _OneShot(_Clicks):
         return super().generate(prompt, **kwargs)
 
 
+class _Short(_Clicks):
+    def generate(self, prompt, **kwargs):
+        return super().generate(prompt, **dict(kwargs, duration=3.5))
+
+
+class _Loud(_Clicks):
+    def generate(self, prompt, **kwargs):
+        song = super().generate(prompt, **kwargs)
+        song.audio.audio_array = song.audio.audio_array * (
+            1.5 / np.abs(song.audio.audio_array).max()
+        )
+        return song
+
+
+class _Slow(_Clicks):
+    def generate(self, prompt, **kwargs):
+        import time
+
+        time.sleep(30)
+        return super().generate(prompt, **kwargs)
+
+
 class _Broken:
     def generate(self, prompt, **kwargs):
         raise RuntimeError("model exploded")
@@ -85,6 +111,13 @@ PLATFORMS = {
     "fake_hosted": (_config("fake_hosted", "rest_api", "provider terms"), _Clicks()),
     "fake_oneshot": (_config("fake_oneshot"), _OneShot()),
     "fake_broken": (_config("fake_broken"), _Broken()),
+    "fake_short": (_config("fake_short"), _Short()),
+    "fake_loud": (_config("fake_loud"), _Loud()),
+    "fake_slow": (_config("fake_slow"), _Slow()),
+    "fake_no_access_type": (
+        {k: v for k, v in _config("fake_no_access_type").items() if k != "access_type"},
+        _Clicks(),
+    ),
 }
 
 
@@ -100,3 +133,11 @@ def unregister():
 
     for name in PLATFORMS:
         _registry.pop(name, None)
+
+
+def exit_badly_at_shutdown():
+    """Make the process exit with 139 at shutdown, as a native library crashing there does."""
+    import atexit
+    import os
+
+    atexit.register(os._exit, 139)

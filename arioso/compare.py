@@ -82,7 +82,9 @@ DFLT_DURATION = 10.0
 #: Seconds of audio generated once before the timed takes, so load is not counted in them.
 DFLT_WARMUP = 2.0
 RESULTS_FILE = "results.jsonl"
-_GB = 2**30
+#: The ``access_type`` values of platforms that run on this machine.
+LOCAL_ACCESS_TYPES = frozenset({"python_lib", "local_runtime"})
+_GB = 1e9  # GB, not GiB
 
 
 # --------------------------------------------------------------------------------------------
@@ -136,7 +138,15 @@ def parse_contenders(specs: "str | Iterable[str | Contender]") -> list[Contender
     labels = [c.label for c in contenders]
     if len(set(labels)) != len(labels):
         raise ValueError(f"Contender labels must be unique, got {labels}")
+    _check_unique_slugs(labels, "Contender labels")
     return contenders
+
+
+def _check_unique_slugs(names, what):
+    """Names become folder and file names: two that map to one would overwrite each other."""
+    slugs = [_slug(n) for n in names]
+    if len(set(slugs)) != len(slugs):
+        raise ValueError(f"{what} {list(names)} collide as file names {slugs}")
 
 
 def load_prompts(source=None) -> list[dict]:
@@ -163,30 +173,37 @@ def load_prompts(source=None) -> list[dict]:
     ids = [p["id"] for p in out]
     if len(set(ids)) != len(ids):
         raise ValueError(f"Prompt ids must be unique, got {ids}")
+    _check_unique_slugs(ids, "Prompt ids")
     return out
 
 
 def is_hosted(contender: "str | Contender") -> bool:
     """Whether a contender may call a hosted (paid, per call) service rather than a local model.
 
-    Errs on the side of caution: a ``rest_api`` platform, one whose terms are the provider's,
-    or one that takes any credential (even an optional one, as ``yue`` takes a fal key) counts
-    as hosted, unless the contender asks for ``runtime="local"``.
+    Errs on the side of caution. Local means: ``access_type`` is ``python_lib`` or
+    ``local_runtime`` (a missing one is the translation layer's ``rest_api``), the terms are
+    not the provider's, no credential is taken (even an optional one: ``yue`` calls fal.ai
+    whenever ``FAL_KEY`` is set), and no fal model is declared. Anything else is hosted,
+    unless the contender asks for ``runtime="local"`` *and* the platform declares a local
+    runtime (``ace_step``); on any other platform that option is ignored, so it changes
+    nothing here either.
 
     >>> is_hosted("elevenlabs"), is_hosted("stable_audio_3"), is_hosted("ace_step:runtime=local")
     (True, False, False)
+    >>> is_hosted("elevenlabs:runtime=local")
+    True
     """
     from arioso.registry import get_config
 
     c = Contender.parse(contender)
-    if c.options.get("runtime") == "local":
-        return False
     config = get_config(c.platform)
-    return (
-        config.get("access_type") == "rest_api"
-        or config.get("commercial_use") == "provider terms"
-        or (config.get("auth") or {}).get("type", "none") != "none"
-        or bool(config.get("fal"))
+    if c.options.get("runtime") == "local" and config.get("runtime"):
+        return False
+    return not (
+        config.get("access_type") in LOCAL_ACCESS_TYPES
+        and config.get("commercial_use") != "provider terms"
+        and (config.get("auth") or {}).get("type", "none") == "none"
+        and not config.get("fal")
     )
 
 
@@ -293,7 +310,7 @@ def _gb(n: Optional[int]) -> Optional[float]:
 
 def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> dict:
     """One prompt's record: the take written to ``out_dir`` and timed, or an ``error``."""
-    from arioso._audio import write_wav
+    from arioso._audio import _channels_first
 
     rec = {
         "prompt": prompt["id"],
@@ -311,8 +328,8 @@ def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> di
             gen_s=round(time.perf_counter() - t, 2),
         )
     gen_s = time.perf_counter() - t
-    path = Path(write_wav(audio, sr, out_dir / f"{_slug(prompt['id'])}.wav"))
-    seconds_out = _frames(audio) / sr if sr else None
+    path = _write_take(audio, sr, out_dir / f"{_slug(prompt['id'])}.wav")
+    seconds_out = _channels_first(audio).shape[1] / sr if sr else None
     return dict(
         rec,
         **used,
@@ -324,14 +341,19 @@ def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> di
     )
 
 
-def _frames(audio) -> int:
-    """Frames in a waveform shaped ``(frames,)``, ``(channels, frames)`` or ``(frames, channels)``."""
-    import numpy as np
+def _write_take(audio, sr: int, path: Path) -> Path:
+    """Write a take as float WAV, so the checks see peaks above full scale (soundfile).
 
-    a = np.squeeze(np.asarray(audio))
-    if a.ndim < 2:
-        return int(a.shape[0]) if a.ndim else 0
-    return int(max(a.shape[-2:]))
+    Without soundfile, :func:`arioso._audio.write_wav` writes 16-bit PCM, which clamps them.
+    """
+    from arioso._audio import _channels_first, write_wav
+
+    try:
+        import soundfile
+    except ImportError:
+        return Path(write_wav(audio, sr, path))
+    soundfile.write(str(path), _channels_first(audio).T, int(sr), subtype="FLOAT")
+    return path
 
 
 def in_child_process(
@@ -344,6 +366,7 @@ def in_child_process(
     warmup: Optional[float],
     python: Optional[str] = None,
     preload: Iterable[str] = (),
+    timeout: Optional[float] = None,
 ) -> list[dict]:
     """Run ``contender`` in a fresh ``python -m arioso.compare`` process (the default runner).
 
@@ -351,8 +374,13 @@ def in_child_process(
     and makes the process's lifetime peak memory that contender's own. ``python`` is the
     interpreter (default: this one); ``preload`` names what the child runs first, to make
     third-party platforms known: ``"module"`` is imported, ``"module:function"`` is imported
-    and ``function()`` called.
+    and ``function()`` called. The child's output goes to ``<out_dir>/<contender>/child.log``.
+    A child killed after ``timeout`` seconds, or exiting non-zero, still returns the records
+    it wrote (a native library crashing at interpreter shutdown loses nothing), each marked
+    with ``child_exit``; with none written, every prompt gets an ``error``.
     """
+    log_path = Path(out_dir) / _slug(contender.label) / "child.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     job = {
         "contender": {
             "platform": contender.platform,
@@ -369,36 +397,42 @@ def in_child_process(
     with tempfile.TemporaryDirectory(prefix="arioso_compare_") as tmp:
         job_path, out_path = Path(tmp) / "job.json", Path(tmp) / "records.json"
         job_path.write_text(json.dumps(job))
-        proc = subprocess.run(
-            [
-                python or sys.executable,
-                "-m",
-                "arioso.compare",
-                str(job_path),
-                str(out_path),
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
-        if proc.returncode or not out_path.exists():
-            tail = (proc.stdout or "").strip().splitlines()[-15:]
-            error = f"child process failed (exit {proc.returncode}): " + " | ".join(
-                tail
-            )
-            return [{"prompt": p["id"], "error": error} for p in prompts]
-        return json.loads(out_path.read_text())
+        cmd = [
+            python or sys.executable,
+            "-m",
+            "arioso.compare",
+            str(job_path),
+            str(out_path),
+        ]
+        with open(log_path, "w") as log:
+            try:
+                code = subprocess.run(
+                    cmd, stdout=log, stderr=subprocess.STDOUT, timeout=timeout
+                ).returncode
+            except subprocess.TimeoutExpired:
+                code = f"killed after {timeout} s"
+        records = json.loads(out_path.read_text()) if out_path.exists() else None
+    if records is not None:
+        return [dict(r, child_exit=code) if code else r for r in records]
+    tail = " | ".join(log_path.read_text().strip().splitlines()[-15:])
+    error = f"child process failed (exit {code}; log {log_path}): {tail}"
+    return [{"prompt": p["id"], "error": error} for p in prompts]
 
 
-def _child_main(job_path: str, out_path: str) -> None:
+def _run_preload(specs: Iterable[str]) -> None:
+    """Import each ``"module"``; for ``"module:function"`` also call ``function()``."""
     import importlib
 
-    job = json.loads(Path(job_path).read_text())
-    for spec in job.get("preload", ()):
+    for spec in specs:
         module, _, function = spec.partition(":")
         loaded = importlib.import_module(module)
         if function:
             getattr(loaded, function)()
+
+
+def _child_main(job_path: str, out_path: str) -> None:
+    job = json.loads(Path(job_path).read_text())
+    _run_preload(job.get("preload", ()))
     c = job["contender"]
     records = in_this_process(
         Contender(c["platform"], c["options"], label=c["label"]),
@@ -464,25 +498,26 @@ def objective_checks(y, sr: int, prompt: Mapping) -> dict:
     """Checks a listener would otherwise make by ear: level, clipping, tempo, key.
 
     Level and clipping need numpy only. Tempo comes from ``denote.get_beats`` and key from
-    ``denote.get_key`` when ``denote`` provides them; a check that cannot run is listed in
-    ``checks_skipped`` instead of failing the take.
+    ``denote.get_key`` when ``denote`` provides them; a check that cannot run goes into
+    ``checks_skipped`` (check name to reason) instead of failing the take.
     """
     import numpy as np
 
-    y = np.asarray(y, dtype=np.float32)
-    if y.ndim > 1:  # mono for analysis: (frames, channels) as the WAV readers give it
-        y = y.mean(axis=1 if y.shape[1] < y.shape[0] else 0)
+    from arioso._audio import _channels_first
+
+    y = _channels_first(y).mean(axis=0)  # mono, whichever way round the channels come
     rms = float(np.sqrt(np.mean(y**2))) if y.size else 0.0
     out = {
         "peak_abs": round(float(np.max(np.abs(y))), 3) if y.size else 0.0,
         "clip_frac": round(float(np.mean(np.abs(y) >= 0.999)), 4) if y.size else 0.0,
         "rms_dbfs": round(float(20 * np.log10(rms + 1e-12)), 1),
     }
-    skipped = []
+    skipped = {}
     try:
         import denote
     except ImportError:
-        return dict(out, checks_skipped=["tempo", "key"])
+        reason = "denote is not installed"
+        return dict(out, checks_skipped={"tempo": reason, "key": reason})
     try:
         beats = denote.get_beats(y, sr=sr)
         tempo = (
@@ -494,11 +529,11 @@ def objective_checks(y, sr: int, prompt: Mapping) -> dict:
             tempo_err=tempo_error(tempo, prompt.get("bpm")),
             beat_cv=round(float(ibi.std() / ibi.mean()), 3) if len(ibi) > 2 else None,
         )
-    except Exception:  # noqa: BLE001 - a missing backend skips the check
-        skipped.append("tempo")
+    except Exception as error:  # noqa: BLE001 - recorded with its reason
+        skipped["tempo"] = f"{type(error).__name__}: {error}"
     get_key = getattr(denote, "get_key", None)
     if get_key is None:
-        skipped.append("key")
+        skipped["key"] = "this denote has no get_key (denote>=0.0.10 has)"
     else:
         try:
             result = get_key(y, sr=sr)
@@ -508,8 +543,8 @@ def objective_checks(y, sr: int, prompt: Mapping) -> dict:
             )
             if prompt.get("key"):
                 out["key_agreement"] = key_agreement(result.key, prompt["key"])
-        except Exception:  # noqa: BLE001
-            skipped.append("key")
+        except Exception as error:  # noqa: BLE001 - e.g. a take too quiet for a key
+            skipped["key"] = f"{type(error).__name__}: {error}"
     if skipped:
         out["checks_skipped"] = skipped
     return out
@@ -519,8 +554,8 @@ def _round(x, n=3):
     return round(float(x), n) if x is not None else None
 
 
-def _read_wav(path) -> tuple[Any, int]:
-    """``(frames,)`` or ``(frames, channels)`` float32 and the sample rate."""
+def _read_take(path) -> tuple[Any, int]:
+    """A take written by :func:`_write_take`: ``(frames,)`` or ``(frames, channels)`` float32, rate."""
     try:
         import soundfile
     except ImportError:
@@ -552,6 +587,8 @@ def compare(
     scorer: Optional[Callable[[Any, int, Mapping], dict]] = objective_checks,
     allow_hosted: bool = False,
     min_free_gb: Optional[float] = None,
+    preload: Iterable[str] = (),
+    run_id: Optional[str] = None,
 ) -> Iterator[dict]:
     """Render every prompt with every contender; yield one record per take.
 
@@ -561,8 +598,8 @@ def compare(
         prompts: A JSON file, a list of prompt dicts, or ``None`` for :data:`DFLT_PROMPTS`.
         duration: Seconds asked of each take (a prompt's own ``duration`` wins).
         seed: Passed to platforms that take one (``None``: don't).
-        out_dir: Takes go to ``<out_dir>/<contender>/<prompt id>.wav``; records are appended
-            to ``<out_dir>/results.jsonl``.
+        out_dir: Takes go to ``<out_dir>/<run_id>/<contender>/<prompt id>.wav``; records
+            are appended to ``<out_dir>/results.jsonl`` (one file for every run).
         warmup: Seconds generated once per contender before the timed takes (``0``/``None``:
             no warm-up, so the first take's time includes loading the model).
         runner: Runs one contender: :func:`in_child_process` (``None``, the default) or
@@ -572,6 +609,10 @@ def compare(
         allow_hosted: Allow contenders that call paid hosted services (:func:`is_hosted`).
         min_free_gb: When the machine has less memory available than this before a
             contender starts, record that contender as an error instead of running it.
+        preload: Modules (``"module"`` or ``"module:function"``) that make third-party
+            platforms known, run here before anything is checked and passed to a runner
+            that takes ``preload`` (the child process runs them too).
+        run_id: Names this run in its records and its folder (default: the start time).
 
     Yields:
         Flat dicts: ``contender``, ``platform``, ``options``, ``prompt``, timings
@@ -579,15 +620,22 @@ def compare(
         ``workers_peak_memory_gb``, ``available_memory_gb``), ``path``, the scorer's
         checks, ``error`` when a take failed, and the machine.
     """
+    import inspect
+
     from arioso._measure import available_memory
     from arioso.registry import get_config
 
+    preload = list(preload)
+    _run_preload(preload)
     contenders = parse_contenders(contenders)
     prompts = load_prompts(prompts)
-    from arioso.registry import list_platforms
-
-    unknown = [c.platform for c in contenders if c.platform not in list_platforms()]
-    if unknown:  # fail before anything runs
+    unknown = []
+    for c in contenders:  # fail before anything runs
+        try:
+            get_config(c.platform)
+        except KeyError:
+            unknown.append(c.platform)
+    if unknown:
         raise ValueError(
             f"Unknown platforms {unknown}. See `arioso platforms` for the list."
         )
@@ -597,8 +645,19 @@ def compare(
             f"Hosted (paid, per call) contenders: {hosted}. Pass allow_hosted=True "
             "(--allow-hosted) to compare them anyway."
         )
+    runner = runner or in_child_process
+    try:
+        runner_kwargs = (
+            {"preload": preload}
+            if preload and "preload" in inspect.signature(runner).parameters
+            else {}
+        )
+    except (TypeError, ValueError):
+        runner_kwargs = {}
     out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    run_id = run_id or time.strftime("%Y%m%d-%H%M%S")
+    run_dir = out_dir / _slug(run_id)
+    run_dir.mkdir(parents=True, exist_ok=True)
     machine = {"machine": _platform.machine(), "system": _platform.system()}
     for c in contenders:
         avail = available_memory()
@@ -609,13 +668,20 @@ def compare(
             records = [{"prompt": p["id"], "error": error} for p in prompts]
         else:
             t = time.perf_counter()
-            records = (runner or in_child_process)(
-                c, prompts, duration=duration, seed=seed, out_dir=out_dir, warmup=warmup
+            records = runner(
+                c,
+                prompts,
+                duration=duration,
+                seed=seed,
+                out_dir=run_dir,
+                warmup=warmup,
+                **runner_kwargs,
             )
             process_s = round(time.perf_counter() - t, 1)
         config = get_config(c.platform)
         for rec in records:
             rec = {
+                "run_id": run_id,
                 "contender": c.label,
                 "platform": c.platform,
                 "options": dict(c.options),
@@ -631,7 +697,7 @@ def compare(
             if scorer is not None and rec.get("path") and "error" not in rec:
                 prompt = next(p for p in prompts if p["id"] == rec["prompt"])
                 try:
-                    y, sr = _read_wav(rec["path"])
+                    y, sr = _read_take(rec["path"])
                     rec.update(scorer(y, sr, prompt))
                 except Exception as error:  # noqa: BLE001
                     rec["score_error"] = f"{type(error).__name__}: {error}"

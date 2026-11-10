@@ -76,8 +76,9 @@ def compare(
 ) -> list[str]:
     """Render the same prompts with several platforms; time, measure and check each take.
 
-    Each contender runs in its own process, one after the other. Takes go to
-    ``<out_dir>/<contender>/``, one JSON line per take to ``<out_dir>/results.jsonl``.
+    Each contender runs in its own process, one after the other, with one progress line per
+    take on stderr. Takes go to ``<out_dir>/<run>/<contender>/``, one JSON line per take to
+    ``<out_dir>/results.jsonl``.
 
     Args:
         contenders: Comma-separated platforms, each optionally with options:
@@ -90,36 +91,45 @@ def compare(
         warmup: Seconds generated once per contender before the timed takes (0: none).
         allow_hosted: Allow platforms that call a paid hosted service.
         min_free_gb: Skip a contender when less memory than this is available.
-        no_page: Do not write ``<out_dir>/index.html`` (a page of players).
+        no_page: Do not write ``<out_dir>/<run>/index.html`` (a page of players).
 
     Returns:
         A summary table, one line per contender, then the paths written.
+
+    Raises:
+        ValueError: When every take failed (the command exits 1).
     """
+    import sys
     from pathlib import Path
 
     from arioso import compare as ac
 
     prompt_list = ac.load_prompts(prompts)
-    records = list(
-        ac.compare(
-            contenders,
-            prompt_list,
-            duration=duration,
-            seed=seed,
-            out_dir=out_dir,
-            warmup=warmup or None,
-            allow_hosted=allow_hosted,
-            min_free_gb=min_free_gb,
+    records = []
+    for rec in ac.compare(
+        contenders,
+        prompt_list,
+        duration=duration,
+        seed=seed,
+        out_dir=out_dir,
+        warmup=warmup or None,
+        allow_hosted=allow_hosted,
+        min_free_gb=min_free_gb,
+    ):
+        records.append(rec)
+        status = rec.get("error") or f"{rec.get('gen_s')} s, RTF {rec.get('rtf')}"
+        print(
+            f"{rec['contender']} {rec['prompt']}: {status}", file=sys.stderr, flush=True
         )
-    )
+    if records and all("error" in r for r in records):
+        raise ValueError(
+            "every take failed:\n" + "\n".join(ac.summary_lines(records)[1:])
+        )
     lines = ac.summary_lines(records) + [str(Path(out_dir) / ac.RESULTS_FILE)]
-    if not no_page:
+    if not no_page and records:
+        run_dir = Path(out_dir) / records[0]["run_id"]
         lines.append(
-            str(
-                ac.compare_page(
-                    records, Path(out_dir) / "index.html", prompts=prompt_list
-                )
-            )
+            str(ac.compare_page(records, run_dir / "index.html", prompts=prompt_list))
         )
     return lines
 

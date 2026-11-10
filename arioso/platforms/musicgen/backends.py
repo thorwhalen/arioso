@@ -1,20 +1,33 @@
-"""The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).
+"""The ways to run MusicGen, behind one interface (thorwhalen/arioso#31, #54).
 
 The adapter holds the modes (text, melody, continuation: window checks, chaining, splicing); a
 backend holds what one library needs to load a model and run it in each of them. ``audiocraft``
-is Meta's library, ``transformers`` the HuggingFace port the adapter falls back to. Each backend
-wraps a model that is already loaded, so building one is free; ``load`` is what loads one.
+is Meta's library, ``transformers`` the HuggingFace port, and ``mlx`` Apple's MLX port
+(``ml-explore/mlx-examples``), which runs in its own environment through a worker and only
+does text. Each backend wraps a model that is already loaded, so building one is free;
+``load`` is what loads one.
 
-Both return the model's own output layout for text and melody, ``(channels, frames)`` from
-audiocraft and ``(frames,)`` from transformers' first channel, and mono for a continuation.
+Which one runs (:func:`select_backend_class`): ``$ARIOSO_MUSICGEN_BACKEND`` when set; else
+MLX for a text take on Apple Silicon when its runtime is installed; else audiocraft when it
+imports; else transformers. On Apple Silicon, transformers runs on the CPU unless
+``$ARIOSO_TORCH_DEVICE`` says otherwise: on MPS it was 15-30x slower and grew Metal memory
+on every decoding step (42 GB after three 10 s clips on an M1 Max).
+
+audiocraft and transformers return the model's own layout for text and melody,
+``(channels, frames)`` from audiocraft and ``(frames,)`` from transformers' first channel, and
+mono for a continuation; MLX returns ``(frames,)``.
 """
 
 from __future__ import annotations
 
+import os
+import tempfile
+import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol
+from pathlib import Path
+from typing import TYPE_CHECKING, Callable, Protocol
 
-from arioso._util import torch_device
+from arioso._util import TORCH_DEVICE_ENV_VAR, torch_device
 
 if TYPE_CHECKING:
     import numpy as np
@@ -64,17 +77,46 @@ class Backend(Protocol):
         """The re-decoded ``tail`` and ``seconds`` after it, mono."""
 
 
-def select_backend_class(model_variant: str) -> type[Backend]:
-    """The library that runs ``model_variant``: audiocraft when it imports, else transformers.
+#: Forces a backend: ``audiocraft``, ``transformers`` or ``mlx``.
+BACKEND_ENV_VAR = "ARIOSO_MUSICGEN_BACKEND"
+#: What a backend is asked to do: plain text, follow a melody, or continue audio.
+TASKS = ("text", "melody", "continuation")
 
-    Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
-    one is read; a present but broken install falls back like a missing one.
+
+def select_backend_class(model_variant: str, *, task: str = "text") -> type[Backend]:
+    """The library that runs ``model_variant`` for ``task`` (see the module docstring).
+
+    Loads no checkpoint, so it can be asked before a multi-GB one is read; a present but
+    broken audiocraft install falls back like a missing one.
     """
+    forced = os.environ.get(BACKEND_ENV_VAR)
+    if forced:
+        try:
+            return BACKENDS[forced]
+        except KeyError:
+            raise ValueError(
+                f"${BACKEND_ENV_VAR}={forced!r}: expected one of {sorted(BACKENDS)}"
+            ) from None
+    if task == "text" and MlxBackend.available(model_variant):
+        return MlxBackend
     try:
         import audiocraft.models  # noqa: F401
     except ImportError:
         return TransformersBackend
     return AudiocraftBackend
+
+
+def _transformers_device() -> str:
+    """:func:`~arioso._util.torch_device`, except CPU where it would pick Apple MPS on its own.
+
+    MusicGen's transformers decoding on MPS is pathological (thorwhalen/arioso#54): slower
+    than the CPU and growing Metal memory per step. An explicit ``$ARIOSO_TORCH_DEVICE=mps``
+    still gets MPS.
+    """
+    device = torch_device()
+    if device == "mps" and not os.environ.get(TORCH_DEVICE_ENV_VAR):
+        return "cpu"
+    return device
 
 
 def _rate_or_default(rate) -> int:
@@ -211,7 +253,7 @@ class TransformersBackend:
 
     @classmethod
     def load(cls, model_variant: str) -> TransformersBackend:
-        """Load ``model_variant`` and its processor with transformers, on :func:`~arioso._util.torch_device`.
+        """Load ``model_variant`` and its processor with transformers, on :func:`_transformers_device`.
 
         Args:
             model_variant: A MusicGen checkpoint name; a melody variant gets the
@@ -232,7 +274,7 @@ class TransformersBackend:
                 MusicgenForConditionalGeneration as _ModelClass,
             )
 
-        model = _ModelClass.from_pretrained(model_variant).to(torch_device())
+        model = _ModelClass.from_pretrained(model_variant).to(_transformers_device())
         return cls(model, AutoProcessor.from_pretrained(model_variant))
 
     @property
@@ -344,3 +386,133 @@ class TransformersBackend:
                 top_p=sampling.top_p if sampling.top_p > 0 else None,
                 guidance_scale=sampling.guidance,
             )
+
+
+class MlxBackend:
+    """MusicGen on MLX, in the ``mlx-examples`` runtime's own process (text only).
+
+    The model lives in a :class:`~arioso._isolated.Worker` running
+    :mod:`arioso.platforms.musicgen._mlx_driver`; audio comes back through a ``.npy`` file.
+    ``top_p`` has no MLX counterpart (a non-zero one is warned about and ignored).
+    """
+
+    def __init__(self, worker, model_variant: str, info: dict):
+        self.worker = worker
+        self.model_variant = model_variant
+        self.info = info
+
+    @staticmethod
+    def runtime():
+        """The ``mlx-examples`` runtime (see the musicgen config's ``mlx_runtime``)."""
+        from arioso._isolated import Runtime
+        from arioso.platforms.musicgen.config import PLATFORM_CONFIG
+
+        return Runtime(**PLATFORM_CONFIG["mlx_runtime"])
+
+    @classmethod
+    def supports(cls, model_variant: str) -> bool:
+        """Whether the MLX port runs ``model_variant``: the mono text checkpoints."""
+        return "melody" not in model_variant and "stereo" not in model_variant
+
+    @classmethod
+    def available(cls, model_variant: str) -> bool:
+        """Apple Silicon, a supported checkpoint, and the runtime installed (cheap)."""
+        from arioso._isolated import is_apple_silicon
+
+        return (
+            is_apple_silicon()
+            and cls.supports(model_variant)
+            and cls.runtime().installed()
+        )
+
+    @classmethod
+    def can_continue(cls, model_variant: str) -> bool:
+        """No: the MLX port generates from text only."""
+        return False
+
+    @classmethod
+    def load(
+        cls, model_variant: str, *, make_worker: Callable[..., object] = None
+    ) -> MlxBackend:
+        """Start the worker and load ``model_variant`` in it.
+
+        Raises:
+            ValueError: For a checkpoint the MLX port does not run.
+            arioso._isolated.RuntimeNotInstalled: With the commands that install it.
+        """
+        from arioso._isolated import Worker
+        from arioso.platforms.musicgen.config import PLATFORM_CONFIG
+
+        if not cls.supports(model_variant):
+            raise ValueError(
+                f"musicgen: the MLX backend runs the mono text checkpoints, not "
+                f"{model_variant!r}; unset ${BACKEND_ENV_VAR} to use another backend."
+            )
+        runtime = cls.runtime()
+        worker = (make_worker or Worker)(
+            runtime.interpreter(), PLATFORM_CONFIG["mlx_driver"], cwd=runtime.workdir()
+        )
+        info = worker.call({"op": "load", "model": model_variant})
+        return cls(worker, model_variant, info)
+
+    @property
+    def sample_rate(self) -> int:
+        """Output samples per second."""
+        return int(self.info["sample_rate"])
+
+    @property
+    def frame_rate(self) -> int:
+        """Codec frames per second."""
+        return _rate_or_default(self.info.get("frame_rate"))
+
+    def text(self, prompt: str, *, seconds: float, sampling: Sampling) -> np.ndarray:
+        """``seconds`` of mono audio for ``prompt``, ``(frames,)``."""
+        import numpy as np
+
+        if sampling.top_p:
+            warnings.warn(
+                f"musicgen (mlx): top_p={sampling.top_p} is ignored; the MLX port "
+                "samples with top_k only.",
+                stacklevel=2,
+            )
+        with tempfile.TemporaryDirectory(prefix="arioso_mlx_mg_") as tmp:
+            out = Path(tmp) / "audio.npy"
+            self.worker.call(
+                {
+                    "op": "text",
+                    "model": self.model_variant,
+                    "prompt": prompt,
+                    "seconds": seconds,
+                    "top_k": sampling.top_k,
+                    "temperature": sampling.temperature,
+                    "guidance": sampling.guidance,
+                    "out": str(out),
+                }
+            )
+            return np.load(out)
+
+    def melody(self, prompt, ref, *, seconds, sampling):
+        """Not on MLX: the selection sends melody takes to another backend."""
+        raise NotImplementedError(
+            "musicgen: the MLX backend does not follow melodies; "
+            f"unset ${BACKEND_ENV_VAR} (or set it to transformers)."
+        )
+
+    def continuation(self, prompt, tail, *, seconds, sampling):
+        """Not on MLX: the selection sends continuations to another backend."""
+        raise NotImplementedError(
+            "musicgen: the MLX backend does not continue audio; "
+            f"unset ${BACKEND_ENV_VAR} (or set it to transformers)."
+        )
+
+    def close(self):
+        """Stop the worker (the model is released)."""
+        self.worker.close()
+
+
+#: The backends by the name ``$ARIOSO_MUSICGEN_BACKEND`` takes.
+BACKENDS = {
+    "audiocraft": AudiocraftBackend,
+    "transformers": TransformersBackend,
+    "mlx": MlxBackend,
+}

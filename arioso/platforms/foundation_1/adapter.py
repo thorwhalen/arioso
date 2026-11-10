@@ -379,6 +379,7 @@ class Adapter:
         negative_prompt: str = None,
         sampler: str = DFLT_SAMPLER,
         device: str = None,
+        normalize: bool = True,
         **kwargs,
     ):
         """Render a loop or a one-shot for the tag prompt ``prompt``.
@@ -403,6 +404,9 @@ class Adapter:
             negative_prompt: What to steer away from.
             sampler: stable-audio-tools sampler type.
             device: ``"mps"``, ``"cuda"`` or ``"cpu"``; default: the best available.
+            normalize: Scale the take to full scale (its peak at 0 dBFS). ``False``
+                keeps the model's own level (written as float, so nothing clips): takes
+                meant to sit side by side, such as a keybed's chunks, keep their balance.
 
         Returns:
             A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.
@@ -439,6 +443,7 @@ class Adapter:
             sigma_max=DFLT_SIGMA_MAX,
             negative_prompt=negative_prompt,
             out=str(out),
+            normalize=bool(normalize),
         )
         # the device the worker resolved (None asked for "the best"): asking for it by
         # name later must not restart the worker and reload the model

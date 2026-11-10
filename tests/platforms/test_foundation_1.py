@@ -242,6 +242,29 @@ def test_naming_the_device_the_worker_chose_keeps_it(adapter):
     assert adapter._worker is first and not first.closed  # no 5 GB reload
 
 
+def test_normalize_reaches_the_worker_and_off_keeps_the_level(adapter, tmp_path):
+    import importlib.util
+
+    import numpy as np
+    import soundfile as sf
+
+    adapter.generate("Pad, Warm", duration=2)
+    adapter.generate("Pad, Warm", duration=2, normalize=False)
+    (_, on), (_, off) = adapter._worker.requests
+    assert on["normalize"] is True and off["normalize"] is False
+
+    spec = importlib.util.spec_from_file_location(
+        "f1_worker", worker_file("foundation_1")
+    )
+    worker = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(worker)
+    hot = np.full((2, 100), 1.5, dtype=np.float32)  # over full scale, as models can be
+    worker._save(hot, 8000, tmp_path / "on.wav")
+    worker._save(hot, 8000, tmp_path / "off.wav", normalize=False)
+    assert sf.read(tmp_path / "on.wav")[0].max() == pytest.approx(1.0, abs=1e-3)
+    assert sf.read(tmp_path / "off.wav")[0].max() == pytest.approx(1.5)  # not clipped
+
+
 def test_negative_prompt_and_note_reach_the_worker(adapter):
     adapter.generate("Pad, Warm", negative_prompt="Distortion", duration=2)
     adapter.generate("Rhodes Piano", note="C3", model="1.2-keybeds")
@@ -306,6 +329,17 @@ def test_generate_routes_affordances_and_adapter_params(adapter, monkeypatch):
     assert (req["steps"], req["cfg_scale"]) == (50, 6.0)
     assert req["checkpoint"] == "Foundation-1.2-Keybeds.safetensors"
     assert song.platform == "foundation_1" and song.status == "complete"
+
+
+def test_normalize_goes_through_generate_without_a_warning(adapter, monkeypatch):
+    import warnings
+
+    get_config("foundation_1")
+    monkeypatch.setitem(_registry["foundation_1"], "adapter", adapter)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        arioso.generate("Pad", platform="foundation_1", duration=2, normalize=False)
+    assert adapter._worker.requests[0][1]["normalize"] is False
 
 
 def test_cached_weights_looks_in_the_hub_cache_at_the_pinned_revision(

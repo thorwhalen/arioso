@@ -91,6 +91,21 @@ def _model(state, *, repo_id, revision, config_file, checkpoint, t5):
     return state["model"], state["model_config"]
 
 
+def _save(audio, sample_rate, out, *, normalize=True):
+    """Write ``audio`` (channels, samples) to ``out``: peak-normalised 16-bit PCM, or,
+    with ``normalize=False``, at the model's own level as float (nothing clips)."""
+    import numpy as np
+    import soundfile as sf
+
+    if normalize:
+        peak = float(np.abs(audio).max()) if audio.size else 0.0
+        if peak > 0:
+            audio = audio / peak
+        sf.write(out, np.clip(audio, -1, 1).T, sample_rate, subtype="PCM_16")
+    else:
+        sf.write(out, audio.T, sample_rate, subtype="FLOAT")
+
+
 def render(
     state,
     *,
@@ -109,8 +124,12 @@ def render(
     sigma_max,
     out,
     negative_prompt=None,
+    normalize=True,
 ):
-    """Generate ``seconds`` of audio for ``prompt`` with our seed; save it at ``out``."""
+    """Generate ``seconds`` of audio for ``prompt`` with our seed; save it at ``out``.
+
+    ``normalize``: peak to full scale, as 16-bit PCM; else the model's level, as float.
+    """
     import numpy as np
     import soundfile as sf
     import torch
@@ -153,10 +172,7 @@ def render(
     audio = (
         audio[0].to(torch.float32).cpu().numpy()[:, : int(round(seconds * sample_rate))]
     )
-    peak = float(np.abs(audio).max()) if audio.size else 0.0
-    if peak > 0:
-        audio = audio / peak
-    sf.write(out, np.clip(audio, -1, 1).T, sample_rate, subtype="PCM_16")
+    _save(audio, sample_rate, out, normalize=normalize)
     return {
         "out": out,
         "sample_rate": sample_rate,

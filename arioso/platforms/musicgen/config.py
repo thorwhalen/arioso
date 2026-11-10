@@ -73,7 +73,7 @@ PLATFORM_CONFIG = {
             "&& uv pip install --python .venv/bin/python -r requirements.txt"
         ),
     },
-    "mlx_driver": "arioso.platforms.musicgen._mlx_driver",
+    "mlx_worker": "musicgen_mlx",  # arioso/_workers/musicgen_mlx_worker.py
     "output": {
         "default_format": "wav",
         "sample_rate": 32000,

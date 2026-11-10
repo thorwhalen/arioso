@@ -28,7 +28,7 @@ PLATFORM_CONFIG = {
             "MAGENTA_HOME={root}/home {root}/.venv/bin/mrt models download mrt2_small"
         ),
     },
-    "driver": "arioso.platforms.magenta_rt._driver",
+    "worker": "magenta_rt",  # arioso/_workers/magenta_rt_worker.py
     "frame_rate": 25,
     "param_map": {
         "prompt": {"native_name": "embed_style(text)", "adapter_handled": True},

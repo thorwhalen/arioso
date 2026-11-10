@@ -26,7 +26,7 @@ PLATFORM_CONFIG = {
             "cd {root} && uv sync   # checkpoints (about 9.4 GB) download on first use"
         ),
     },
-    "driver": "arioso.platforms.ace_step._driver",
+    "worker": "ace_step",  # arioso/_workers/ace_step_worker.py
     "param_map": {
         "prompt": {"native_name": "tags", "required": True, "adapter_handled": True},
         "genre": {"native_name": "tags", "adapter_handled": True},

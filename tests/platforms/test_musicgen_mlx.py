@@ -1,8 +1,8 @@
-"""The MLX MusicGen backend (thorwhalen/arioso#54): selection, the worker protocol, the driver.
+"""The MLX MusicGen backend (thorwhalen/arioso#54): selection, the worker protocol, the worker.
 
-No MLX and no model: the worker is a fake that runs the real driver's ``handle`` in this
-process against a fake ``musicgen`` module, so the request shapes, the step arithmetic and
-the trimming are all exercised.
+No MLX and no model: the worker is a stand-in that runs the real worker file's functions
+in this process against a fake ``musicgen`` module, so the request shapes, the step
+arithmetic and the trimming are all exercised.
 """
 
 import sys
@@ -12,7 +12,7 @@ import pytest
 
 np = pytest.importorskip("numpy")
 
-from arioso.platforms.musicgen import _mlx_driver  # noqa: E402
+from arioso._isolated import worker_file  # noqa: E402
 from arioso.platforms.musicgen import backends as mg  # noqa: E402
 from arioso.platforms.musicgen.adapter import Adapter  # noqa: E402
 from arioso.platforms.musicgen.backends import (  # noqa: E402
@@ -22,6 +22,7 @@ from arioso.platforms.musicgen.backends import (  # noqa: E402
     select_backend_class,
 )
 from arioso.platforms.musicgen.config import PLATFORM_CONFIG  # noqa: E402
+from tests._in_process import InProcessWorker as _InProcessWorker  # noqa: E402
 
 SR = 32000
 HOP = SR // 50
@@ -29,7 +30,7 @@ SAMPLING = Sampling(temperature=0.7, top_k=123, top_p=0.0, guidance=4.5)
 
 
 class _FakeMlxModel:
-    """What the driver touches of mlx-examples' ``MusicGen``: 4 codebooks, 32 kHz."""
+    """What the worker touches of mlx-examples' ``MusicGen``: 4 codebooks, 32 kHz."""
 
     sampling_rate = SR
     num_codebooks = 4
@@ -57,7 +58,7 @@ class _FakeMlxModel:
 
 @pytest.fixture
 def fake_port(monkeypatch):
-    """A fake ``musicgen`` module and ``mlx.core`` for the real driver to import."""
+    """A fake ``musicgen`` module and ``mlx.core`` for the real worker file to import."""
     model = _FakeMlxModel()
     loaded = []
 
@@ -74,25 +75,9 @@ def fake_port(monkeypatch):
     monkeypatch.setitem(sys.modules, "musicgen", musicgen)
     monkeypatch.setitem(sys.modules, "mlx", mlx)
     monkeypatch.setitem(sys.modules, "mlx.core", core)
-    monkeypatch.setattr(_mlx_driver, "_models", {})
+    monkeypatch.setattr(sys, "path", list(sys.path))  # load() puts its cwd on the path
     model.loaded = loaded
     return model
-
-
-class _InProcessWorker:
-    """A Worker stand-in that runs the driver's ``handle`` here and records the requests."""
-
-    def __init__(self, python, module, *, env=None, cwd=None):
-        self.started = dict(python=str(python), module=module, cwd=str(cwd))
-        self.requests = []
-        self.closed = False
-
-    def call(self, request):
-        self.requests.append(request)
-        return _mlx_driver.handle(request)
-
-    def close(self):
-        self.closed = True
 
 
 @pytest.fixture
@@ -106,18 +91,20 @@ def runtime_dir(tmp_path, monkeypatch):
     return tmp_path
 
 
-def test_load_starts_the_driver_in_the_runtime_and_reads_the_rate(
+def test_load_starts_the_worker_in_the_runtime_and_reads_the_rate(
     fake_port, runtime_dir
 ):
     backend = MlxBackend.load("facebook/musicgen-small", make_worker=_InProcessWorker)
     rt = PLATFORM_CONFIG["mlx_runtime"]
-    assert backend.worker.started == dict(
-        python=str(runtime_dir / rt["python"]),
-        module="arioso.platforms.musicgen._mlx_driver",
-        cwd=str(runtime_dir / rt["cwd"]),
-    )
+    w = backend.worker
+    assert w.python == str(runtime_dir / rt["python"])
+    assert w.adapter == worker_file("musicgen_mlx")
+    assert str(w.cwd) == str(runtime_dir / rt["cwd"])
+    assert w.init == {"model": "facebook/musicgen-small"} and w.stderr is None
     assert (backend.sample_rate, backend.frame_rate) == (SR, 50)
     assert fake_port.loaded == ["facebook/musicgen-small"]
+    # the port's modules live in the working directory: load() puts it on the path
+    assert sys.path[0] == str(runtime_dir / rt["cwd"])
 
 
 def test_text_asks_for_the_frames_the_delay_pattern_costs_and_trims(

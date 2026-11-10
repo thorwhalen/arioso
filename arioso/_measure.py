@@ -176,8 +176,11 @@ def available_memory() -> Optional[int]:
 
 
 def _children_maxrss() -> int:
-    """The largest resident set of any waited-for child process, in bytes (0 if none)."""
-    import resource
+    """The largest resident set of any waited-for child process, in bytes (0 if none or unknown)."""
+    try:
+        import resource
+    except ImportError:  # Windows
+        return 0
 
     rss = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
     return rss if sys.platform == "darwin" else rss * 1024  # Linux reports kB

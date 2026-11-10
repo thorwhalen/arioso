@@ -51,6 +51,46 @@ def test_fix_octaves_moves_jumps_back():
     assert np.allclose(out, 62.0)
 
 
+def _fix_octaves_loop(midi, fps, *, window_s=0.5, min_jump=9.5):
+    """The original per-frame loop of ``fix_octaves``: the oracle for the vectorised one."""
+    out = midi.copy()
+    half = max(1, int(window_s * fps) // 2)
+    for i in np.flatnonzero(~np.isnan(midi)):
+        dev = midi[i] - np.nanmedian(midi[max(0, i - half) : i + half + 1])
+        if abs(dev) >= min_jump:
+            out[i] = midi[i] - 12 * np.round(dev / 12)
+    return out
+
+
+@pytest.mark.filterwarnings("error")  # neither version may warn (no window is all-NaN)
+@pytest.mark.parametrize("chunk_frames", [None, 7, 1])  # None: the module default
+@pytest.mark.parametrize("dtype", [np.float64, np.float32])
+def test_fix_octaves_equals_the_loop_bit_for_bit(dtype, chunk_frames):
+    chunk = {} if chunk_frames is None else {"chunk_frames": chunk_frames}
+    rng = np.random.default_rng(50)
+    for _ in range(400):
+        n = int(rng.integers(0, 150))  # includes empty and shorter-than-the-window inputs
+        fps = float(rng.choice([5, 20, 50, 100, 86.13]))
+        window_s = float(rng.uniform(0.01, 2.0))
+        midi = rng.normal(60, 3, n) + 12 * rng.integers(-2, 3, n) * (rng.random(n) < 0.2)
+        if rng.random() < 0.3:
+            midi = np.round(midi)  # ties, and even-count medians at NaN-trimmed edges
+        for _ in range(int(rng.integers(0, 5))):  # NaN runs, some at the ends
+            a = int(rng.integers(0, max(n, 1)))
+            midi[a : a + int(rng.integers(1, 40))] = np.nan
+        midi = midi.astype(dtype)
+        want = _fix_octaves_loop(midi, fps, window_s=window_s)
+        got = fix_octaves(midi, fps, window_s=window_s, **chunk)
+        assert got.dtype == want.dtype
+        assert np.array_equal(got, want, equal_nan=True), (n, fps, window_s)
+
+
+def test_fix_octaves_all_silent_and_integer_input():
+    assert np.all(np.isnan(fix_octaves(np.full(10, NAN), fps=100)))
+    midi = np.random.default_rng(0).integers(50, 80, 300)
+    assert np.array_equal(fix_octaves(midi, fps=100), _fix_octaves_loop(midi, fps=100))
+
+
 def test_tuning_offset_is_circular():
     assert tuning_offset(np.array([60.3, 62.3, NAN, 64.3])) == pytest.approx(0.3)
     # 49 cents sharp and 49 flat average to the quarter-tone, not to in-tune

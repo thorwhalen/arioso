@@ -4,10 +4,15 @@
 the best available when None) and the one checkpoint loaded so far (a new checkpoint
 replaces it, so at most one ~5 GB model is held).
 
-``render(state, *, repo_id, revision, config_file, checkpoint, prompt, seconds, steps,
+``render(state, *, repo_id, revision, config_file, checkpoint, t5, prompt, seconds, steps,
 cfg_scale, seed, sampler, sigma_min, sigma_max, out, negative_prompt=None)`` ->
 ``{"out", "sample_rate", "seconds", "device"}``: one take, peak-normalised, written as a
-16-bit wav at ``out``. Weights come from the Hugging Face cache (downloaded on first use).
+16-bit wav at ``out``. Weights come from the Hugging Face cache at pinned revisions
+(downloaded on first use, read from the cache with no network call after): the checkpoint,
+and the T5-base files (``t5``: ``repo_id``, ``revision``, ``files``), which the prompt
+conditioner is pointed at (its ``model_path``) instead of looking ``t5-base`` up online.
+The model is conditioned on whole seconds (``seconds_total``), as it was trained, and the
+audio is trimmed to the exact ``seconds``.
 
 Sampling is plain classifier-free guidance (``apg_scale=0``), as Stable Audio Open 1.0 and
 the Foundation-1 tools sample. stable-audio-tools' adaptive projected guidance (its
@@ -24,7 +29,6 @@ def load(device=None):
     """Pick the device; the model loads on the first render (it depends on the checkpoint)."""
     import torch
 
-    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     if device is None:
         if torch.cuda.is_available():
             device = "cuda"
@@ -35,14 +39,36 @@ def load(device=None):
     return {"device": device, "loaded": None, "model": None, "model_config": None}
 
 
-def _model(state, *, repo_id, revision, config_file, checkpoint):
+def _fetch(repo_id, filename, revision):
+    """The cached file at ``revision``, else downloaded (no network call when it is cached)."""
+    from huggingface_hub import hf_hub_download
+
+    try:
+        return hf_hub_download(
+            repo_id, filename, revision=revision, local_files_only=True
+        )
+    except Exception:  # not cached yet (the hub raises several kinds)
+        return hf_hub_download(repo_id, filename, revision=revision)
+
+
+def _pin_t5(model_config, t5):
+    """Point every T5 prompt conditioner at the pinned T5 files (their folder)."""
+    folder = None
+    for name in t5["files"]:
+        folder = os.path.dirname(_fetch(t5["repo_id"], name, t5["revision"]))
+    for cond in model_config["model"]["conditioning"]["configs"]:
+        if cond["type"] == "t5":
+            cond["config"]["model_path"] = folder
+    return model_config
+
+
+def _model(state, *, repo_id, revision, config_file, checkpoint, t5):
     """The model for ``checkpoint`` (loaded once; replaces the one held before)."""
     key = (repo_id, revision, checkpoint)
     if state["loaded"] != key:
         import gc
 
         import torch
-        from huggingface_hub import hf_hub_download
         from stable_audio_tools.models.factory import create_model_from_config
         from stable_audio_tools.models.utils import (
             copy_state_dict,
@@ -51,9 +77,9 @@ def _model(state, *, repo_id, revision, config_file, checkpoint):
 
         state["model"] = state["loaded"] = None
         gc.collect()
-        with open(hf_hub_download(repo_id, config_file, revision=revision)) as f:
-            model_config = json.load(f)
-        weights = hf_hub_download(repo_id, checkpoint, revision=revision)
+        with open(_fetch(repo_id, config_file, revision)) as f:
+            model_config = _pin_t5(json.load(f), t5)
+        weights = _fetch(repo_id, checkpoint, revision)
         model = create_model_from_config(model_config)
         copy_state_dict(model, load_ckpt_state_dict(weights))
         model = model.to(state["device"]).eval().requires_grad_(False)
@@ -70,6 +96,7 @@ def render(
     revision,
     config_file,
     checkpoint,
+    t5,
     prompt,
     seconds,
     steps,
@@ -93,12 +120,14 @@ def render(
         revision=revision,
         config_file=config_file,
         checkpoint=checkpoint,
+        t5=t5,
     )
     sample_rate = int(model_config["sample_rate"])
     window = int(model_config["sample_size"])
-    conditioning = [{"prompt": prompt, "seconds_start": 0, "seconds_total": seconds}]
+    total = max(1, round(seconds))  # whole seconds, as in training
+    conditioning = [{"prompt": prompt, "seconds_start": 0, "seconds_total": total}]
     negative = (
-        [{"prompt": negative_prompt, "seconds_start": 0, "seconds_total": seconds}]
+        [{"prompt": negative_prompt, "seconds_start": 0, "seconds_total": total}]
         if negative_prompt
         else None
     )

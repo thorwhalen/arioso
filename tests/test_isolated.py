@@ -120,7 +120,7 @@ def _write_wav(path, frames=800, rate=8000):
 def test_song_from_wav_holds_bytes_rate_and_duration(tmp_path):
     path = _write_wav(tmp_path / "out" / "x.wav")
     data = path.read_bytes()
-    song = song_from_wav(path, platform="toy", metadata={"seed": 3})
+    song = song_from_wav(path, platform="toy", metadata={"seed": 3}, remove=True)
     assert song.status == "complete" and song.platform == "toy"
     assert song.audio_bytes == data and song.sample_rate == 8000
     assert song.metadata == {"seed": 3}

@@ -105,7 +105,7 @@ def _arioso_only_dir() -> str:
     host's whole site-packages (its numpy, torch...) to an environment built to pin its own.
     """
     global _ARIOSO_ONLY_DIR
-    if _ARIOSO_ONLY_DIR is None:
+    if _ARIOSO_ONLY_DIR is None or not Path(_ARIOSO_ONLY_DIR, "arioso").exists():  # temp dirs get swept
         import shutil
         import tempfile
 
@@ -299,11 +299,11 @@ def is_apple_silicon() -> bool:
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
-def song_from_wav(path, *, platform: str, metadata: dict, remove: bool = True):
+def song_from_wav(path, *, platform: str, metadata: dict, remove: bool = False):
     """A complete :class:`~arioso.base.Song` holding the wav at ``path`` (bytes and array).
 
-    The Song holds the audio in memory, so the file (and its directory, when that is left
-    empty) is removed unless ``remove=False``.
+    The Song holds the audio in memory; with ``remove=True`` (for a temporary file a
+    runtime wrote) the file, and its directory when that is left empty, are deleted.
     """
     from arioso.base import AudioResult, Song
 

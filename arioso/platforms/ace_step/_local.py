@@ -92,4 +92,4 @@ class LocalAceStep:
         meta = {"runtime": "local", "seed": seed, "model": model, "lm_model": lm_model, "bpm": bpm,
                 "key": key, "num_steps": num_steps, "audio_to_audio": audio_input is not None,
                 "ace_step": result.get("params", {})}
-        return song_from_wav(result["out"], platform="ace_step", metadata=meta)
+        return song_from_wav(result["out"], platform="ace_step", metadata=meta, remove=True)

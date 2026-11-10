@@ -87,7 +87,7 @@ class Adapter:
         finally:
             if ref is not None:
                 ref.cleanup()
-        return song_from_wav(result["out"], platform="magenta_rt", metadata={
+        return song_from_wav(result["out"], platform="magenta_rt", remove=True, metadata={
             "model": model, "temperature": temperature, "top_k": top_k, "guidance": guidance,
             "frames": result["frames"], "seed": None, "style_from_audio": reference_audio is not None,
         })

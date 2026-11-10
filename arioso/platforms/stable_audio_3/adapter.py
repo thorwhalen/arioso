@@ -107,9 +107,12 @@ class Adapter:
             if ref is not None:
                 ref.cleanup()
         if code or not out.exists():
+            import shutil
+
+            shutil.rmtree(work, ignore_errors=True)
             tail = _ANSI.sub("", log)[-2000:]
             raise RuntimeError(f"stable_audio_3 failed (exit {code}):\n{tail}")
-        return song_from_wav(out, platform="stable_audio_3", metadata={
+        return song_from_wav(out, platform="stable_audio_3", remove=True, metadata={
             "seed": seed, "model": model, "num_steps": num_steps, "guidance": guidance,
             "audio_to_audio": audio_input is not None, "inpaint_range": inpaint_range,
             "audio_input_strength": audio_input_strength if audio_input is not None else None,

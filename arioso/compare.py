@@ -100,7 +100,9 @@ class Contender:
     def __post_init__(self):
         if not self.label:
             opts = ":".join(f"{k}={v}" for k, v in self.options.items())
-            object.__setattr__(self, "label", f"{self.platform}:{opts}" if opts else self.platform)
+            object.__setattr__(
+                self, "label", f"{self.platform}:{opts}" if opts else self.platform
+            )
 
     @classmethod
     def parse(cls, spec: "str | Contender") -> "Contender":
@@ -220,7 +222,9 @@ def _generate(contender: Contender, prompt: dict, *, duration, seed):
         used[f"{name}_used"] = name in kwargs
     song = arioso.generate(prompt["text"], platform=contender.platform, **kwargs)
     if song.is_error:
-        raise RuntimeError(song.error_message or f"{contender.platform} returned an error")
+        raise RuntimeError(
+            song.error_message or f"{contender.platform} returned an error"
+        )
     if song.audio_array is None:
         raise RuntimeError(
             f"{contender.platform} returned no waveform (status {song.status!r})"
@@ -254,12 +258,24 @@ def in_this_process(
         if warmup:
             t = time.perf_counter()
             try:
-                _generate(contender, dict(prompts[0], duration=warmup), duration=warmup, seed=seed)
+                _generate(
+                    contender,
+                    dict(prompts[0], duration=warmup),
+                    duration=warmup,
+                    seed=seed,
+                )
             except Exception as error:  # noqa: BLE001 - recorded, not raised
                 load_error = f"{type(error).__name__}: {error}"
             load_s = round(time.perf_counter() - t, 2)
         records = [
-            _take(contender, p, duration=duration, seed=seed, out_dir=out_dir, load_error=load_error)
+            _take(
+                contender,
+                p,
+                duration=duration,
+                seed=seed,
+                out_dir=out_dir,
+                load_error=load_error,
+            )
             for p in prompts
         ]
     for rec in records:
@@ -279,14 +295,21 @@ def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> di
     """One prompt's record: the take written to ``out_dir`` and timed, or an ``error``."""
     from arioso._audio import write_wav
 
-    rec = {"prompt": prompt["id"], "seconds_requested": prompt.get("duration", duration)}
+    rec = {
+        "prompt": prompt["id"],
+        "seconds_requested": prompt.get("duration", duration),
+    }
     if load_error:
         return dict(rec, error=f"warm-up failed: {load_error}")
     t = time.perf_counter()
     try:
         audio, sr, used = _generate(contender, prompt, duration=duration, seed=seed)
     except Exception as error:  # noqa: BLE001 - recorded, not raised
-        return dict(rec, error=f"{type(error).__name__}: {error}", gen_s=round(time.perf_counter() - t, 2))
+        return dict(
+            rec,
+            error=f"{type(error).__name__}: {error}",
+            gen_s=round(time.perf_counter() - t, 2),
+        )
     gen_s = time.perf_counter() - t
     path = Path(write_wav(audio, sr, out_dir / f"{_slug(prompt['id'])}.wav"))
     seconds_out = _frames(audio) / sr if sr else None
@@ -330,7 +353,11 @@ def in_child_process(
     (third-party platforms that register themselves on import).
     """
     job = {
-        "contender": {"platform": contender.platform, "options": dict(contender.options), "label": contender.label},
+        "contender": {
+            "platform": contender.platform,
+            "options": dict(contender.options),
+            "label": contender.label,
+        },
         "prompts": prompts,
         "duration": duration,
         "seed": seed,
@@ -342,14 +369,22 @@ def in_child_process(
         job_path, out_path = Path(tmp) / "job.json", Path(tmp) / "records.json"
         job_path.write_text(json.dumps(job))
         proc = subprocess.run(
-            [python or sys.executable, "-m", "arioso.compare", str(job_path), str(out_path)],
+            [
+                python or sys.executable,
+                "-m",
+                "arioso.compare",
+                str(job_path),
+                str(out_path),
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
         )
         if proc.returncode or not out_path.exists():
             tail = (proc.stdout or "").strip().splitlines()[-15:]
-            error = f"child process failed (exit {proc.returncode}): " + " | ".join(tail)
+            error = f"child process failed (exit {proc.returncode}): " + " | ".join(
+                tail
+            )
             return [{"prompt": p["id"], "error": error} for p in prompts]
         return json.loads(out_path.read_text())
 
@@ -380,7 +415,9 @@ def _key_parts(name: str) -> Optional[tuple[int, str]]:
     """``"C# minor"`` -> ``(1, "minor")``; ``None`` when it does not parse."""
     from arioso.analysis import pitch_class
 
-    m = re.match(r"\s*([A-Ga-gH][#b]?)\s*(major|minor|maj|min|m)?\s*$", name or "", re.I)
+    m = re.match(
+        r"\s*([A-Ga-gH][#b]?)\s*(major|minor|maj|min|m)?\s*$", name or "", re.I
+    )
     if not m:
         return None
     mode = (m.group(2) or "major").lower()
@@ -444,7 +481,9 @@ def objective_checks(y, sr: int, prompt: Mapping) -> dict:
         return dict(out, checks_skipped=["tempo", "key"])
     try:
         beats = denote.get_beats(y, sr=sr)
-        tempo = float(np.atleast_1d(beats.tempo)[0]) if beats.tempo is not None else None
+        tempo = (
+            float(np.atleast_1d(beats.tempo)[0]) if beats.tempo is not None else None
+        )
         ibi = np.diff(np.asarray(beats.beats, dtype=float))
         out.update(
             tempo_detected=round(tempo, 1) if tempo else None,
@@ -459,7 +498,10 @@ def objective_checks(y, sr: int, prompt: Mapping) -> dict:
     else:
         try:
             result = get_key(y, sr=sr)
-            out.update(key=result.key, key_confidence=_round(getattr(result, "confidence", None)))
+            out.update(
+                key=result.key,
+                key_confidence=_round(getattr(result, "confidence", None)),
+            )
             if prompt.get("key"):
                 out["key_agreement"] = key_agreement(result.key, prompt["key"])
         except Exception:  # noqa: BLE001
@@ -542,7 +584,9 @@ def compare(
 
     unknown = [c.platform for c in contenders if c.platform not in list_platforms()]
     if unknown:  # fail before anything runs
-        raise ValueError(f"Unknown platforms {unknown}. See `arioso platforms` for the list.")
+        raise ValueError(
+            f"Unknown platforms {unknown}. See `arioso platforms` for the list."
+        )
     hosted = [c.label for c in contenders if is_hosted(c)]
     if hosted and not allow_hosted:
         raise ValueError(
@@ -561,7 +605,9 @@ def compare(
             records = [{"prompt": p["id"], "error": error} for p in prompts]
         else:
             t = time.perf_counter()
-            records = (runner or in_child_process)(c, prompts, duration=duration, seed=seed, out_dir=out_dir, warmup=warmup)
+            records = (runner or in_child_process)(
+                c, prompts, duration=duration, seed=seed, out_dir=out_dir, warmup=warmup
+            )
             process_s = round(time.perf_counter() - t, 1)
         config = get_config(c.platform)
         for rec in records:
@@ -628,7 +674,8 @@ def summarize(records: Iterable[Mapping]) -> list[dict]:
                 "load_s": median(r.get("load_s") for r in ok),
                 "peak_memory_gb": max(
                     (
-                        (r.get("peak_memory_gb") or 0) + (r.get("workers_peak_memory_gb") or 0)
+                        (r.get("peak_memory_gb") or 0)
+                        + (r.get("workers_peak_memory_gb") or 0)
                         for r in ok
                     ),
                     default=None,
@@ -645,11 +692,24 @@ def summarize(records: Iterable[Mapping]) -> list[dict]:
 
 def summary_lines(records: Iterable[Mapping]) -> list[str]:
     """:func:`summarize` as aligned text lines, a header first."""
-    fields = ("contender", "takes", "failed", "rtf", "load_s", "peak_memory_gb", "tempo_err", "key_hits")
+    fields = (
+        "contender",
+        "takes",
+        "failed",
+        "rtf",
+        "load_s",
+        "peak_memory_gb",
+        "tempo_err",
+        "key_hits",
+    )
     rows = summarize(records)
-    table = [fields] + [tuple("-" if r[f] is None else str(r[f]) for f in fields) for r in rows]
+    table = [fields] + [
+        tuple("-" if r[f] is None else str(r[f]) for f in fields) for r in rows
+    ]
     widths = [max(len(row[i]) for row in table) for i in range(len(fields))]
-    lines = ["  ".join(c.ljust(w) for c, w in zip(row, widths)).rstrip() for row in table]
+    lines = [
+        "  ".join(c.ljust(w) for c, w in zip(row, widths)).rstrip() for row in table
+    ]
     lines += [f"{r['contender']}: {r['first_error']}" for r in rows if r["first_error"]]
     return lines
 
@@ -689,18 +749,32 @@ def compare_page(
                 body = f"<div class=err>{esc(r['error'][:300])}</div>"
             else:
                 src = os.path.relpath(r["path"], path.parent) if r.get("path") else ""
-                chips = [f"{r.get('gen_s')}s for {r.get('seconds_out')}s (RTF {r.get('rtf')})"]
+                chips = [
+                    f"{r.get('gen_s')}s for {r.get('seconds_out')}s (RTF {r.get('rtf')})"
+                ]
                 if r.get("tempo_detected"):
-                    chips.append(f"tempo {r['tempo_detected']}" + (f", err {r['tempo_err']}" if r.get("tempo_err") is not None else ""))
+                    chips.append(
+                        f"tempo {r['tempo_detected']}"
+                        + (
+                            f", err {r['tempo_err']}"
+                            if r.get("tempo_err") is not None
+                            else ""
+                        )
+                    )
                 if r.get("key"):
-                    chips.append(f"key {r['key']}" + (f" ({r['key_agreement']})" if r.get("key_agreement") else ""))
+                    chips.append(
+                        f"key {r['key']}"
+                        + (f" ({r['key_agreement']})" if r.get("key_agreement") else "")
+                    )
                 if r.get("clip_frac"):
                     chips.append(f"clipped {100 * r['clip_frac']:.2f}%")
                 body = (
                     f"<audio controls preload=none src='{esc(Path(src).as_posix())}'></audio>"
                     f"<div class=chips>{' · '.join(esc(c) for c in chips)}</div>"
                 )
-            takes.append(f"<div class=take><div class=who>{esc(r['contender'])}</div>{body}</div>")
+            takes.append(
+                f"<div class=take><div class=who>{esc(r['contender'])}</div>{body}</div>"
+            )
         text = texts.get(pid, "")
         sections.append(
             f"<section><h2>{esc(pid)}</h2>"
@@ -722,7 +796,17 @@ def compare_page(
     return path
 
 
-_PAGE_FIELDS = ("contender", "takes", "failed", "rtf", "load_s", "peak_memory_gb", "tempo_err", "key_hits", "weights_license")
+_PAGE_FIELDS = (
+    "contender",
+    "takes",
+    "failed",
+    "rtf",
+    "load_s",
+    "peak_memory_gb",
+    "tempo_err",
+    "key_hits",
+    "weights_license",
+)
 
 _PAGE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

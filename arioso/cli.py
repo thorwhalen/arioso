@@ -114,7 +114,13 @@ def compare(
     )
     lines = ac.summary_lines(records) + [str(Path(out_dir) / ac.RESULTS_FILE)]
     if not no_page:
-        lines.append(str(ac.compare_page(records, Path(out_dir) / "index.html", prompts=prompt_list)))
+        lines.append(
+            str(
+                ac.compare_page(
+                    records, Path(out_dir) / "index.html", prompts=prompt_list
+                )
+            )
+        )
     return lines
 
 

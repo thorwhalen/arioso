@@ -28,7 +28,9 @@ def clicks(bpm: float, seconds: float, sr: int = SAMPLE_RATE) -> np.ndarray:
     y = 0.05 * np.sin(2 * np.pi * 440 * t)
     length = int(0.03 * sr)
     noise = np.random.default_rng(0).standard_normal(length)
-    click = 0.6 * noise / np.abs(noise).max() * np.exp(-np.arange(length) / (0.005 * sr))
+    click = (
+        0.6 * noise / np.abs(noise).max() * np.exp(-np.arange(length) / (0.005 * sr))
+    )
     for start in np.arange(0, seconds, 60 / bpm):
         i = int(start * sr)
         y[i : i + len(click)] += click[: n - i]
@@ -74,6 +76,8 @@ def _config(name, access_type="python_lib", commercial_use="yes"):
 
 
 register_platform("fake_clicks", _config("fake_clicks"), _Clicks())
-register_platform("fake_hosted", _config("fake_hosted", "rest_api", "provider terms"), _Clicks())
+register_platform(
+    "fake_hosted", _config("fake_hosted", "rest_api", "provider terms"), _Clicks()
+)
 register_platform("fake_oneshot", _config("fake_oneshot"), _OneShot())
 register_platform("fake_broken", _config("fake_broken"), _Broken())

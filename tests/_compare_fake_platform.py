@@ -126,7 +126,7 @@ class _CrashWithWorker(_Clicks):
         )
         with open(os.environ["ARIOSO_TEST_PIDFILE"], "w") as f:
             f.write(str(worker.pid))
-        time.sleep(1)  # the parent's watch sees it (it reads the tree every 0.25 s)
+        time.sleep(3)  # the parent's watch sees it (it reads the tree every 0.25 s)
         os._exit(139)
 
 

@@ -259,10 +259,16 @@ def _alive(pid):
     """Whether ``pid`` is still running (a zombie counts as gone)."""
     if os.name == "nt":  # os.kill(pid, 0) would terminate it there
         import ctypes
+        from ctypes import wintypes
 
-        kernel32 = ctypes.windll.kernel32
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+        kernel32.WaitForSingleObject.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+        kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
+        # SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION
         handle = kernel32.OpenProcess(0x00100000 | 0x1000, False, pid)
-        if not handle:  # SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION
+        if not handle:
             return False
         try:
             return kernel32.WaitForSingleObject(handle, 0) == 0x102  # WAIT_TIMEOUT
@@ -300,6 +306,37 @@ def _kill(pid):
         pass
 
 
+def test_the_liveness_check_sees_a_live_process_and_its_end():
+    """So the 'gone' checks below cannot pass vacuously (on Windows above all)."""
+    import subprocess
+
+    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        assert _alive(sleeper.pid)
+    finally:
+        sleeper.kill()
+        sleeper.wait()
+    assert _gone_soon(sleeper.pid)
+
+
+def test_a_bad_timeout_raises_and_leaves_no_child(fakes, tmp_path, monkeypatch):
+    import subprocess
+
+    started = []
+    real_popen = subprocess.Popen
+
+    def popen(*args, **kwargs):
+        started.append(real_popen(*args, **kwargs))
+        return started[-1]
+
+    monkeypatch.setattr(subprocess, "Popen", popen)
+    with pytest.raises(ValueError):
+        ac._run_child(
+            [sys.executable, "-c", "import time; time.sleep(30)"], None, timeout=-1
+        )
+    assert len(started) == 1 and started[0].returncode is not None
+
+
 def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(
     fakes, tmp_path, monkeypatch
 ):
@@ -311,17 +348,17 @@ def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(
         tmp_path,
         runner=None,  # the default: in_child_process
         preload=[f"{FAKE}:register"],
-        timeout=8,
+        timeout=12,
     )
     fast, slow = records
-    assert "error" not in fast and fast["child_exit"] == "killed after 8 s"
+    assert "error" not in fast and fast["child_exit"] == "killed after 12 s"
     assert Path(fast["path"]).is_file()
-    assert "killed after 8 s" in slow["error"]
+    assert "killed after 12 s" in slow["error"]
     worker = int(pidfile.read_text())
-    try:
-        assert _gone_soon(worker)  # the worker the child started is gone too
-    finally:
-        _kill(worker)
+    gone = _gone_soon(worker)  # the worker the child started is gone too
+    if not gone:
+        _kill(worker)  # only a live one: a dead pid may be someone else's by now
+    assert gone
 
 
 @pytest.mark.skipif(
@@ -341,10 +378,10 @@ def test_a_child_that_crashes_takes_its_workers_with_it(fakes, tmp_path, monkeyp
     )
     assert all("child process failed (exit 139" in r["error"] for r in records)
     worker = int(pidfile.read_text())
-    try:
-        assert _gone_soon(worker)  # a crash skips the child's cleanup; ours ran
-    finally:
+    gone = _gone_soon(worker)  # a crash skips the child's cleanup; ours ran
+    if not gone:
         _kill(worker)
+    assert gone
 
 
 def test_preload_reaches_the_default_child_runner(tmp_path, monkeypatch):

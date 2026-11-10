@@ -21,34 +21,43 @@ def load():
     if root not in sys.path:
         sys.path.insert(0, root)
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
-    return {"root": root, "dit": (None, None), "lm": (None, None)}
+    return {"root": root, "dit": _EMPTY, "lm": _EMPTY}
 
 
 def _is_apple_silicon():
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
+#: An empty slot: no DiT or LM loaded (``None`` is a real request: no LM).
+_EMPTY = ("<none loaded>", None)
+#: The DiT ACE-Step loads when none is named (its own default).
+DFLT_DIT = "acestep-v15-turbo"
+
+
 def _handlers_for(state, dit, lm):
     """The loaded DiT and LM for this request; each is replaced when the request changes.
 
     One DiT and one LM are held at a time (each is several GB): the LM does not
-    depend on the DiT, so changing only the LM keeps the DiT, and the reverse.
+    depend on the DiT, so changing only the LM keeps the DiT, and the reverse. The
+    old one is unloaded and its memory released before the next loads; a failed
+    load leaves its slot empty (the other is kept) and releases what it took.
     """
+    dit = dit or DFLT_DIT
     if state["dit"][0] != dit:
         from acestep.handler import AceStepHandler
 
-        state["dit"] = (None, None)  # let the old one go before loading the next
-        _release_memory()
+        _drop(state, "dit")
         dit_h = AceStepHandler()
         msg, ok = dit_h.initialize_service(
             project_root=state["root"], config_path=dit, device="auto"
         )
         if not ok:
+            del dit_h
+            _release_memory()
             raise RuntimeError(f"ACE-Step DiT {dit!r} failed to load: {msg}")
         state["dit"] = (dit, dit_h)
     if state["lm"][0] != lm:
-        state["lm"] = (None, None)
-        _release_memory()
+        _drop(state, "lm")
         llm_h = None
         if lm:
             from acestep.llm_inference import LLMHandler
@@ -61,16 +70,38 @@ def _handlers_for(state, dit, lm):
                 device="auto",
             )
             if not ok:
+                del llm_h
+                _release_memory()
                 raise RuntimeError(f"ACE-Step LM {lm!r} failed to load: {msg}")
         state["lm"] = (lm, llm_h)
     return state["dit"][1], state["lm"][1]
 
 
+def _drop(state, slot):
+    """Unload the handler in ``slot`` (its own ``unload`` first, if it has one) and free it."""
+    handler = state[slot][1]
+    state[slot] = _EMPTY
+    unload = getattr(handler, "unload", None)
+    if callable(unload):
+        try:
+            unload()
+        except Exception:  # noqa: BLE001 - freeing must not fail the next load
+            pass
+    del handler
+    _release_memory()
+
+
 def _release_memory():
-    """Collect what a dropped handler held (and the GPU cache, if torch is loaded)."""
+    """Collect what a dropped handler held, and empty the MLX and torch GPU caches."""
     import gc
 
     gc.collect()
+    mx = sys.modules.get("mlx.core")
+    if mx is not None and hasattr(mx, "clear_cache"):
+        try:
+            mx.clear_cache()
+        except Exception:  # noqa: BLE001 - a cache that cannot be emptied is no error
+            pass
     torch = sys.modules.get("torch")
     if torch is not None:
         for backend in ("mps", "cuda"):
@@ -78,7 +109,7 @@ def _release_memory():
             if mod is not None and getattr(mod, "is_available", lambda: False)():
                 try:
                     mod.empty_cache()
-                except Exception:  # noqa: BLE001 - a cache that cannot be emptied is no error
+                except Exception:  # noqa: BLE001
                     pass
 
 

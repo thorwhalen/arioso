@@ -28,11 +28,11 @@ import os
 import re
 import subprocess
 import sys
-
-from ps.util import descendants  # noqa: F401 - part of this module's interface
 import threading
 from functools import lru_cache
 from typing import Optional
+
+from ps.util import descendants  # noqa: F401 - part of this module's interface
 
 #: ``RUSAGE_INFO_V4`` from ``<sys/resource.h>``: the first flavour carrying the lifetime peak.
 _RUSAGE_INFO_V4 = 4

@@ -3,8 +3,8 @@
 The worker's working directory is the checkout, which ``acestep`` needs as its project
 root (checkpoints download into ``checkpoints/`` there on first use).
 
-``load()`` -> the state: the checkout root and a cache of handlers, one ``(DiT, LM)`` pair
-per ``(dit, lm)``, loaded on first use and kept. On Apple Silicon the LM runs on MLX and
+``load()`` -> the state: the checkout root, and the one DiT and one LM loaded (each loaded
+on first use, replaced when a request names another). On Apple Silicon the LM runs on MLX and
 the DiT on MPS/MLX (ACE-Step's own defaults).
 ``render(state, *, caption, seconds, steps, guidance, seed, dit, lm, out_dir, ...)`` ->
 ``{"out", "key", "params"}``: one take saved in ``out_dir``.
@@ -16,12 +16,12 @@ import sys
 
 
 def load():
-    """The checkout root (put on ``sys.path``) and an empty handler cache."""
+    """The checkout root (put on ``sys.path``); no DiT or LM loaded yet."""
     root = os.getcwd()
     if root not in sys.path:
         sys.path.insert(0, root)
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
-    return {"root": root, "handlers": {}}
+    return {"root": root, "dit": (None, None), "lm": (None, None)}
 
 
 def _is_apple_silicon():
@@ -29,16 +29,26 @@ def _is_apple_silicon():
 
 
 def _handlers_for(state, dit, lm):
-    key = (dit, lm)
-    if key not in state["handlers"]:
+    """The loaded DiT and LM for this request; each is replaced when the request changes.
+
+    One DiT and one LM are held at a time (each is several GB): the LM does not
+    depend on the DiT, so changing only the LM keeps the DiT, and the reverse.
+    """
+    if state["dit"][0] != dit:
         from acestep.handler import AceStepHandler
 
+        state["dit"] = (None, None)  # let the old one go before loading the next
+        _release_memory()
         dit_h = AceStepHandler()
         msg, ok = dit_h.initialize_service(
             project_root=state["root"], config_path=dit, device="auto"
         )
         if not ok:
             raise RuntimeError(f"ACE-Step DiT {dit!r} failed to load: {msg}")
+        state["dit"] = (dit, dit_h)
+    if state["lm"][0] != lm:
+        state["lm"] = (None, None)
+        _release_memory()
         llm_h = None
         if lm:
             from acestep.llm_inference import LLMHandler
@@ -52,8 +62,24 @@ def _handlers_for(state, dit, lm):
             )
             if not ok:
                 raise RuntimeError(f"ACE-Step LM {lm!r} failed to load: {msg}")
-        state["handlers"][key] = (dit_h, llm_h)
-    return state["handlers"][key]
+        state["lm"] = (lm, llm_h)
+    return state["dit"][1], state["lm"][1]
+
+
+def _release_memory():
+    """Collect what a dropped handler held (and the GPU cache, if torch is loaded)."""
+    import gc
+
+    gc.collect()
+    torch = sys.modules.get("torch")
+    if torch is not None:
+        for backend in ("mps", "cuda"):
+            mod = getattr(torch, backend, None)
+            if mod is not None and getattr(mod, "is_available", lambda: False)():
+                try:
+                    mod.empty_cache()
+                except Exception:  # noqa: BLE001 - a cache that cannot be emptied is no error
+                    pass
 
 
 def render(

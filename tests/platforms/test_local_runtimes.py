@@ -361,7 +361,7 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         and seen["params"]["thinking"] is False
     )
     assert out["out"].endswith("ace.wav")
-    # with an LM: MLX on Apple Silicon, PyTorch elsewhere, loaded once per (dit, lm)
+    # with an LM: MLX on Apple Silicon, PyTorch elsewhere; changing the LM keeps the DiT
     for apple, backend in ((True, "mlx"), (False, "pt")):
         monkeypatch.setattr(worker, "_is_apple_silicon", lambda apple=apple: apple)
         lm = f"lm-{backend}"
@@ -369,7 +369,12 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         worker.render(state, **dict(request, lm=lm))
         assert seen["lm"][-1]["backend"] == backend
         assert seen["lm"][-1]["lm_model_path"] == lm
-    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 3
+    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 1
+    assert state["lm"][0] == "lm-pt"  # one LM held: the previous one was let go
+    # another DiT replaces the first (one held at a time) and keeps the LM
+    worker.render(state, **dict(request, dit="acestep-v15-base", lm="lm-pt"))
+    assert seen["dit_loads"] == 2 and seen["dit"]["config_path"] == "acestep-v15-base"
+    assert len(seen["lm"]) == 2 and state["dit"][0] == "acestep-v15-base"
 
 
 def test_magenta_rt_worker_loads_once_per_size_and_samples_per_call(

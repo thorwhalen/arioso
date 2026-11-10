@@ -5,6 +5,11 @@ Core types and constants for arioso.
 Defines the unified output types (Song, AudioResult) and the canonical
 set of affordance names that all platform adapters map to.
 
+### Module Attributes
+
+| [`COMMERCIAL_USE_VALUES`](#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), or the weights are not public and the hosted service's own terms decide (`"provider terms"`).   |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`Affordance`](#arioso.base.Affordance)(name, type, description[, default])   | Descriptor for a unified parameter affordance.           |
@@ -102,6 +107,14 @@ Duration of the audio in seconds.
 
 * **Type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'provider terms')*
+
+What a platform’s `commercial_use` config field may say, about using its
+output commercially: the weights’ licence allows it (`"yes"`), forbids it
+(`"no"`), allows it under conditions such as a revenue cap or use
+restrictions (`"conditional"`), or the weights are not public and the
+hosted service’s own terms decide (`"provider terms"`).
 
 ### *exception* arioso.base.CatalogMatchError(message, , task_id=None, code=None)
 

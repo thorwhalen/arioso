@@ -1,0 +1,19 @@
+arioso.cli
+==========
+
+.. automodule:: arioso.cli
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      commands
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate
+      platforms
+   

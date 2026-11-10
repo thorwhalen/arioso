@@ -198,7 +198,7 @@ Codec frames per second (50 for every MusicGen checkpoint).
 
 #### *classmethod* load(model_variant)
 
-Load `model_variant` and its processor with transformers, on `_device()`.
+Load `model_variant` and its processor with transformers, on `torch_device()`.
 
 * **Parameters:**
   **model_variant** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A MusicGen checkpoint name; a melody variant gets the

@@ -9,6 +9,7 @@ arioso.registry
    .. autosummary::
    
       discover_platforms
+      get_config
       get_platform
       list_platforms
       register_platform

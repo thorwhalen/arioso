@@ -9,6 +9,7 @@
    .. autosummary::
    
       AUDIO_INPUT_AFFORDANCES
+      PLATFORM_TABLE_FIELDS
    
    .. rubric:: Functions
 
@@ -21,6 +22,7 @@
       generate_many
       get_platform_info
       list_platforms
+      platform_table
       supports_audio_input
    
 .. rubric:: Modules
@@ -31,6 +33,7 @@
 
    analysis
    base
+   cli
    named_prompts
    platforms
    registry

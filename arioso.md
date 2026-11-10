@@ -1,4 +1,4 @@
-> built 2026-10-26 15:38 UTC from 8fa03e2 (main) · arioso 0.0.41. Details: build_info.json
+> built 2026-11-10 08:03 UTC from ee7abe5 (main) · arioso 0.0.42. Details: build_info.json
 
 # index.html.md
 
@@ -33,6 +33,22 @@ song.audio.sample_rate  # e.g. 32000
 song = arioso.generate("epic orchestral soundtrack", platform="elevenlabs", duration=30)
 song.audio.audio_bytes  # MP3 bytes
 ```
+
+## Command line
+
+Installing arioso also installs an `arioso` command (`python -m arioso` does the same).
+
+```default
+arioso generate "warm lo-fi piano" --platform musicgen --duration 10 -o out.wav
+arioso generate "ambient pads" --platform stable_audio --model stabilityai/stable-audio-open-1.0 --seed 7 -o pads.wav
+arioso platforms
+```
+
+`generate` writes the audio and prints the path it wrote. A waveform from a local model is written as WAV (with `soundfile` when installed, else the standard library’s `wave`); encoded audio from a hosted platform keeps its format, and the file’s suffix follows it. `--model` and `--seed` are passed on only when given.
+
+`platforms` lists every platform with its access type, weights licence and whether its output may be used commercially (`yes`, `no`, `conditional`, or `provider terms` for hosted models whose service terms decide). The same table is `arioso.platform_table()` in Python, and each platform’s `weights_license` and `commercial_use` are in `arioso.get_platform_info(name)`. MusicGen’s weights are CC-BY-NC-4.0, so its output is not for commercial use.
+
+Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set `ARIOSO_TORCH_DEVICE` to force one.
 
 ## Enhance existing audio (audio-to-audio)
 
@@ -484,6 +500,11 @@ Core types and constants for arioso.
 Defines the unified output types (Song, AudioResult) and the canonical
 set of affordance names that all platform adapters map to.
 
+### Module Attributes
+
+| [`COMMERCIAL_USE_VALUES`](_autosummary/arioso.base.html.md#arioso.base.COMMERCIAL_USE_VALUES)   | What a platform's `commercial_use` config field may say, about using its output commercially: the weights' licence allows it (`"yes"`), forbids it (`"no"`), allows it under conditions such as a revenue cap or use restrictions (`"conditional"`), or the weights are not public and the hosted service's own terms decide (`"provider terms"`).   |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Classes
 
 | [`Affordance`](_autosummary/arioso.base.html.md#arioso.base.Affordance)(name, type, description[, default])   | Descriptor for a unified parameter affordance.           |
@@ -582,6 +603,14 @@ Duration of the audio in seconds.
 * **Type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
+### arioso.base.COMMERCIAL_USE_VALUES *= ('yes', 'no', 'conditional', 'provider terms')*
+
+What a platform’s `commercial_use` config field may say, about using its
+output commercially: the weights’ licence allows it (`"yes"`), forbids it
+(`"no"`), allows it under conditions such as a revenue cap or use
+restrictions (`"conditional"`), or the weights are not public and the
+hosted service’s own terms decide (`"provider terms"`).
+
 ### *exception* arioso.base.CatalogMatchError(message, , task_id=None, code=None)
 
 Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
@@ -672,6 +701,58 @@ Check if this Song represents an error response.
 Shortcut to audio.sample_rate.
 
 
+# _autosummary/arioso.cli.html.md
+
+# arioso.cli
+
+The functions behind the `arioso` command line.
+
+Plain functions with no CLI library in sight: `arioso.__main__` projects
+[`commands`](_autosummary/arioso.cli.html.md#arioso.cli.commands) onto a parser with `cw`. Each returns what the command prints.
+
+### Module Attributes
+
+| [`commands`](_autosummary/arioso.cli.html.md#arioso.cli.commands)   | The commands of the `arioso` command line (the SSOT its parser is built from).   |
+|-------------------------------------------------------------|----------------------------------------------------------------------------------|
+
+### Functions
+
+| [`generate`](_autosummary/arioso.cli.html.md#arioso.cli.generate)(prompt, \*[, platform, duration, ...])   | Generate music from a text prompt and write it to a file.                      |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [`platforms`](_autosummary/arioso.cli.html.md#arioso.cli.platforms)()                                       | List the platforms with their access type, weights licence and commercial use. |
+
+### arioso.cli.commands *= {'generate': <function generate>, 'platforms': <function platforms>}*
+
+The commands of the `arioso` command line (the SSOT its parser is built from).
+
+### arioso.cli.generate(prompt, , platform='musicgen', duration=None, output='out.wav', model=None, seed=None)
+
+Generate music from a text prompt and write it to a file.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Text description of the music.
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The platform to generate with (see `arioso platforms`).
+  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length in seconds (default: the platform’s own).
+  * **output** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Where to write the audio. A waveform is written as WAV and
+    encoded audio from a hosted platform keeps its own format; either
+    way the suffix follows the format.
+  * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The platform’s model or checkpoint, when it offers a choice.
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed, on platforms that take one.
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+* **Returns:**
+  The path written.
+
+### arioso.cli.platforms()
+
+List the platforms with their access type, weights licence and commercial use.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+* **Returns:**
+  The table’s lines, a header first.
+
+
 # _autosummary/arioso.html.md
 
 # arioso
@@ -695,6 +776,9 @@ arioso.list_platforms()  # ['musicgen', 'sunoapi', 'elevenlabs', ...]
 # Get platform config
 arioso.get_platform_info("musicgen")
 
+# Every platform with its access type and weights licence
+arioso.platform_table()
+
 # Rich platform access via services
 s = arioso.services.sunoapi
 s.generate("jazz piano", duration=30)       # unified names
@@ -710,18 +794,20 @@ arioso.generators.sunoapi("jazz")
 
 | [`AUDIO_INPUT_AFFORDANCES`](_autosummary/arioso.html.md#arioso.AUDIO_INPUT_AFFORDANCES)   | Affordances that carry caller-supplied *input* audio (used by [`enhance()`](_autosummary/arioso.html.md#arioso.enhance)).   |
 |----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [`PLATFORM_TABLE_FIELDS`](_autosummary/arioso.html.md#arioso.PLATFORM_TABLE_FIELDS)     | The config fields [`platform_table()`](_autosummary/arioso.html.md#arioso.platform_table) reports, in column order.                |
 
 ### Functions
 
-| [`check_status`](_autosummary/arioso.html.md#arioso.check_status)(song)                                | Check the current status of a pending Song and return updated Songs.    |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`enhance`](_autosummary/arioso.html.md#arioso.enhance)(audio[, prompt, platform, strength, as_]) | Transform existing audio into AI-enhanced audio (pipeline stage 3->4).  |
-| [`fetch_audio`](_autosummary/arioso.html.md#arioso.fetch_audio)(song)                                 | Download the audio bytes for a Song that has an audio_url.              |
-| [`generate`](_autosummary/arioso.html.md#arioso.generate)(prompt, \*[, platform])                  | Generate music using the specified platform.                            |
-| [`generate_many`](_autosummary/arioso.html.md#arioso.generate_many)(prompt, \*[, platform])             | Generate music, returning all results (some platforms return multiple). |
-| [`get_platform_info`](_autosummary/arioso.html.md#arioso.get_platform_info)(name)                           | Get configuration info for a platform.                                  |
-| [`list_platforms`](_autosummary/arioso.html.md#arioso.list_platforms)()                                  | Return names of all available platforms.                                |
-| [`supports_audio_input`](_autosummary/arioso.html.md#arioso.supports_audio_input)(platform)                    | Whether *platform* can condition on caller-supplied input audio.        |
+| [`check_status`](_autosummary/arioso.html.md#arioso.check_status)(song)                                | Check the current status of a pending Song and return updated Songs.       |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`enhance`](_autosummary/arioso.html.md#arioso.enhance)(audio[, prompt, platform, strength, as_]) | Transform existing audio into AI-enhanced audio (pipeline stage 3->4).     |
+| [`fetch_audio`](_autosummary/arioso.html.md#arioso.fetch_audio)(song)                                 | Download the audio bytes for a Song that has an audio_url.                 |
+| [`generate`](_autosummary/arioso.html.md#arioso.generate)(prompt, \*[, platform])                  | Generate music using the specified platform.                               |
+| [`generate_many`](_autosummary/arioso.html.md#arioso.generate_many)(prompt, \*[, platform])             | Generate music, returning all results (some platforms return multiple).    |
+| [`get_platform_info`](_autosummary/arioso.html.md#arioso.get_platform_info)(name)                           | Get configuration info for a platform.                                     |
+| [`list_platforms`](_autosummary/arioso.html.md#arioso.list_platforms)()                                  | Return names of all available platforms.                                   |
+| [`platform_table`](_autosummary/arioso.html.md#arioso.platform_table)(\*[, fields])                      | One row per platform: its access type, weights licence and commercial use. |
+| [`supports_audio_input`](_autosummary/arioso.html.md#arioso.supports_audio_input)(platform)                    | Whether *platform* can condition on caller-supplied input audio.           |
 
 ### arioso.AUDIO_INPUT_AFFORDANCES *= ('audio_input', 'melody', 'reference_audio')*
 
@@ -729,6 +815,10 @@ Affordances that carry caller-supplied *input* audio (used by [`enhance()`](_aut
 Distinct from the clip-extension affordance `continue_from`, which extends
 a track rather than conditioning on one (a prior generation’s id/URL on
 hosted platforms, the audio itself on musicgen).
+
+### arioso.PLATFORM_TABLE_FIELDS *= ('name', 'access_type', 'weights_license', 'commercial_use')*
+
+The config fields [`platform_table()`](_autosummary/arioso.html.md#arioso.platform_table) reports, in column order.
 
 ### arioso.check_status(song)
 
@@ -857,6 +947,26 @@ Return names of all available platforms.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
+### arioso.platform_table(, fields=('name', 'access_type', 'weights_license', 'commercial_use'))
+
+One row per platform: its access type, weights licence and commercial use.
+
+Reads the platforms’ configs only, so no adapter (and no optional dependency)
+is loaded. `commercial_use` is one of `COMMERCIAL_USE_VALUES`.
+
+* **Parameters:**
+  **fields** – The config keys each row carries (a missing key reads `None`).
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
+* **Returns:**
+  A list of dicts, one per platform, keyed by `fields`.
+
+Example:
+
+```default
+free = [r["name"] for r in arioso.platform_table() if r["commercial_use"] == "yes"]
+```
+
 ### arioso.supports_audio_input(platform)
 
 Whether *platform* can condition on caller-supplied input audio.
@@ -879,6 +989,7 @@ arioso.supports_audio_input("mubert")        # False
 
 | [`base`](_autosummary/arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                        |
 |--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [`cli`](_autosummary/arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                             |
 | [`named_prompts`](_autosummary/arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category. |
 | [`platforms`](_autosummary/arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                               |
 | [`registry`](_autosummary/arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                     |
@@ -1892,7 +2003,7 @@ Codec frames per second (50 for every MusicGen checkpoint).
 
 #### *classmethod* load(model_variant)
 
-Load `model_variant` and its processor with transformers, on `_device()`.
+Load `model_variant` and its processor with transformers, on `torch_device()`.
 
 * **Parameters:**
   **model_variant** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A MusicGen checkpoint name; a melody variant gets the
@@ -2030,20 +2141,37 @@ Riffusion platform for arioso.
 
 Stable Audio Open adapter using HuggingFace Diffusers.
 
+Runs on `arioso._util.torch_device()` (CUDA, else Apple MPS, else CPU), in
+float16 on CUDA only. The Stability AI repositories are gated: accept the
+licence on the model’s Hugging Face page and log in before the first load.
+
+### Module Attributes
+
+| [`SEED_BOUND`](_autosummary/arioso.platforms.stable_audio.adapter.html.md#arioso.platforms.stable_audio.adapter.SEED_BOUND)   | Seeds are drawn below this bound when none is given, so every take records one.   |
+|---------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### Functions
+
+| [`load_pipeline`](_autosummary/arioso.platforms.stable_audio.adapter.html.md#arioso.platforms.stable_audio.adapter.load_pipeline)(model)               | `diffusers.StableAudioPipeline` for *model*, on the shared torch device.   |
+|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`make_torch_generator`](_autosummary/arioso.platforms.stable_audio.adapter.html.md#arioso.platforms.stable_audio.adapter.make_torch_generator)(device, seed) | A `torch.Generator` on *device* seeded with *seed*.                        |
+
 ### Classes
 
-| [`Adapter`](_autosummary/arioso.platforms.stable_audio.adapter.html.md#arioso.platforms.stable_audio.adapter.Adapter)(config)   | Stable Audio Open adapter with lazy model loading.   |
-|--------------------------------------------------------------------|------------------------------------------------------|
+| [`Adapter`](_autosummary/arioso.platforms.stable_audio.adapter.html.md#arioso.platforms.stable_audio.adapter.Adapter)(config, \*[, load_pipeline, ...])   | Stable Audio Open adapter with lazy model loading.   |
+|----------------------------------------------------------------------------------------------|------------------------------------------------------|
 
-### *class* arioso.platforms.stable_audio.adapter.Adapter(config)
+### *class* arioso.platforms.stable_audio.adapter.Adapter(config, \*, load_pipeline=<function load_pipeline>, make_generator=<function make_torch_generator>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Stable Audio Open adapter with lazy model loading.
 
-Uses `diffusers.StableAudioPipeline` for local inference.
+Uses `diffusers.StableAudioPipeline` for local inference. `load_pipeline`
+(model id -> pipeline) and `make_generator` ((device, seed) -> generator)
+are the seams that keep tests free of torch, diffusers and the gated weights.
 
-#### generate(prompt, , negative_prompt=None, duration=10.0, num_steps=200, guidance=7.0, seed=None, batch_size=1, sampler='dpmpp-3m-sde', audio_input=None, audio_input_strength=None, \*\*kwargs)
+#### generate(prompt, , negative_prompt=None, duration=10.0, num_steps=200, guidance=7.0, seed=None, batch_size=1, sampler='dpmpp-3m-sde', audio_input=None, audio_input_strength=None, model='stabilityai/stable-audio-open-1.0', \*\*kwargs)
 
 Generate audio from a text prompt, optionally conditioned on input audio.
 
@@ -2053,7 +2181,8 @@ Generate audio from a text prompt, optionally conditioned on input audio.
   * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Length in seconds.
   * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Number of diffusion inference steps.
   * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Classifier-free guidance scale.
-  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed for reproducibility.
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed for reproducibility. When omitted, one is drawn
+    and recorded in `metadata['seed']`, so every take can be redone.
   * **batch_size** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Number of waveforms to generate.
   * **sampler** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Sampler type for the diffusion process.
   * **audio_input** – Optional input audio to condition on (audio-to-audio):
@@ -2064,10 +2193,24 @@ Generate audio from a text prompt, optionally conditioned on input audio.
     the diffusers `StableAudioPipeline` exposes no denoise/strength
     control (that is a stable-audio-tools/ComfyUI feature). A warning
     is emitted if a value is passed alongside `audio_input`.
+  * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Hugging Face id of a Stable Audio checkpoint that
+    `StableAudioPipeline` loads.
 * **Return type:**
   [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
 * **Returns:**
   A Song with audio_array populated.
+
+### arioso.platforms.stable_audio.adapter.SEED_BOUND *= 2147483648*
+
+Seeds are drawn below this bound when none is given, so every take records one.
+
+### arioso.platforms.stable_audio.adapter.load_pipeline(model)
+
+`diffusers.StableAudioPipeline` for *model*, on the shared torch device.
+
+### arioso.platforms.stable_audio.adapter.make_torch_generator(device, seed)
+
+A `torch.Generator` on *device* seeded with *seed*.
 
 
 # _autosummary/arioso.platforms.stable_audio.config.html.md
@@ -2497,11 +2640,12 @@ Platform registry with auto-discovery and lazy loading.
 
 ### Functions
 
-| [`discover_platforms`](_autosummary/arioso.registry.html.md#arioso.registry.discover_platforms)()                       | Scan arioso.platforms for valid platform packages.                |
-|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| [`get_platform`](_autosummary/arioso.registry.html.md#arioso.registry.get_platform)(name)                         | Get registered platform info, lazy-loading the adapter if needed. |
-| [`list_platforms`](_autosummary/arioso.registry.html.md#arioso.registry.list_platforms)()                           | Return names of all registered platforms.                         |
-| [`register_platform`](_autosummary/arioso.registry.html.md#arioso.registry.register_platform)(name, config[, adapter]) | Manually register a platform (for third-party plugins).           |
+| [`discover_platforms`](_autosummary/arioso.registry.html.md#arioso.registry.discover_platforms)()                       | Scan arioso.platforms for valid platform packages.                   |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`get_config`](_autosummary/arioso.registry.html.md#arioso.registry.get_config)(name)                           | The PLATFORM_CONFIG of platform *name*, without loading its adapter. |
+| [`get_platform`](_autosummary/arioso.registry.html.md#arioso.registry.get_platform)(name)                         | Get registered platform info, lazy-loading the adapter if needed.    |
+| [`list_platforms`](_autosummary/arioso.registry.html.md#arioso.registry.list_platforms)()                           | Return names of all registered platforms.                            |
+| [`register_platform`](_autosummary/arioso.registry.html.md#arioso.registry.register_platform)(name, config[, adapter]) | Manually register a platform (for third-party plugins).              |
 
 ### arioso.registry.discover_platforms()
 
@@ -2516,6 +2660,15 @@ A valid platform package is a directory under arioso/platforms/ that:
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 * **Returns:**
   List of discovered platform names.
+
+### arioso.registry.get_config(name)
+
+The PLATFORM_CONFIG of platform *name*, without loading its adapter.
+
+* **Raises:**
+  [**KeyError**](https://docs.python.org/3/builtins/exceptions.html#KeyError) – If the platform is not found.
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### arioso.registry.get_platform(name)
 
@@ -2729,18 +2882,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-10-26 15:38 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e2</code></a> on branch <code>main</code>, for **arioso 0.0.41** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 08:03 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/ee7abe5f725a35bc8eb5a277365565eb94a04fa4"><code>ee7abe5</code></a> on branch <code>main</code>, for **arioso 0.0.42** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.42) is ahead of the latest release on PyPI (0.0.41): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/8fa03e23d27858ed874c7e512f8e98dcd273f143"><code>8fa03e23d27858ed874c7e512f8e98dcd273f143</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/ee7abe5f725a35bc8eb5a277365565eb94a04fa4"><code>ee7abe5f725a35bc8eb5a277365565eb94a04fa4</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.41</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.42</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -2749,9 +2904,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/40350814189">40350814189</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42779414678">42779414678</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>2282350b493123aba72c460d2ab543fa7dd4033e</code> (in the history of the built commit) |
+| Event commit | <code>87abd18fc105437d3bb6a54f33c1c7d306b75e6b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2760,7 +2915,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | epythet  | 0.2.22  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -2776,13 +2931,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.41/">0.0.41</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.41/">0.0.41</a>, older than the documented version (0.0.42).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 8fa03e23d27858ed874c7e512f8e98dcd273f143
+git checkout ee7abe5f725a35bc8eb5a277365565eb94a04fa4
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

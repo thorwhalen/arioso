@@ -19,6 +19,9 @@ arioso.list_platforms()  # ['musicgen', 'sunoapi', 'elevenlabs', ...]
 # Get platform config
 arioso.get_platform_info("musicgen")
 
+# Every platform with its access type and weights licence
+arioso.platform_table()
+
 # Rich platform access via services
 s = arioso.services.sunoapi
 s.generate("jazz piano", duration=30)       # unified names
@@ -34,18 +37,20 @@ arioso.generators.sunoapi("jazz")
 
 | [`AUDIO_INPUT_AFFORDANCES`](#arioso.AUDIO_INPUT_AFFORDANCES)   | Affordances that carry caller-supplied *input* audio (used by [`enhance()`](#arioso.enhance)).   |
 |----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| [`PLATFORM_TABLE_FIELDS`](#arioso.PLATFORM_TABLE_FIELDS)     | The config fields [`platform_table()`](#arioso.platform_table) reports, in column order.                |
 
 ### Functions
 
-| [`check_status`](#arioso.check_status)(song)                                | Check the current status of a pending Song and return updated Songs.    |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`enhance`](#arioso.enhance)(audio[, prompt, platform, strength, as_]) | Transform existing audio into AI-enhanced audio (pipeline stage 3->4).  |
-| [`fetch_audio`](#arioso.fetch_audio)(song)                                 | Download the audio bytes for a Song that has an audio_url.              |
-| [`generate`](#arioso.generate)(prompt, \*[, platform])                  | Generate music using the specified platform.                            |
-| [`generate_many`](#arioso.generate_many)(prompt, \*[, platform])             | Generate music, returning all results (some platforms return multiple). |
-| [`get_platform_info`](#arioso.get_platform_info)(name)                           | Get configuration info for a platform.                                  |
-| [`list_platforms`](#arioso.list_platforms)()                                  | Return names of all available platforms.                                |
-| [`supports_audio_input`](#arioso.supports_audio_input)(platform)                    | Whether *platform* can condition on caller-supplied input audio.        |
+| [`check_status`](#arioso.check_status)(song)                                | Check the current status of a pending Song and return updated Songs.       |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| [`enhance`](#arioso.enhance)(audio[, prompt, platform, strength, as_]) | Transform existing audio into AI-enhanced audio (pipeline stage 3->4).     |
+| [`fetch_audio`](#arioso.fetch_audio)(song)                                 | Download the audio bytes for a Song that has an audio_url.                 |
+| [`generate`](#arioso.generate)(prompt, \*[, platform])                  | Generate music using the specified platform.                               |
+| [`generate_many`](#arioso.generate_many)(prompt, \*[, platform])             | Generate music, returning all results (some platforms return multiple).    |
+| [`get_platform_info`](#arioso.get_platform_info)(name)                           | Get configuration info for a platform.                                     |
+| [`list_platforms`](#arioso.list_platforms)()                                  | Return names of all available platforms.                                   |
+| [`platform_table`](#arioso.platform_table)(\*[, fields])                      | One row per platform: its access type, weights licence and commercial use. |
+| [`supports_audio_input`](#arioso.supports_audio_input)(platform)                    | Whether *platform* can condition on caller-supplied input audio.           |
 
 ### arioso.AUDIO_INPUT_AFFORDANCES *= ('audio_input', 'melody', 'reference_audio')*
 
@@ -53,6 +58,10 @@ Affordances that carry caller-supplied *input* audio (used by [`enhance()`](#ari
 Distinct from the clip-extension affordance `continue_from`, which extends
 a track rather than conditioning on one (a prior generation’s id/URL on
 hosted platforms, the audio itself on musicgen).
+
+### arioso.PLATFORM_TABLE_FIELDS *= ('name', 'access_type', 'weights_license', 'commercial_use')*
+
+The config fields [`platform_table()`](#arioso.platform_table) reports, in column order.
 
 ### arioso.check_status(song)
 
@@ -181,6 +190,26 @@ Return names of all available platforms.
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
+### arioso.platform_table(, fields=('name', 'access_type', 'weights_license', 'commercial_use'))
+
+One row per platform: its access type, weights licence and commercial use.
+
+Reads the platforms’ configs only, so no adapter (and no optional dependency)
+is loaded. `commercial_use` is one of `COMMERCIAL_USE_VALUES`.
+
+* **Parameters:**
+  **fields** – The config keys each row carries (a missing key reads `None`).
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
+* **Returns:**
+  A list of dicts, one per platform, keyed by `fields`.
+
+Example:
+
+```default
+free = [r["name"] for r in arioso.platform_table() if r["commercial_use"] == "yes"]
+```
+
 ### arioso.supports_audio_input(platform)
 
 Whether *platform* can condition on caller-supplied input audio.
@@ -203,6 +232,7 @@ arioso.supports_audio_input("mubert")        # False
 
 | [`base`](arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                        |
 |--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| [`cli`](arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                             |
 | [`named_prompts`](arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category. |
 | [`platforms`](arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                               |
 | [`registry`](arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                     |

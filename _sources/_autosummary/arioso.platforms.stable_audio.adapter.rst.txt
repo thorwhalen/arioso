@@ -4,6 +4,19 @@ arioso.platforms.stable\_audio.adapter
 .. automodule:: arioso.platforms.stable_audio.adapter
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SEED_BOUND
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      load_pipeline
+      make_torch_generator
+   
    .. rubric:: Classes
 
    .. autosummary::

@@ -4,11 +4,12 @@ Platform registry with auto-discovery and lazy loading.
 
 ### Functions
 
-| [`discover_platforms`](#arioso.registry.discover_platforms)()                       | Scan arioso.platforms for valid platform packages.                |
-|---------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| [`get_platform`](#arioso.registry.get_platform)(name)                         | Get registered platform info, lazy-loading the adapter if needed. |
-| [`list_platforms`](#arioso.registry.list_platforms)()                           | Return names of all registered platforms.                         |
-| [`register_platform`](#arioso.registry.register_platform)(name, config[, adapter]) | Manually register a platform (for third-party plugins).           |
+| [`discover_platforms`](#arioso.registry.discover_platforms)()                       | Scan arioso.platforms for valid platform packages.                   |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`get_config`](#arioso.registry.get_config)(name)                           | The PLATFORM_CONFIG of platform *name*, without loading its adapter. |
+| [`get_platform`](#arioso.registry.get_platform)(name)                         | Get registered platform info, lazy-loading the adapter if needed.    |
+| [`list_platforms`](#arioso.registry.list_platforms)()                           | Return names of all registered platforms.                            |
+| [`register_platform`](#arioso.registry.register_platform)(name, config[, adapter]) | Manually register a platform (for third-party plugins).              |
 
 ### arioso.registry.discover_platforms()
 
@@ -23,6 +24,15 @@ A valid platform package is a directory under arioso/platforms/ that:
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 * **Returns:**
   List of discovered platform names.
+
+### arioso.registry.get_config(name)
+
+The PLATFORM_CONFIG of platform *name*, without loading its adapter.
+
+* **Raises:**
+  [**KeyError**](https://docs.python.org/3/builtins/exceptions.html#KeyError) – If the platform is not found.
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### arioso.registry.get_platform(name)
 

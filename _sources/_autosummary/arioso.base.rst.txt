@@ -4,6 +4,12 @@ arioso.base
 .. automodule:: arioso.base
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      COMMERCIAL_USE_VALUES
+   
    .. rubric:: Classes
 
    .. autosummary::

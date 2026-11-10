@@ -7,6 +7,7 @@
 
 - [arioso](arioso.html.md): Arioso - Unified facade for AI music generation platforms.
 - [arioso.base](arioso.base.html.md): Core types and constants for arioso.
+- [arioso.cli](arioso.cli.html.md): The functions behind the &#96;arioso&#96; command line.
 - [arioso.named_prompts](arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
 - [arioso.platforms](arioso.platforms.html.md): Platform packages for arioso.
 - [arioso.platforms.ace_step](arioso.platforms.ace_step.html.md): ACE-Step (hosted on fal.ai) platform for arioso.

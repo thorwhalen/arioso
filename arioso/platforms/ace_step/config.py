@@ -1,20 +1,32 @@
-"""ACE-Step platform configuration (fal.ai hosted).
+"""ACE-Step platform configuration: fal.ai hosted, or ACE-Step 1.5 run locally.
 
 Live docs (verified 2026-10-03): https://fal.ai/models/fal-ai/ace-step/api and
-https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api
+https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api. Local runtime: the
+``ACE-Step/ACE-Step-1.5`` checkout (MIT code and weights), verified against its
+``docs/en/INFERENCE.md`` and ``acestep.inference.GenerationParams`` on 2026-11-10.
 """
 
 PLATFORM_CONFIG = {
     "name": "ace_step",
-    "display_name": "ACE-Step (via fal.ai)",
+    "display_name": "ACE-Step (fal.ai, or local ACE-Step 1.5)",
     "website": "https://fal.ai/models/fal-ai/ace-step",
     "tier": "structured",
     "access_type": "rest_api",
-    "weights_license": "Apache-2.0",
-    "commercial_use": "yes",
     "auth": {"type": "api_key", "env_var": "FAL_KEY"},
     "dependencies": [],
-    "optional_dependencies": ["fal_client", "requests"],
+    "optional_dependencies": ["fal_client", "requests", "soundfile"],
+    "weights_license": "MIT (ACE-Step 1.5; Apache-2.0 for v1 on fal)",
+    "commercial_use": "yes",
+    # runtime="local": ACE-Step 1.5 in its own checkout and environment (arioso._isolated).
+    "runtime": {
+        "name": "ace-step-1.5",
+        "env_var": "ARIOSO_ACE_STEP_DIR",
+        "setup": (
+            "git clone --depth 1 https://github.com/ACE-Step/ACE-Step-1.5 {root}\n"
+            "cd {root} && uv sync   # checkpoints (about 9.4 GB) download on first use"
+        ),
+    },
+    "driver": "arioso.platforms.ace_step._driver",
     "param_map": {
         "prompt": {"native_name": "tags", "required": True, "adapter_handled": True},
         "genre": {"native_name": "tags", "adapter_handled": True},
@@ -52,10 +64,19 @@ PLATFORM_CONFIG = {
         "guidance",
         "seed",
         "audio_input",
+        # local runtime only (the fal adapter warns and drops them)
+        "bpm",
+        "key",
+        "model",
+        "reference_audio",
+        "audio_input_strength",
     ],
     # The adapter takes the unified names itself (native_name documents the
     # mapping), and these adapter-only keywords pass validation untouched.
     "adapter_params": [
+        "runtime",
+        "lm_model",
+        "timesignature",
         "fetch",
         "original_tags",
         "original_lyrics",

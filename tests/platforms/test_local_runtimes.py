@@ -145,16 +145,16 @@ def test_magenta_rt_renders_through_one_worker_with_its_home(installed, monkeypa
     assert w.closed and a._worker is None
 
 
-def test_ace_step_resolves_runtime_from_fal_key(installed, monkeypatch):
+def test_ace_step_defaults_to_fal_and_env_can_make_local_the_default(installed, monkeypatch):
     installed(ACE_CONFIG)
     seen = []
     monkeypatch.setattr(ace_mod, "fal_run", lambda endpoint, arguments: seen.append(endpoint) or {"audio": {"url": "u"}})
-    monkeypatch.setenv("FAL_KEY", "k")
+    monkeypatch.delenv("ARIOSO_ACE_STEP_RUNTIME", raising=False)
     a = ace_mod.Adapter()
     with pytest.warns(UserWarning, match="no bpm"):
         a.generate("jazz", bpm=120, fetch=False)
     assert seen == ["fal-ai/ace-step"]
-    monkeypatch.delenv("FAL_KEY")
+    monkeypatch.setenv("ARIOSO_ACE_STEP_RUNTIME", "local")
     local = ace_mod.LocalAceStep(ACE_CONFIG, make_worker=_FakeWorker)
     song = ace_mod.Adapter(local=local).generate("jazz", bpm=120, key="C Major", duration=10)
     req = local._worker.requests[0]

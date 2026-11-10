@@ -1,5 +1,6 @@
 """Tests for arioso._isolated: runtime location, the JSON-lines worker, and wav reading."""
 
+import re
 import sys
 import wave
 
@@ -24,7 +25,7 @@ def test_missing_runtime_raises_with_the_setup_commands(monkeypatch, tmp_path):
     monkeypatch.setenv("ARIOSO_TOY_DIR", str(tmp_path))
     rt = _runtime()
     assert not rt.installed()
-    with pytest.raises(RuntimeNotInstalled, match=f"install into {tmp_path}") as err:
+    with pytest.raises(RuntimeNotInstalled, match=re.escape(f"install into {tmp_path}")) as err:
         rt.interpreter()
     assert "ARIOSO_TOY_DIR" in str(err.value)
 

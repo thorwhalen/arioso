@@ -132,7 +132,7 @@ For a source in a generator's own phrasing, `musicgen_variation(voice, "C#", pro
 | **Jen** | REST API | `JEN_API_KEY` | `pip install arioso[jen]` |
 | **YuE** | fal.ai / local CLI | `FAL_KEY` | `pip install arioso[yue]` |
 | **Stable Audio 2.5** | fal.ai | `FAL_KEY` | `pip install arioso[stable-audio-25]` |
-| **ACE-Step** | fal.ai | `FAL_KEY` | `pip install arioso[ace-step]` |
+| **ACE-Step** | fal.ai, or local ACE-Step 1.5 (`runtime="local"`) | `FAL_KEY` (fal only) | `pip install arioso[ace-step]` |
 | **Udio** | Unofficial wrapper | `UDIO_AUTH_COOKIE` | `pip install arioso[udio]` |
 
 ```python
@@ -172,7 +172,7 @@ song = arioso.generate("lo-fi hip hop loop, 85 BPM, mellow Rhodes", platform="st
 # Magenta RealTime 2 (MLX, Apple Silicon): style from text or from a reference clip
 song = arioso.generate("funky drum and bass groove", platform="magenta_rt", duration=10)
 
-# ACE-Step 1.5 run locally (fal.ai stays the default when FAL_KEY is set): explicit BPM and key
+# ACE-Step 1.5 run locally (fal.ai stays the default; $ARIOSO_ACE_STEP_RUNTIME=local changes it): explicit BPM and key
 song = arioso.generate("acoustic guitar and soft piano", platform="ace_step", runtime="local", bpm=100, key="C Major", duration=30)
 ```
 

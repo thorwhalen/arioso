@@ -1,9 +1,9 @@
 """ACE-Step adapter: fal.ai's hosted endpoint, or ACE-Step 1.5 run locally.
 
-``runtime="fal"`` is the config-driven :class:`arioso._fal.FalAdapter` (the mapping lives
-in this platform's ``config.py``); ``runtime="local"`` runs ACE-Step 1.5 in its own
-environment (:mod:`arioso.platforms.ace_step._local`). With no ``runtime``, fal is used
-when ``$FAL_KEY`` is set (paid), local otherwise. The module-level ``fal_run`` /
+``runtime="fal"`` (the default) is the config-driven :class:`arioso._fal.FalAdapter` (the
+mapping lives in this platform's ``config.py``); ``runtime="local"`` runs ACE-Step 1.5 in
+its own environment (:mod:`arioso.platforms.ace_step._local`). ``$ARIOSO_ACE_STEP_RUNTIME``
+changes the default, e.g. to ``local`` on a machine with the runtime installed. The module-level ``fal_run`` /
 ``fal_upload_audio`` are looked up at call time, so tests can patch them here.
 """
 
@@ -45,7 +45,7 @@ class Adapter(FalAdapter):
 
     def generate(self, prompt: str = "", *, runtime: str = None, **params):
         """Generate with fal or locally; see the module docstring for how ``runtime`` resolves."""
-        runtime = runtime or ("fal" if os.environ.get("FAL_KEY") else "local")
+        runtime = runtime or os.environ.get("ARIOSO_ACE_STEP_RUNTIME") or "fal"
         if runtime == "local":
             params.pop("fetch", None)
             return self.local.generate(prompt, **params)

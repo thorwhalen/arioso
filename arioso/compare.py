@@ -455,11 +455,44 @@ def _run_child(cmd, log, *, timeout) -> "int | str":
         return proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
         if posix:
-            os.killpg(proc.pid, signal.SIGKILL)  # its runtime workers too
+            _kill_tree_and_groups(proc.pid, signal.SIGKILL)
         else:
             proc.kill()
         proc.wait()
         return f"killed after {timeout} s"
+
+
+def _kill_tree_and_groups(pid: int, sig: int) -> None:
+    """Kill ``pid``, everything below it, and the process groups they lead.
+
+    Runtime workers start in sessions of their own (ps.isolated), so killing the child's
+    group alone would leave them running. The tree is read before anything is killed: an
+    orphan loses its link to ``pid``. This process's own group is never killed.
+    """
+    from arioso._measure import descendants
+
+    pids = [pid, *descendants(pid)]
+    own = os.getpgrp()
+    groups, loose = set(), []
+    for p in pids:
+        try:
+            group = os.getpgid(p)
+        except ProcessLookupError:
+            continue
+        if group == own:
+            loose.append(p)  # same group as us: kill the process, not the group
+        else:
+            groups.add(group)
+    for group in groups:
+        try:
+            os.killpg(group, sig)
+        except ProcessLookupError:
+            pass
+    for p in loose:
+        try:
+            os.kill(p, sig)
+        except ProcessLookupError:
+            pass
 
 
 def _run_preload(specs: Iterable[str]) -> None:

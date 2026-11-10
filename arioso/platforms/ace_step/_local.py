@@ -11,7 +11,7 @@ import tempfile
 import warnings
 
 from arioso._audio import to_audio_ref
-from arioso._isolated import Runtime, Worker, draw_seed, song_from_wav
+from arioso._isolated import Runtime, Worker, draw_seed, song_from_wav, worker_file
 
 #: The checkout's own bundle ships the turbo DiT and the 1.7B LM; other LMs download on use.
 DFLT_DIT = "acestep-v15-turbo"
@@ -31,8 +31,9 @@ class LocalAceStep:
         if self._worker is None:
             self._worker = self._make_worker(
                 self.runtime.interpreter(),
-                self.config["driver"],
+                worker_file(self.config["worker"]),
                 cwd=self.runtime.workdir(),
+                stderr=None,
             )
         return self._worker
 
@@ -104,7 +105,7 @@ class LocalAceStep:
             if reference_audio is not None:
                 refs.append(to_audio_ref(reference_audio))
                 req["reference_audio"] = refs[-1].as_path(suffix=".wav")
-            result = self._ensure_worker().call(req)
+            result = self._ensure_worker().call("render", **req)
         finally:
             for ref in refs:
                 ref.cleanup()

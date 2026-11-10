@@ -404,7 +404,7 @@ class MlxBackend:
     """MusicGen on MLX, in the ``mlx-examples`` runtime's own process (text only).
 
     The model lives in a :class:`~arioso._isolated.Worker` running
-    :mod:`arioso.platforms.musicgen._mlx_driver`; audio comes back through a ``.npy`` file.
+    ``arioso/_workers/musicgen_mlx_worker.py``; audio comes back through a ``.npy`` file.
     ``top_p`` has no MLX counterpart (a non-zero one is warned about and ignored).
     """
 
@@ -455,7 +455,7 @@ class MlxBackend:
             ValueError: For a checkpoint the MLX port does not run.
             arioso._isolated.RuntimeNotInstalled: With the commands that install it.
         """
-        from arioso._isolated import Worker
+        from arioso._isolated import Worker, worker_file
         from arioso.platforms.musicgen.config import PLATFORM_CONFIG
 
         if not cls.supports(model_variant):
@@ -465,9 +465,13 @@ class MlxBackend:
             )
         runtime = cls.runtime()
         worker = (make_worker or Worker)(
-            runtime.interpreter(), PLATFORM_CONFIG["mlx_driver"], cwd=runtime.workdir()
+            runtime.interpreter(),
+            worker_file(PLATFORM_CONFIG["mlx_worker"]),
+            init={"model": model_variant},
+            cwd=runtime.workdir(),
+            stderr=None,
         )
-        info = worker.call({"op": "load", "model": model_variant})
+        info = worker.call("info")  # starting the worker loads the model
         return cls(worker, model_variant, info)
 
     @property
@@ -499,16 +503,13 @@ class MlxBackend:
         with tempfile.TemporaryDirectory(prefix="arioso_mlx_mg_") as tmp:
             out = Path(tmp) / "audio.npy"
             self.worker.call(
-                {
-                    "op": "text",
-                    "model": self.model_variant,
-                    "prompt": prompt,
-                    "seconds": seconds,
-                    "top_k": sampling.top_k,
-                    "temperature": sampling.temperature,
-                    "guidance": sampling.guidance,
-                    "out": str(out),
-                }
+                "text",
+                prompt=prompt,
+                seconds=seconds,
+                top_k=sampling.top_k,
+                temperature=sampling.temperature,
+                guidance=sampling.guidance,
+                out=str(out),
             )
             return np.load(out)
 

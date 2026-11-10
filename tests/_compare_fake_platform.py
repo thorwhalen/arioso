@@ -96,8 +96,12 @@ class _SlowSecond(_Clicks):
         import time
 
         if "120 BPM" not in prompt:
+            from ps.util import NEW_PROCESS_GROUP
+
+            # a session of its own, as ps.isolated starts runtime workers
             worker = subprocess.Popen(
-                [sys.executable, "-c", "import time; time.sleep(60)"]
+                [sys.executable, "-c", "import time; time.sleep(60)"],
+                **NEW_PROCESS_GROUP,
             )
             with open(os.environ["ARIOSO_TEST_PIDFILE"], "w") as f:
                 f.write(str(worker.pid))

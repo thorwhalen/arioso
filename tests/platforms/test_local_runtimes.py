@@ -1,23 +1,27 @@
 """Tests for the local-runtime platforms: stable_audio_3, magenta_rt, ace_step (runtime="local").
 
-The process and worker seams are faked, and the drivers run against fake upstream modules,
+The process and worker seams are faked, and the worker files run against fake upstream modules,
 so these need no MLX, torch or weights. The tests at the end render real audio only with
 ``ARIOSO_RUN_INTEGRATION=1`` and an installed runtime (``$ARIOSO_SA3_DIR`` /
 ``$ARIOSO_MAGENTA_RT_DIR`` / ``$ARIOSO_ACE_STEP_DIR``).
 """
 
+import ast
+import os
+import sys
 import wave
 
 import pytest
 
 import arioso
-from arioso._isolated import Runtime
+from arioso._isolated import Runtime, worker_file
 from arioso.platforms.ace_step import adapter as ace_mod
 from arioso.platforms.ace_step.config import PLATFORM_CONFIG as ACE_CONFIG
 from arioso.platforms.magenta_rt.adapter import Adapter as MrtAdapter
 from arioso.platforms.magenta_rt.config import PLATFORM_CONFIG as MRT_CONFIG
 from arioso.platforms.stable_audio_3.adapter import Adapter as Sa3Adapter
 from arioso.platforms.stable_audio_3.config import PLATFORM_CONFIG as SA3_CONFIG
+from tests._in_process import load_worker_module
 
 
 def _write_wav(path, frames=441, rate=44100):
@@ -144,12 +148,14 @@ class _FakeWorker:
 
     instances = []
 
-    def __init__(self, python, module, *, env=None, cwd=None):
-        self.python, self.module, self.env, self.cwd = python, module, env, cwd
-        self.requests, self.closed = [], False
+    def __init__(self, python, adapter, *, init=None, env=None, cwd=None, stderr="log"):
+        self.python, self.adapter, self.env, self.cwd = python, adapter, env, cwd
+        self.init, self.stderr = init, stderr
+        self.ops, self.requests, self.closed = [], [], False
         _FakeWorker.instances.append(self)
 
-    def call(self, req):
+    def call(self, op, /, **req):
+        self.ops.append(op)
         self.requests.append(req)
         if "out_dir" in req:  # ace_step
             return {
@@ -173,7 +179,8 @@ def test_magenta_rt_renders_through_one_worker_with_its_home(installed, monkeypa
     song = a.generate("funk groove", duration=2, model="mrt2_base", guidance=4)
     a.generate("second take", duration=1)
     w = a._worker
-    assert w.module == "arioso.platforms.magenta_rt._driver" and len(w.requests) == 2
+    assert w.adapter == worker_file("magenta_rt") and w.ops == ["render", "render"]
+    assert w.stderr is None  # model output stays on the terminal
     assert w.env["MAGENTA_HOME"] == str(root / "home")
     assert w.requests[0]["size"] == "mrt2_base" and w.requests[0]["guidance"] == 4.0
     assert song.metadata["frames"] == 50 and song.metadata["seed"] is None
@@ -201,6 +208,8 @@ def test_ace_step_defaults_to_fal_and_env_can_make_local_the_default(
     song = ace_mod.Adapter(local=local).generate(
         "jazz", bpm=120, key="C Major", duration=10
     )
+    assert local._worker.adapter == worker_file("ace_step")
+    assert local._worker.ops == ["render"] and local._worker.stderr is None
     req = local._worker.requests[0]
     assert (req["caption"], req["bpm"], req["key"], req["lyrics"]) == (
         "jazz",
@@ -252,7 +261,7 @@ def test_local_only_keywords_are_read_by_the_local_runtime():
     assert "seed" not in ace_mod.LOCAL_ONLY  # fal maps it too
 
 
-# --- the drivers' handle(), against fake upstream modules ------------------------------
+# --- the worker files, against fake upstream modules --------------------------------
 
 
 def _install_fake_modules(monkeypatch, modules):
@@ -265,7 +274,7 @@ def _install_fake_modules(monkeypatch, modules):
         monkeypatch.setitem(sys.modules, name, mod)
 
 
-def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
+def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
     seen = {}
 
     class Params:
@@ -280,6 +289,12 @@ def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
     class Handler:
         def initialize_service(self, **kw):
             seen["dit"] = kw
+            seen["dit_loads"] = seen.get("dit_loads", 0) + 1
+            return "ok", True
+
+    class LLMHandler:
+        def initialize(self, **kw):
+            seen.setdefault("lm", []).append(kw)
             return "ok", True
 
     def generate_music(dit_h, llm_h, *, params, config, save_dir):
@@ -300,6 +315,7 @@ def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
         {
             "acestep": {},
             "acestep.handler": {"AceStepHandler": Handler},
+            "acestep.llm_inference": {"LLMHandler": LLMHandler},
             "acestep.inference": {
                 "GenerationParams": Params,
                 "GenerationConfig": Config,
@@ -307,23 +323,30 @@ def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
             },
         },
     )
-    from arioso.platforms.ace_step import _driver
-
-    monkeypatch.setattr(_driver, "_handlers", {})
-    out = _driver.handle(
-        {
-            "caption": "funk",
-            "seconds": 10.0,
-            "steps": 8,
-            "guidance": 7.0,
-            "seed": 123,
-            "dit": "acestep-v15-turbo",
-            "lm": None,
-            "bpm": 100,
-            "key": "C Major",
-            "out_dir": str(tmp_path),
-        }
-    )
+    monkeypatch.setattr(sys, "path", list(sys.path))  # load() puts the checkout on it
+    monkeypatch.delenv("TOKENIZERS_PARALLELISM", raising=False)
+    monkeypatch.chdir(tmp_path)  # the worker runs in the checkout
+    worker = load_worker_module(worker_file("ace_step"))
+    state = worker.load()
+    assert state["root"] == str(tmp_path) and sys.path[0] == str(tmp_path)
+    assert os.environ["TOKENIZERS_PARALLELISM"] == "false"
+    request = {
+        "caption": "funk",
+        "seconds": 10.0,
+        "steps": 8,
+        "guidance": 7.0,
+        "seed": 123,
+        "dit": "acestep-v15-turbo",
+        "lm": None,
+        "bpm": 100,
+        "key": "C Major",
+        "out_dir": str(tmp_path),
+    }
+    out = worker.render(state, **request)
+    worker.render(state, **request)
+    assert seen["dit"]["project_root"] == str(tmp_path)
+    assert seen["dit_loads"] == 1, "the DiT loads once and is kept"
+    assert "lm" not in seen  # lm=None: no LM
     assert seen["config"]["use_random_seed"] is False and seen["config"]["seeds"] == [
         123
     ]
@@ -333,9 +356,18 @@ def test_ace_step_driver_passes_our_seed_and_controls(monkeypatch, tmp_path):
         and seen["params"]["thinking"] is False
     )
     assert out["out"].endswith("ace.wav")
+    # with an LM: MLX on Apple Silicon, PyTorch elsewhere, loaded once per (dit, lm)
+    for apple, backend in ((True, "mlx"), (False, "pt")):
+        monkeypatch.setattr(worker, "_is_apple_silicon", lambda apple=apple: apple)
+        lm = f"lm-{backend}"
+        worker.render(state, **dict(request, lm=lm))
+        worker.render(state, **dict(request, lm=lm))
+        assert seen["lm"][-1]["backend"] == backend
+        assert seen["lm"][-1]["lm_model_path"] == lm
+    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 3
 
 
-def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(
+def test_magenta_rt_worker_loads_once_per_size_and_samples_per_call(
     monkeypatch, tmp_path
 ):
     built, calls = [], []
@@ -366,9 +398,8 @@ def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(
             "magenta_rt.config": {"MUSICCOCA": type("M", (), {"key": "musiccoca"})},
         },
     )
-    from arioso.platforms.magenta_rt import _driver
-
-    monkeypatch.setattr(_driver, "_models", {})
+    worker = load_worker_module(worker_file("magenta_rt"))
+    models = worker.load()
     base = {
         "prompt": "funk",
         "seconds": 2.0,
@@ -376,10 +407,51 @@ def test_magenta_rt_driver_loads_once_per_size_and_samples_per_call(
         "top_k": 40,
         "out": str(tmp_path / "o.wav"),
     }
-    _driver.handle({**base, "temperature": 1.3, "guidance": 3.0})
-    _driver.handle({**base, "temperature": 0.9, "guidance": 5.0})
+    out = worker.render(models, **base, temperature=1.3, guidance=3.0)
+    worker.render(models, **base, temperature=0.9, guidance=5.0)
+    assert out == {"out": base["out"], "sample_rate": 48000, "frames": 50}
     assert built == ["mrt2_small"]
     assert calls == [(3.0, 1.3, 40, 50), (5.0, 0.9, 40, 50)]
+
+
+WORKERS = ("magenta_rt", "ace_step", "musicgen_mlx")
+
+
+@pytest.mark.parametrize("name", WORKERS)
+def test_worker_files_import_nothing_from_arioso(name):
+    """They run in environments that need not have arioso."""
+    tree = ast.parse(worker_file(name).read_text())
+    imported = {
+        alias.name.split(".")[0]
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Import)
+        for alias in node.names
+    } | {
+        (node.module or "").split(".")[0]
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+    }
+    assert "arioso" not in imported and "ps" not in imported
+    relative = [n for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.level]
+    assert not relative, "a worker file is loaded standalone: no relative imports"
+
+
+def test_the_configs_name_existing_workers():
+    from arioso.platforms.musicgen.config import PLATFORM_CONFIG as MG_CONFIG
+
+    for name in (MRT_CONFIG["worker"], ACE_CONFIG["worker"], MG_CONFIG["mlx_worker"]):
+        assert worker_file(name).is_file()
+
+
+@pytest.mark.parametrize("name", ["magenta_rt", "ace_step"])
+def test_worker_files_load_in_a_real_worker(name, tmp_path):
+    """Through ps: the file loads standalone and answers (a bad render is reported)."""
+    from arioso._isolated import Worker, WorkerError
+
+    with Worker(sys.executable, worker_file(name), cwd=tmp_path) as w:
+        with pytest.raises(WorkerError, match="TypeError"):
+            w.call("render")  # no arguments: load() ran, render() refused them
+        assert w.running
 
 
 def test_local_platforms_are_registered_with_their_licences():

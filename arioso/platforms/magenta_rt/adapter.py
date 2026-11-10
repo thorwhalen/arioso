@@ -1,7 +1,7 @@
 """Magenta RealTime 2 adapter: offline renders from a worker in magenta-rt's own environment.
 
-The model loads once, in a :class:`~arioso._isolated.Worker` running this platform's
-``_driver`` with the runtime's Python (MLX pinned below 0.32, which arioso's environment
+The model loads once, in a :class:`~arioso._isolated.Worker` running
+``arioso/_workers/magenta_rt_worker.py`` with the runtime's Python (MLX pinned below 0.32, which arioso's environment
 need not share). Style comes from the text ``prompt`` or a ``reference_audio`` clip; there
 is no tempo control beyond the words, and no seed (the sampler is not seedable).
 """
@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 from arioso._audio import to_audio_ref
-from arioso._isolated import Runtime, Worker, song_from_wav
+from arioso._isolated import Runtime, Worker, song_from_wav, worker_file
 from arioso.platforms.magenta_rt.config import PLATFORM_CONFIG
 
 
@@ -38,9 +38,10 @@ class Adapter:
             env = self._magenta_home()
             self._worker = self._make_worker(
                 self.runtime.interpreter(),
-                self.config["driver"],
+                worker_file(self.config["worker"]),
                 env=env,
                 cwd=self.runtime.workdir(),
+                stderr=None,
             )
         return self._worker
 
@@ -90,7 +91,7 @@ class Adapter:
         try:
             if ref is not None:
                 req["reference_audio"] = ref.as_path(suffix=".wav")
-            result = self._ensure_worker().call(req)
+            result = self._ensure_worker().call("render", **req)
         finally:
             if ref is not None:
                 ref.cleanup()

@@ -87,8 +87,11 @@ def test_checks_find_the_tempo_that_was_rendered(fakes, tmp_path):
 def test_rtf_divides_by_the_audio_that_came_back(fakes, tmp_path):
     r = _run("fake_short", tmp_path, warmup=None)[0]
     assert r["seconds_out"] == 3.5
-    assert r["rtf"] == pytest.approx(r["gen_s"] / 3.5, rel=0.01)
-    assert r["rtf"] != pytest.approx(r["gen_s"] / 4.0, rel=0.05)
+    # gen_s is rounded to 0.01 s and rtf to 0.001, so they agree up to that rounding
+    rounding = 0.005 / 3.5 + 0.0005
+    assert abs(r["rtf"] - r["gen_s"] / 3.5) <= rounding
+    # the fake sleeps >= 0.3 s, so dividing by 4 s would be off by >= 0.0107
+    assert abs(r["rtf"] - r["gen_s"] / 4.0) > 0.005
 
 
 def test_a_leading_batch_axis_is_not_taken_for_channels(fakes, tmp_path):

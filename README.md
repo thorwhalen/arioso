@@ -162,7 +162,20 @@ arioso.get_platform_info("musicgen")
 
 ### MusicGen (local, no API key)
 
-Runs on your machine. Tries `audiocraft` first, falls back to HuggingFace `transformers`.
+Runs on your machine, with one of three libraries:
+
+- **MLX** (Apple Silicon, text prompts): Apple's port in `ml-explore/mlx-examples`, run in its own environment by a worker. On an M1 Max a 10 s clip of `musicgen-small` takes about 11 s, against 3 to 6 minutes with `transformers` on the GPU. It is used for text takes whenever its runtime is installed:
+
+  ```
+  git clone --depth 1 https://github.com/ml-explore/mlx-examples ~/.local/share/arioso/runtimes/mlx-examples
+  cd ~/.local/share/arioso/runtimes/mlx-examples/musicgen && uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
+  ```
+
+  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs the mono text checkpoints (small, medium, large); `top_p` is ignored there.
+- **audiocraft**, Meta's library, when it imports.
+- **transformers** otherwise. On Apple Silicon it runs on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS it was slower than the CPU and grew GPU memory with every step.
+
+Melody-following and continuation always use audiocraft or transformers. `ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers` forces one.
 
 ```python
 song = arioso.generate(

@@ -1,4 +1,4 @@
-> built 2026-11-10 11:20 UTC from 56f43eb (main) · arioso 0.0.48. Details: build_info.json
+> built 2026-11-10 14:44 UTC from e6583ed (main) · arioso 0.0.49. Details: build_info.json
 
 # index.html.md
 
@@ -187,11 +187,13 @@ Runs on your machine, with one of three libraries:
 
 - **MLX** (Apple Silicon, text prompts): Apple’s port in `ml-explore/mlx-examples`, run in its own environment by a worker. On an M1 Max a 10 s clip of `musicgen-small` takes about 11 s, against 3 to 6 minutes with `transformers` on the GPU. It is used for text takes whenever its runtime is installed:
   ```default
-  git clone --depth 1 https://github.com/ml-explore/mlx-examples ~/.local/share/arioso/runtimes/mlx-examples
+  git init --quiet ~/.local/share/arioso/runtimes/mlx-examples
+  git -C ~/.local/share/arioso/runtimes/mlx-examples fetch --quiet --depth 1 https://github.com/ml-explore/mlx-examples 796f5b53cab69a3d48a44233ce21aae889e94a08
+  git -C ~/.local/share/arioso/runtimes/mlx-examples checkout --quiet --detach 796f5b53cab69a3d48a44233ce21aae889e94a08
   cd ~/.local/share/arioso/runtimes/mlx-examples/musicgen && uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
   ```
 
-  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs Meta’s mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
+  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). The checkout is pinned to that commit, the one arioso was measured on: a runtime at another commit is not used for automatic selection (arioso warns and falls back to the next backend), and the error says how to move it. `python -c "from arioso.platforms.musicgen.backends import MlxBackend; print(MlxBackend.runtime().hint())"` prints the commands for the current pin. It runs Meta’s mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
 - **audiocraft**, Meta’s library, when it imports.
 - **transformers** otherwise. On Apple Silicon the text checkpoints run on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.
 
@@ -2480,7 +2482,11 @@ The model lives in a `Worker` running
 
 #### *classmethod* available(model_variant)
 
-Apple Silicon, a supported checkpoint, and the runtime installed (cheap).
+Apple Silicon, a supported checkpoint, and the runtime installed at its pinned commit.
+
+A runtime at another commit (or with edits) is not available: a warning says
+how to move it, and selection falls back to the next backend rather than
+failing a take that another backend can make.
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
@@ -3557,20 +3563,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 11:20 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/56f43eb16ed4da533f730d0017bf4bd810fd81d8"><code>56f43eb</code></a> on branch <code>main</code>, for **arioso 0.0.48** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 14:44 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e6583eda348336d103a5d0008a9112951521313d"><code>e6583ed</code></a> on branch <code>main</code>, for **arioso 0.0.49** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.48) is ahead of the latest release on PyPI (0.0.47): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/56f43eb16ed4da533f730d0017bf4bd810fd81d8"><code>56f43eb16ed4da533f730d0017bf4bd810fd81d8</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/e6583eda348336d103a5d0008a9112951521313d"><code>e6583eda348336d103a5d0008a9112951521313d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.48</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.49</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3579,9 +3583,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42806324055">42806324055</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42836582339">42836582339</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>c02e47b5f51f0b626f6645546423c75cc5878e04</code> (in the history of the built commit) |
+| Event commit | <code>6cd1c8ce53d0b8b0ec35abfb181739fba5dee4fd</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3606,13 +3610,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.47/">0.0.47</a>, older than the documented version (0.0.48).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.49/">0.0.49</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 56f43eb16ed4da533f730d0017bf4bd810fd81d8
+git checkout e6583eda348336d103a5d0008a9112951521313d
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -183,11 +183,13 @@ Runs on your machine, with one of three libraries:
 
 - **MLX** (Apple Silicon, text prompts): Apple’s port in `ml-explore/mlx-examples`, run in its own environment by a worker. On an M1 Max a 10 s clip of `musicgen-small` takes about 11 s, against 3 to 6 minutes with `transformers` on the GPU. It is used for text takes whenever its runtime is installed:
   ```default
-  git clone --depth 1 https://github.com/ml-explore/mlx-examples ~/.local/share/arioso/runtimes/mlx-examples
+  git init --quiet ~/.local/share/arioso/runtimes/mlx-examples
+  git -C ~/.local/share/arioso/runtimes/mlx-examples fetch --quiet --depth 1 https://github.com/ml-explore/mlx-examples 796f5b53cab69a3d48a44233ce21aae889e94a08
+  git -C ~/.local/share/arioso/runtimes/mlx-examples checkout --quiet --detach 796f5b53cab69a3d48a44233ce21aae889e94a08
   cd ~/.local/share/arioso/runtimes/mlx-examples/musicgen && uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
   ```
 
-  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs Meta’s mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
+  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). The checkout is pinned to that commit, the one arioso was measured on: a runtime at another commit is not used for automatic selection (arioso warns and falls back to the next backend), and the error says how to move it. `python -c "from arioso.platforms.musicgen.backends import MlxBackend; print(MlxBackend.runtime().hint())"` prints the commands for the current pin. It runs Meta’s mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
 - **audiocraft**, Meta’s library, when it imports.
 - **transformers** otherwise. On Apple Silicon the text checkpoints run on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.
 

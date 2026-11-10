@@ -195,7 +195,11 @@ The model lives in a `Worker` running
 
 #### *classmethod* available(model_variant)
 
-Apple Silicon, a supported checkpoint, and the runtime installed (cheap).
+Apple Silicon, a supported checkpoint, and the runtime installed at its pinned commit.
+
+A runtime at another commit (or with edits) is not available: a warning says
+how to move it, and selection falls back to the next backend rather than
+failing a take that another backend can make.
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)

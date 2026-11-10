@@ -1,4 +1,4 @@
-"""MusicGen adapter using audiocraft (preferred) or transformers.
+"""MusicGen adapter using MLX (text, Apple Silicon), audiocraft or transformers.
 
 The adapter holds the modes; ``backends.py`` holds how each library runs them.
 
@@ -39,8 +39,9 @@ class Adapter:
     """MusicGen adapter with lazy model loading.
 
     ``backend_for`` (model variant -> backend class) chooses the library without
-    loading weights: ``audiocraft`` when it imports, else the HuggingFace
-    ``transformers`` pipeline (:func:`select_backend_class`). The chosen class is
+    loading weights (:func:`select_backend_class`: MLX for text takes on Apple Silicon when
+    its runtime is installed, else ``audiocraft`` when it imports, else ``transformers``);
+    a chooser that takes a ``task`` keyword is told the task. The chosen class is
     asked what it can do (``can_continue``) and then loads the weights, so the class
     that answers is the class that loads. ``load_backend`` (model variant ->
     :class:`Backend`) replaces the choice and the loading together: nothing is asked
@@ -60,8 +61,9 @@ class Adapter:
             backend_for = select_backend_class
         self.config = config
         self._backend_for = backend_for  # None: the injected loader owns the choice
-        self._load_backend = load_backend or (lambda v: backend_for(v).load(v))
-        self._loaded: tuple[str, Backend] | None = None  # (model variant, its backend)
+        self._load_backend = load_backend
+        # ((model variant, backend class), its backend): one loaded at a time
+        self._loaded: tuple[tuple, Backend] | None = None
 
     def generate(
         self,
@@ -141,7 +143,7 @@ class Adapter:
 
         if melody is not None and "melody" not in model:
             model = "facebook/musicgen-melody"
-        backend = self._backend(model)
+        backend = self._backend(model, "text" if melody is None else "melody")
         if melody is None:
             audio, extra = backend.text(prompt, seconds=duration, sampling=sampling), {}
         else:
@@ -156,10 +158,44 @@ class Adapter:
             **extra,
         )
 
-    def _backend(self, model: str) -> Backend:
-        """The *model* loaded (once per variant) behind the interface of its library."""
-        if self._loaded is None or self._loaded[0] != model:
-            self._loaded = (model, self._load_backend(model))
+    def _class_for(self, model: str, task: str) -> type[Backend] | None:
+        """The backend class for *task*; ``None`` when an injected loader owns the choice.
+
+        A chooser that takes a ``task`` keyword (as :func:`select_backend_class` does) is
+        told the task; one that takes the variant only gets the variant.
+        """
+        import inspect
+
+        if self._backend_for is None:
+            return None
+        try:
+            params = inspect.signature(self._backend_for).parameters.values()
+        except (TypeError, ValueError):
+            params = ()
+        takes_task = any(p.name == "task" or p.kind is p.VAR_KEYWORD for p in params)
+        if takes_task:
+            return self._backend_for(model, task=task)
+        return self._backend_for(model)
+
+    def _backend(self, model: str, task: str = "text") -> Backend:
+        """The *model* loaded behind the interface of the library that runs *task*.
+
+        One backend is kept loaded; switching library or variant closes the previous one
+        first (an MLX worker holds its model in another process). So on a Mac with the MLX
+        runtime, alternating text takes with melody or continuation takes reloads a model
+        at each switch: batch takes by task.
+        """
+        backend_class = self._class_for(model, task)
+        key = (model, backend_class)
+        if self._loaded is None or self._loaded[0] != key:
+            if self._loaded is not None:
+                getattr(self._loaded[1], "close", lambda: None)()
+                self._loaded = None
+            if self._load_backend is not None:
+                backend = self._load_backend(model)
+            else:
+                backend = backend_class.load(model)
+            self._loaded = (key, backend)
         return self._loaded[1]
 
     def _continue(
@@ -185,7 +221,7 @@ class Adapter:
                 f"Song or (array, sample_rate)), not a hosted clip id or URL."
             )
         # refuse before loading a multi-GB checkpoint that cannot do this
-        backend_class = self._backend_for and self._backend_for(model)
+        backend_class = self._class_for(model, "continuation")
         if backend_class and not backend_class.can_continue(model):
             raise ValueError(
                 f"musicgen: {model!r} cannot continue audio with "
@@ -193,7 +229,7 @@ class Adapter:
                 f"to extend). Use a non-melody checkpoint such as "
                 f"'facebook/musicgen-small'."
             )
-        backend = self._backend(model)
+        backend = self._backend(model, "continuation")
         sample_rate = backend.sample_rate
         # Prompt lengths are whole codec frames, so the model re-decodes the
         # prompt to exactly as many samples as it was given, and dropping that

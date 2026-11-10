@@ -37,7 +37,10 @@ class Adapter:
         if self._worker is None:
             env = self._magenta_home()
             self._worker = self._make_worker(
-                self.runtime.interpreter(), self.config["driver"], env=env, cwd=self.runtime.workdir()
+                self.runtime.interpreter(),
+                self.config["driver"],
+                env=env,
+                cwd=self.runtime.workdir(),
             )
         return self._worker
 
@@ -75,8 +78,12 @@ class Adapter:
         """
         out = Path(tempfile.mkdtemp(prefix="arioso_mrt_")) / "out.wav"
         req = {
-            "prompt": prompt, "seconds": float(duration), "size": model,
-            "temperature": float(temperature), "top_k": int(top_k), "guidance": float(guidance),
+            "prompt": prompt,
+            "seconds": float(duration),
+            "size": model,
+            "temperature": float(temperature),
+            "top_k": int(top_k),
+            "guidance": float(guidance),
             "out": str(out),
         }
         ref = to_audio_ref(reference_audio) if reference_audio is not None else None
@@ -87,7 +94,17 @@ class Adapter:
         finally:
             if ref is not None:
                 ref.cleanup()
-        return song_from_wav(result["out"], platform="magenta_rt", remove=True, metadata={
-            "model": model, "temperature": temperature, "top_k": top_k, "guidance": guidance,
-            "frames": result["frames"], "seed": None, "style_from_audio": reference_audio is not None,
-        })
+        return song_from_wav(
+            result["out"],
+            platform="magenta_rt",
+            remove=True,
+            metadata={
+                "model": model,
+                "temperature": temperature,
+                "top_k": top_k,
+                "guidance": guidance,
+                "frames": result["frames"],
+                "seed": None,
+                "style_from_audio": reference_audio is not None,
+            },
+        )

@@ -30,7 +30,9 @@ class LocalAceStep:
     def _ensure_worker(self):
         if self._worker is None:
             self._worker = self._make_worker(
-                self.runtime.interpreter(), self.config["driver"], cwd=self.runtime.workdir()
+                self.runtime.interpreter(),
+                self.config["driver"],
+                cwd=self.runtime.workdir(),
             )
         return self._worker
 
@@ -62,26 +64,43 @@ class LocalAceStep:
         **fal_only,
     ):
         if fal_only:
-            warnings.warn(f"ace_step (local) has no {', '.join(sorted(fal_only))} control; ignored "
-                          "(those are fal.ai endpoint options)", stacklevel=3)
-        caption = genre or prompt  # the same precedence as the fal mapping (tags: genre, else prompt)
+            warnings.warn(
+                f"ace_step (local) has no {', '.join(sorted(fal_only))} control; ignored "
+                "(those are fal.ai endpoint options)",
+                stacklevel=3,
+            )
+        caption = (
+            genre or prompt
+        )  # the same precedence as the fal mapping (tags: genre, else prompt)
         if not caption:
             raise ValueError("ace_step requires a style prompt (prompt or genre)")
         if instrumental is None:
             instrumental = not lyrics
         seed = draw_seed() if seed is None else int(seed)
         req = {
-            "caption": caption, "lyrics": "[Instrumental]" if instrumental else lyrics,
-            "instrumental": bool(instrumental), "seconds": float(duration), "bpm": bpm, "key": key,
-            "timesignature": timesignature, "steps": int(num_steps), "guidance": float(guidance),
-            "seed": seed, "dit": model, "lm": lm_model, "out_dir": tempfile.mkdtemp(prefix="arioso_ace_"),
+            "caption": caption,
+            "lyrics": "[Instrumental]" if instrumental else lyrics,
+            "instrumental": bool(instrumental),
+            "seconds": float(duration),
+            "bpm": bpm,
+            "key": key,
+            "timesignature": timesignature,
+            "steps": int(num_steps),
+            "guidance": float(guidance),
+            "seed": seed,
+            "dit": model,
+            "lm": lm_model,
+            "out_dir": tempfile.mkdtemp(prefix="arioso_ace_"),
         }
         refs = []
         try:
             if audio_input is not None:
                 refs.append(to_audio_ref(audio_input))
-                req.update(task_type="cover", src_audio=refs[-1].as_path(suffix=".wav"),
-                           cover_strength=float(audio_input_strength))
+                req.update(
+                    task_type="cover",
+                    src_audio=refs[-1].as_path(suffix=".wav"),
+                    cover_strength=float(audio_input_strength),
+                )
             if reference_audio is not None:
                 refs.append(to_audio_ref(reference_audio))
                 req["reference_audio"] = refs[-1].as_path(suffix=".wav")
@@ -89,7 +108,17 @@ class LocalAceStep:
         finally:
             for ref in refs:
                 ref.cleanup()
-        meta = {"runtime": "local", "seed": seed, "model": model, "lm_model": lm_model, "bpm": bpm,
-                "key": key, "num_steps": num_steps, "audio_to_audio": audio_input is not None,
-                "ace_step": result.get("params", {})}
-        return song_from_wav(result["out"], platform="ace_step", metadata=meta, remove=True)
+        meta = {
+            "runtime": "local",
+            "seed": seed,
+            "model": model,
+            "lm_model": lm_model,
+            "bpm": bpm,
+            "key": key,
+            "num_steps": num_steps,
+            "audio_to_audio": audio_input is not None,
+            "ace_step": result.get("params", {}),
+        }
+        return song_from_wav(
+            result["out"], platform="ace_step", metadata=meta, remove=True
+        )

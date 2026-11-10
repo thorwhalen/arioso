@@ -105,7 +105,9 @@ def _arioso_only_dir() -> str:
     host's whole site-packages (its numpy, torch...) to an environment built to pin its own.
     """
     global _ARIOSO_ONLY_DIR
-    if _ARIOSO_ONLY_DIR is None or not Path(_ARIOSO_ONLY_DIR, "arioso").exists():  # temp dirs get swept
+    if (
+        _ARIOSO_ONLY_DIR is None or not Path(_ARIOSO_ONLY_DIR, "arioso").exists()
+    ):  # temp dirs get swept
         import shutil
         import tempfile
 
@@ -114,7 +116,9 @@ def _arioso_only_dir() -> str:
         try:
             (base / "arioso").symlink_to(package, target_is_directory=True)
         except OSError:  # no symlink rights (e.g. Windows without developer mode)
-            shutil.copytree(package, base / "arioso", ignore=shutil.ignore_patterns("__pycache__"))
+            shutil.copytree(
+                package, base / "arioso", ignore=shutil.ignore_patterns("__pycache__")
+            )
         _ARIOSO_ONLY_DIR = str(base)
     return _ARIOSO_ONLY_DIR
 
@@ -198,11 +202,15 @@ class Worker:
         line = self._proc.stdout.readline()
         if not line:
             code = self._proc.wait()
-            raise WorkerError(f"{self.module} worker exited (code {code}) before answering")
+            raise WorkerError(
+                f"{self.module} worker exited (code {code}) before answering"
+            )
         try:
             return json.loads(line)
         except json.JSONDecodeError:
-            raise WorkerError(f"{self.module} worker sent a line that is not a reply: {line[:200]!r}")
+            raise WorkerError(
+                f"{self.module} worker sent a line that is not a reply: {line[:200]!r}"
+            )
 
     def _kill(self):
         proc, self._proc = self._proc, None

@@ -33,7 +33,9 @@ def handle(req):
     wav, _state = mrt.generate(
         conditioning={MUSICCOCA.key: emb},
         cfg_scales={"musiccoca": req["guidance"], "notes": 1.0, "drums": 1.0},
-        temperature=req["temperature"], top_k=req["top_k"], frames=frames,
+        temperature=req["temperature"],
+        top_k=req["top_k"],
+        frames=frames,
     )
     wav.write(req["out"])
     return {"out": req["out"], "sample_rate": wav.sample_rate, "frames": frames}

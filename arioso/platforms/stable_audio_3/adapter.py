@@ -14,7 +14,14 @@ import tempfile
 from pathlib import Path
 
 from arioso._audio import to_audio_ref
-from arioso._isolated import Runner, Runtime, draw_seed, is_apple_silicon, run_process, song_from_wav
+from arioso._isolated import (
+    Runner,
+    Runtime,
+    draw_seed,
+    is_apple_silicon,
+    run_process,
+    song_from_wav,
+)
 from arioso.platforms.stable_audio_3.config import PLATFORM_CONFIG
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
@@ -26,22 +33,59 @@ DFLT_A2A_NOISE = 0.7
 class Adapter:
     """Local Stable Audio 3 (MLX) adapter."""
 
-    def __init__(self, config: dict = None, *, runner: Runner = run_process, is_supported=is_apple_silicon):
+    def __init__(
+        self,
+        config: dict = None,
+        *,
+        runner: Runner = run_process,
+        is_supported=is_apple_silicon,
+    ):
         self.config = config or PLATFORM_CONFIG
         self.runtime = Runtime(**self.config["runtime"])
         self._run = runner
         self._is_supported = is_supported
 
-    def _command(self, prompt, out, *, model, seconds, steps, guidance, seed,
-                 negative_prompt, init_audio, strength, inpaint_range):
+    def _command(
+        self,
+        prompt,
+        out,
+        *,
+        model,
+        seconds,
+        steps,
+        guidance,
+        seed,
+        negative_prompt,
+        init_audio,
+        strength,
+        inpaint_range,
+    ):
         try:
             dit, decoder = self.config["models"][model]
         except KeyError:
-            raise ValueError(f"stable_audio_3: unknown model {model!r}; one of {sorted(self.config['models'])}")
+            raise ValueError(
+                f"stable_audio_3: unknown model {model!r}; one of {sorted(self.config['models'])}"
+            )
         # --flag=value keeps a prompt that starts with "-" from being read as an option.
-        cmd = [self.runtime.interpreter(), "scripts/sa3_mlx.py", f"--prompt={prompt}",
-               "--dit", dit, "--decoder", decoder, "--seconds", seconds, "--steps", steps,
-               "--cfg", guidance, "--seed", seed, "--out", out]
+        cmd = [
+            self.runtime.interpreter(),
+            "scripts/sa3_mlx.py",
+            f"--prompt={prompt}",
+            "--dit",
+            dit,
+            "--decoder",
+            decoder,
+            "--seconds",
+            seconds,
+            "--steps",
+            steps,
+            "--cfg",
+            guidance,
+            "--seed",
+            seed,
+            "--out",
+            out,
+        ]
         if negative_prompt:
             cmd += [f"--negative-prompt={negative_prompt}"]
         if init_audio is not None:
@@ -50,7 +94,9 @@ class Adapter:
                 start, end = inpaint_range
                 cmd += ["--inpaint-range", f"{start},{end}"]
         elif inpaint_range is not None:
-            raise ValueError("stable_audio_3: inpaint_range needs audio_input (the audio to inpaint into)")
+            raise ValueError(
+                "stable_audio_3: inpaint_range needs audio_input (the audio to inpaint into)"
+            )
         return cmd
 
     def generate(
@@ -98,11 +144,22 @@ class Adapter:
             audio_input_strength = 1.0 if inpaint_range is not None else DFLT_A2A_NOISE
         ref = to_audio_ref(audio_input) if audio_input is not None else None
         try:
-            cmd = self._command(prompt, out, model=model, seconds=float(duration), steps=int(num_steps),
-                                guidance=float(guidance), seed=seed, negative_prompt=negative_prompt,
-                                init_audio=ref.as_path(suffix=".wav") if ref else None,
-                                strength=float(audio_input_strength), inpaint_range=inpaint_range)
-            code, log = self._run(cmd, cwd=self.runtime.workdir(), env=None, timeout=timeout)
+            cmd = self._command(
+                prompt,
+                out,
+                model=model,
+                seconds=float(duration),
+                steps=int(num_steps),
+                guidance=float(guidance),
+                seed=seed,
+                negative_prompt=negative_prompt,
+                init_audio=ref.as_path(suffix=".wav") if ref else None,
+                strength=float(audio_input_strength),
+                inpaint_range=inpaint_range,
+            )
+            code, log = self._run(
+                cmd, cwd=self.runtime.workdir(), env=None, timeout=timeout
+            )
         finally:
             if ref is not None:
                 ref.cleanup()
@@ -112,8 +169,19 @@ class Adapter:
             shutil.rmtree(work, ignore_errors=True)
             tail = _ANSI.sub("", log)[-2000:]
             raise RuntimeError(f"stable_audio_3 failed (exit {code}):\n{tail}")
-        return song_from_wav(out, platform="stable_audio_3", remove=True, metadata={
-            "seed": seed, "model": model, "num_steps": num_steps, "guidance": guidance,
-            "audio_to_audio": audio_input is not None, "inpaint_range": inpaint_range,
-            "audio_input_strength": audio_input_strength if audio_input is not None else None,
-        })
+        return song_from_wav(
+            out,
+            platform="stable_audio_3",
+            remove=True,
+            metadata={
+                "seed": seed,
+                "model": model,
+                "num_steps": num_steps,
+                "guidance": guidance,
+                "audio_to_audio": audio_input is not None,
+                "inpaint_range": inpaint_range,
+                "audio_input_strength": audio_input_strength
+                if audio_input is not None
+                else None,
+            },
+        )

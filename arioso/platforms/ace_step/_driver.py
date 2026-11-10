@@ -23,7 +23,9 @@ def _handlers_for(dit, lm):
         from acestep.handler import AceStepHandler
 
         dit_h = AceStepHandler()
-        msg, ok = dit_h.initialize_service(project_root=ROOT, config_path=dit, device="auto")
+        msg, ok = dit_h.initialize_service(
+            project_root=ROOT, config_path=dit, device="auto"
+        )
         if not ok:
             raise RuntimeError(f"ACE-Step DiT {dit!r} failed to load: {msg}")
         llm_h = None
@@ -31,8 +33,12 @@ def _handlers_for(dit, lm):
             from acestep.llm_inference import LLMHandler
 
             llm_h = LLMHandler()
-            msg, ok = llm_h.initialize(checkpoint_dir=os.path.join(ROOT, "checkpoints"), lm_model_path=lm,
-                                       backend="mlx" if is_apple_silicon() else "pt", device="auto")
+            msg, ok = llm_h.initialize(
+                checkpoint_dir=os.path.join(ROOT, "checkpoints"),
+                lm_model_path=lm,
+                backend="mlx" if is_apple_silicon() else "pt",
+                device="auto",
+            )
             if not ok:
                 raise RuntimeError(f"ACE-Step LM {lm!r} failed to load: {msg}")
         _handlers[key] = (dit_h, llm_h)
@@ -61,16 +67,28 @@ def handle(req):
         audio_cover_strength=req.get("cover_strength", 1.0),
     )
     # use_random_seed=False: otherwise ACE-Step draws its own seed and ignores ours.
-    config = GenerationConfig(batch_size=1, use_random_seed=False, seeds=[req["seed"]], audio_format="wav")
-    res = generate_music(dit_h, llm_h, params=params, config=config, save_dir=req["out_dir"])
+    config = GenerationConfig(
+        batch_size=1, use_random_seed=False, seeds=[req["seed"]], audio_format="wav"
+    )
+    res = generate_music(
+        dit_h, llm_h, params=params, config=config, save_dir=req["out_dir"]
+    )
     if not res.success:
         raise RuntimeError(res.error or res.status_message)
     audio = res.audios[0]
     if not audio.get("path"):
-        raise RuntimeError(f"ACE-Step reported success but saved no audio: {res.status_message}")
-    return {"out": audio["path"], "key": audio.get("key"), "params": {
-        k: v for k, v in (audio.get("params") or {}).items() if isinstance(v, (str, int, float, bool, type(None)))
-    }}
+        raise RuntimeError(
+            f"ACE-Step reported success but saved no audio: {res.status_message}"
+        )
+    return {
+        "out": audio["path"],
+        "key": audio.get("key"),
+        "params": {
+            k: v
+            for k, v in (audio.get("params") or {}).items()
+            if isinstance(v, (str, int, float, bool, type(None)))
+        },
+    }
 
 
 if __name__ == "__main__":

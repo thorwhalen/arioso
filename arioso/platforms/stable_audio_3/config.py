@@ -37,12 +37,31 @@ PLATFORM_CONFIG = {
     },
     "param_map": {
         "prompt": {"native_name": "--prompt", "adapter_handled": True},
-        "negative_prompt": {"native_name": "--negative-prompt", "adapter_handled": True},
-        "duration": {"native_name": "--seconds", "native_default": 10.0, "adapter_handled": True},
-        "num_steps": {"native_name": "--steps", "native_default": 8, "adapter_handled": True},
-        "guidance": {"native_name": "--cfg", "native_default": 1.0, "adapter_handled": True},
+        "negative_prompt": {
+            "native_name": "--negative-prompt",
+            "adapter_handled": True,
+        },
+        "duration": {
+            "native_name": "--seconds",
+            "native_default": 10.0,
+            "adapter_handled": True,
+        },
+        "num_steps": {
+            "native_name": "--steps",
+            "native_default": 8,
+            "adapter_handled": True,
+        },
+        "guidance": {
+            "native_name": "--cfg",
+            "native_default": 1.0,
+            "adapter_handled": True,
+        },
         "seed": {"native_name": "--seed", "adapter_handled": True},
-        "model": {"native_name": "--dit", "native_default": "sm-music", "adapter_handled": True},
+        "model": {
+            "native_name": "--dit",
+            "native_default": "sm-music",
+            "adapter_handled": True,
+        },
         "audio_input": {"native_name": "--init-audio", "adapter_handled": True},
         "audio_input_strength": {
             "native_name": "--init-noise-level",

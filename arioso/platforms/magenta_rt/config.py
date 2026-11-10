@@ -32,12 +32,35 @@ PLATFORM_CONFIG = {
     "frame_rate": 25,
     "param_map": {
         "prompt": {"native_name": "embed_style(text)", "adapter_handled": True},
-        "duration": {"native_name": "frames", "native_default": 10.0, "adapter_handled": True},
-        "model": {"native_name": "size", "native_default": "mrt2_small", "adapter_handled": True},
-        "temperature": {"native_name": "temperature", "native_default": 1.3, "adapter_handled": True},
-        "top_k": {"native_name": "top_k", "native_default": 40, "adapter_handled": True},
-        "guidance": {"native_name": "cfg_scales.musiccoca", "native_default": 3.0, "adapter_handled": True},
-        "reference_audio": {"native_name": "embed_style(audio)", "adapter_handled": True},
+        "duration": {
+            "native_name": "frames",
+            "native_default": 10.0,
+            "adapter_handled": True,
+        },
+        "model": {
+            "native_name": "size",
+            "native_default": "mrt2_small",
+            "adapter_handled": True,
+        },
+        "temperature": {
+            "native_name": "temperature",
+            "native_default": 1.3,
+            "adapter_handled": True,
+        },
+        "top_k": {
+            "native_name": "top_k",
+            "native_default": 40,
+            "adapter_handled": True,
+        },
+        "guidance": {
+            "native_name": "cfg_scales.musiccoca",
+            "native_default": 3.0,
+            "adapter_handled": True,
+        },
+        "reference_audio": {
+            "native_name": "embed_style(audio)",
+            "adapter_handled": True,
+        },
     },
     "supported_affordances": [
         "prompt",

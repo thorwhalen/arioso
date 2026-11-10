@@ -183,13 +183,25 @@ Some local models pin library versions (MLX, torch) that cannot share an environ
 import arioso
 
 # Stable Audio 3 (Stability's MLX build, Apple Silicon): model="sm-music" (default), "sm-sfx" or "medium"
-song = arioso.generate("lo-fi hip hop loop, 85 BPM, mellow Rhodes", platform="stable_audio_3", duration=11.29, seed=1)
+song = arioso.generate(
+    "lo-fi hip hop loop, 85 BPM, mellow Rhodes",
+    platform="stable_audio_3",
+    duration=11.29,
+    seed=1,
+)
 
 # Magenta RealTime 2 (MLX, Apple Silicon): style from text or from a reference clip
 song = arioso.generate("funky drum and bass groove", platform="magenta_rt", duration=10)
 
 # ACE-Step 1.5 run locally (fal.ai stays the default; $ARIOSO_ACE_STEP_RUNTIME=local changes it): explicit BPM and key
-song = arioso.generate("acoustic guitar and soft piano", platform="ace_step", runtime="local", bpm=100, key="C Major", duration=30)
+song = arioso.generate(
+    "acoustic guitar and soft piano",
+    platform="ace_step",
+    runtime="local",
+    bpm=100,
+    key="C Major",
+    duration=30,
+)
 ```
 
 | platform | weights licence | commercial use |

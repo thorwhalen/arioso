@@ -255,12 +255,54 @@ def _with_repo_on_path(monkeypatch):
     )
 
 
-@pytest.mark.skipif(os.name != "posix", reason="process groups")
+def _alive(pid):
+    """Whether ``pid`` is still running (a zombie counts as gone)."""
+    if os.name == "nt":  # os.kill(pid, 0) would terminate it there
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x00100000 | 0x1000, False, pid)
+        if not handle:  # SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION
+            return False
+        try:
+            return kernel32.WaitForSingleObject(handle, 0) == 0x102  # WAIT_TIMEOUT
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except OSError:
+        return True
+    import subprocess
+
+    out = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True)
+    return bool(out.stdout.strip()) and not out.stdout.strip().startswith("Z")
+
+
+def _gone_soon(pid, timeout=5.0):
+    import time
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if not _alive(pid):
+            return True
+        time.sleep(0.05)
+    return False
+
+
+def _kill(pid):
+    import signal
+
+    try:
+        os.kill(pid, getattr(signal, "SIGKILL", signal.SIGTERM))
+    except OSError:
+        pass
+
+
 def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(
     fakes, tmp_path, monkeypatch
 ):
-    import time
-
     _with_repo_on_path(monkeypatch)
     pidfile = tmp_path / "worker.pid"
     monkeypatch.setenv("ARIOSO_TEST_PIDFILE", str(pidfile))
@@ -276,9 +318,33 @@ def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(
     assert Path(fast["path"]).is_file()
     assert "killed after 8 s" in slow["error"]
     worker = int(pidfile.read_text())
-    time.sleep(0.2)
-    with pytest.raises(ProcessLookupError):
-        os.kill(worker, 0)  # the worker the child started is gone too
+    try:
+        assert _gone_soon(worker)  # the worker the child started is gone too
+    finally:
+        _kill(worker)
+
+
+@pytest.mark.skipif(
+    not (sys.platform == "darwin" or sys.platform.startswith("linux")),
+    reason="the tree is watched through macOS libproc or Linux /proc",
+)
+def test_a_child_that_crashes_takes_its_workers_with_it(fakes, tmp_path, monkeypatch):
+    _with_repo_on_path(monkeypatch)
+    pidfile = tmp_path / "worker.pid"
+    monkeypatch.setenv("ARIOSO_TEST_PIDFILE", str(pidfile))
+    records = _run(
+        "fake_crash_with_worker",
+        tmp_path,
+        runner=None,
+        preload=[f"{FAKE}:register"],
+        timeout=60,
+    )
+    assert all("child process failed (exit 139" in r["error"] for r in records)
+    worker = int(pidfile.read_text())
+    try:
+        assert _gone_soon(worker)  # a crash skips the child's cleanup; ours ran
+    finally:
+        _kill(worker)
 
 
 def test_preload_reaches_the_default_child_runner(tmp_path, monkeypatch):

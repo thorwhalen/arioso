@@ -37,7 +37,7 @@ dependencies = [
     "dol>=0.0.1",
     "config2py>=0.0.1",
     "cw>=0.1,<0.2",
-    "ps>=0.1.18",  # ps.isolated: local runtimes in their own environments (and their tree kill)
+    "ps>=0.1.22",  # ps.isolated: local runtimes in their own environments (and wait_and_reap)
 ]
 
 [project.scripts]

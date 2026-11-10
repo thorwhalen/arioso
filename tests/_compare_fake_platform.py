@@ -13,6 +13,7 @@ in the registry would leak into other tests. A child process gets them with
 - ``fake_slow``: sleeps 30 s per call (for timeouts).
 - ``fake_batched``: returns ``(1, channels, frames)``.
 - ``fake_slow_second``: hangs (with a worker process) on any prompt but the 120 BPM one.
+- ``fake_crash_with_worker``: starts a worker process, then the process dies (exit 139).
 - ``fake_provider_terms`` / ``fake_fal``: local-looking configs with provider terms / a fal block.
 - ``fake_no_access_type``: a plugin config that forgot ``access_type`` (hosted by default).
 - ``fake_broken``: a local platform whose every call fails.
@@ -109,6 +110,26 @@ class _SlowSecond(_Clicks):
         return super().generate(prompt, **kwargs)
 
 
+class _CrashWithWorker(_Clicks):
+    """Starts a worker process, as a runtime does, then dies without any cleanup."""
+
+    def generate(self, prompt, **kwargs):
+        import os
+        import subprocess
+        import sys
+        import time
+
+        from ps.util import NEW_PROCESS_GROUP
+
+        worker = subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(60)"], **NEW_PROCESS_GROUP
+        )
+        with open(os.environ["ARIOSO_TEST_PIDFILE"], "w") as f:
+            f.write(str(worker.pid))
+        time.sleep(1)  # the parent's watch sees it (it reads the tree every 0.25 s)
+        os._exit(139)
+
+
 class _Loud(_Clicks):
     def generate(self, prompt, **kwargs):
         song = super().generate(prompt, **kwargs)
@@ -152,6 +173,7 @@ PLATFORMS = {
     "fake_slow": (_config("fake_slow"), _Slow()),
     "fake_batched": (_config("fake_batched"), _Batched()),
     "fake_slow_second": (_config("fake_slow_second"), _SlowSecond()),
+    "fake_crash_with_worker": (_config("fake_crash_with_worker"), _CrashWithWorker()),
     "fake_provider_terms": (
         _config("fake_provider_terms", "python_lib", "provider terms"),
         _Clicks(),

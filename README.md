@@ -171,11 +171,11 @@ Runs on your machine, with one of three libraries:
   cd ~/.local/share/arioso/runtimes/mlx-examples/musicgen && uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
   ```
 
-  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs the mono text checkpoints (small, medium, large); `top_p` is ignored there.
+  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs Meta's mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen's 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
 - **audiocraft**, Meta's library, when it imports.
-- **transformers** otherwise. On Apple Silicon it runs on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS it was slower than the CPU and grew GPU memory with every step.
+- **transformers** otherwise. On Apple Silicon the text checkpoints run on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.
 
-Melody-following and continuation always use audiocraft or transformers. `ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers` forces one.
+Melody-following and continuation always use audiocraft or transformers. `ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers` forces one (`mlx` for text takes only).
 
 ```python
 song = arioso.generate(
@@ -190,7 +190,7 @@ song = arioso.generate(
 
 ### Local models in their own environments (Stable Audio 3, Magenta RealTime 2, ACE-Step 1.5)
 
-Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform's own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`) points elsewhere. Magenta RealTime and ACE-Step keep one worker process alive, so the model loads once per session.
+Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform's own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`, `$ARIOSO_MLX_EXAMPLES_DIR` for MusicGen on MLX) points elsewhere. Magenta RealTime, ACE-Step and MusicGen on MLX keep one worker process alive, so the model loads once per session.
 
 ```python
 import arioso

@@ -9,7 +9,7 @@ Requests (JSON lines, :func:`arioso._isolated.serve`):
 
 - ``{"op": "load", "model"}`` -> ``{"sample_rate", "frame_rate"}``; loads once per model.
 - ``{"op": "text", "model", "prompt", "seconds", "top_k", "temperature", "guidance",
-  "seed", "out"}`` -> ``{"out", "frames"}``: ``seconds`` of mono float32 audio saved with
+  "out"}`` -> ``{"out", "frames"}``: ``seconds`` of mono float32 audio saved with
   ``numpy.save`` at ``out``.
 """
 
@@ -36,21 +36,21 @@ def _model(name):
 
 
 def handle(req):
+    if req["op"] not in ("load", "text"):
+        raise ValueError(f"unknown op {req['op']!r}")
     model = _model(req["model"])
     if req["op"] == "load":
         return {"sample_rate": int(model.sampling_rate), "frame_rate": FRAME_RATE}
-    if req["op"] != "text":
-        raise ValueError(f"unknown op {req['op']!r}")
     import mlx.core as mx
     import numpy as np
 
-    if req.get("seed") is not None:
-        mx.random.seed(int(req["seed"]))
     frames = max(1, round(req["seconds"] * FRAME_RATE))
-    # undoing the codebook delay pattern costs num_codebooks - 1 of the steps
+    # Undoing the codebook delay pattern costs num_codebooks - 1 steps, and the port's undo
+    # leaves its last frame misaligned (codebook 0 at t with the others at t-1..t-3): one
+    # step more, and the trim below drops that frame.
     audio = model.generate(
         req["prompt"],
-        max_steps=frames + model.num_codebooks - 1,
+        max_steps=frames + model.num_codebooks,
         top_k=int(req["top_k"]),
         temp=float(req["temperature"]),
         guidance_coef=float(req["guidance"]),

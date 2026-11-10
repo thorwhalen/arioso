@@ -116,12 +116,16 @@ Python library -- local inference (no external API calls).
 
 ### Dependencies
 
-- Primary: `audiocraft` (Meta's library)
-- Fallback: `transformers` (HuggingFace)
-- Required: `torch`
+- MLX (Apple Silicon, text takes): `ml-explore/mlx-examples/musicgen` in its own runtime
+  (`$ARIOSO_MLX_EXAMPLES_DIR`), driven by a worker; no package in arioso's environment
+- `audiocraft` (Meta's library), when it imports
+- `transformers` (HuggingFace) otherwise, with `torch`
 
-The adapter uses a **dual backend** strategy: it tries `audiocraft` first and falls back
-to `transformers` if `audiocraft` is not installed.
+`select_backend_class(model, task=...)` picks per take: MLX for text when its runtime is
+installed and the checkpoint is `facebook/musicgen-{small,medium,large}`, else audiocraft,
+else transformers; melody and continuation never go to MLX. `$ARIOSO_MUSICGEN_BACKEND`
+forces one. On Apple Silicon, transformers runs the text checkpoints on the CPU (MPS was
+slower and grew Metal memory per step) and the melody checkpoint on MPS.
 
 ### Authentication
 

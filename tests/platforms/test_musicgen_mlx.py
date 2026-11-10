@@ -47,8 +47,12 @@ class _FakeMlxModel:
                 guidance=guidance_coef,
             )
         )
-        # the port returns max_steps - (num_codebooks - 1) frames after undoing the delay
-        return np.ones((max_steps - (self.num_codebooks - 1)) * HOP, np.float32)
+        # the port returns max_steps - (num_codebooks - 1) frames after undoing the delay,
+        # the last one misaligned: marked 9 here, so a test can see it is dropped
+        frames = max_steps - (self.num_codebooks - 1)
+        audio = np.ones(frames * HOP, np.float32)
+        audio[-HOP:] = 9
+        return audio
 
 
 @pytest.fixture
@@ -64,7 +68,6 @@ def fake_port(monkeypatch):
     musicgen = types.ModuleType("musicgen")
     musicgen.MusicGen = types.SimpleNamespace(from_pretrained=from_pretrained)
     core = types.ModuleType("mlx.core")
-    core.random = types.SimpleNamespace(seed=lambda s: model.calls.append({"seed": s}))
     core.eval = lambda *a: None
     mlx = types.ModuleType("mlx")
     mlx.core = core
@@ -124,10 +127,12 @@ def test_text_asks_for_the_frames_the_delay_pattern_costs_and_trims(
     audio = backend.text("warm piano", seconds=2.3, sampling=SAMPLING)
 
     frames = 115  # round(2.3 * 50)
+    # num_codebooks - 1 steps for the delay pattern, one more for the port's bad last frame
     assert fake_port.calls[-1] == dict(
-        text="warm piano", max_steps=frames + 3, top_k=123, temp=0.7, guidance=4.5
+        text="warm piano", max_steps=frames + 4, top_k=123, temp=0.7, guidance=4.5
     )
     assert audio.shape == (frames * HOP,)  # exactly the seconds asked, mono
+    assert (audio == 1).all()  # the misaligned last frame was trimmed
 
 
 def test_top_p_has_no_mlx_counterpart_and_says_so(fake_port, runtime_dir):
@@ -140,11 +145,21 @@ def test_top_p_has_no_mlx_counterpart_and_says_so(fake_port, runtime_dir):
         )
 
 
+def test_takes_past_the_context_are_warned_about(fake_port, runtime_dir):
+    backend = MlxBackend.load("facebook/musicgen-small", make_worker=_InProcessWorker)
+    with pytest.warns(UserWarning, match="30 s"):
+        backend.text("x", seconds=31, sampling=SAMPLING)
+
+
 def test_only_mono_text_checkpoints_run_on_mlx(runtime_dir):
     with pytest.raises(ValueError, match="musicgen-melody"):
         MlxBackend.load("facebook/musicgen-melody", make_worker=_InProcessWorker)
     assert not MlxBackend.supports("facebook/musicgen-stereo-small")
     assert MlxBackend.supports("facebook/musicgen-medium")
+    assert not MlxBackend.supports(
+        "facebook/musicgen-style"
+    )  # no state_dict.bin to load
+    assert not MlxBackend.supports("someone/musicgen-small-finetune")
     assert not MlxBackend.can_continue("facebook/musicgen-small")
 
 
@@ -204,6 +219,12 @@ def test_the_environment_variable_forces_a_backend(
 ):
     monkeypatch.setenv(mg.BACKEND_ENV_VAR, "transformers")
     assert select_backend_class("facebook/musicgen-small") is TransformersBackend
+    monkeypatch.setenv(mg.BACKEND_ENV_VAR, "mlx")  # forced only where it can run
+    assert select_backend_class("facebook/musicgen-small") is MlxBackend
+    assert (
+        select_backend_class("facebook/musicgen-small", task="continuation")
+        is TransformersBackend
+    )
     monkeypatch.setenv(mg.BACKEND_ENV_VAR, "nope")
     with pytest.raises(ValueError, match="ARIOSO_MUSICGEN_BACKEND"):
         select_backend_class("facebook/musicgen-small")
@@ -255,20 +276,57 @@ def test_the_adapter_uses_mlx_for_text_and_hands_continuation_over(
 
 
 @pytest.mark.parametrize(
-    "env, picked, expected",
+    "env, picked, variant, expected",
     [
-        (None, "mps", "cpu"),
-        ("mps", "mps", "mps"),
-        (None, "cuda", "cuda"),
-        (None, "cpu", "cpu"),
+        (None, "mps", "facebook/musicgen-small", "cpu"),
+        (None, "mps", "facebook/musicgen-melody", "mps"),  # measured faster on MPS
+        ("mps", "mps", "facebook/musicgen-small", "mps"),
+        (None, "cuda", "facebook/musicgen-small", "cuda"),
+        (None, "cpu", "facebook/musicgen-small", "cpu"),
     ],
 )
-def test_transformers_runs_on_cpu_rather_than_mps_unless_asked(
-    monkeypatch, env, picked, expected
+def test_transformers_runs_text_on_cpu_rather_than_mps_unless_asked(
+    monkeypatch, env, picked, variant, expected
 ):
     if env:
         monkeypatch.setenv("ARIOSO_TORCH_DEVICE", env)
     else:
         monkeypatch.delenv("ARIOSO_TORCH_DEVICE", raising=False)
     monkeypatch.setattr(mg, "torch_device", lambda: picked)
-    assert mg._transformers_device() == expected
+    assert mg._transformers_device(variant) == expected
+
+
+def test_transformers_load_moves_the_model_to_that_device(monkeypatch):
+    moved = []
+
+    class _Model:
+        @classmethod
+        def from_pretrained(cls, name):
+            return cls()
+
+        def to(self, device):
+            moved.append(device)
+            return self
+
+    fake = types.ModuleType("transformers")
+    fake.MusicgenForConditionalGeneration = _Model
+    fake.MusicgenMelodyForConditionalGeneration = _Model
+    fake.AutoProcessor = types.SimpleNamespace(from_pretrained=lambda name: "processor")
+    monkeypatch.setitem(sys.modules, "transformers", fake)
+    monkeypatch.delenv("ARIOSO_TORCH_DEVICE", raising=False)
+    monkeypatch.setattr(mg, "torch_device", lambda: "mps")
+    TransformersBackend.load("facebook/musicgen-small")
+    TransformersBackend.load("facebook/musicgen-melody")
+    assert moved == ["cpu", "mps"]
+
+
+def test_a_chooser_taking_keywords_is_told_the_task():
+    seen = []
+
+    def chooser(variant, **kwargs):
+        seen.append(kwargs)
+        return TransformersBackend
+
+    adapter = Adapter(PLATFORM_CONFIG, backend_for=chooser)
+    adapter._class_for("facebook/musicgen-small", "continuation")
+    assert seen == [{"task": "continuation"}]

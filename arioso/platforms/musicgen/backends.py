@@ -25,7 +25,7 @@ import tempfile
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Protocol
+from typing import TYPE_CHECKING, Callable, Optional, Protocol
 
 from arioso._util import TORCH_DEVICE_ENV_VAR, torch_device
 
@@ -79,6 +79,12 @@ class Backend(Protocol):
 
 #: Forces a backend: ``audiocraft``, ``transformers`` or ``mlx``.
 BACKEND_ENV_VAR = "ARIOSO_MUSICGEN_BACKEND"
+#: MusicGen's context in seconds (1500 frames); the MLX port does not stop there itself.
+MLX_MAX_SECONDS = 30.0
+#: The checkpoints the MLX port loads.
+MLX_CHECKPOINTS = frozenset(
+    f"facebook/musicgen-{size}" for size in ("small", "medium", "large")
+)
 #: What a backend is asked to do: plain text, follow a melody, or continue audio.
 TASKS = ("text", "melody", "continuation")
 
@@ -90,13 +96,12 @@ def select_backend_class(model_variant: str, *, task: str = "text") -> type[Back
     broken audiocraft install falls back like a missing one.
     """
     forced = os.environ.get(BACKEND_ENV_VAR)
-    if forced:
-        try:
-            return BACKENDS[forced]
-        except KeyError:
-            raise ValueError(
-                f"${BACKEND_ENV_VAR}={forced!r}: expected one of {sorted(BACKENDS)}"
-            ) from None
+    if forced and forced not in BACKENDS:
+        raise ValueError(
+            f"${BACKEND_ENV_VAR}={forced!r}: expected one of {sorted(BACKENDS)}"
+        )
+    if forced and (forced != "mlx" or task == "text"):
+        return BACKENDS[forced]  # mlx forced only where it can run: text
     if task == "text" and MlxBackend.available(model_variant):
         return MlxBackend
     try:
@@ -106,15 +111,20 @@ def select_backend_class(model_variant: str, *, task: str = "text") -> type[Back
     return AudiocraftBackend
 
 
-def _transformers_device() -> str:
-    """:func:`~arioso._util.torch_device`, except CPU where it would pick Apple MPS on its own.
+def _transformers_device(model_variant: str) -> str:
+    """:func:`~arioso._util.torch_device`, except CPU for the text checkpoints on Apple MPS.
 
-    MusicGen's transformers decoding on MPS is pathological (thorwhalen/arioso#54): slower
-    than the CPU and growing Metal memory per step. An explicit ``$ARIOSO_TORCH_DEVICE=mps``
-    still gets MPS.
+    Text (and continuation) decoding of ``musicgen-small`` on MPS is pathological
+    (thorwhalen/arioso#54): slower than the CPU and growing Metal memory per step. The melody
+    checkpoint keeps MPS, where it was measured faster than the CPU (a 30 s melody take took a
+    quarter of an hour on the CPU). An explicit ``$ARIOSO_TORCH_DEVICE`` always wins.
     """
     device = torch_device()
-    if device == "mps" and not os.environ.get(TORCH_DEVICE_ENV_VAR):
+    if (
+        device == "mps"
+        and not os.environ.get(TORCH_DEVICE_ENV_VAR)
+        and "melody" not in model_variant
+    ):
         return "cpu"
     return device
 
@@ -274,7 +284,9 @@ class TransformersBackend:
                 MusicgenForConditionalGeneration as _ModelClass,
             )
 
-        model = _ModelClass.from_pretrained(model_variant).to(_transformers_device())
+        model = _ModelClass.from_pretrained(model_variant).to(
+            _transformers_device(model_variant)
+        )
         return cls(model, AutoProcessor.from_pretrained(model_variant))
 
     @property
@@ -397,6 +409,7 @@ class MlxBackend:
     """
 
     def __init__(self, worker, model_variant: str, info: dict):
+        """Wrap a started ``worker`` that has loaded ``model_variant`` (``info``: its rates)."""
         self.worker = worker
         self.model_variant = model_variant
         self.info = info
@@ -411,8 +424,10 @@ class MlxBackend:
 
     @classmethod
     def supports(cls, model_variant: str) -> bool:
-        """Whether the MLX port runs ``model_variant``: the mono text checkpoints."""
-        return "melody" not in model_variant and "stereo" not in model_variant
+        """Whether the MLX port runs ``model_variant``: Meta's mono text checkpoints only
+        (the port reads their audiocraft ``state_dict.bin``; fine-tunes in transformers
+        format have none)."""
+        return model_variant in MLX_CHECKPOINTS
 
     @classmethod
     def available(cls, model_variant: str) -> bool:
@@ -432,7 +447,7 @@ class MlxBackend:
 
     @classmethod
     def load(
-        cls, model_variant: str, *, make_worker: Callable[..., object] = None
+        cls, model_variant: str, *, make_worker: Optional[Callable[..., object]] = None
     ) -> MlxBackend:
         """Start the worker and load ``model_variant`` in it.
 
@@ -469,6 +484,12 @@ class MlxBackend:
         """``seconds`` of mono audio for ``prompt``, ``(frames,)``."""
         import numpy as np
 
+        if seconds > MLX_MAX_SECONDS:
+            warnings.warn(
+                f"musicgen (mlx): {seconds} s is past MusicGen's {MLX_MAX_SECONDS:.0f} s "
+                "context; the take degrades after it.",
+                stacklevel=2,
+            )
         if sampling.top_p:
             warnings.warn(
                 f"musicgen (mlx): top_p={sampling.top_p} is ignored; the MLX port "

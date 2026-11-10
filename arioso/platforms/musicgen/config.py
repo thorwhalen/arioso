@@ -10,6 +10,7 @@ PLATFORM_CONFIG = {
     "commercial_use": "no",
     "auth": {"type": "none"},
     "dependencies": [],
+    # MLX needs no package here: it runs in its own runtime (see mlx_runtime below).
     "optional_dependencies": ["audiocraft", "transformers", "torch"],
     "param_map": {
         "prompt": {"native_name": "descriptions", "coerce": lambda x: [x]},

@@ -39,8 +39,9 @@ class Adapter:
     """MusicGen adapter with lazy model loading.
 
     ``backend_for`` (model variant -> backend class) chooses the library without
-    loading weights: ``audiocraft`` when it imports, else the HuggingFace
-    ``transformers`` pipeline (:func:`select_backend_class`). The chosen class is
+    loading weights (:func:`select_backend_class`: MLX for text takes on Apple Silicon when
+    its runtime is installed, else ``audiocraft`` when it imports, else ``transformers``);
+    a chooser that takes a ``task`` keyword is told the task. The chosen class is
     asked what it can do (``can_continue``) and then loads the weights, so the class
     that answers is the class that loads. ``load_backend`` (model variant ->
     :class:`Backend`) replaces the choice and the loading together: nothing is asked
@@ -168,9 +169,10 @@ class Adapter:
         if self._backend_for is None:
             return None
         try:
-            takes_task = "task" in inspect.signature(self._backend_for).parameters
+            params = inspect.signature(self._backend_for).parameters.values()
         except (TypeError, ValueError):
-            takes_task = False
+            params = ()
+        takes_task = any(p.name == "task" or p.kind is p.VAR_KEYWORD for p in params)
         if takes_task:
             return self._backend_for(model, task=task)
         return self._backend_for(model)
@@ -179,7 +181,9 @@ class Adapter:
         """The *model* loaded behind the interface of the library that runs *task*.
 
         One backend is kept loaded; switching library or variant closes the previous one
-        first (an MLX worker holds its model in another process).
+        first (an MLX worker holds its model in another process). So on a Mac with the MLX
+        runtime, alternating text takes with melody or continuation takes reloads a model
+        at each switch: batch takes by task.
         """
         backend_class = self._class_for(model, task)
         key = (model, backend_class)

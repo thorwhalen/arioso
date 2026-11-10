@@ -159,7 +159,8 @@ def build_prompt(
     tempo the clip is ``duration`` seconds (default 10).
 
     ``note`` makes a one-shot at that pitch: ``"Target Note, <note>"`` is appended (no
-    tempo or bars then; default length 3 s), and with ``keybed=True`` (the keybeds
+    tempo or bars then; default length 3 s; a key goes before it; a ``Target Note`` already
+    in the prompt is read like the other tags), and with ``keybed=True`` (the keybeds
     checkpoint) the prompt starts with its single-note prefix ``"Keybed, Timbre Profile"``.
 
     >>> build_prompt("Synth Lead, Warm, Arp", bpm=140, key="Em", duration=12)
@@ -208,12 +209,29 @@ def build_prompt(
         given_key = tagged
     key = given_key[0] if given_key else None
 
+    target_at = next(
+        (i for i, t in enumerate(tags) if t.lower() == TARGET_NOTE_TAG.lower()), None
+    )
+    if target_at is not None:  # "Target Note, <note>" in the prompt
+        if target_at + 1 >= len(tags):
+            raise ValueError(f"foundation_1: {TARGET_NOTE_TAG!r} with no note after it")
+        tagged_note = normalize_note(tags[target_at + 1])
+        if note is not None and normalize_note(note) != tagged_note:
+            raise contradiction("note", note, tags[target_at + 1])
+        tags[target_at + 1] = note = tagged_note
+
     if note is not None:
         note = normalize_note(note)
         if bpm is not None or bars is not None:
             raise ValueError("foundation_1: a note is a one-shot: no bpm or bars")
-        if not any(t.lower() == TARGET_NOTE_TAG.lower() for t in tags):
+        if target_at is None:
+            target_at = len(tags)
             tags += [TARGET_NOTE_TAG, note]
+        if (
+            key and key_at is None
+        ):  # the key goes before the note, which ends the prompt
+            tags.insert(target_at, key)
+            key_at = target_at
         if keybed and tags[: len(KEYBED_PREFIX)] != list(KEYBED_PREFIX):
             tags = list(KEYBED_PREFIX) + tags
         seconds = DFLT_NOTE_SECONDS if duration is None else float(duration)
@@ -233,10 +251,13 @@ def build_prompt(
                 f"not the duration={duration} asked for",
                 stacklevel=3,
             )
-        if bpm_tag is None:
-            bpm_at = len(tags) if key_at is None else key_at
+        if bpm_tag is None:  # after a Bars tag, else before the key, else last
+            if bars_tag is not None:
+                bpm_at = bars_at + 1
+            else:
+                bpm_at = len(tags) if key_at is None else key_at
             tags.insert(bpm_at, f"{bpm} BPM")
-            if key_at is not None:
+            if key_at is not None and key_at >= bpm_at:
                 key_at += 1
         if bars_tag is None:
             tags.insert(bpm_at, f"{bars} Bars")  # just before the tempo

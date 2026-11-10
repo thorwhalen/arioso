@@ -89,6 +89,27 @@ def test_a_duration_far_from_the_loop_length_warns():
         f1.build_prompt("Pad", bpm=100, duration=10)  # 9.6 s: within a bar
 
 
+def test_a_tempo_goes_after_a_bars_tag_even_when_the_key_comes_first():
+    text, _, _ = f1.build_prompt("Pad, E minor, 8 Bars", bpm=140)
+    assert text == "Pad, E minor, 8 Bars, 140 BPM"
+
+
+def test_a_target_note_in_the_prompt_is_read_and_compared():
+    text, seconds, timing = f1.build_prompt("Cello, Target Note, c3")
+    assert text == "Cello, Target Note, C3" and seconds == 3.0
+    assert timing["note"] == "C3"
+    assert f1.build_prompt("Cello, Target Note, C3", note="C3")[0] == (
+        "Cello, Target Note, C3"
+    )
+    with pytest.raises(ValueError, match="contradicts"):
+        f1.build_prompt("Cello, Target Note, C3", note="D3")
+
+
+def test_a_key_goes_before_the_target_note():
+    text, _, _ = f1.build_prompt("Cello", note="C3", key="Am")
+    assert text == "Cello, A minor, Target Note, C3"
+
+
 def test_a_note_makes_a_one_shot_at_that_pitch():
     text, seconds, timing = f1.build_prompt("Cello, Airy", note="d#3")
     assert text == "Cello, Airy, Target Note, D#3" and seconds == 3.0
@@ -521,11 +542,29 @@ def test_worker_conditions_on_whole_seconds_and_trims_exactly(monkeypatch, tmp_p
         **_request(tmp_path, seconds=9.6, negative_prompt="Distortion"),
     )
     call = seen["calls"][0]
-    assert call["conditioning"][0]["seconds_total"] == 10
+    assert call["conditioning"][0]["seconds_total"] == 10  # 9.6 rounded up
     assert call["negative_conditioning"] == [
         {"prompt": "Distortion", "seconds_start": 0, "seconds_total": 10}
     ]
     assert seen["written"][1] == (960, 2) and out["seconds"] == pytest.approx(9.6)
+
+
+@pytest.mark.parametrize(
+    "seconds, total", [(6.4, 7), (8.0, 8), (8.0000001, 8), (0.3, 1)]
+)
+def test_worker_rounds_the_conditioning_up_as_in_training(
+    seconds, total, monkeypatch, tmp_path
+):
+    """A loop told less than its length fades before its end (150 BPM, 4 bars: 6.4 s)."""
+    seen = {}
+    _fake_upstream(monkeypatch, tmp_path, seen)
+    worker = load_worker_module(worker_file("foundation_1"))
+    worker.render(
+        worker.load(),
+        checkpoint="Foundation_1.safetensors",
+        **_request(tmp_path, seconds=seconds),
+    )
+    assert seen["calls"][0]["conditioning"][0]["seconds_total"] == total
 
 
 def test_worker_points_the_t5_conditioner_at_the_pinned_files(monkeypatch, tmp_path):
@@ -574,6 +613,12 @@ def _skip_unless_ready():
         return pytest.mark.skip(
             reason="Foundation-1 weights not in the Hugging Face cache"
         )
+    existing = os.environ.get(PLATFORM_CONFIG["env_var"])
+    if existing:  # an environment named instead of the built one
+        from ps.isolated import venv_python
+
+        ready = venv_python(Path(existing).expanduser()).exists()
+        return pytest.mark.skipif(not ready, reason=f"no Python in {existing}")
     ready = is_env_ready(ENV_SPEC, env_dir(ENV_SPEC.name))
     return pytest.mark.skipif(not ready, reason="foundation-1 environment not built")
 

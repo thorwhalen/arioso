@@ -11,8 +11,9 @@ cfg_scale, seed, sampler, sigma_min, sigma_max, out, negative_prompt=None)`` ->
 (downloaded on first use, read from the cache with no network call after): the checkpoint,
 and the T5-base files (``t5``: ``repo_id``, ``revision``, ``files``), which the prompt
 conditioner is pointed at (its ``model_path``) instead of looking ``t5-base`` up online.
-The model is conditioned on whole seconds (``seconds_total``), as it was trained, and the
-audio is trimmed to the exact ``seconds``.
+The model is conditioned on whole seconds (``seconds_total``), rounded up as in training
+(stable-audio-tools takes the ceiling of a clip's length), so a 6.4 s loop is told 7 s and
+does not fade before its end; the audio is trimmed to the exact ``seconds``.
 
 Sampling is plain classifier-free guidance (``apg_scale=0``), as Stable Audio Open 1.0 and
 the Foundation-1 tools sample. stable-audio-tools' adaptive projected guidance (its
@@ -22,6 +23,7 @@ lets any operator MPS does not have run on the CPU instead of failing.
 """
 
 import json
+import math
 import os
 
 
@@ -124,7 +126,8 @@ def render(
     )
     sample_rate = int(model_config["sample_rate"])
     window = int(model_config["sample_size"])
-    total = max(1, round(seconds))  # whole seconds, as in training
+    # whole seconds, rounded up as in training (the epsilon keeps 8.0000001 at 8)
+    total = max(1, math.ceil(seconds - 1e-6))
     conditioning = [{"prompt": prompt, "seconds_start": 0, "seconds_total": total}]
     negative = (
         [{"prompt": negative_prompt, "seconds_start": 0, "seconds_total": total}]

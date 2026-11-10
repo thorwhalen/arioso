@@ -444,55 +444,21 @@ def in_child_process(
 
 
 def _run_child(cmd, log, *, timeout) -> "int | str":
-    """Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started."""
-    import signal
+    """Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started.
 
-    posix = os.name == "posix"
-    proc = subprocess.Popen(
-        cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=posix
-    )
+    Runtime workers start in sessions of their own (ps.isolated), so the child's group
+    alone would not reach them: :func:`ps.util.kill_process_tree` kills every group in
+    the tree (``taskkill /T`` on Windows).
+    """
+    from ps.util import NEW_PROCESS_GROUP, kill_process_tree
+
+    proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, **NEW_PROCESS_GROUP)
     try:
         return proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
-        if posix:
-            _kill_tree_and_groups(proc.pid, signal.SIGKILL)
-        else:
-            proc.kill()
+        kill_process_tree(proc)
         proc.wait()
         return f"killed after {timeout} s"
-
-
-def _kill_tree_and_groups(pid: int, sig: int) -> None:
-    """Kill ``pid``, everything below it, and the process groups they lead.
-
-    Runtime workers start in sessions of their own (ps.isolated), so killing the child's
-    group alone would leave them running. The tree is read before anything is killed: an
-    orphan loses its link to ``pid``. This process's own group is never killed.
-    """
-    from arioso._measure import descendants
-
-    pids = [pid, *descendants(pid)]
-    own = os.getpgrp()
-    groups, loose = set(), []
-    for p in pids:
-        try:
-            group = os.getpgid(p)
-        except ProcessLookupError:
-            continue
-        if group == own:
-            loose.append(p)  # same group as us: kill the process, not the group
-        else:
-            groups.add(group)
-    for group in groups:
-        try:
-            os.killpg(group, sig)
-        except ProcessLookupError:
-            pass
-    for p in loose:
-        try:
-            os.kill(p, sig)
-        except ProcessLookupError:
-            pass
 
 
 def _run_preload(specs: Iterable[str]) -> None:

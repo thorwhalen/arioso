@@ -361,7 +361,7 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         and seen["params"]["thinking"] is False
     )
     assert out["out"].endswith("ace.wav")
-    # with an LM: MLX on Apple Silicon, PyTorch elsewhere, loaded once per (dit, lm)
+    # with an LM: MLX on Apple Silicon, PyTorch elsewhere; changing the LM keeps the DiT
     for apple, backend in ((True, "mlx"), (False, "pt")):
         monkeypatch.setattr(worker, "_is_apple_silicon", lambda apple=apple: apple)
         lm = f"lm-{backend}"
@@ -369,7 +369,12 @@ def test_ace_step_worker_passes_our_seed_and_controls(monkeypatch, tmp_path):
         worker.render(state, **dict(request, lm=lm))
         assert seen["lm"][-1]["backend"] == backend
         assert seen["lm"][-1]["lm_model_path"] == lm
-    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 3
+    assert len(seen["lm"]) == 2 and seen["dit_loads"] == 1
+    assert state["lm"][0] == "lm-pt"  # one LM held: the previous one was let go
+    # another DiT replaces the first (one held at a time) and keeps the LM
+    worker.render(state, **dict(request, dit="acestep-v15-base", lm="lm-pt"))
+    assert seen["dit_loads"] == 2 and seen["dit"]["config_path"] == "acestep-v15-base"
+    assert len(seen["lm"]) == 2 and state["dit"][0] == "acestep-v15-base"
 
 
 def test_magenta_rt_worker_loads_once_per_size_and_samples_per_call(
@@ -512,3 +517,79 @@ def test_ace_step_local_renders_for_real():
         seed=1,
     )
     assert song.status == "complete" and song.audio_bytes
+
+
+def test_ace_step_worker_holds_one_dit_and_one_lm(monkeypatch, tmp_path):
+    """Handlers reach generate_music; a replaced one is unloaded and freed before the next
+    loads; a failed load leaves its slot empty and keeps the other; dit=None is the default."""
+    import gc
+    import weakref
+
+    events, live = [], {}
+
+    class Handler:
+        def initialize_service(self, *, config_path, **kw):
+            events.append(("load dit", config_path))
+            self.name = config_path
+            live[config_path] = weakref.ref(self)
+            return ("boom", False) if config_path == "broken-dit" else ("ok", True)
+
+    class LLMHandler:
+        def initialize(self, *, lm_model_path, **kw):
+            events.append(("load lm", lm_model_path))
+            self.name = lm_model_path
+            live[lm_model_path] = weakref.ref(self)
+            return ("boom", False) if lm_model_path == "broken-lm" else ("ok", True)
+
+        def unload(self):
+            events.append(("unload lm", self.name))
+
+    received = []
+
+    def generate_music(dit_h, llm_h, *, params, config, save_dir):
+        received.append((dit_h.name, llm_h.name if llm_h else None))
+        out = _write_wav(tmp_path / "ace.wav", rate=48000)
+        return type("R", (), {"success": True, "audios": [{"path": out, "key": "C", "params": {}}],
+                              "status_message": "", "error": None})()
+
+    _install_fake_modules(monkeypatch, {
+        "acestep": {},
+        "acestep.handler": {"AceStepHandler": Handler},
+        "acestep.llm_inference": {"LLMHandler": LLMHandler},
+        "acestep.inference": {"GenerationParams": lambda **kw: type("P", (), kw)(),
+                              "GenerationConfig": lambda **kw: None,
+                              "generate_music": generate_music},
+    })
+    monkeypatch.setattr(sys, "path", list(sys.path))
+    monkeypatch.chdir(tmp_path)
+    worker = load_worker_module(worker_file("ace_step"))
+    released = []
+    real_release = worker._release_memory
+    monkeypatch.setattr(worker, "_release_memory", lambda: released.append(len(events)) or real_release())
+    state = worker.load()
+    request = dict(caption="x", seconds=1.0, steps=1, guidance=1.0, seed=1, out_dir=str(tmp_path))
+
+    worker.render(state, dit=None, lm="lm-a", **request)
+    assert received[-1] == (worker.DFLT_DIT, "lm-a")  # dit=None: ACE-Step's default
+    worker.render(state, dit=None, lm="lm-b", **request)
+    assert received[-1] == (worker.DFLT_DIT, "lm-b")
+    assert ("unload lm", "lm-a") in events  # the old LM unloaded ...
+    gc.collect()
+    assert live["lm-a"]() is None  # ... and freed
+    unload_at = events.index(("unload lm", "lm-a"))
+    assert any(unload_at < r <= events.index(("load lm", "lm-b")) for r in released)  # released first
+    assert sum(1 for e in events if e[0] == "load dit") == 1  # the DiT was kept
+
+    with pytest.raises(RuntimeError, match="LM 'broken-lm' failed"):
+        worker.render(state, dit=None, lm="broken-lm", **request)
+    assert state["lm"] == worker._EMPTY and state["dit"][0] == worker.DFLT_DIT
+    gc.collect()
+    assert live["broken-lm"]() is None  # the failed load's handler was let go
+
+    worker.render(state, dit="acestep-v15-base", lm=None, **request)
+    assert received[-1] == ("acestep-v15-base", None)
+    gc.collect()
+    assert live[worker.DFLT_DIT]() is None  # one DiT at a time
+    with pytest.raises(RuntimeError, match="DiT 'broken-dit' failed"):
+        worker.render(state, dit="broken-dit", lm=None, **request)
+    assert state["dit"] == worker._EMPTY and state["lm"] == (None, None)

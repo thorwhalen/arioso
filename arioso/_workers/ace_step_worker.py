@@ -3,8 +3,8 @@
 The worker's working directory is the checkout, which ``acestep`` needs as its project
 root (checkpoints download into ``checkpoints/`` there on first use).
 
-``load()`` -> the state: the checkout root and a cache of handlers, one ``(DiT, LM)`` pair
-per ``(dit, lm)``, loaded on first use and kept. On Apple Silicon the LM runs on MLX and
+``load()`` -> the state: the checkout root, and the one DiT and one LM loaded (each loaded
+on first use, replaced when a request names another). On Apple Silicon the LM runs on MLX and
 the DiT on MPS/MLX (ACE-Step's own defaults).
 ``render(state, *, caption, seconds, steps, guidance, seed, dit, lm, out_dir, ...)`` ->
 ``{"out", "key", "params"}``: one take saved in ``out_dir``.
@@ -16,29 +16,48 @@ import sys
 
 
 def load():
-    """The checkout root (put on ``sys.path``) and an empty handler cache."""
+    """The checkout root (put on ``sys.path``); no DiT or LM loaded yet."""
     root = os.getcwd()
     if root not in sys.path:
         sys.path.insert(0, root)
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
-    return {"root": root, "handlers": {}}
+    return {"root": root, "dit": _EMPTY, "lm": _EMPTY}
 
 
 def _is_apple_silicon():
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
+#: An empty slot: no DiT or LM loaded (``None`` is a real request: no LM).
+_EMPTY = ("<none loaded>", None)
+#: The DiT ACE-Step loads when none is named (its own default).
+DFLT_DIT = "acestep-v15-turbo"
+
+
 def _handlers_for(state, dit, lm):
-    key = (dit, lm)
-    if key not in state["handlers"]:
+    """The loaded DiT and LM for this request; each is replaced when the request changes.
+
+    One DiT and one LM are held at a time (each is several GB): the LM does not
+    depend on the DiT, so changing only the LM keeps the DiT, and the reverse. The
+    old one is unloaded and its memory released before the next loads; a failed
+    load leaves its slot empty (the other is kept) and releases what it took.
+    """
+    dit = dit or DFLT_DIT
+    if state["dit"][0] != dit:
         from acestep.handler import AceStepHandler
 
+        _drop(state, "dit")
         dit_h = AceStepHandler()
         msg, ok = dit_h.initialize_service(
             project_root=state["root"], config_path=dit, device="auto"
         )
         if not ok:
+            del dit_h
+            _release_memory()
             raise RuntimeError(f"ACE-Step DiT {dit!r} failed to load: {msg}")
+        state["dit"] = (dit, dit_h)
+    if state["lm"][0] != lm:
+        _drop(state, "lm")
         llm_h = None
         if lm:
             from acestep.llm_inference import LLMHandler
@@ -51,9 +70,47 @@ def _handlers_for(state, dit, lm):
                 device="auto",
             )
             if not ok:
+                del llm_h
+                _release_memory()
                 raise RuntimeError(f"ACE-Step LM {lm!r} failed to load: {msg}")
-        state["handlers"][key] = (dit_h, llm_h)
-    return state["handlers"][key]
+        state["lm"] = (lm, llm_h)
+    return state["dit"][1], state["lm"][1]
+
+
+def _drop(state, slot):
+    """Unload the handler in ``slot`` (its own ``unload`` first, if it has one) and free it."""
+    handler = state[slot][1]
+    state[slot] = _EMPTY
+    unload = getattr(handler, "unload", None)
+    if callable(unload):
+        try:
+            unload()
+        except Exception:  # noqa: BLE001 - freeing must not fail the next load
+            pass
+    del handler
+    _release_memory()
+
+
+def _release_memory():
+    """Collect what a dropped handler held, and empty the MLX and torch GPU caches."""
+    import gc
+
+    gc.collect()
+    mx = sys.modules.get("mlx.core")
+    if mx is not None and hasattr(mx, "clear_cache"):
+        try:
+            mx.clear_cache()
+        except Exception:  # noqa: BLE001 - a cache that cannot be emptied is no error
+            pass
+    torch = sys.modules.get("torch")
+    if torch is not None:
+        for backend in ("mps", "cuda"):
+            mod = getattr(torch, backend, None)
+            if mod is not None and getattr(mod, "is_available", lambda: False)():
+                try:
+                    mod.empty_cache()
+                except Exception:  # noqa: BLE001
+                    pass
 
 
 def render(

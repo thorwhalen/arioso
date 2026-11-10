@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://jenmusic.ai",
     "tier": "structured",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "bearer_token",
         "env_var": "JEN_API_KEY",

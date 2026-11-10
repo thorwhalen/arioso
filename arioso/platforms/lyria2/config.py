@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://deepmind.google/technologies/lyria/",
     "tier": "structured",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "bearer_token",
         "env_var": "GOOGLE_CLOUD_API_KEY",

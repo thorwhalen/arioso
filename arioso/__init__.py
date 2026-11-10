@@ -16,6 +16,9 @@ Usage::
     # Get platform config
     arioso.get_platform_info("musicgen")
 
+    # Every platform with its access type and weights licence
+    arioso.platform_table()
+
     # Rich platform access via services
     s = arioso.services.sunoapi
     s.generate("jazz piano", duration=30)       # unified names
@@ -27,7 +30,13 @@ Usage::
     arioso.generators.sunoapi("jazz")
 """
 
-from arioso.base import Song, AudioResult, AFFORDANCES, CatalogMatchError
+from arioso.base import (
+    Song,
+    AudioResult,
+    AFFORDANCES,
+    COMMERCIAL_USE_VALUES,
+    CatalogMatchError,
+)
 from arioso.services import ServiceCollection, SliceMapping
 
 services = ServiceCollection()
@@ -219,6 +228,33 @@ def get_platform_info(name: str) -> dict:
     from arioso.registry import get_platform
 
     return get_platform(name)["config"]
+
+
+#: The config fields :func:`platform_table` reports, in column order.
+PLATFORM_TABLE_FIELDS = ("name", "access_type", "weights_license", "commercial_use")
+
+
+def platform_table(*, fields=PLATFORM_TABLE_FIELDS) -> list[dict]:
+    """One row per platform: its access type, weights licence and commercial use.
+
+    Reads the platforms' configs only, so no adapter (and no optional dependency)
+    is loaded. ``commercial_use`` is one of :data:`COMMERCIAL_USE_VALUES`.
+
+    Args:
+        fields: The config keys each row carries (a missing key reads ``None``).
+
+    Returns:
+        A list of dicts, one per platform, keyed by ``fields``.
+
+    Example::
+
+        free = [r["name"] for r in arioso.platform_table() if r["commercial_use"] == "yes"]
+    """
+    from arioso.registry import get_config, list_platforms as _list
+
+    return [
+        {field: get_config(name).get(field) for field in fields} for name in _list()
+    ]
 
 
 def check_status(song: Song) -> list[Song]:

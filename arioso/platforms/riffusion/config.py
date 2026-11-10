@@ -6,6 +6,9 @@ PLATFORM_CONFIG = {
     "website": "https://riffusion.com",
     "tier": "low_level",
     "access_type": "python_lib",
+    "weights_license": "CreativeML-OpenRAIL-M",
+    # Commercial use allowed, subject to the licence's use-based restrictions.
+    "commercial_use": "conditional",
     "auth": {"type": "none"},
     "dependencies": [],
     "optional_dependencies": ["diffusers", "torch", "scipy", "numpy", "Pillow"],

@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://github.com/multimodal-art-projection/YuE",
     "tier": "structured",
     "access_type": "python_lib",
+    "weights_license": "Apache-2.0",
+    "commercial_use": "yes",
     "auth": {
         "type": "bearer_token",
         "env_var": "FAL_KEY",

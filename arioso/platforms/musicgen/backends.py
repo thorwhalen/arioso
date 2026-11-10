@@ -14,6 +14,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
+from arioso._util import torch_device
+
 if TYPE_CHECKING:
     import numpy as np
 
@@ -79,22 +81,8 @@ def _rate_or_default(rate) -> int:
     return int(rate) if isinstance(rate, (int, float)) and rate else DEFAULT_FRAME_RATE
 
 
-def _device() -> str:
-    """The torch device for the transformers path: ``$ARIOSO_TORCH_DEVICE``,
-    else CUDA, else Apple MPS, else CPU (the CPU-only default made a
-    30-second melody-conditioned generation take a quarter of an hour)."""
-    import os
-
-    import torch
-
-    env = os.environ.get("ARIOSO_TORCH_DEVICE")
-    if env:
-        return env
-    if torch.cuda.is_available():
-        return "cuda"
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
+#: Kept under its old name; the choice is shared by every local platform.
+_device = torch_device
 
 
 class AudiocraftBackend:
@@ -223,7 +211,7 @@ class TransformersBackend:
 
     @classmethod
     def load(cls, model_variant: str) -> TransformersBackend:
-        """Load ``model_variant`` and its processor with transformers, on :func:`_device`.
+        """Load ``model_variant`` and its processor with transformers, on :func:`~arioso._util.torch_device`.
 
         Args:
             model_variant: A MusicGen checkpoint name; a melody variant gets the
@@ -244,7 +232,7 @@ class TransformersBackend:
                 MusicgenForConditionalGeneration as _ModelClass,
             )
 
-        model = _ModelClass.from_pretrained(model_variant).to(_device())
+        model = _ModelClass.from_pretrained(model_variant).to(torch_device())
         return cls(model, AutoProcessor.from_pretrained(model_variant))
 
     @property

@@ -13,7 +13,9 @@ arioso/
     base.py                      # Song, AudioResult dataclasses; AFFORDANCES constant
     registry.py                  # Platform auto-discovery and lazy loading
     translation.py               # Parameter name translation via i2.Ingress
-    _util.py                     # Auth helpers, HTTP session factory
+    _util.py                     # Auth helpers, HTTP session factory, torch_device()/torch_dtype()
+    cli.py                       # Functions behind the `arioso` command (no CLI library)
+    __main__.py                  # `arioso` / `python -m arioso`: projects cli.commands with cw
     _fal.py                      # Shared fal.ai upload/run/result plumbing
     platforms/
         __init__.py              # Auto-discovery hook
@@ -68,7 +70,10 @@ Source locations for reference:
 
 - Python 3.10+, type hints everywhere
 - Google-style docstrings
-- Zero required dependencies; platform deps are lazy-imported inside methods
+- Few, light required dependencies; platform deps are lazy-imported inside methods
+- `import arioso` must not import `cw` (only `arioso.__main__` does)
+- Every PLATFORM_CONFIG declares `weights_license` and `commercial_use` (verified from the model card or provider terms)
+- Local torch platforms choose their device with `arioso._util.torch_device()`
 - All platform parameters use unified affordance names (see `AFFORDANCES` in `base.py`)
 - No emojis in code or docs
 - Tests in `tests/`, examples in `examples/`, scratch in `scrap/`

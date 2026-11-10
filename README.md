@@ -40,7 +40,7 @@ arioso platforms
 
 `generate` writes the audio and prints the path it wrote. A waveform from a local model is written as WAV (with `soundfile` when installed, else the standard library's `wave`); encoded audio from a hosted platform keeps its format, and the file's suffix follows it. `--model` and `--seed` are passed on only when given.
 
-`platforms` lists every platform with its access type, weights licence and whether its output may be used commercially (`yes`, `no`, `conditional`, or `provider terms` for hosted models whose service terms decide). The same table is `arioso.platform_table()` in Python, and each platform's `weights_license` and `commercial_use` are in `arioso.get_platform_info(name)`. MusicGen's weights are CC-BY-NC-4.0, so its output is not for commercial use.
+`platforms` lists every platform with its access type, weights licence and whether its output may be used commercially (`yes`, `no`, `conditional`, `unclear` when the weights' licence is unstated or disputed, or `provider terms` for hosted models whose service terms decide; denote uses the same values). The same table is `arioso.platform_table()` in Python, and each platform's `weights_license` and `commercial_use` are in `arioso.get_platform_info(name)`. MusicGen's weights are CC-BY-NC-4.0, so its output is not for commercial use.
 
 Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set `ARIOSO_TORCH_DEVICE` to force one.
 

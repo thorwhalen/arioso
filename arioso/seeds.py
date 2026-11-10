@@ -202,14 +202,27 @@ def drop_blips(midi: np.ndarray, fps: float, *, min_s: float = 0.12) -> np.ndarr
     return out
 
 
+#: Voiced frames per ``fix_octaves`` batch: its working memory is about this many windows.
+FIX_OCTAVES_CHUNK_FRAMES = 65536
+
+
 def fix_octaves(
-    midi: np.ndarray, fps: float, *, window_s: float = 0.5, min_jump: float = 9.5
+    midi: np.ndarray,
+    fps: float,
+    *,
+    window_s: float = 0.5,
+    min_jump: float = 9.5,
+    chunk_frames: int = FIX_OCTAVES_CHUNK_FRAMES,
 ) -> np.ndarray:
     """Move frames an octave (or two) away from the local median back next to it.
 
     f0 trackers jump an octave on breathy or loud notes. Only frames at least ``min_jump``
     semitones from the median of the surrounding ``window_s`` move, so a real leap of a fifth or
     a sixth stays; a real leap of a seventh or more inside the window is rare enough to sacrifice.
+
+    The medians are taken ``chunk_frames`` voiced frames at a time, so working memory is about
+    five ``chunk_frames x window`` float arrays whatever the contour's length (about 130 MB at the
+    defaults and 100 fps, 470 MB with ``window_s=2``); the result does not depend on it.
     """
     out = midi.copy()
     half = max(1, int(window_s * fps) // 2)
@@ -219,11 +232,13 @@ def fix_octaves(
     # NaN padding stands in for the window's clipping at the edges (nanmedian skips it), and only
     # voiced frames are evaluated, so every window holds its own frame and is never all-NaN
     pad_dtype = midi.dtype if np.issubdtype(midi.dtype, np.floating) else float
-    padded = np.pad(midi.astype(pad_dtype), half, constant_values=np.nan)
-    windows = np.lib.stride_tricks.sliding_window_view(padded, 2 * half + 1)[voiced]
-    dev = midi[voiced] - np.nanmedian(windows, axis=1)
-    jump = np.abs(dev) >= min_jump
-    out[voiced[jump]] = midi[voiced[jump]] - 12 * np.round(dev[jump] / 12)
+    padded = np.pad(midi.astype(pad_dtype, copy=False), half, constant_values=np.nan)
+    windows = np.lib.stride_tricks.sliding_window_view(padded, 2 * half + 1)
+    for start in range(0, len(voiced), max(1, chunk_frames)):
+        idx = voiced[start : start + max(1, chunk_frames)]
+        dev = midi[idx] - np.nanmedian(windows[idx], axis=1)
+        jump = np.abs(dev) >= min_jump
+        out[idx[jump]] = midi[idx[jump]] - 12 * np.round(dev[jump] / 12)
     return out
 
 

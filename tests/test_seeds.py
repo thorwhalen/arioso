@@ -63,8 +63,10 @@ def _fix_octaves_loop(midi, fps, *, window_s=0.5, min_jump=9.5):
 
 
 @pytest.mark.filterwarnings("error")  # neither version may warn (no window is all-NaN)
+@pytest.mark.parametrize("chunk_frames", [None, 7, 1])  # None: the module default
 @pytest.mark.parametrize("dtype", [np.float64, np.float32])
-def test_fix_octaves_equals_the_loop_bit_for_bit(dtype):
+def test_fix_octaves_equals_the_loop_bit_for_bit(dtype, chunk_frames):
+    chunk = {} if chunk_frames is None else {"chunk_frames": chunk_frames}
     rng = np.random.default_rng(50)
     for _ in range(400):
         n = int(rng.integers(0, 150))  # includes empty and shorter-than-the-window inputs
@@ -78,7 +80,7 @@ def test_fix_octaves_equals_the_loop_bit_for_bit(dtype):
             midi[a : a + int(rng.integers(1, 40))] = np.nan
         midi = midi.astype(dtype)
         want = _fix_octaves_loop(midi, fps, window_s=window_s)
-        got = fix_octaves(midi, fps, window_s=window_s)
+        got = fix_octaves(midi, fps, window_s=window_s, **chunk)
         assert got.dtype == want.dtype
         assert np.array_equal(got, want, equal_nan=True), (n, fps, window_s)
 

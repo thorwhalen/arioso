@@ -148,7 +148,7 @@ def test_the_instrument_folder_has_sf2_sfz_wavs_and_metadata(tmp_path):
     )
     assert paths["sf2"].name == "Rhodes Piano.sf2"
     sfz = paths["sfz"].read_text()
-    assert "sample=Rhodes Piano/060.wav pitch_keycenter=60 lokey=0 hikey=62" in sfz
+    assert "pitch_keycenter=60 lokey=0 hikey=62 sample=Rhodes Piano/060.wav\n" in sfz
     assert (tmp_path / "Rhodes Piano" / "064.wav").is_file()
     meta = json.loads(paths["metadata"].read_text())
     assert meta["seed"] == 11 and meta["keys"] == [60, 64]
@@ -178,7 +178,7 @@ def test_the_prompt_follows_the_models_grammar():
 
 def test_chunks_are_balanced_and_never_over_the_size():
     for n in range(1, 40):
-        sizes = [len(c) for c in chunks(range(n), 6)]
+        sizes = [len(c) for c in chunks(range(20, 20 + n), 6)]
         assert sum(sizes) == n and max(sizes) <= 6 and max(sizes) - min(sizes) <= 1
 
 
@@ -203,12 +203,14 @@ def test_each_note_is_exactly_its_slot_no_gap_no_neighbour():
     notes, _ = render_keybed(
         "Pad", [60, 61, 62, 63], generate=Markers(), seed=1, peak=None
     )
-    fade = int(0.02 * RATE)
+    fade, fade_in = int(0.02 * RATE), int(0.002 * RATE)
     for i, key in enumerate([60, 61, 62, 63]):
         audio, _ = notes[key]
         assert len(audio) == NOTE_SECONDS * RATE
-        assert np.all(audio[: len(audio) - fade] == np.float32((i + 1) / 10)), key
-        assert audio[-1] == 0  # faded out
+        assert np.all(audio[fade_in : len(audio) - fade] == np.float32((i + 1) / 10)), (
+            key
+        )
+        assert audio[0] == 0 and audio[-1] == 0  # faded in and out
 
 
 def test_one_gain_for_the_whole_keybed_keeps_the_chunks_balance():
@@ -220,9 +222,8 @@ def test_one_gain_for_the_whole_keybed_keeps_the_chunks_balance():
     notes, _ = render_keybed(
         "Pad", [60, 72], generate=levels, seed=1, chunk=1, peak=0.8
     )
-    assert notes[60][0][0] == pytest.approx(0.8) and notes[72][0][0] == pytest.approx(
-        0.4
-    )
+    assert notes[60][0][100] == pytest.approx(0.8)
+    assert notes[72][0][100] == pytest.approx(0.4)
 
 
 def test_a_chunk_past_the_window_is_refused_before_anything_renders():
@@ -320,6 +321,89 @@ def test_fluidsynth_plays_each_key_at_its_pitch(tmp_path, name):
     for i, key in enumerate(played):
         segment = audio[int((i * 0.5 + 0.05) * rate) : int((i * 0.5 + 0.4) * rate)]
         assert _pitch(segment, rate) == pytest.approx(_freq(key), rel=0.02), key
+
+
+def test_release_reaches_every_format_and_odd_names_are_safe(tmp_path):
+    paths = keybed_instrument(
+        "Bass / Sub, Warm",
+        tmp_path,
+        [40, 45],
+        generate=FakeModel(),
+        seed=2,
+        release=1.5,
+    )
+    assert "ampeg_release=1.5" in paths["sfz"].read_text()
+    assert paths["sf2"].name == "Bass _ Sub.sf2" and paths["sf2"].is_file()
+    igen = _riff_chunks(paths["sf2"].read_bytes())[b"igen"]
+    gens = [struct.unpack("<Hh", igen[i : i + 4]) for i in range(0, len(igen), 4)]
+    assert (38, round(1200 * np.log2(1.5))) in gens
+
+
+def test_effect_tags_follow_wet_and_are_refused_dry():
+    assert keybed_prompt("Pad, Warm, Medium Reverb", [60], wet=True) == (
+        "Keybed, Timbre Profile, Pad, Warm, Wet, Medium Reverb, Target Note, C4"
+    )
+    assert keybed_prompt("Pad, Medium Reverb, Wet", [60]).endswith(
+        "Pad, Wet, Medium Reverb, Target Note, C4"
+    )
+    with pytest.raises(ValueError, match="wet"):
+        keybed_prompt("Pad, Medium Reverb", [60])
+    with pytest.raises(ValueError, match="both"):
+        keybed_prompt("Pad, Wet, Dry", [60])
+
+
+def test_keys_outside_the_models_range_are_refused():
+    with pytest.raises(ValueError, match="C0..C8"):
+        chunks([11, 60])
+    with pytest.raises(ValueError, match="C0..C8"):
+        chunks([109])
+
+
+def _stereo(prompt, *, duration, seed, anti=False):
+    mono_song = FakeModel()(prompt, duration=duration, seed=seed)
+    left = mono_song.audio_array
+    right = -left if anti else left
+    return Song(  # (samples, 2), as soundfile reads a stereo wav
+        audio=AudioResult(audio_array=np.stack([left, right], axis=1), sample_rate=RATE)
+    )
+
+
+def test_stereo_takes_fold_to_mono_at_the_right_pitch():
+    notes, info = render_keybed("Pad", [48, 60, 72], generate=_stereo, seed=1, chunk=1)
+    assert info["fold"] == "mid"
+    for key, (audio, rate) in notes.items():
+        assert audio.ndim == 1 and len(audio) == NOTE_SECONDS * rate
+        assert _pitch(audio, rate) == pytest.approx(_freq(key), rel=0.02)
+
+
+def test_an_anti_phase_keybed_is_not_folded_to_silence():
+    def anti(prompt, *, duration, seed):
+        return _stereo(prompt, duration=duration, seed=seed, anti=True)
+
+    notes, info = render_keybed(
+        "Pad", [60, 61, 62, 72], generate=anti, seed=1, peak=None
+    )
+    assert info["fold"] == "left"  # one choice for every chunk
+    assert all(np.abs(a).max() > 0.4 for a, _ in notes.values())
+
+
+def test_the_default_generator_keeps_the_models_level(monkeypatch):
+    import arioso
+
+    seen = []
+
+    def generate(prompt, **kwargs):
+        seen.append(kwargs)
+        return FakeModel()(prompt, duration=kwargs["duration"], seed=kwargs["seed"])
+
+    monkeypatch.setattr(arioso, "generate", generate)
+    render_keybed("Pad", [60, 61], seed=1)
+    assert seen and all(
+        k["normalize"] is False
+        and k["platform"] == "foundation_1"
+        and k["model"] == "1.2-keybeds"
+        for k in seen
+    )
 
 
 def _keybed_weights():

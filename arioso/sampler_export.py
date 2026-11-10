@@ -47,25 +47,53 @@ def key_ranges(keys) -> dict:
     return ranges
 
 
-def mono(audio) -> np.ndarray:
-    """``audio`` as a 1-d float32 array: the mid of a stereo pair (either orientation),
-    or its first channel when the mid has lost most of the energy (anti-phase).
+def channels_first(audio) -> np.ndarray:
+    """``audio`` as a float32 ``(channels, samples)`` array (mono becomes one channel;
+    a 2-d array has its channels on the shorter axis)."""
+    a = np.asarray(audio, dtype=np.float32)
+    if a.ndim == 1:
+        a = a[None, :]
+    elif a.ndim == 2 and a.shape[0] > a.shape[1]:
+        a = a.T
+    if a.ndim != 2 or not a.size:
+        raise ValueError(
+            f"a sample should be a non-empty mono or stereo array, got {a.shape}"
+        )
+    return a
+
+
+def choose_fold(audios) -> str:
+    """``"mid"`` ((L+R)/2), or ``"left"`` when the mid would lose most of the energy
+    (anti-phase content), judged over all of ``audios`` together, so every sample of an
+    instrument is folded the same way.
+
+    >>> t = np.linspace(0, 1, 100)
+    >>> choose_fold([np.stack([t, t])]), choose_fold([np.stack([t, -t])])
+    ('mid', 'left')
+    """
+    energy = mid_energy = 0.0
+    for audio in audios:
+        c = channels_first(audio)
+        energy += float(np.sum(c**2)) / len(c)
+        mid_energy += float(np.sum(c.mean(axis=0) ** 2))
+    return "mid" if mid_energy >= 0.25 * energy else "left"
+
+
+def mono(audio, *, fold: str = None) -> np.ndarray:
+    """``audio`` as a 1-d float32 array, folded as ``fold`` says (``"mid"`` or
+    ``"left"``; default: :func:`choose_fold` for this audio alone).
 
     >>> t = np.linspace(0, 1, 100)
     >>> bool(mono(np.stack([t, -t])).max() > 0.9)  # the mid would be silence
     True
     """
-    a = np.asarray(audio, dtype=np.float32)
-    if a.ndim == 2:
-        channels = a if a.shape[0] < a.shape[1] else a.T
-        mid = channels.mean(axis=0)
-        energy = float(np.mean(channels**2))
-        a = mid if float(np.mean(mid**2)) >= 0.25 * energy else channels[0]
-    if a.ndim != 1 or not len(a):
-        raise ValueError(
-            f"a sample should be a non-empty mono or stereo array, got {a.shape}"
-        )
-    return a
+    c = channels_first(audio)
+    if len(c) == 1:
+        return c[0]
+    fold = fold or choose_fold([c])
+    if fold not in ("mid", "left"):
+        raise ValueError(f"fold should be 'mid' or 'left', got {fold!r}")
+    return c.mean(axis=0) if fold == "mid" else c[0]
 
 
 def _int16(a: np.ndarray) -> np.ndarray:
@@ -214,8 +242,8 @@ def write_sfz(
         audio, rate = samples[key]
         wav = f"{stem}/{key:03d}.wav"
         sf.write(folder / wav, mono(audio), int(rate), subtype="PCM_16")
-        lines.append(
-            f"<region> sample={wav} pitch_keycenter={key} lokey={low} hikey={high}"
+        lines.append(  # sample= last: a path with spaces runs to the end of the line
+            f"<region> pitch_keycenter={key} lokey={low} hikey={high} sample={wav}"
         )
     path = folder / f"{stem}.sfz"
     path.write_text("\n".join(lines) + "\n")
@@ -228,15 +256,21 @@ def write_instrument(
     *,
     name: str = "instrument",
     formats=("sf2", "sfz"),
+    release: float = 0.3,
     **sf2_options,
 ) -> dict:
-    """Write ``samples`` in each of ``formats`` under ``folder``; returns ``{format: path}``."""
-    folder = Path(folder)
+    """Write ``samples`` in each of ``formats`` under ``folder``; returns ``{format: path}``.
+
+    Files are named after ``name`` (made safe for a path), so several instruments (the
+    layers of one sound, say) can share a folder; ``release`` (seconds) goes to every
+    format.
+    """
+    folder, stem = Path(folder), safe_name(name)
     writers = {
         "sf2": lambda: write_sf2(
-            samples, folder / f"{name}.sf2", name=name, **sf2_options
+            samples, folder / f"{stem}.sf2", name=name, release=release, **sf2_options
         ),
-        "sfz": lambda: write_sfz(samples, folder, name=name),
+        "sfz": lambda: write_sfz(samples, folder, name=name, release=release),
     }
     unknown = set(formats) - set(writers)
     if unknown:

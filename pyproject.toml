@@ -49,6 +49,8 @@ Repository = "https://github.com/thorwhalen/arioso"
 Documentation = "https://thorwhalen.github.io/arioso"
 
 [project.optional-dependencies]
+# arioso.keybed / arioso.sampler_export: sampler instruments from one-shot renders.
+keybed = ["numpy", "soundfile"]
 # arioso.scoring: music under a narration (ducking, phrase-timed pauses); also needs ffmpeg.
 scoring = [
     "numpy",

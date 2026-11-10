@@ -154,7 +154,8 @@ PLATFORM_CONFIG = {
     # bars: 4 or 8, the loop length when bpm is given (default: the nearest to duration).
     # note: a one-shot's pitch, e.g. "C3", appended as "Target Note, C3".
     # sampler: stable-audio-tools sampler_type; device: "mps", "cuda" or "cpu" (default: best).
-    "adapter_params": ["bars", "note", "sampler", "device"],
+    # normalize: False keeps the model's level (a keybed's chunks keep their balance).
+    "adapter_params": ["bars", "note", "sampler", "device", "normalize"],
     "on_unsupported_param": "warn",
     "output": {"default_format": "wav", "sample_rate": 44100, "returns": "array"},
 }

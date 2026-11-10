@@ -258,11 +258,11 @@ def test_normalize_reaches_the_worker_and_off_keeps_the_level(adapter, tmp_path)
     )
     worker = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(worker)
-    quiet = np.full((2, 100), 0.25, dtype=np.float32)
-    worker._save(quiet, 8000, tmp_path / "on.wav")
-    worker._save(quiet, 8000, tmp_path / "off.wav", normalize=False)
+    hot = np.full((2, 100), 1.5, dtype=np.float32)  # over full scale, as models can be
+    worker._save(hot, 8000, tmp_path / "on.wav")
+    worker._save(hot, 8000, tmp_path / "off.wav", normalize=False)
     assert sf.read(tmp_path / "on.wav")[0].max() == pytest.approx(1.0, abs=1e-3)
-    assert sf.read(tmp_path / "off.wav")[0].max() == pytest.approx(0.25)
+    assert sf.read(tmp_path / "off.wav")[0].max() == pytest.approx(1.5)  # not clipped
 
 
 def test_negative_prompt_and_note_reach_the_worker(adapter):
@@ -329,6 +329,17 @@ def test_generate_routes_affordances_and_adapter_params(adapter, monkeypatch):
     assert (req["steps"], req["cfg_scale"]) == (50, 6.0)
     assert req["checkpoint"] == "Foundation-1.2-Keybeds.safetensors"
     assert song.platform == "foundation_1" and song.status == "complete"
+
+
+def test_normalize_goes_through_generate_without_a_warning(adapter, monkeypatch):
+    import warnings
+
+    get_config("foundation_1")
+    monkeypatch.setitem(_registry["foundation_1"], "adapter", adapter)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        arioso.generate("Pad", platform="foundation_1", duration=2, normalize=False)
+    assert adapter._worker.requests[0][1]["normalize"] is False
 
 
 def test_cached_weights_looks_in_the_hub_cache_at_the_pinned_revision(

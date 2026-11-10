@@ -39,8 +39,13 @@ NOTE_SECONDS, GAP_SECONDS = 3.0, 0.25
 CHUNK_NOTES = 6
 #: The default register: C3 to C5, every key.
 DFLT_KEYS = tuple(range(48, 73))
-#: Fade at the end of each cut note, so the cut does not click.
-FADE_SECONDS = 0.02
+#: Fades at the end and the start of each cut note, so neither cut clicks (the start
+#: one is short: a wet note's neighbour's tail can run into its slot).
+FADE_SECONDS, FADE_IN_SECONDS = 0.02, 0.002
+#: The notes the model was trained on: C0 to C8.
+KEY_RANGE = (12, 108)
+#: Words that make a descriptor tag an effect (the RC fork's ``KEYBED_FX_WORDS``).
+FX_WORDS = ("reverb", "delay", "distortion", "phaser", "bitcrush")
 #: How much shorter than asked a render may come back (rounding) before it is an error.
 SHORTFALL_SECONDS = 0.01
 #: The level of the loudest note after the keybed's one gain (about -1 dBFS).
@@ -59,12 +64,23 @@ def note_name(key: int) -> str:
 def keybed_prompt(descriptor: str, keys: Iterable[int], *, wet: bool = False) -> str:
     """The prompt for ``keys``: the model's control grammar around ``descriptor``.
 
-    ``"Wet"`` or ``"Dry"`` (``wet``) follows the descriptor unless it already says which.
+    The descriptor's sound tags come first, then ``"Wet"`` or ``"Dry"`` (a tag in the
+    descriptor wins over ``wet``), then its effect tags (reverb, delay, ...), which only
+    a wet keybed can have.
     """
     keys = [int(k) for k in keys]
     tags = [t.strip() for t in descriptor.split(",") if t.strip()]
-    if not any(t.lower() in ("wet", "dry") for t in tags):
-        tags.append("Wet" if wet else "Dry")
+    said = [t for t in tags if t.lower() in ("wet", "dry")]
+    if len({t.lower() for t in said}) > 1:
+        raise ValueError(f"keybed: {descriptor!r} says both Wet and Dry")
+    is_wet = said[0].lower() == "wet" if said else wet
+    fx = [t for t in tags if any(w in t.lower() for w in FX_WORDS)]
+    body = [t for t in tags if t not in fx and t not in said]
+    if fx and not is_wet:
+        raise ValueError(
+            f"keybed: effect tags {fx} need a wet keybed (wet=True, or 'Wet' in the descriptor)"
+        )
+    tags = [*body, "Wet" if is_wet else "Dry", *fx]
     if len(keys) == 1:
         return ", ".join(
             ["Keybed", "Timbre Profile", *tags, "Target Note", note_name(keys[0])]
@@ -86,8 +102,12 @@ def chunks(keys, size: int = CHUNK_NOTES) -> list:
     keys = sorted(set(int(k) for k in keys))
     if not keys:
         raise ValueError("no keys to render")
-    if not all(0 <= k <= 127 for k in keys):
-        raise ValueError(f"keys are MIDI numbers 0..127, got {keys}")
+    low, high = KEY_RANGE
+    if not all(low <= k <= high for k in keys):
+        raise ValueError(
+            f"keybed: the model knows {note_name(low)}..{note_name(high)} "
+            f"(MIDI {low}..{high}), got {[k for k in keys if not low <= k <= high]}"
+        )
     n = math.ceil(len(keys) / size)
     q, r = divmod(len(keys), n)
     out, i = [], 0
@@ -138,7 +158,7 @@ def render_keybed(
     ``info`` holds the seed and, per chunk, its keys and the prompt actually sent.
     """
     from arioso._isolated import draw_seed
-    from arioso.sampler_export import mono
+    from arioso.sampler_export import channels_first, choose_fold, mono
 
     groups = chunks(keys, chunk)
     window = _window_seconds() if window_seconds is None else window_seconds
@@ -155,8 +175,10 @@ def render_keybed(
     generate = generate or _default_generate
     seed = draw_seed() if seed is None else int(seed)
     step = note_seconds + gap_seconds
-    notes, sent = {}, []
-    for group in groups:
+    renders, sent = [], []
+    for (
+        group
+    ) in groups:  # every chunk first: the fold to mono is chosen over all of them
         prompt = keybed_prompt(descriptor, group, wet=wet)
         song = generate(prompt, duration=length(group), seed=seed, **generate_kwargs)
         sent.append(
@@ -164,8 +186,16 @@ def render_keybed(
         )
         if song.audio_array is None:
             raise ValueError(f"keybed: the render for {group} came back with no audio")
-        audio, rate = mono(song.audio_array), int(song.sample_rate)
-        size, fade = int(round(note_seconds * rate)), int(round(FADE_SECONDS * rate))
+        renders.append((group, channels_first(song.audio_array), int(song.sample_rate)))
+    fold = choose_fold([audio for _, audio, _ in renders])
+    notes = {}
+    for group, channels, rate in renders:
+        audio = mono(channels, fold=fold)
+        size = int(round(note_seconds * rate))
+        fade, fade_in = (
+            int(round(FADE_SECONDS * rate)),
+            int(round(FADE_IN_SECONDS * rate)),
+        )
         for i, key in enumerate(group):
             start = int(round(i * step * rate))
             note = audio[start : start + size].copy()
@@ -177,13 +207,15 @@ def render_keybed(
                 )
             k = min(fade, len(note))
             note[len(note) - k :] *= np.linspace(1.0, 0.0, k, dtype=np.float32)
+            k = min(fade_in, len(note))
+            note[:k] *= np.linspace(0.0, 1.0, k, dtype=np.float32)
             notes[key] = (note, rate)
     if peak is not None:
         loudest = max(float(np.abs(a).max()) for a, _ in notes.values())
         if loudest > 0:
             gain = peak / loudest
             notes = {k: (a * gain, r) for k, (a, r) in notes.items()}
-    return notes, {"seed": seed, "chunks": sent}
+    return notes, {"seed": seed, "fold": fold, "chunks": sent}
 
 
 def keybed_instrument(

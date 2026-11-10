@@ -213,3 +213,10 @@ AFFORDANCES: dict[str, Affordance] = {
     ),
     "looping": Affordance("looping", bool, "Generate loopable audio"),
 }
+
+#: What a platform's ``commercial_use`` config field may say, about using its
+#: output commercially: the weights' licence allows it (``"yes"``), forbids it
+#: (``"no"``), allows it under conditions such as a revenue cap or use
+#: restrictions (``"conditional"``), or the weights are not public and the
+#: hosted service's own terms decide (``"provider terms"``).
+COMMERCIAL_USE_VALUES = ("yes", "no", "conditional", "provider terms")

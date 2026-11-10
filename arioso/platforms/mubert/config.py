@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://mubert.com",
     "tier": "prompt_and_duration",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "bearer_token",
         "env_var": "MUBERT_PAT",

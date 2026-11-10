@@ -36,7 +36,11 @@ dependencies = [
     "pyyaml>=6.0",
     "dol>=0.0.1",
     "config2py>=0.0.1",
+    "cw>=0.1,<0.2",
 ]
+
+[project.scripts]
+arioso = "arioso.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/thorwhalen/arioso"

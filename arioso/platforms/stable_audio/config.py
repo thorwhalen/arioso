@@ -6,6 +6,9 @@ PLATFORM_CONFIG = {
     "website": "https://huggingface.co/stabilityai/stable-audio-open-1.0",
     "tier": "low_level",
     "access_type": "python_lib",
+    "weights_license": "Stability AI Community License",
+    # Free for commercial use below US$1M annual revenue; an enterprise licence above.
+    "commercial_use": "conditional",
     "auth": {"type": "none"},
     "dependencies": [],
     "optional_dependencies": ["diffusers", "torch", "transformers"],
@@ -17,7 +20,7 @@ PLATFORM_CONFIG = {
             "native_name": "num_inference_steps",
             "native_default": 200,
         },
-        "guidance": {"native_name": "cfg_scale", "native_default": 7.0},
+        "guidance": {"native_name": "guidance_scale", "native_default": 7.0},
         "seed": {
             "native_name": "generator",
             "adapter_handled": True,
@@ -32,6 +35,11 @@ PLATFORM_CONFIG = {
             "adapter_handled": True,
         },
         "audio_input_strength": {"native_name": "strength"},
+        "model": {
+            "native_name": "pretrained_model_name_or_path",
+            "native_default": "stabilityai/stable-audio-open-1.0",
+            "adapter_handled": True,
+        },
     },
     "supported_affordances": [
         "prompt",
@@ -44,6 +52,7 @@ PLATFORM_CONFIG = {
         "sampler",
         "audio_input",
         "audio_input_strength",
+        "model",
     ],
     "on_unsupported_param": "warn",
     "output": {

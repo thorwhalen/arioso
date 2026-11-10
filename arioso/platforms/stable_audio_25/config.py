@@ -11,6 +11,8 @@ PLATFORM_CONFIG = {
     "website": "https://fal.ai/models/fal-ai/stable-audio-25/audio-to-audio",
     "tier": "low_level",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {"type": "api_key", "env_var": "FAL_KEY"},
     "dependencies": [],
     "optional_dependencies": ["fal_client", "requests"],

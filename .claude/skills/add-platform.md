@@ -82,6 +82,11 @@ PLATFORM_CONFIG = {
     "website": "https://...",
     "tier": "simple|structured|low_level",
     "access_type": "rest_api|python_lib|unofficial_wrapper",
+    # Required (tests/test_platform_licence.py): the weights' licence as its model card
+    # states it ("proprietary" for hosted-only models), and one of
+    # arioso.base.COMMERCIAL_USE_VALUES: "yes" | "no" | "conditional" | "provider terms".
+    "weights_license": "<SPDX id or licence name>",
+    "commercial_use": "yes|no|conditional|provider terms",
     "auth": {
         "type": "api_key|bearer_token|none",
         "env_var": "<ENV_VAR_NAME>",

@@ -48,7 +48,9 @@ def _mono_float(audio) -> np.ndarray:
     if a.ndim == 2:  # either orientation: average the shorter axis (the channels)
         a = a.mean(axis=0 if a.shape[0] < a.shape[1] else 1)
     if a.ndim != 1 or not len(a):
-        raise ValueError(f"a sample should be a non-empty mono or stereo array, got {a.shape}")
+        raise ValueError(
+            f"a sample should be a non-empty mono or stereo array, got {a.shape}"
+        )
     return a
 
 
@@ -106,7 +108,9 @@ def write_sf2(
                 1,  # mono
             )
         )
-    headers.append(struct.pack("<20sIIIIIBbHH", _name("EOS"), 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    headers.append(
+        struct.pack("<20sIIIIIBbHH", _name("EOS"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    )
 
     release_tc = round(1200 * math.log2(max(release, 0.001)))
     igen, ibag = bytearray(), bytearray()
@@ -153,13 +157,18 @@ def write_sf2(
     return path
 
 
-def write_sfz(samples: Mapping[int, tuple], folder, *, name: str = "instrument") -> Path:
+def write_sfz(
+    samples: Mapping[int, tuple], folder, *, name: str = "instrument"
+) -> Path:
     """Write ``samples`` as ``<name>.sfz`` with one WAV per note in ``folder/samples``."""
     import soundfile as sf
 
     folder = Path(folder)
     (folder / "samples").mkdir(parents=True, exist_ok=True)
-    lines = [f"// {name}: one-shot samples, one region per note", "<group> ampeg_release=0.3"]
+    lines = [
+        f"// {name}: one-shot samples, one region per note",
+        "<group> ampeg_release=0.3",
+    ]
     for key, (low, high) in key_ranges(samples).items():
         audio, rate = samples[key]
         wav = f"samples/{key:03d}.wav"
@@ -182,12 +191,14 @@ def write_instrument(
 ) -> dict:
     """Write ``samples`` in each of ``formats`` under ``folder``; returns ``{format: path}``."""
     folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=True)
     writers = {
-        "sf2": lambda: write_sf2(samples, folder / f"{name}.sf2", name=name, **sf2_options),
+        "sf2": lambda: write_sf2(
+            samples, folder / f"{name}.sf2", name=name, **sf2_options
+        ),
         "sfz": lambda: write_sfz(samples, folder, name=name),
     }
     unknown = set(formats) - set(writers)
     if unknown:
         raise ValueError(f"unknown formats {sorted(unknown)}; one of {sorted(writers)}")
+    folder.mkdir(parents=True, exist_ok=True)
     return {f: writers[f]() for f in formats}

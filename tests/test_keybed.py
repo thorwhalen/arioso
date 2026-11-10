@@ -387,6 +387,25 @@ def test_an_anti_phase_keybed_is_not_folded_to_silence():
     assert all(np.abs(a).max() > 0.4 for a, _ in notes.values())
 
 
+def test_the_keybed_folds_every_chunk_alike_and_says_when_one_suffers():
+    def mixed(prompt, *, duration, seed):  # the last chunk alone is anti-phase
+        return _stereo(prompt, duration=duration, seed=seed, anti="C5" in prompt)
+
+    with pytest.warns(UserWarning, match="anti-phase"):
+        notes, info = render_keybed(
+            "Pad", [48, 55, 60, 72], generate=mixed, seed=1, chunk=1, peak=None
+        )
+    assert info["fold"] == "mid"  # three chunks in phase outweigh one
+    assert np.abs(notes[72][0]).max() < 1e-6  # folded like the rest, not on its own
+
+
+def test_a_pasted_prompt_is_not_doubled_and_far_keys_are_refused():
+    pasted = "Keybed, Timbre Profile, Pad, Warm, Pad, Dry, Target Note, C4"
+    assert keybed_prompt(pasted, [60]) == keybed_prompt("Pad, Warm", [60])
+    with pytest.raises(ValueError, match="C0..C8"):
+        keybed_prompt("Pad", [120])
+
+
 def test_the_default_generator_keeps_the_models_level(monkeypatch):
     import arioso
 

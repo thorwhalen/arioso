@@ -26,12 +26,17 @@ from __future__ import annotations
 
 import json
 import math
+import warnings
 from pathlib import Path
 from typing import Callable, Iterable, Optional
+
+import re
 
 import numpy as np
 
 from arioso.analysis import NOTES
+
+_NOTE_TAG = re.compile(r"^[A-G](#|b)?-?\d+$")
 
 #: Seconds per note and between notes in a sequence render, as the model was trained.
 NOTE_SECONDS, GAP_SECONDS = 3.0, 0.25
@@ -61,6 +66,37 @@ def note_name(key: int) -> str:
     return f"{NOTES[key % 12]}{key // 12 - 1}"
 
 
+def _check_keys(keys) -> None:
+    low, high = KEY_RANGE
+    wrong = [k for k in keys if not low <= k <= high]
+    if wrong:
+        raise ValueError(
+            f"keybed: the model knows {note_name(low)}..{note_name(high)} "
+            f"(MIDI {low}..{high}), got {wrong}"
+        )
+
+
+#: The model's control tags, which the descriptor must not repeat (a pasted prompt).
+_CONTROL_TAGS = {
+    "keybed",
+    "sequence",
+    "timbre profile",
+    "chromatic chunk",
+    "note sequence",
+    "target note",
+}
+
+
+def _descriptor_tags(descriptor: str) -> list:
+    """The descriptor's own tags: control tags and note names dropped, duplicates once."""
+    tags = []
+    for t in (t.strip() for t in descriptor.split(",")):
+        if t and t.lower() not in _CONTROL_TAGS and not _NOTE_TAG.match(t):
+            if t.lower() not in (x.lower() for x in tags):
+                tags.append(t)
+    return tags
+
+
 def keybed_prompt(descriptor: str, keys: Iterable[int], *, wet: bool = False) -> str:
     """The prompt for ``keys``: the model's control grammar around ``descriptor``.
 
@@ -69,7 +105,8 @@ def keybed_prompt(descriptor: str, keys: Iterable[int], *, wet: bool = False) ->
     a wet keybed can have.
     """
     keys = [int(k) for k in keys]
-    tags = [t.strip() for t in descriptor.split(",") if t.strip()]
+    _check_keys(keys)
+    tags = _descriptor_tags(descriptor)
     said = [t for t in tags if t.lower() in ("wet", "dry")]
     if len({t.lower() for t in said}) > 1:
         raise ValueError(f"keybed: {descriptor!r} says both Wet and Dry")
@@ -102,12 +139,7 @@ def chunks(keys, size: int = CHUNK_NOTES) -> list:
     keys = sorted(set(int(k) for k in keys))
     if not keys:
         raise ValueError("no keys to render")
-    low, high = KEY_RANGE
-    if not all(low <= k <= high for k in keys):
-        raise ValueError(
-            f"keybed: the model knows {note_name(low)}..{note_name(high)} "
-            f"(MIDI {low}..{high}), got {[k for k in keys if not low <= k <= high]}"
-        )
+    _check_keys(keys)
     n = math.ceil(len(keys) / size)
     q, r = divmod(len(keys), n)
     out, i = [], 0
@@ -191,6 +223,11 @@ def render_keybed(
     notes = {}
     for group, channels, rate in renders:
         audio = mono(channels, fold=fold)
+        if len(channels) > 1 and choose_fold([channels]) != fold:
+            warnings.warn(
+                f"keybed: the chunk {[note_name(k) for k in group]} is largely anti-phase; "
+                f"folded to {fold!r} like the rest of the keybed, it comes out quieter"
+            )
         size = int(round(note_seconds * rate))
         fade, fade_in = (
             int(round(FADE_SECONDS * rate)),

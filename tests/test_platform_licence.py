@@ -19,6 +19,7 @@ def test_every_platform_declares_its_licence(name):
     [
         ("musicgen", "CC-BY-NC-4.0", "no"),
         ("stable_audio", "Stability AI Community License", "conditional"),
+        ("foundation_1", "Stability AI Community License", "conditional"),
         ("harmonai", "MIT", "yes"),
         ("sunoapi", "proprietary", "provider terms"),
     ],

@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-Arioso wraps 16 AI music generation platforms behind a unified Python interface.
+Arioso wraps 19 AI music generation platforms behind a unified Python interface.
 Users generate music via `arioso.generate(prompt, platform="...", **kwargs)`.
 
 ## Architecture

@@ -133,7 +133,7 @@ def test_each_contender_in_its_own_process_measures_peak_memory(
     )
 
     def runner(*args, **kwargs):
-        return ac.in_child_process(*args, preload=[FAKE], **kwargs)
+        return ac.in_child_process(*args, preload=[f"{FAKE}:register"], **kwargs)
 
     records = _run("fake_clicks", tmp_path, runner=runner)
 

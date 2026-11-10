@@ -73,4 +73,6 @@ def test_platform_configs_have_required_keys():
         assert "name" in config, f"{name} missing 'name'"
         assert "access_type" in config, f"{name} missing 'access_type'"
         assert "param_map" in config, f"{name} missing 'param_map'"
-        assert "supported_affordances" in config, f"{name} missing 'supported_affordances'"
+        assert "supported_affordances" in config, (
+            f"{name} missing 'supported_affordances'"
+        )

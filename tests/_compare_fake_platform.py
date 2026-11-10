@@ -1,4 +1,8 @@
-"""Fake platforms for the compare tests; importing this module registers them (no model, no network).
+"""Fake platforms for the compare tests (no model, no network); ``register()`` adds them.
+
+Nothing is registered on import: test collection may import this module, and platforms left
+in the registry would leak into other tests. A child process gets them with
+``preload=["tests._compare_fake_platform:register"]``.
 
 - ``fake_clicks``: a local platform rendering a click track at the BPM written in the prompt
   ("... 120 BPM ...") over an A tone, so tempo checks have something true to find.
@@ -96,6 +100,3 @@ def unregister():
 
     for name in PLATFORMS:
         _registry.pop(name, None)
-
-
-register()  # on import: a child process preloads this module to get them

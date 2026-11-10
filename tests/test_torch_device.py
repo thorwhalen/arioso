@@ -10,7 +10,9 @@ from arioso._util import torch_device, torch_dtype
 
 def _fake_torch(monkeypatch, *, cuda, mps):
     """A fake torch; ``mps=None`` is a build without the MPS backend."""
-    mps_backend = {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
+    mps_backend = (
+        {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
+    )
     torch = types.SimpleNamespace(
         cuda=types.SimpleNamespace(is_available=lambda: cuda),
         backends=types.SimpleNamespace(**mps_backend),
@@ -39,7 +41,8 @@ def test_device_order(monkeypatch, env, cuda, mps, expected):
 
 
 @pytest.mark.parametrize(
-    "device, dtype", [("cuda", "f16"), ("cuda:1", "f16"), ("mps", "f32"), ("cpu", "f32")]
+    "device, dtype",
+    [("cuda", "f16"), ("cuda:1", "f16"), ("mps", "f32"), ("cpu", "f32")],
 )
 def test_half_precision_only_on_cuda(monkeypatch, device, dtype):
     _fake_torch(monkeypatch, cuda=False, mps=False)

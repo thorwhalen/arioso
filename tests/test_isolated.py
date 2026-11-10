@@ -8,7 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from arioso._isolated import Runtime, RuntimeNotInstalled, Worker, WorkerError, read_wav, song_from_wav
+from arioso._isolated import (
+    Runtime,
+    RuntimeNotInstalled,
+    Worker,
+    WorkerError,
+    read_wav,
+    song_from_wav,
+)
 
 #: The repo root, passed explicitly so the worker can import the tests package's driver.
 REPO = str(Path(__file__).resolve().parent.parent)
@@ -19,7 +26,9 @@ def _echo_worker(**kw):
 
 
 def _runtime(**kw):
-    return Runtime(name="toy", env_var="ARIOSO_TOY_DIR", setup="install into {root}", **kw)
+    return Runtime(
+        name="toy", env_var="ARIOSO_TOY_DIR", setup="install into {root}", **kw
+    )
 
 
 def test_runtime_root_prefers_its_own_variable(monkeypatch, tmp_path):
@@ -34,7 +43,9 @@ def test_missing_runtime_raises_with_the_setup_commands(monkeypatch, tmp_path):
     monkeypatch.setenv("ARIOSO_TOY_DIR", str(tmp_path))
     rt = _runtime()
     assert not rt.installed()
-    with pytest.raises(RuntimeNotInstalled, match=re.escape(f"install into {tmp_path}")) as err:
+    with pytest.raises(
+        RuntimeNotInstalled, match=re.escape(f"install into {tmp_path}")
+    ) as err:
         rt.interpreter()
     assert "ARIOSO_TOY_DIR" in str(err.value)
 
@@ -92,13 +103,20 @@ class _FakeProc:
         return 0
 
 
-@pytest.mark.parametrize("reply, error", [(KeyboardInterrupt(), KeyboardInterrupt), ("garbage\n", WorkerError)])
+@pytest.mark.parametrize(
+    "reply, error",
+    [(KeyboardInterrupt(), KeyboardInterrupt), ("garbage\n", WorkerError)],
+)
 def test_an_interrupted_or_garbled_exchange_kills_the_worker(reply, error):
     procs = []
-    w = Worker("python", "m", spawn=lambda *a, **k: procs.append(_FakeProc(reply)) or procs[-1])
+    w = Worker(
+        "python", "m", spawn=lambda *a, **k: procs.append(_FakeProc(reply)) or procs[-1]
+    )
     with pytest.raises(error):
         w.call({"x": 1})
-    assert procs[0].killed and not w.alive, "a stale reply must never be read by the next call"
+    assert procs[0].killed and not w.alive, (
+        "a stale reply must never be read by the next call"
+    )
 
 
 def test_worker_reports_a_driver_that_dies():
@@ -127,13 +145,22 @@ def test_song_from_wav_holds_bytes_rate_and_duration(tmp_path):
     assert song.audio.duration_seconds == pytest.approx(0.1)
     if song.audio_array is not None:  # soundfile installed
         assert len(song.audio_array) == 800
-    assert not path.parent.exists(), "the Song holds the audio, so the temp file and its folder go"
+    assert not path.parent.exists(), (
+        "the Song holds the audio, so the temp file and its folder go"
+    )
 
 
 def test_read_wav_gives_the_rate_without_soundfile(tmp_path, monkeypatch):
     import builtins
 
     real_import = builtins.__import__
-    monkeypatch.setattr(builtins, "__import__",
-                        lambda name, *a, **k: (_ for _ in ()).throw(ImportError()) if name == "soundfile" else real_import(name, *a, **k))
+    monkeypatch.setattr(
+        builtins,
+        "__import__",
+        lambda name, *a, **k: (
+            (_ for _ in ()).throw(ImportError())
+            if name == "soundfile"
+            else real_import(name, *a, **k)
+        ),
+    )
     assert read_wav(_write_wav(tmp_path / "y.wav")) == (None, 8000)

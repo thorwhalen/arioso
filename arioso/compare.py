@@ -349,8 +349,9 @@ def in_child_process(
 
     A fresh process per contender frees the previous model's memory before the next loads,
     and makes the process's lifetime peak memory that contender's own. ``python`` is the
-    interpreter (default: this one); ``preload`` names modules the child imports first
-    (third-party platforms that register themselves on import).
+    interpreter (default: this one); ``preload`` names what the child runs first, to make
+    third-party platforms known: ``"module"`` is imported, ``"module:function"`` is imported
+    and ``function()`` called.
     """
     job = {
         "contender": {
@@ -393,8 +394,11 @@ def _child_main(job_path: str, out_path: str) -> None:
     import importlib
 
     job = json.loads(Path(job_path).read_text())
-    for module in job.get("preload", ()):
-        importlib.import_module(module)
+    for spec in job.get("preload", ()):
+        module, _, function = spec.partition(":")
+        loaded = importlib.import_module(module)
+        if function:
+            getattr(loaded, function)()
     c = job["contender"]
     records = in_this_process(
         Contender(c["platform"], c["options"], label=c["label"]),

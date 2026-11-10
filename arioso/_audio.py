@@ -267,16 +267,6 @@ def to_audio_ref(value: Any) -> AudioRef:
 # Egress: writing a generated Song to a file
 
 
-def _as_numpy(array):
-    """*array* as a NumPy array; a torch tensor (any device or dtype) is moved to
-    CPU float32 first, since NumPy has no half, bfloat16 or GPU memory."""
-    import numpy as np
-
-    if hasattr(array, "detach"):
-        array = array.detach().cpu().float().numpy()
-    return np.asarray(array)
-
-
 def _write_pcm16_wav(frames, sample_rate: int, path: str) -> None:
     """Write float ``(frames, channels)`` audio as 16-bit PCM with the stdlib."""
     import wave
@@ -296,10 +286,11 @@ def write_wav(array, sample_rate: int, path) -> str:
 
     Uses ``soundfile`` when it is installed, else the stdlib ``wave`` module
     (16-bit PCM). ``array`` may be ``(frames,)``, ``(channels, frames)``,
-    ``(frames, channels)`` or carry leading batch axes of size 1, as a NumPy
-    array or a torch tensor.
+    ``(frames, channels)`` or carry leading batch axes of size 1.
     """
-    audio = _as_numpy(array)
+    import numpy as np
+
+    audio = np.asarray(array)
     while audio.ndim > 2 and audio.shape[0] == 1:
         audio = audio[0]
     frames = _channels_first(audio).T  # writers want (frames, channels)
@@ -316,9 +307,10 @@ def write_wav(array, sample_rate: int, path) -> str:
 def save_song(song, path) -> Path:
     """Write *song*'s audio to *path* and return the path written.
 
-    A waveform is written as WAV. Encoded bytes are written as they are; when
-    their format (e.g. ``mp3``) differs from the path's suffix, the suffix is
-    replaced by the format, so the file's name never lies about its contents.
+    A waveform is written as WAV. Encoded bytes are written as they are, in
+    their format (e.g. ``mp3``). Either way, a path whose suffix differs from
+    the format gets the format's suffix, so the file's name never lies about
+    its contents.
     A song that only has a URL is downloaded first (:func:`arioso.fetch_audio`).
 
     Raises:
@@ -333,7 +325,9 @@ def save_song(song, path) -> Path:
     if audio.audio_array is not None:
         if not audio.sample_rate:
             raise ValueError("The song's waveform has no sample rate.")
-        return Path(write_wav(audio.audio_array, audio.sample_rate, path))
+        return Path(
+            write_wav(audio.audio_array, audio.sample_rate, path.with_suffix(".wav"))
+        )
     if audio.audio_bytes is None and audio.audio_url:
         from arioso import fetch_audio
 

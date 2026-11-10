@@ -63,17 +63,36 @@ def test_generate_writes_a_wav_and_prints_its_path(fake_platform, tmp_path, caps
         assert w.getnframes() == SAMPLE_RATE // 2
 
 
-def test_generate_passes_no_model_or_seed_unless_given(fake_platform, tmp_path):
+def test_generate_passes_only_the_options_given(fake_platform, tmp_path):
+    # platforms without a duration knob (or, like sunoapi, refusing one) get none
     main(["generate", "x", "-p", "fake", "-o", str(tmp_path / "a.wav")])
-    assert fake_platform.calls == [("x", {"duration": 10.0})]
+    assert fake_platform.calls == [("x", {})]
 
 
 def test_unknown_platform_is_one_line_and_exit_1(capsys):
     code = main(["generate", "x", "--platform", "no_such_platform"])
     err = capsys.readouterr().err
     assert code == 1
-    assert "Unknown platform: 'no_such_platform'" in err
+    assert "Unknown platform 'no_such_platform'" in err
     assert "Traceback" not in err
+
+
+def test_a_missing_optional_dependency_is_one_line(fake_platform, monkeypatch, capsys):
+    def needs_torch(prompt, **kwargs):
+        import torch_that_is_not_installed  # noqa: F401
+
+    monkeypatch.setattr(fake_platform, "generate", needs_torch)
+    assert main(["generate", "x", "-p", "fake"]) == 1
+    assert "torch_that_is_not_installed" in capsys.readouterr().err
+
+
+def test_an_internal_bug_keeps_its_traceback(fake_platform, monkeypatch):
+    def buggy(prompt, **kwargs):
+        return {}["sample_rate"]
+
+    monkeypatch.setattr(fake_platform, "generate", buggy)
+    with pytest.raises(KeyError, match="sample_rate"):
+        main(["generate", "x", "-p", "fake"])
 
 
 def test_platforms_lists_name_access_licence_and_commercial_use(capsys):
@@ -128,6 +147,16 @@ def test_write_wav_falls_back_to_the_stdlib(tmp_path, monkeypatch):
         assert (w.getnchannels(), w.getsampwidth(), w.getnframes()) == (1, 2, SAMPLE_RATE)
         frames = np.frombuffer(w.readframes(SAMPLE_RATE), dtype="<i2")
     assert frames[0] == -32767 and frames[-1] == 32767
+
+
+def test_save_song_names_a_waveform_wav(tmp_path):
+    song = Song(audio=AudioResult(audio_array=_stereo_wave(), sample_rate=SAMPLE_RATE))
+
+    path = save_song(song, tmp_path / "out.mp3")
+
+    assert path == tmp_path / "out.wav"
+    with wave.open(str(path)) as w:
+        assert w.getnchannels() == 2
 
 
 def test_save_song_keeps_encoded_bytes_and_their_format(tmp_path):

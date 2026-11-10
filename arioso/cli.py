@@ -11,7 +11,7 @@ def generate(
     prompt: str,
     *,
     platform: str = "musicgen",
-    duration: float = 10.0,
+    duration: float = None,
     output: str = "out.wav",
     model: str = None,
     seed: int = None,
@@ -21,10 +21,10 @@ def generate(
     Args:
         prompt: Text description of the music.
         platform: The platform to generate with (see ``arioso platforms``).
-        duration: Length in seconds.
-        output: Where to write the audio. A waveform is written as WAV; encoded
-            audio from a hosted platform keeps its own format, and the suffix
-            follows it.
+        duration: Length in seconds (default: the platform's own).
+        output: Where to write the audio. A waveform is written as WAV and
+            encoded audio from a hosted platform keeps its own format; either
+            way the suffix follows the format.
         model: The platform's model or checkpoint, when it offers a choice.
         seed: Random seed, on platforms that take one.
 
@@ -34,11 +34,12 @@ def generate(
     import arioso
     from arioso._audio import save_song
 
-    kwargs = {"duration": duration}
-    if model is not None:
-        kwargs["model"] = model
-    if seed is not None:
-        kwargs["seed"] = seed
+    if platform not in arioso.list_platforms():
+        raise ValueError(
+            f"Unknown platform {platform!r}. See `arioso platforms` for the list."
+        )
+    given = {"duration": duration, "model": model, "seed": seed}
+    kwargs = {k: v for k, v in given.items() if v is not None}
     song = arioso.generate(prompt, platform=platform, **kwargs)
     return str(save_song(song, output))
 

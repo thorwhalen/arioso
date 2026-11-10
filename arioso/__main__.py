@@ -15,9 +15,14 @@ import cw
 
 from arioso.cli import commands
 
-#: Failures a user can fix (an unknown platform, a bad value, a missing optional
-#: dependency): one line on stderr instead of a traceback.
-EXPECTED_ERRORS = (KeyError, ValueError, ImportError)
+
+def _is_expected(error: Exception) -> bool:
+    """Whether *error* is one a user can fix: a bad value (arioso raises ValueError
+    for those) or a missing optional dependency. Anything else is a bug and keeps
+    its traceback."""
+    if isinstance(error, ModuleNotFoundError):
+        return not (error.name or "").startswith("arioso")
+    return isinstance(error, ValueError)
 
 
 def _expected_errors_as_messages(func):
@@ -25,9 +30,10 @@ def _expected_errors_as_messages(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except EXPECTED_ERRORS as error:
-            message = error.args[0] if isinstance(error, KeyError) else error
-            raise cw.CommandError(str(message)) from error
+        except Exception as error:
+            if _is_expected(error):
+                raise cw.CommandError(str(error)) from error
+            raise
 
     return wrapper
 

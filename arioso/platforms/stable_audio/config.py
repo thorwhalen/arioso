@@ -1,5 +1,7 @@
 """Stable Audio Open platform configuration."""
 
+DEFAULT_MODEL = "stabilityai/stable-audio-open-1.0"
+
 PLATFORM_CONFIG = {
     "name": "stable_audio",
     "display_name": "Stable Audio Open (Stability AI)",
@@ -37,7 +39,7 @@ PLATFORM_CONFIG = {
         "audio_input_strength": {"native_name": "strength"},
         "model": {
             "native_name": "pretrained_model_name_or_path",
-            "native_default": "stabilityai/stable-audio-open-1.0",
+            "native_default": DEFAULT_MODEL,
             "adapter_handled": True,
         },
     },

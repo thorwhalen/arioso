@@ -22,6 +22,7 @@ class _FakePipe:
     """Stand-in for diffusers StableAudioPipeline: records call kwargs."""
 
     device = "fake-device"
+    dtype = "fake-dtype"
 
     def __init__(self, capture):
         self._capture = capture
@@ -203,3 +204,48 @@ def test_pipeline_loads_in_float16_only_on_cuda(monkeypatch):
         monkeypatch.setattr(sa_adapter, "torch_device", lambda d=device: d)
         assert sa_adapter.load_pipeline("org/m") == ("on", device)
         assert calls == [("org/m", dtype)]
+
+
+def test_returns_a_host_array_and_records_the_device(monkeypatch):
+    capture = {}
+    adapter = _adapter_with_fake_pipe(monkeypatch, capture)
+
+    song = adapter.generate("warm band", seed=1)
+
+    assert capture["output_type"] == "np"
+    assert song.metadata["device"] == "fake-device"
+
+
+def test_init_audio_moves_to_the_pipeline_device_and_dtype(monkeypatch):
+    capture = {}
+    adapter = _adapter_with_fake_pipe(monkeypatch, capture)
+    ref = _stub_ingress(monkeypatch)
+
+    adapter.generate("warm band", audio_input="in.wav")
+
+    batched = ref.as_waveform.return_value.unsqueeze.return_value
+    batched.to.assert_called_once_with(device="fake-device", dtype="fake-dtype")
+    assert capture["initial_audio_waveforms"] is batched.to.return_value
+
+
+def test_songs_are_labelled_with_the_configured_platform(monkeypatch):
+    adapter = Adapter(
+        {**PLATFORM_CONFIG, "name": "stable_audio_x"},
+        load_pipeline=lambda model: _FakePipe({}),
+        make_generator=_fake_generator,
+    )
+    assert adapter.generate("warm band").platform == "stable_audio_x"
+
+
+def test_pipeline_call_matches_the_diffusers_signature(monkeypatch):
+    pytest.importorskip("torch")  # without it diffusers exports placeholder classes
+    diffusers = pytest.importorskip("diffusers")
+    import inspect
+
+    capture = {}
+    adapter = _adapter_with_fake_pipe(monkeypatch, capture)
+    _stub_ingress(monkeypatch)
+    adapter.generate("warm band", audio_input="in.wav")
+
+    accepted = inspect.signature(diffusers.StableAudioPipeline.__call__).parameters
+    assert set(capture) <= set(accepted)

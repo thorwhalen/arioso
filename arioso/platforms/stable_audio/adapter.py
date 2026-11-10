@@ -15,8 +15,8 @@ from typing import Any
 from arioso.base import AudioResult, Song
 from arioso._audio import to_audio_ref
 from arioso._util import torch_device, torch_dtype
+from arioso.platforms.stable_audio.config import DEFAULT_MODEL
 
-DEFAULT_MODEL = "stabilityai/stable-audio-open-1.0"
 #: Seeds are drawn below this bound when none is given, so every take records one.
 SEED_BOUND = 2**31
 
@@ -108,7 +108,8 @@ class Adapter:
         pipe = self._pipeline(model)
         if seed is None:
             seed = secrets.randbelow(SEED_BOUND)
-        generator = self._make_generator(getattr(pipe, "device", "cpu"), seed)
+        device = getattr(pipe, "device", "cpu")
+        generator = self._make_generator(device, seed)
 
         call_kwargs = dict(
             prompt=prompt,
@@ -118,6 +119,7 @@ class Adapter:
             guidance_scale=guidance,
             num_waveforms_per_prompt=batch_size,
             generator=generator,
+            output_type="np",  # a host array, not a tensor left on the GPU
         )
 
         if audio_input is not None:
@@ -131,8 +133,10 @@ class Adapter:
                 )
             ref = to_audio_ref(audio_input)
             waveform = ref.as_waveform()  # (channels, frames)
-            # pipeline wants (batch, channels, frames)
-            call_kwargs["initial_audio_waveforms"] = waveform.unsqueeze(0)
+            # pipeline wants (batch, channels, frames), on its own device and dtype
+            call_kwargs["initial_audio_waveforms"] = waveform.unsqueeze(0).to(
+                device=device, dtype=getattr(pipe, "dtype", None)
+            )
             call_kwargs["initial_audio_sampling_rate"] = ref.sample_rate
 
         output = pipe(**call_kwargs)
@@ -147,11 +151,12 @@ class Adapter:
                 format="wav",
                 duration_seconds=duration,
             ),
-            platform="stable_audio",
+            platform=self.config.get("name", "stable_audio"),
             status="complete",
             metadata={
                 "model": model,
                 "seed": seed,
+                "device": str(device),  # the same seed differs across devices
                 "num_steps": num_steps,
                 "guidance": guidance,
                 "audio_to_audio": audio_input is not None,

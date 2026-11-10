@@ -334,7 +334,7 @@ def test_a_bad_timeout_raises_and_leaves_no_child(fakes, tmp_path, monkeypatch):
         ac._run_child(
             [sys.executable, "-c", "import time; time.sleep(30)"], None, timeout=-1
         )
-    assert len(started) == 1 and started[0].returncode is not None
+    assert started[0].returncode is not None  # the child (on Windows taskkill follows)
 
 
 def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(

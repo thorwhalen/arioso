@@ -10,8 +10,8 @@ so it works on any live process, including the worker processes a local runtime 
 
 - :func:`peak_memory` / :func:`current_memory`: one live process's lifetime peak / current
   memory, in bytes (macOS: physical footprint; Linux: ``VmHWM`` / ``VmRSS``).
-- :func:`descendants`: the live process ids under a process (``libproc`` on macOS, ``/proc``
-  on Linux: no process is started to find them).
+- :func:`descendants`: the live process ids under a process (:func:`ps.util.descendants`:
+  ``libproc`` on macOS, ``/proc`` on Linux; no process is started to find them).
 - :func:`available_memory`: what the machine can still give without swapping, in bytes.
 - :class:`PeakSampler`: the peak memory of the processes a block of code starts, including
   short-lived ones.
@@ -28,6 +28,8 @@ import os
 import re
 import subprocess
 import sys
+
+from ps.util import descendants  # noqa: F401 - part of this module's interface
 import threading
 from functools import lru_cache
 from typing import Optional
@@ -115,55 +117,6 @@ def current_memory(pid: Optional[int] = None) -> Optional[int]:
     if sys.platform.startswith("linux"):
         return _linux_status_kb(pid, "VmRSS")
     return None
-
-
-def _darwin_children(pid: int) -> list[int]:
-    lib = _libproc()
-    if lib is None:
-        return []
-    buf = (ctypes.c_int * 4096)()
-    n = lib.proc_listchildpids(int(pid), buf, ctypes.sizeof(buf))
-    return [p for p in buf[: max(n, 0)] if p > 0]
-
-
-def _linux_children_map() -> dict[int, list[int]]:
-    """Parent pid -> child pids, from one scan of ``/proc``."""
-    tree: dict[int, list[int]] = {}
-    for entry in os.listdir("/proc"):
-        if not entry.isdigit():
-            continue
-        try:
-            with open(f"/proc/{entry}/stat") as f:
-                stat = f.read()
-        except OSError:
-            continue  # exited while we looked
-        # the command name may hold spaces and parentheses: ppid follows the last ')'
-        fields = stat[stat.rfind(")") + 2 :].split()
-        if len(fields) > 1:
-            tree.setdefault(int(fields[1]), []).append(int(entry))
-    return tree
-
-
-def descendants(pid: Optional[int] = None) -> list[int]:
-    """The live process ids below ``pid`` (default: this process), children first.
-
-    Starts no process: ``proc_listchildpids`` on macOS, one scan of ``/proc`` on Linux; an
-    empty list elsewhere.
-    """
-    pid = os.getpid() if pid is None else pid
-    if sys.platform == "darwin":
-        children = _darwin_children
-    elif sys.platform.startswith("linux"):
-        tree = _linux_children_map()
-        children = lambda p: tree.get(p, [])  # noqa: E731
-    else:
-        return []
-    found, frontier = [], [pid]
-    while frontier:
-        kids = children(frontier.pop(0))
-        found += kids
-        frontier += kids
-    return found
 
 
 def available_memory() -> Optional[int]:

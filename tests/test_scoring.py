@@ -24,10 +24,19 @@ def test_phrase_starts_finds_the_rises():
 
 
 def test_plan_starts_snaps_to_phrases_within_bounds():
-    starts = plan_starts([6.0, 6.0, 6.0], [5.0, 14.0, 40.0], intro_s=4.0, min_gap_s=2.0, max_gap_s=6.0,
-                         gap_s=3.0, lead_s=0.5)
+    starts = plan_starts(
+        [6.0, 6.0, 6.0],
+        [5.0, 14.0, 40.0],
+        intro_s=4.0,
+        min_gap_s=2.0,
+        max_gap_s=6.0,
+        gap_s=3.0,
+        lead_s=0.5,
+    )
     assert starts[0] == 5.5 and starts[1] == 14.5  # both on phrases
-    assert starts[2] == pytest.approx(14.5 + 6.0 + 3.0)  # no phrase in reach: the default pause
+    assert starts[2] == pytest.approx(
+        14.5 + 6.0 + 3.0
+    )  # no phrase in reach: the default pause
 
 
 def test_duck_gain_levels_and_ramps():
@@ -43,13 +52,29 @@ def test_score_places_segments_and_sets_levels():
     music = _phrased_music([3.0, 9.0, 16.0, 24.0], total_s=60.0)
     t = np.arange(int(3.0 * SR)) / SR
     voice = (0.2 * np.sin(2 * np.pi * 300 * t)).astype(np.float32)
-    out = score([voice, voice], music, SR, gap_rel_db=-10.0, under_rel_db=-30.0,
-                plan_kwargs={"intro_s": 2.0, "min_gap_s": 2.0, "max_gap_s": 10.0, "lead_s": 0.5})
-    assert out.starts[0] == pytest.approx(3.5, abs=0.3) and out.starts[1] > out.starts[0] + 3.0 + 2.0
+    out = score(
+        [voice, voice],
+        music,
+        SR,
+        gap_rel_db=-10.0,
+        under_rel_db=-30.0,
+        plan_kwargs={
+            "intro_s": 2.0,
+            "min_gap_s": 2.0,
+            "max_gap_s": 10.0,
+            "lead_s": 0.5,
+        },
+    )
+    assert (
+        out.starts[0] == pytest.approx(3.5, abs=0.3)
+        and out.starts[1] > out.starts[0] + 3.0 + 2.0
+    )
     assert out.seconds == pytest.approx(out.starts[1] + 3.0 + 6.0, abs=0.05)
     i = int((out.starts[0] + 1.5) * SR)
-    seg = out.mix[i: i + SR // 2]
-    assert np.sqrt(np.mean(seg ** 2)) == pytest.approx(0.2 / np.sqrt(2), rel=0.1)  # the voice dominates
+    seg = out.mix[i : i + SR // 2]
+    assert np.sqrt(np.mean(seg**2)) == pytest.approx(
+        0.2 / np.sqrt(2), rel=0.1
+    )  # the voice dominates
 
 
 def test_write_audio_constant_bitrate(tmp_path):
@@ -62,6 +87,18 @@ def test_write_audio_constant_bitrate(tmp_path):
 
     y = (0.1 * np.sin(2 * np.pi * 220 * np.arange(SR * 3) / SR)).astype(np.float32)
     path = write_audio(tmp_path / "c.mp3", y, SR, bitrate="64k")
-    rate = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=bit_rate", "-of", "csv=p=0", path],
-                          capture_output=True, text=True).stdout.strip()
+    rate = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "stream=bit_rate",
+            "-of",
+            "csv=p=0",
+            path,
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     assert rate == "64000"

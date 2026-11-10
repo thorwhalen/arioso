@@ -48,7 +48,9 @@ def _sample(name, config):
 
 @pytest.mark.parametrize("platform", PLATFORMS)
 def test_supported_affordances_are_explicit_adapter_parameters(platform):
-    adapter_cls = importlib.import_module(f"arioso.platforms.{platform}.adapter").Adapter
+    adapter_cls = importlib.import_module(
+        f"arioso.platforms.{platform}.adapter"
+    ).Adapter
     if issubclass(adapter_cls, FalAdapter):  # its config declares what it reads
         params = set(adapter_cls().accepted_params())
     else:
@@ -71,9 +73,7 @@ def test_services_generate_passes_unified_names_unchanged(platform):
 
     generate = _make_validated_generate(recorder, config, platform)
     sent = {
-        a: _sample(a, config)
-        for a in config["supported_affordances"]
-        if a != "prompt"
+        a: _sample(a, config) for a in config["supported_affordances"] if a != "prompt"
     }
     assert generate("a prompt", **sent) == "song"
     assert seen == {"prompt": "a prompt", **sent}

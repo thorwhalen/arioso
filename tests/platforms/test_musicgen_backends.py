@@ -354,7 +354,9 @@ def _fake_audiocraft(monkeypatch) -> list:
 
 def _without_audiocraft(monkeypatch):
     monkeypatch.setitem(sys.modules, "audiocraft", None)  # import raises ImportError
-    monkeypatch.setitem(sys.modules, "audiocraft.models", None)  # even if already imported
+    monkeypatch.setitem(
+        sys.modules, "audiocraft.models", None
+    )  # even if already imported
 
 
 def test_adapter_falls_back_to_transformers_and_loads_once_per_variant(monkeypatch):
@@ -426,7 +428,9 @@ def test_adapter_prefers_audiocraft(monkeypatch):
 
 def _torch_with(monkeypatch, *, cuda, mps):
     """A fake torch; ``mps=None`` is a build without the MPS backend."""
-    mps_backend = {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
+    mps_backend = (
+        {} if mps is None else {"mps": types.SimpleNamespace(is_available=lambda: mps)}
+    )
     torch = types.SimpleNamespace(
         cuda=types.SimpleNamespace(is_available=lambda: cuda),
         backends=types.SimpleNamespace(**mps_backend),

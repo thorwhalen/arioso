@@ -223,24 +223,28 @@ class TestServiceHandle:
         step in make_kwargs_trans will raise on bad types. We test a param
         that has no coercion but is declared as int in AFFORDANCES.
         """
-        _register_fake("fake_plat", extra_config={
-            "param_map": {
-                "prompt": {"native_name": "prompt"},
-                "duration": {"native_name": "duration_sec", "coerce": float},
-                "model": {"native_name": "model_version", "choices": ["v1", "v2", "v3"]},
-                "seed": {"native_name": "seed_val"},
+        _register_fake(
+            "fake_plat",
+            extra_config={
+                "param_map": {
+                    "prompt": {"native_name": "prompt"},
+                    "duration": {"native_name": "duration_sec", "coerce": float},
+                    "model": {
+                        "native_name": "model_version",
+                        "choices": ["v1", "v2", "v3"],
+                    },
+                    "seed": {"native_name": "seed_val"},
+                },
+                "supported_affordances": ["prompt", "duration", "model", "seed"],
             },
-            "supported_affordances": ["prompt", "duration", "model", "seed"],
-        })
+        )
         sh = ServiceHandle("fake_plat")
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             # seed is declared as int in AFFORDANCES but we pass a string;
             # no coercion is defined so it won't crash, but should warn.
             sh.generate("hello", seed="not_an_int")
-            type_warnings = [
-                x for x in w if "expects" in str(x.message)
-            ]
+            type_warnings = [x for x in w if "expects" in str(x.message)]
             assert len(type_warnings) > 0
 
     def test_proxy_to_adapter_methods(self):

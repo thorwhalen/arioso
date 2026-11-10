@@ -64,6 +64,11 @@ seeds = [
     "pretty_midi",
     "denote>=0.0.9",
 ]
+# arioso.compare: objective checks (level, clipping; tempo and key through denote).
+compare = [
+    "numpy",
+    "denote>=0.0.9",
+]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

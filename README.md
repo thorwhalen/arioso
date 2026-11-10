@@ -44,6 +44,20 @@ arioso platforms
 
 Local torch platforms (MusicGen on transformers, Stable Audio Open) run on CUDA, else Apple MPS, else CPU; set `ARIOSO_TORCH_DEVICE` to force one.
 
+### Comparing platforms
+
+`compare` renders the same prompts with several platforms and measures each take:
+
+```
+arioso compare stable_audio_3,magenta_rt,ace_step:runtime=local --prompts prompts.json --duration 10
+```
+
+A contender is a platform with optional `key=value` options (`musicgen:model=facebook/musicgen-small`). Each one runs in a fresh process, one after the other, so only one model is in memory at a time and its peak memory is its own (on macOS the peak physical footprint, which counts Metal allocations; on Linux the peak resident set). Every take becomes one JSON line in `<out_dir>/results.jsonl`: model load plus warm-up time, generation time, real-time factor, peak memory, available memory before the run, the weights licence, and objective checks: level and clipping, and, when `denote` is installed, the detected tempo against the prompt's `bpm` (half and double time forgiven) and the estimated key against its `key`. The command prints a summary per contender and writes `<out_dir>/index.html`, a page of players.
+
+Without `--prompts` it uses three built-in prompts (a groove at 100 BPM, an accompaniment in C major, a loop at 85 BPM). A prompts file is a JSON list of `{"id", "text", "bpm", "key", "melody", "duration"}` (only `text` is required; a `melody` path is passed to platforms that take one). Platforms that call a paid hosted service, or take any credential, are refused unless you pass `--allow-hosted`; `--min-free-gb` skips a contender when the machine is short of memory.
+
+In Python, `arioso.compare.compare(contenders, prompts)` yields the same records, and `runner=` (how a contender is run and measured) and `scorer=` (audio to a dict of checks) are the seams.
+
 ## Enhance existing audio (audio-to-audio)
 
 Beyond text-to-music, arioso can transform audio you already have -- e.g. turn a

@@ -62,5 +62,61 @@ def platforms() -> list[str]:
     ]
 
 
+def compare(
+    contenders: str,
+    *,
+    prompts: str = None,
+    duration: float = 10.0,
+    seed: int = 0,
+    out_dir: str = "arioso_compare",
+    warmup: float = 2.0,
+    allow_hosted: bool = False,
+    min_free_gb: float = None,
+    no_page: bool = False,
+) -> list[str]:
+    """Render the same prompts with several platforms; time, measure and check each take.
+
+    Each contender runs in its own process, one after the other. Takes go to
+    ``<out_dir>/<contender>/``, one JSON line per take to ``<out_dir>/results.jsonl``.
+
+    Args:
+        contenders: Comma-separated platforms, each optionally with options:
+            ``stable_audio_3,magenta_rt,ace_step:runtime=local``.
+        prompts: A JSON file holding a list of prompts (``text``, and optionally ``id``,
+            ``bpm``, ``key``, ``melody``, ``duration``); default: three built-in prompts.
+        duration: Seconds asked of each take.
+        seed: Random seed, on platforms that take one.
+        out_dir: Where takes, records and the page go.
+        warmup: Seconds generated once per contender before the timed takes (0: none).
+        allow_hosted: Allow platforms that call a paid hosted service.
+        min_free_gb: Skip a contender when less memory than this is available.
+        no_page: Do not write ``<out_dir>/index.html`` (a page of players).
+
+    Returns:
+        A summary table, one line per contender, then the paths written.
+    """
+    from pathlib import Path
+
+    from arioso import compare as ac
+
+    prompt_list = ac.load_prompts(prompts)
+    records = list(
+        ac.compare(
+            contenders,
+            prompt_list,
+            duration=duration,
+            seed=seed,
+            out_dir=out_dir,
+            warmup=warmup or None,
+            allow_hosted=allow_hosted,
+            min_free_gb=min_free_gb,
+        )
+    )
+    lines = ac.summary_lines(records) + [str(Path(out_dir) / ac.RESULTS_FILE)]
+    if not no_page:
+        lines.append(str(ac.compare_page(records, Path(out_dir) / "index.html", prompts=prompt_list)))
+    return lines
+
+
 #: The commands of the ``arioso`` command line (the SSOT its parser is built from).
-commands = {"generate": generate, "platforms": platforms}
+commands = {"generate": generate, "platforms": platforms, "compare": compare}

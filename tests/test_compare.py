@@ -85,9 +85,15 @@ def test_checks_find_the_tempo_that_was_rendered(fakes, tmp_path):
 
 
 def test_rtf_divides_by_the_audio_that_came_back(fakes, tmp_path):
-    r = _run("fake_short", tmp_path)[0]
+    r = _run("fake_short", tmp_path, warmup=None)[0]
     assert r["seconds_out"] == 3.5
-    assert r["rtf"] == pytest.approx(r["gen_s"] / 3.5, abs=1e-3)
+    assert r["rtf"] == pytest.approx(r["gen_s"] / 3.5, rel=0.01)
+    assert r["rtf"] != pytest.approx(r["gen_s"] / 4.0, rel=0.05)
+
+
+def test_a_leading_batch_axis_is_not_taken_for_channels(fakes, tmp_path):
+    r = _run("fake_batched", tmp_path)[0]
+    assert r["seconds_out"] == 4.0 and "error" not in r
 
 
 def test_clipping_is_seen_even_above_full_scale(fakes, tmp_path):
@@ -137,6 +143,7 @@ def test_hosted_errs_on_the_side_of_caution(fakes):
     assert ac.is_hosted("stable_audio_25:runtime=local")
     # a config without access_type is a rest_api one to the translation layer
     assert ac.is_hosted("fake_no_access_type")
+    assert ac.is_hosted("fake_provider_terms") and ac.is_hosted("fake_fal")
     assert ac.is_hosted("yue")  # local code, but takes a fal key: counted as hosted
     assert not any(
         ac.is_hosted(p) for p in ("musicgen", "stable_audio_3", "magenta_rt")
@@ -237,6 +244,54 @@ def test_a_hung_child_is_killed_after_the_timeout(fakes, tmp_path, monkeypatch):
 
     records = _run("fake_slow", tmp_path, runner=runner)
     assert all("killed after 3 s" in r["error"] for r in records)
+
+
+def _with_repo_on_path(monkeypatch):
+    monkeypatch.setenv(
+        "PYTHONPATH", os.pathsep.join([str(REPO), os.environ.get("PYTHONPATH", "")])
+    )
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process groups")
+def test_a_timeout_kills_the_child_and_its_workers_and_keeps_finished_takes(
+    fakes, tmp_path, monkeypatch
+):
+    import time
+
+    _with_repo_on_path(monkeypatch)
+    pidfile = tmp_path / "worker.pid"
+    monkeypatch.setenv("ARIOSO_TEST_PIDFILE", str(pidfile))
+    records = _run(
+        "fake_slow_second",
+        tmp_path,
+        runner=None,  # the default: in_child_process
+        preload=[f"{FAKE}:register"],
+        timeout=8,
+    )
+    fast, slow = records
+    assert "error" not in fast and fast["child_exit"] == "killed after 8 s"
+    assert Path(fast["path"]).is_file()
+    assert "killed after 8 s" in slow["error"]
+    worker = int(pidfile.read_text())
+    time.sleep(0.2)
+    with pytest.raises(ProcessLookupError):
+        os.kill(worker, 0)  # the worker the child started is gone too
+
+
+def test_preload_reaches_the_default_child_runner(tmp_path, monkeypatch):
+    import importlib
+
+    _with_repo_on_path(monkeypatch)
+    module = importlib.import_module(FAKE)
+    module.unregister()
+    try:
+        records = _run(
+            "fake_clicks", tmp_path, runner=None, preload=[f"{FAKE}:register"]
+        )
+        assert all("error" not in r for r in records)
+        assert module.CALLS == []  # generated in the child, which had the platform too
+    finally:
+        module.unregister()
 
 
 def test_preload_makes_a_third_party_platform_known_here_too(tmp_path):
@@ -366,3 +421,66 @@ def test_the_sampler_keeps_a_live_child_lifetime_peak():
     finally:
         child.kill()
         child.wait()
+
+
+def _hold(mb, seconds, *, child=False):
+    """Python code holding ``mb`` MB for ``seconds`` (in a child process of its own if asked)."""
+    code = (
+        f"b = bytearray({mb} * 2**20); b[::4096] = b'x' * len(b[::4096]); "
+        f"import time; time.sleep({seconds})"
+    )
+    if child:
+        code = (
+            f"import subprocess, sys; subprocess.run([sys.executable, '-c', {code!r}])"
+        )
+    return [sys.executable, "-c", code]
+
+
+def test_the_sampler_does_not_add_up_peaks_that_never_coincided(monkeypatch):
+    # A peaks at 200 MB and frees it; B takes 200 MB while A is still alive. Never more
+    # than ~200 MB at once, though their lifetime peaks add up to 400.
+    import subprocess
+    import time
+
+    from arioso import _measure
+
+    if _measure.peak_memory() is None:
+        pytest.skip("no memory probe on this platform")
+    monkeypatch.setattr(_measure, "_children_maxrss", lambda: 0)
+    first = [
+        sys.executable,
+        "-c",
+        "b = bytearray(200 * 2**20); b[::4096] = b'x' * len(b[::4096]); del b; "
+        "import time; time.sleep(1.5)",
+    ]
+    with _measure.PeakSampler(interval=0.05) as sampler:
+        a = subprocess.Popen(first)
+        time.sleep(0.5)
+        subprocess.run(_hold(200, 0.6), check=True)
+        a.wait()
+    assert 0.15 * 2**30 <= sampler.peak_descendants < 0.35 * 2**30
+
+
+def test_the_sampler_sees_grandchildren(monkeypatch):
+    import subprocess
+
+    from arioso import _measure
+
+    if _measure.peak_memory() is None:
+        pytest.skip("no memory probe on this platform")
+    monkeypatch.setattr(_measure, "_children_maxrss", lambda: 0)
+    with _measure.PeakSampler(interval=0.05) as sampler:
+        subprocess.run(_hold(200, 0.6, child=True), check=True)
+    assert sampler.peak_descendants >= 0.15 * 2**30
+
+
+def test_a_sampling_error_is_kept_not_raised(monkeypatch):
+    from arioso import _measure
+
+    def broken(pid=None):
+        raise OSError("no /proc today")
+
+    monkeypatch.setattr(_measure, "descendants", broken)
+    with _measure.PeakSampler(interval=0.01) as sampler:
+        pass
+    assert sampler.errors and "no /proc today" in sampler.errors[0]

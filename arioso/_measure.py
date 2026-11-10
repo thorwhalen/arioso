@@ -117,44 +117,52 @@ def current_memory(pid: Optional[int] = None) -> Optional[int]:
     return None
 
 
-def _children(pid: int) -> list[int]:
-    if sys.platform == "darwin":
-        lib = _libproc()
-        if lib is None:
-            return []
-        buf = (ctypes.c_int * 4096)()
-        n = lib.proc_listchildpids(int(pid), buf, ctypes.sizeof(buf))
-        return [p for p in buf[: max(n, 0)] if p > 0]
-    if sys.platform.startswith("linux"):
-        kids = []
-        for entry in os.listdir("/proc"):
-            if not entry.isdigit():
-                continue
-            try:
-                with open(f"/proc/{entry}/stat") as f:
-                    stat = f.read()
-            except OSError:
-                continue  # exited while we looked
-            # the command name may hold spaces and parentheses: ppid follows the last ')'
-            fields = stat[stat.rfind(")") + 2 :].split()
-            if len(fields) > 1 and int(fields[1]) == pid:
-                kids.append(int(entry))
-        return kids
-    return []
+def _darwin_children(pid: int) -> list[int]:
+    lib = _libproc()
+    if lib is None:
+        return []
+    buf = (ctypes.c_int * 4096)()
+    n = lib.proc_listchildpids(int(pid), buf, ctypes.sizeof(buf))
+    return [p for p in buf[: max(n, 0)] if p > 0]
+
+
+def _linux_children_map() -> dict[int, list[int]]:
+    """Parent pid -> child pids, from one scan of ``/proc``."""
+    tree: dict[int, list[int]] = {}
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit():
+            continue
+        try:
+            with open(f"/proc/{entry}/stat") as f:
+                stat = f.read()
+        except OSError:
+            continue  # exited while we looked
+        # the command name may hold spaces and parentheses: ppid follows the last ')'
+        fields = stat[stat.rfind(")") + 2 :].split()
+        if len(fields) > 1:
+            tree.setdefault(int(fields[1]), []).append(int(entry))
+    return tree
 
 
 def descendants(pid: Optional[int] = None) -> list[int]:
     """The live process ids below ``pid`` (default: this process), children first.
 
-    Starts no process: ``proc_listchildpids`` on macOS, ``/proc/*/stat`` on Linux; an empty
-    list elsewhere.
+    Starts no process: ``proc_listchildpids`` on macOS, one scan of ``/proc`` on Linux; an
+    empty list elsewhere.
     """
     pid = os.getpid() if pid is None else pid
+    if sys.platform == "darwin":
+        children = _darwin_children
+    elif sys.platform.startswith("linux"):
+        tree = _linux_children_map()
+        children = lambda p: tree.get(p, [])  # noqa: E731
+    else:
+        return []
     found, frontier = [], [pid]
     while frontier:
-        children = _children(frontier.pop(0))
-        found += children
-        frontier += children
+        kids = children(frontier.pop(0))
+        found += kids
+        frontier += kids
     return found
 
 
@@ -205,13 +213,16 @@ class PeakSampler:
     gone, by the time anyone asks. So a background thread samples the live descendants
     every ``interval`` seconds, keeping two figures, and ``peak_descendants`` is the larger:
 
-    - the largest lifetime peak of any one descendant (exact for that process, provided it
-      was seen alive at least once);
+    - the largest lifetime peak of any one descendant *as of the last tick that saw it
+      alive* (memory it takes after that tick, just before exiting, is missed);
     - the largest sum of the descendants' *current* memory at one tick (their concurrent
       use, as sampled; a spike between two ticks is missed).
 
-    Exited children's resident peaks (``RUSAGE_CHILDREN``, which misses Metal allocations)
-    are a floor under it. A sampling error is kept in ``errors`` and never raised.
+    So it is a lower bound, tight for processes that hold their memory for longer than an
+    interval, as a loaded model does. Exited children's resident peaks
+    (``RUSAGE_CHILDREN``, which misses Metal allocations) are a floor under it; that floor
+    covers every child this process ever waited for, not only those of this block. A
+    sampling error is kept in ``errors`` and never raised.
 
     >>> with PeakSampler(interval=0.05) as sampler:
     ...     _ = bytearray(10 * 2**20)
@@ -219,7 +230,7 @@ class PeakSampler:
     True
     """
 
-    def __init__(self, *, interval: float = 0.5):
+    def __init__(self, *, interval: float = 0.1):
         self.interval = interval
         self.peak_self: Optional[int] = None
         self.peak_descendants: Optional[int] = None

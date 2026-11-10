@@ -257,6 +257,7 @@ def in_this_process(
     seed: Optional[int],
     out_dir: Path,
     warmup: Optional[float],
+    on_record: Optional[Callable[[dict], None]] = None,
 ) -> list[dict]:
     """Run ``contender`` on ``prompts`` here; one record per prompt, audio under ``out_dir``.
 
@@ -264,7 +265,10 @@ def in_this_process(
     that fails its warm-up makes every record an error. ``peak_memory_gb`` is this process's
     lifetime peak, so run each contender in a fresh process (:func:`in_child_process`) to
     attribute it; ``workers_peak_memory_gb`` is the peak of the processes it started (a local
-    runtime's worker, or one process per take), sampled while it ran.
+    runtime's worker, or one process per take), sampled while it ran (see
+    :class:`~arioso._measure.PeakSampler`; here its exit-time floor also covers children of
+    earlier contenders run in this process). ``on_record`` is called with each take's record
+    as soon as it is made, before the memory figures are added at the end.
     """
     from arioso._measure import PeakSampler
 
@@ -284,8 +288,9 @@ def in_this_process(
             except Exception as error:  # noqa: BLE001 - recorded, not raised
                 load_error = f"{type(error).__name__}: {error}"
             load_s = round(time.perf_counter() - t, 2)
-        records = [
-            _take(
+        records = []
+        for p in prompts:
+            rec = _take(
                 contender,
                 p,
                 duration=duration,
@@ -293,8 +298,9 @@ def in_this_process(
                 out_dir=out_dir,
                 load_error=load_error,
             )
-            for p in prompts
-        ]
+            records.append(rec)
+            if on_record is not None:
+                on_record(rec)
     for rec in records:
         rec.update(
             load_s=load_s,
@@ -328,8 +334,12 @@ def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> di
             gen_s=round(time.perf_counter() - t, 2),
         )
     gen_s = time.perf_counter() - t
-    path = _write_take(audio, sr, out_dir / f"{_slug(prompt['id'])}.wav")
-    seconds_out = _channels_first(audio).shape[1] / sr if sr else None
+    try:
+        audio = _channels_first(_drop_batch_axes(audio))
+        path = _write_take(audio, sr, out_dir / f"{_slug(prompt['id'])}.wav")
+    except Exception as error:  # noqa: BLE001
+        return dict(rec, error=f"writing the take: {type(error).__name__}: {error}")
+    seconds_out = audio.shape[1] / sr if sr else None
     return dict(
         rec,
         **used,
@@ -339,6 +349,16 @@ def _take(contender, prompt, *, duration, seed, out_dir: Path, load_error) -> di
         rtf=round(gen_s / seconds_out, 3) if seconds_out else None,
         path=str(path),
     )
+
+
+def _drop_batch_axes(audio):
+    """``audio`` without leading axes of size 1 (``(1, channels, frames)`` from some models)."""
+    import numpy as np
+
+    audio = np.asarray(audio)
+    while audio.ndim > 2 and audio.shape[0] == 1:
+        audio = audio[0]
+    return audio
 
 
 def _write_take(audio, sr: int, path: Path) -> Path:
@@ -375,9 +395,10 @@ def in_child_process(
     interpreter (default: this one); ``preload`` names what the child runs first, to make
     third-party platforms known: ``"module"`` is imported, ``"module:function"`` is imported
     and ``function()`` called. The child's output goes to ``<out_dir>/<contender>/child.log``.
-    A child killed after ``timeout`` seconds, or exiting non-zero, still returns the records
-    it wrote (a native library crashing at interpreter shutdown loses nothing), each marked
-    with ``child_exit``; with none written, every prompt gets an ``error``.
+    The child writes each take's record as soon as it is made, so a child killed after
+    ``timeout`` seconds (with every process it started) or exiting non-zero still returns
+    the takes it finished, each marked with ``child_exit``; prompts it never reached get an
+    ``error``.
     """
     log_path = Path(out_dir) / _slug(contender.label) / "child.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -395,7 +416,7 @@ def in_child_process(
         "preload": list(preload),
     }
     with tempfile.TemporaryDirectory(prefix="arioso_compare_") as tmp:
-        job_path, out_path = Path(tmp) / "job.json", Path(tmp) / "records.json"
+        job_path, out_path = Path(tmp) / "job.json", Path(tmp) / "records.jsonl"
         job_path.write_text(json.dumps(job))
         cmd = [
             python or sys.executable,
@@ -405,18 +426,40 @@ def in_child_process(
             str(out_path),
         ]
         with open(log_path, "w") as log:
-            try:
-                code = subprocess.run(
-                    cmd, stdout=log, stderr=subprocess.STDOUT, timeout=timeout
-                ).returncode
-            except subprocess.TimeoutExpired:
-                code = f"killed after {timeout} s"
-        records = json.loads(out_path.read_text()) if out_path.exists() else None
-    if records is not None:
-        return [dict(r, child_exit=code) if code else r for r in records]
+            code = _run_child(cmd, log, timeout=timeout)
+        lines = out_path.read_text().splitlines() if out_path.exists() else []
+    records = {}  # the last line per prompt wins: the final one carries the memory figures
+    for line in lines:
+        if line.strip():
+            rec = json.loads(line)
+            records[rec["prompt"]] = rec
     tail = " | ".join(log_path.read_text().strip().splitlines()[-15:])
     error = f"child process failed (exit {code}; log {log_path}): {tail}"
-    return [{"prompt": p["id"], "error": error} for p in prompts]
+    return [
+        (dict(records[p["id"]], child_exit=code) if code else records[p["id"]])
+        if p["id"] in records
+        else {"prompt": p["id"], "error": error}
+        for p in prompts
+    ]
+
+
+def _run_child(cmd, log, *, timeout) -> "int | str":
+    """Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started."""
+    import signal
+
+    posix = os.name == "posix"
+    proc = subprocess.Popen(
+        cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=posix
+    )
+    try:
+        return proc.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        if posix:
+            os.killpg(proc.pid, signal.SIGKILL)  # its runtime workers too
+        else:
+            proc.kill()
+        proc.wait()
+        return f"killed after {timeout} s"
 
 
 def _run_preload(specs: Iterable[str]) -> None:
@@ -433,6 +476,12 @@ def _run_preload(specs: Iterable[str]) -> None:
 def _child_main(job_path: str, out_path: str) -> None:
     job = json.loads(Path(job_path).read_text())
     _run_preload(job.get("preload", ()))
+    out = Path(out_path)
+
+    def append(record):
+        with open(out, "a") as f:
+            f.write(json.dumps(record) + "\n")
+
     c = job["contender"]
     records = in_this_process(
         Contender(c["platform"], c["options"], label=c["label"]),
@@ -441,8 +490,10 @@ def _child_main(job_path: str, out_path: str) -> None:
         seed=job["seed"],
         out_dir=Path(job["out_dir"]),
         warmup=job["warmup"],
+        on_record=append,
     )
-    Path(out_path).write_text(json.dumps(records))
+    for record in records:  # again, now with the memory figures
+        append(record)
 
 
 # --------------------------------------------------------------------------------------------
@@ -588,6 +639,7 @@ def compare(
     allow_hosted: bool = False,
     min_free_gb: Optional[float] = None,
     preload: Iterable[str] = (),
+    timeout: Optional[float] = None,
     run_id: Optional[str] = None,
 ) -> Iterator[dict]:
     """Render every prompt with every contender; yield one record per take.
@@ -612,6 +664,8 @@ def compare(
         preload: Modules (``"module"`` or ``"module:function"``) that make third-party
             platforms known, run here before anything is checked and passed to a runner
             that takes ``preload`` (the child process runs them too).
+        timeout: Seconds a contender may run before it is killed with every process it
+            started, passed to a runner that takes ``timeout`` (the default one does).
         run_id: Names this run in its records and its folder (default: the start time).
 
     Yields:
@@ -647,13 +701,11 @@ def compare(
         )
     runner = runner or in_child_process
     try:
-        runner_kwargs = (
-            {"preload": preload}
-            if preload and "preload" in inspect.signature(runner).parameters
-            else {}
-        )
+        accepted = inspect.signature(runner).parameters
     except (TypeError, ValueError):
-        runner_kwargs = {}
+        accepted = {}
+    given = {"preload": preload or None, "timeout": timeout}
+    runner_kwargs = {k: v for k, v in given.items() if v is not None and k in accepted}
     out_dir = Path(out_dir)
     run_id = run_id or time.strftime("%Y%m%d-%H%M%S")
     run_dir = out_dir / _slug(run_id)

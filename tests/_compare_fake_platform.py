@@ -11,6 +11,9 @@ in the registry would leak into other tests. A child process gets them with
 - ``fake_short``: returns 3.5 s whatever it is asked (real time factors divide by what came back).
 - ``fake_loud``: peaks at 1.5, over full scale (clipping must be seen).
 - ``fake_slow``: sleeps 30 s per call (for timeouts).
+- ``fake_batched``: returns ``(1, channels, frames)``.
+- ``fake_slow_second``: hangs (with a worker process) on any prompt but the 120 BPM one.
+- ``fake_provider_terms`` / ``fake_fal``: local-looking configs with provider terms / a fal block.
 - ``fake_no_access_type``: a plugin config that forgot ``access_type`` (hosted by default).
 - ``fake_broken``: a local platform whose every call fails.
 """
@@ -70,7 +73,36 @@ class _OneShot(_Clicks):
 
 class _Short(_Clicks):
     def generate(self, prompt, **kwargs):
+        import time
+
+        time.sleep(0.3)  # long enough that dividing by 4 s instead of 3.5 s shows
         return super().generate(prompt, **dict(kwargs, duration=3.5))
+
+
+class _Batched(_Clicks):
+    def generate(self, prompt, **kwargs):
+        song = super().generate(prompt, **kwargs)
+        song.audio.audio_array = song.audio.audio_array[None]  # (1, channels, frames)
+        return song
+
+
+class _SlowSecond(_Clicks):
+    """Fast for the 120 BPM prompt; for any other, starts a worker process and hangs."""
+
+    def generate(self, prompt, **kwargs):
+        import os
+        import subprocess
+        import sys
+        import time
+
+        if "120 BPM" not in prompt:
+            worker = subprocess.Popen(
+                [sys.executable, "-c", "import time; time.sleep(60)"]
+            )
+            with open(os.environ["ARIOSO_TEST_PIDFILE"], "w") as f:
+                f.write(str(worker.pid))
+            time.sleep(60)
+        return super().generate(prompt, **kwargs)
 
 
 class _Loud(_Clicks):
@@ -114,6 +146,13 @@ PLATFORMS = {
     "fake_short": (_config("fake_short"), _Short()),
     "fake_loud": (_config("fake_loud"), _Loud()),
     "fake_slow": (_config("fake_slow"), _Slow()),
+    "fake_batched": (_config("fake_batched"), _Batched()),
+    "fake_slow_second": (_config("fake_slow_second"), _SlowSecond()),
+    "fake_provider_terms": (
+        _config("fake_provider_terms", "python_lib", "provider terms"),
+        _Clicks(),
+    ),
+    "fake_fal": (dict(_config("fake_fal"), fal={"endpoint": "x"}), _Clicks()),
     "fake_no_access_type": (
         {k: v for k, v in _config("fake_no_access_type").items() if k != "access_type"},
         _Clicks(),

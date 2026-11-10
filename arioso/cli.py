@@ -72,6 +72,8 @@ def compare(
     warmup: float = 2.0,
     allow_hosted: bool = False,
     min_free_gb: float = None,
+    timeout: float = None,
+    preload: str = None,
     no_page: bool = False,
 ) -> list[str]:
     """Render the same prompts with several platforms; time, measure and check each take.
@@ -91,6 +93,9 @@ def compare(
         warmup: Seconds generated once per contender before the timed takes (0: none).
         allow_hosted: Allow platforms that call a paid hosted service.
         min_free_gb: Skip a contender when less memory than this is available.
+        timeout: Seconds a contender may run before it is killed (with its workers).
+        preload: Comma-separated modules (``module`` or ``module:function``) that
+            register third-party platforms.
         no_page: Do not write ``<out_dir>/<run>/index.html`` (a page of players).
 
     Returns:
@@ -115,6 +120,8 @@ def compare(
         warmup=warmup or None,
         allow_hosted=allow_hosted,
         min_free_gb=min_free_gb,
+        timeout=timeout,
+        preload=[m for m in (preload or "").split(",") if m.strip()],
     ):
         records.append(rec)
         status = rec.get("error") or f"{rec.get('gen_s')} s, RTF {rec.get('rtf')}"

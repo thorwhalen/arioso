@@ -398,7 +398,8 @@ def in_child_process(
     The child writes each take's record as soon as it is made, so a child killed after
     ``timeout`` seconds (with every process it started) or exiting non-zero still returns
     the takes it finished, each marked with ``child_exit``; prompts it never reached get an
-    ``error``.
+    ``error``. Processes the child started are killed when it ends, however it ends; on
+    Windows only when it is killed (thorwhalen/ps#25).
     """
     log_path = Path(out_dir) / _slug(contender.label) / "child.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -444,23 +445,27 @@ def in_child_process(
 
 
 def _run_child(cmd, log, *, timeout) -> "int | str":
-    """Run ``cmd`` with its output to ``log``; on timeout kill it and everything it started.
+    """Run ``cmd`` with its output to ``log``; kill everything it started once it ends.
 
-    Runtime workers start in sessions of their own (ps.isolated), so the child's group
-    alone would not reach them: :func:`ps.util.kill_process_tree` kills every group in
-    the tree (``taskkill /T`` on Windows).
+    Runtime workers start in sessions of their own (ps.isolated) and hold gigabytes, so
+    they must not outlive the child, however it ends: on timeout, by a crash that skips
+    its cleanup, or between the timeout and the kill. :func:`ps.util.wait_and_reap`
+    watches the tree while waiting and kills what is left (``taskkill /T`` on Windows,
+    on timeout only).
     """
-    from ps.util import NEW_PROCESS_GROUP, kill_process_tree
+    from ps.util import NEW_PROCESS_GROUP, kill_process_tree, wait_and_reap
 
     proc = subprocess.Popen(
         cmd, stdout=log, stderr=subprocess.STDOUT, **NEW_PROCESS_GROUP
     )
     try:
-        return proc.wait(timeout=timeout)
+        return wait_and_reap(proc, timeout=timeout)
     except subprocess.TimeoutExpired:
+        return f"killed after {timeout} s"
+    except BaseException:  # a bad timeout, say: refused before any wait, child running
         kill_process_tree(proc)
         proc.wait()
-        return f"killed after {timeout} s"
+        raise
 
 
 def _run_preload(specs: Iterable[str]) -> None:

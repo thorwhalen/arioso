@@ -217,6 +217,10 @@ AFFORDANCES: dict[str, Affordance] = {
 #: What a platform's ``commercial_use`` config field may say, about using its
 #: output commercially: the weights' licence allows it (``"yes"``), forbids it
 #: (``"no"``), allows it under conditions such as a revenue cap or use
-#: restrictions (``"conditional"``), or the weights are not public and the
-#: hosted service's own terms decide (``"provider terms"``).
-COMMERCIAL_USE_VALUES = ("yes", "no", "conditional", "provider terms")
+#: restrictions (``"conditional"``), the weights are not public and the
+#: hosted service's own terms decide (``"provider terms"``), or the terms are
+#: not settled: the licence is unstated, disputed or withdrawn, or the
+#: training-data chain is doubtful (``"unclear"``). Obligations on
+#: redistributing the weights themselves (LGPL, attribution) belong in
+#: ``weights_license``, not here. denote's backends use the same values.
+COMMERCIAL_USE_VALUES = ("yes", "no", "conditional", "unclear", "provider terms")

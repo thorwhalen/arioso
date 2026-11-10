@@ -74,7 +74,7 @@ Source locations for reference:
 - Google-style docstrings
 - Few, light required dependencies; platform deps are lazy-imported inside methods
 - `import arioso` must not import `cw` (only `arioso.__main__` does)
-- Every PLATFORM_CONFIG declares `weights_license` and `commercial_use` (verified from the model card or provider terms)
+- Every PLATFORM_CONFIG declares `weights_license` and `commercial_use` (verified from the model card or provider terms; `unclear` when they do not settle it, rather than a guess)
 - Local torch platforms choose their device with `arioso._util.torch_device()`
 - All platform parameters use unified affordance names (see `AFFORDANCES` in `base.py`)
 - No emojis in code or docs

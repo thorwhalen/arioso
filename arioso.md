@@ -1,4 +1,4 @@
-> built 2026-11-10 10:21 UTC from 8808f06 (main) · arioso 0.0.45. Details: build_info.json
+> built 2026-11-10 10:24 UTC from ffd0943 (main) · arioso 0.0.46. Details: build_info.json
 
 # index.html.md
 
@@ -183,7 +183,19 @@ arioso.get_platform_info("musicgen")
 
 ### MusicGen (local, no API key)
 
-Runs on your machine. Tries `audiocraft` first, falls back to HuggingFace `transformers`.
+Runs on your machine, with one of three libraries:
+
+- **MLX** (Apple Silicon, text prompts): Apple’s port in `ml-explore/mlx-examples`, run in its own environment by a worker. On an M1 Max a 10 s clip of `musicgen-small` takes about 11 s, against 3 to 6 minutes with `transformers` on the GPU. It is used for text takes whenever its runtime is installed:
+  ```default
+  git clone --depth 1 https://github.com/ml-explore/mlx-examples ~/.local/share/arioso/runtimes/mlx-examples
+  cd ~/.local/share/arioso/runtimes/mlx-examples/musicgen && uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
+  ```
+
+  (or point `$ARIOSO_MLX_EXAMPLES_DIR` at an existing checkout). It runs Meta’s mono text checkpoints (`facebook/musicgen-small`, `-medium`, `-large`); `top_p` is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.
+- **audiocraft**, Meta’s library, when it imports.
+- **transformers** otherwise. On Apple Silicon the text checkpoints run on the CPU unless `ARIOSO_TORCH_DEVICE=mps`: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.
+
+Melody-following and continuation always use audiocraft or transformers. `ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers` forces one (`mlx` for text takes only).
 
 ```python
 song = arioso.generate(
@@ -198,7 +210,7 @@ song = arioso.generate(
 
 ### Local models in their own environments (Stable Audio 3, Magenta RealTime 2, ACE-Step 1.5)
 
-Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform’s own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`) points elsewhere. Magenta RealTime and ACE-Step keep one worker process alive, so the model loads once per session.
+Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform’s own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`, `$ARIOSO_MLX_EXAMPLES_DIR` for MusicGen on MLX) points elsewhere. Magenta RealTime, ACE-Step and MusicGen on MLX keep one worker process alive, so the model loads once per session.
 
 ```python
 import arioso
@@ -2169,7 +2181,7 @@ Mubert platform for arioso.
 
 # arioso.platforms.musicgen.adapter
 
-MusicGen adapter using audiocraft (preferred) or transformers.
+MusicGen adapter using MLX (text, Apple Silicon), audiocraft or transformers.
 
 The adapter holds the modes; `backends.py` holds how each library runs them.
 
@@ -2203,8 +2215,9 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 MusicGen adapter with lazy model loading.
 
 `backend_for` (model variant -> backend class) chooses the library without
-loading weights: `audiocraft` when it imports, else the HuggingFace
-`transformers` pipeline (`select_backend_class()`). The chosen class is
+loading weights (`select_backend_class()`: MLX for text takes on Apple Silicon when
+its runtime is installed, else `audiocraft` when it imports, else `transformers`);
+a chooser that takes a `task` keyword is told the task. The chosen class is
 asked what it can do (`can_continue`) and then loads the weights, so the class
 that answers is the class that loads. `load_backend` (model variant ->
 `Backend`) replaces the choice and the loading together: nothing is asked
@@ -2268,31 +2281,46 @@ generates must fit in it (transformers caps generation at 1500 frames).
 
 # arioso.platforms.musicgen.backends
 
-The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).
+The ways to run MusicGen, behind one interface (thorwhalen/arioso#31, #54).
 
 The adapter holds the modes (text, melody, continuation: window checks, chaining, splicing); a
 backend holds what one library needs to load a model and run it in each of them. `audiocraft`
-is Meta’s library, `transformers` the HuggingFace port the adapter falls back to. Each backend
-wraps a model that is already loaded, so building one is free; `load` is what loads one.
+is Meta’s library, `transformers` the HuggingFace port, and `mlx` Apple’s MLX port
+(`ml-explore/mlx-examples`), which runs in its own environment through a worker and only
+does text. Each backend wraps a model that is already loaded, so building one is free;
+`load` is what loads one.
 
-Both return the model’s own output layout for text and melody, `(channels, frames)` from
-audiocraft and `(frames,)` from transformers’ first channel, and mono for a continuation.
+Which one runs ([`select_backend_class()`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.select_backend_class)): `$ARIOSO_MUSICGEN_BACKEND` when set; else
+MLX for a text take on Apple Silicon when its runtime is installed; else audiocraft when it
+imports; else transformers. On Apple Silicon, transformers runs on the CPU unless
+`$ARIOSO_TORCH_DEVICE` says otherwise: on MPS it was 15-30x slower and grew Metal memory
+on every decoding step (42 GB after three 10 s clips on an M1 Max).
+
+audiocraft and transformers return the model’s own layout for text and melody,
+`(channels, frames)` from audiocraft and `(frames,)` from transformers’ first channel, and
+mono for a continuation; MLX returns `(frames,)`.
 
 ### Module Attributes
 
-| [`DEFAULT_FRAME_RATE`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE)   | Codec frames per second, used when a model does not report its own.   |
-|-----------------------------------------------------------------------|-----------------------------------------------------------------------|
+| [`DEFAULT_FRAME_RATE`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE)   | Codec frames per second, used when a model does not report its own.                   |
+|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`BACKEND_ENV_VAR`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.BACKEND_ENV_VAR)      | `audiocraft`, `transformers` or `mlx`.                                                |
+| [`MLX_MAX_SECONDS`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.MLX_MAX_SECONDS)      | MusicGen's context in seconds (1500 frames); the MLX port does not stop there itself. |
+| [`MLX_CHECKPOINTS`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS)      | The checkpoints the MLX port loads.                                                   |
+| [`TASKS`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.TASKS)                | plain text, follow a melody, or continue audio.                                       |
+| [`BACKENDS`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.BACKENDS)             | The backends by the name `$ARIOSO_MUSICGEN_BACKEND` takes.                            |
 
 ### Functions
 
-| [`select_backend_class`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.select_backend_class)(model_variant)   | The library that runs `model_variant`: audiocraft when it imports, else transformers.   |
-|----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| [`select_backend_class`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.select_backend_class)(model_variant, \*[, task])   | The library that runs `model_variant` for `task` (see the module docstring).   |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
 
 ### Classes
 
 | [`AudiocraftBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.AudiocraftBackend)(model)                          | A loaded `audiocraft.models.MusicGen`.                                              |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | [`Backend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Backend)(\*args, \*\*kwargs)                       | What the adapter needs from a library that runs a loaded MusicGen model.            |
+| [`MlxBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.MlxBackend)(worker, model_variant, info)           | MusicGen on MLX, in the `mlx-examples` runtime's own process (text only).           |
 | [`Sampling`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Sampling)(\*, temperature, top_k, top_p, guidance) | Sampling settings shared by every MusicGen mode.                                    |
 | [`TransformersBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.TransformersBackend)(model, processor)             | A loaded transformers `Musicgen(Melody)ForConditionalGeneration` and its processor. |
 
@@ -2371,6 +2399,17 @@ Generate from a text prompt.
 * **Returns:**
   The audio, `(channels, frames)`.
 
+### arioso.platforms.musicgen.backends.BACKENDS *= {'audiocraft': <class 'arioso.platforms.musicgen.backends.AudiocraftBackend'>, 'mlx': <class 'arioso.platforms.musicgen.backends.MlxBackend'>, 'transformers': <class 'arioso.platforms.musicgen.backends.TransformersBackend'>}*
+
+The backends by the name `$ARIOSO_MUSICGEN_BACKEND` takes.
+
+### arioso.platforms.musicgen.backends.BACKEND_ENV_VAR *= 'ARIOSO_MUSICGEN_BACKEND'*
+
+`audiocraft`, `transformers` or `mlx`.
+
+* **Type:**
+  Forces a backend
+
 ### *class* arioso.platforms.musicgen.backends.Backend(\*args, \*\*kwargs)
 
 Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
@@ -2417,11 +2456,100 @@ Output samples per second.
 
 Codec frames per second, used when a model does not report its own.
 
+### arioso.platforms.musicgen.backends.MLX_CHECKPOINTS *= frozenset({'facebook/musicgen-large', 'facebook/musicgen-medium', 'facebook/musicgen-small'})*
+
+The checkpoints the MLX port loads.
+
+### arioso.platforms.musicgen.backends.MLX_MAX_SECONDS *= 30.0*
+
+MusicGen’s context in seconds (1500 frames); the MLX port does not stop there itself.
+
+### *class* arioso.platforms.musicgen.backends.MlxBackend(worker, model_variant, info)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+MusicGen on MLX, in the `mlx-examples` runtime’s own process (text only).
+
+The model lives in a `Worker` running
+`arioso.platforms.musicgen._mlx_driver`; audio comes back through a `.npy` file.
+`top_p` has no MLX counterpart (a non-zero one is warned about and ignored).
+
+#### *classmethod* available(model_variant)
+
+Apple Silicon, a supported checkpoint, and the runtime installed (cheap).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### *classmethod* can_continue(model_variant)
+
+No: the MLX port generates from text only.
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### close()
+
+Stop the worker (the model is released).
+
+#### continuation(prompt, tail, , seconds, sampling)
+
+Not on MLX: the selection sends continuations to another backend.
+
+#### *property* frame_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Codec frames per second.
+
+#### *classmethod* load(model_variant, , make_worker=None)
+
+Start the worker and load `model_variant` in it.
+
+* **Raises:**
+  * [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – For a checkpoint the MLX port does not run.
+  * **arioso._isolated.RuntimeNotInstalled** – With the commands that install it.
+* **Return type:**
+  [`MlxBackend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.MlxBackend)
+
+#### melody(prompt, ref, , seconds, sampling)
+
+Not on MLX: the selection sends melody takes to another backend.
+
+#### *static* runtime()
+
+The `mlx-examples` runtime (see the musicgen config’s `mlx_runtime`).
+
+#### *property* sample_rate *: [int](https://docs.python.org/3/builtins/functions.html#int)*
+
+Output samples per second.
+
+#### *classmethod* supports(model_variant)
+
+Whether the MLX port runs `model_variant`: Meta’s mono text checkpoints only
+(the port reads their audiocraft `state_dict.bin`; fine-tunes in transformers
+format have none).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### text(prompt, , seconds, sampling)
+
+`seconds` of mono audio for `prompt`, `(frames,)`.
+
+* **Return type:**
+  `ndarray`
+
 ### *class* arioso.platforms.musicgen.backends.Sampling(, temperature, top_k, top_p, guidance)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Sampling settings shared by every MusicGen mode.
+
+### arioso.platforms.musicgen.backends.TASKS *= ('text', 'melody', 'continuation')*
+
+plain text, follow a melody, or continue audio.
+
+* **Type:**
+  What a backend is asked to do
 
 ### *class* arioso.platforms.musicgen.backends.TransformersBackend(model, processor)
 
@@ -2466,7 +2594,7 @@ Codec frames per second (50 for every MusicGen checkpoint).
 
 #### *classmethod* load(model_variant)
 
-Load `model_variant` and its processor with transformers, on `torch_device()`.
+Load `model_variant` and its processor with transformers, on `_transformers_device()`.
 
 * **Parameters:**
   **model_variant** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A MusicGen checkpoint name; a melody variant gets the
@@ -2507,12 +2635,12 @@ Generate from a text prompt.
 * **Returns:**
   The first channel of the audio, `(frames,)`.
 
-### arioso.platforms.musicgen.backends.select_backend_class(model_variant)
+### arioso.platforms.musicgen.backends.select_backend_class(model_variant, , task='text')
 
-The library that runs `model_variant`: audiocraft when it imports, else transformers.
+The library that runs `model_variant` for `task` (see the module docstring).
 
-Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
-one is read; a present but broken install falls back like a missing one.
+Loads no checkpoint, so it can be asked before a multi-GB one is read; a present but
+broken audiocraft install falls back like a missing one.
 
 * **Return type:**
   [`type`](https://docs.python.org/3/builtins/functions.html#type)[[`Backend`](_autosummary/arioso.platforms.musicgen.backends.html.md#arioso.platforms.musicgen.backends.Backend)]
@@ -2533,10 +2661,10 @@ MusicGen platform for arioso.
 
 ### Modules
 
-| [`adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#module-arioso.platforms.musicgen.adapter)   | MusicGen adapter using audiocraft (preferred) or transformers.             |
-|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| [`backends`](_autosummary/arioso.platforms.musicgen.backends.html.md#module-arioso.platforms.musicgen.backends) | The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31). |
-| [`config`](_autosummary/arioso.platforms.musicgen.config.html.md#module-arioso.platforms.musicgen.config)     | MusicGen platform configuration.                                           |
+| [`adapter`](_autosummary/arioso.platforms.musicgen.adapter.html.md#module-arioso.platforms.musicgen.adapter)   | MusicGen adapter using MLX (text, Apple Silicon), audiocraft or transformers.   |
+|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`backends`](_autosummary/arioso.platforms.musicgen.backends.html.md#module-arioso.platforms.musicgen.backends) | The ways to run MusicGen, behind one interface (thorwhalen/arioso#31, #54).     |
+| [`config`](_autosummary/arioso.platforms.musicgen.config.html.md#module-arioso.platforms.musicgen.config)     | MusicGen platform configuration.                                                |
 
 
 # _autosummary/arioso.platforms.riffusion.adapter.html.md
@@ -3425,18 +3553,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 10:21 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/8808f069ed225c558fa061e1dcb1b66d4cd0b283"><code>8808f06</code></a> on branch <code>main</code>, for **arioso 0.0.45** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 10:24 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07"><code>ffd0943</code></a> on branch <code>main</code>, for **arioso 0.0.46** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.46) is ahead of the latest release on PyPI (0.0.45): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/8808f069ed225c558fa061e1dcb1b66d4cd0b283"><code>8808f069ed225c558fa061e1dcb1b66d4cd0b283</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07"><code>ffd094361041e6aac8081ca9311c5dcca445ef07</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.45</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.46</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3445,9 +3575,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42798021192">42798021192</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42798499635">42798499635</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ad9a9225faa0a9846ff92c6aa827c66e97000cca</code> (in the history of the built commit) |
+| Event commit | <code>0c96fdd25c29bc16b250db3a06c3ab1c1b481d18</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3472,13 +3602,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.45/">0.0.45</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.45/">0.0.45</a>, older than the documented version (0.0.46).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 8808f069ed225c558fa061e1dcb1b66d4cd0b283
+git checkout ffd094361041e6aac8081ca9311c5dcca445ef07
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

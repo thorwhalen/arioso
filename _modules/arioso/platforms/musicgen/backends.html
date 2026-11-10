@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../../../../_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -715,23 +715,36 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for arioso.platforms.musicgen.backends</h1><div class="highlight"><pre>
-<span></span><span class="sd">"""The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).</span>
+<span></span><span class="sd">"""The ways to run MusicGen, behind one interface (thorwhalen/arioso#31, #54).</span>
 
 <span class="sd">The adapter holds the modes (text, melody, continuation: window checks, chaining, splicing); a</span>
 <span class="sd">backend holds what one library needs to load a model and run it in each of them. ``audiocraft``</span>
-<span class="sd">is Meta's library, ``transformers`` the HuggingFace port the adapter falls back to. Each backend</span>
-<span class="sd">wraps a model that is already loaded, so building one is free; ``load`` is what loads one.</span>
+<span class="sd">is Meta's library, ``transformers`` the HuggingFace port, and ``mlx`` Apple's MLX port</span>
+<span class="sd">(``ml-explore/mlx-examples``), which runs in its own environment through a worker and only</span>
+<span class="sd">does text. Each backend wraps a model that is already loaded, so building one is free;</span>
+<span class="sd">``load`` is what loads one.</span>
 
-<span class="sd">Both return the model's own output layout for text and melody, ``(channels, frames)`` from</span>
-<span class="sd">audiocraft and ``(frames,)`` from transformers' first channel, and mono for a continuation.</span>
+<span class="sd">Which one runs (:func:`select_backend_class`): ``$ARIOSO_MUSICGEN_BACKEND`` when set; else</span>
+<span class="sd">MLX for a text take on Apple Silicon when its runtime is installed; else audiocraft when it</span>
+<span class="sd">imports; else transformers. On Apple Silicon, transformers runs on the CPU unless</span>
+<span class="sd">``$ARIOSO_TORCH_DEVICE`` says otherwise: on MPS it was 15-30x slower and grew Metal memory</span>
+<span class="sd">on every decoding step (42 GB after three 10 s clips on an M1 Max).</span>
+
+<span class="sd">audiocraft and transformers return the model's own layout for text and melody,</span>
+<span class="sd">``(channels, frames)`` from audiocraft and ``(frames,)`` from transformers' first channel, and</span>
+<span class="sd">mono for a continuation; MLX returns ``(frames,)``.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Protocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">arioso._util</span><span class="w"> </span><span class="kn">import</span> <span class="n">torch_device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso._util</span><span class="w"> </span><span class="kn">import</span> <span class="n">TORCH_DEVICE_ENV_VAR</span><span class="p">,</span> <span class="n">torch_device</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -799,20 +812,59 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<span class="c1">#: Forces a backend: ``audiocraft``, ``transformers`` or ``mlx``.</span>
+<span class="n">BACKEND_ENV_VAR</span> <span class="o">=</span> <span class="s2">"ARIOSO_MUSICGEN_BACKEND"</span>
+<span class="c1">#: MusicGen's context in seconds (1500 frames); the MLX port does not stop there itself.</span>
+<span class="n">MLX_MAX_SECONDS</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="c1">#: The checkpoints the MLX port loads.</span>
+<span class="n">MLX_CHECKPOINTS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"facebook/musicgen-</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"small"</span><span class="p">,</span> <span class="s2">"medium"</span><span class="p">,</span> <span class="s2">"large"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="c1">#: What a backend is asked to do: plain text, follow a melody, or continue audio.</span>
+<span class="n">TASKS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"melody"</span><span class="p">,</span> <span class="s2">"continuation"</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="select_backend_class">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.select_backend_class">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">select_backend_class</span><span class="p">(</span><span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Backend</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""The library that runs ``model_variant``: audiocraft when it imports, else transformers.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">select_backend_class</span><span class="p">(</span><span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"text"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Backend</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The library that runs ``model_variant`` for ``task`` (see the module docstring).</span>
 
-<span class="sd">    Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB</span>
-<span class="sd">    one is read; a present but broken install falls back like a missing one.</span>
+<span class="sd">    Loads no checkpoint, so it can be asked before a multi-GB one is read; a present but</span>
+<span class="sd">    broken audiocraft install falls back like a missing one.</span>
 <span class="sd">    """</span>
+    <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BACKEND_ENV_VAR</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">forced</span> <span class="ow">and</span> <span class="n">forced</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BACKENDS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"$</span><span class="si">{</span><span class="n">BACKEND_ENV_VAR</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">forced</span><span class="si">!r}</span><span class="s2">: expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">BACKENDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">forced</span> <span class="ow">and</span> <span class="p">(</span><span class="n">forced</span> <span class="o">!=</span> <span class="s2">"mlx"</span> <span class="ow">or</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">"text"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BACKENDS</span><span class="p">[</span><span class="n">forced</span><span class="p">]</span>  <span class="c1"># mlx forced only where it can run: text</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">"text"</span> <span class="ow">and</span> <span class="n">MlxBackend</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="n">model_variant</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MlxBackend</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">audiocraft.models</span>  <span class="c1"># noqa: F401</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TransformersBackend</span>
     <span class="k">return</span> <span class="n">AudiocraftBackend</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_transformers_device</span><span class="p">(</span><span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">""":func:`~arioso._util.torch_device`, except CPU for the text checkpoints on Apple MPS.</span>
+
+<span class="sd">    Text (and continuation) decoding of ``musicgen-small`` on MPS is pathological</span>
+<span class="sd">    (thorwhalen/arioso#54): slower than the CPU and growing Metal memory per step. The melody</span>
+<span class="sd">    checkpoint keeps MPS, where it was measured faster than the CPU (a 30 s melody take took a</span>
+<span class="sd">    quarter of an hour on the CPU). An explicit ``$ARIOSO_TORCH_DEVICE`` always wins.</span>
+<span class="sd">    """</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch_device</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">device</span> <span class="o">==</span> <span class="s2">"mps"</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TORCH_DEVICE_ENV_VAR</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="s2">"melody"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_variant</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"cpu"</span>
+    <span class="k">return</span> <span class="n">device</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_rate_or_default</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -974,7 +1026,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.load">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TransformersBackend</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Load ``model_variant`` and its processor with transformers, on :func:`~arioso._util.torch_device`.</span>
+<span class="w">        </span><span class="sd">"""Load ``model_variant`` and its processor with transformers, on :func:`_transformers_device`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model_variant: A MusicGen checkpoint name; a melody variant gets the</span>
@@ -995,7 +1047,9 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">MusicgenForConditionalGeneration</span> <span class="k">as</span> <span class="n">_ModelClass</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">model</span> <span class="o">=</span> <span class="n">_ModelClass</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch_device</span><span class="p">())</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_ModelClass</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
+            <span class="n">_transformers_device</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_variant</span><span class="p">))</span></div>
 
 
@@ -1118,6 +1172,175 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">guidance_scale</span><span class="o">=</span><span class="n">sampling</span><span class="o">.</span><span class="n">guidance</span><span class="p">,</span>
             <span class="p">)</span></div>
 
+
+
+<div class="viewcode-block" id="MlxBackend">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MlxBackend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""MusicGen on MLX, in the ``mlx-examples`` runtime's own process (text only).</span>
+
+<span class="sd">    The model lives in a :class:`~arioso._isolated.Worker` running</span>
+<span class="sd">    :mod:`arioso.platforms.musicgen._mlx_driver`; audio comes back through a ``.npy`` file.</span>
+<span class="sd">    ``top_p`` has no MLX counterpart (a non-zero one is warned about and ignored).</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Wrap a started ``worker`` that has loaded ``model_variant`` (``info``: its rates)."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker</span> <span class="o">=</span> <span class="n">worker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_variant</span> <span class="o">=</span> <span class="n">model_variant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+
+<div class="viewcode-block" id="MlxBackend.runtime">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.runtime">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""The ``mlx-examples`` runtime (see the musicgen config's ``mlx_runtime``)."""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._isolated</span><span class="w"> </span><span class="kn">import</span> <span class="n">Runtime</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.musicgen.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLATFORM_CONFIG</span>
+
+        <span class="k">return</span> <span class="n">Runtime</span><span class="p">(</span><span class="o">**</span><span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"mlx_runtime"</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.supports">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.supports">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Whether the MLX port runs ``model_variant``: Meta's mono text checkpoints only</span>
+<span class="sd">        (the port reads their audiocraft ``state_dict.bin``; fine-tunes in transformers</span>
+<span class="sd">        format have none)."""</span>
+        <span class="k">return</span> <span class="n">model_variant</span> <span class="ow">in</span> <span class="n">MLX_CHECKPOINTS</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.available">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.available">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apple Silicon, a supported checkpoint, and the runtime installed (cheap)."""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._isolated</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_apple_silicon</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">is_apple_silicon</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supports</span><span class="p">(</span><span class="n">model_variant</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">runtime</span><span class="p">()</span><span class="o">.</span><span class="n">installed</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.can_continue">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.can_continue">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_continue</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""No: the MLX port generates from text only."""</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.load">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.load">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">make_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MlxBackend</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Start the worker and load ``model_variant`` in it.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: For a checkpoint the MLX port does not run.</span>
+<span class="sd">            arioso._isolated.RuntimeNotInstalled: With the commands that install it.</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso._isolated</span><span class="w"> </span><span class="kn">import</span> <span class="n">Worker</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.musicgen.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLATFORM_CONFIG</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">supports</span><span class="p">(</span><span class="n">model_variant</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"musicgen: the MLX backend runs the mono text checkpoints, not "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">model_variant</span><span class="si">!r}</span><span class="s2">; unset $</span><span class="si">{</span><span class="n">BACKEND_ENV_VAR</span><span class="si">}</span><span class="s2"> to use another backend."</span>
+            <span class="p">)</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">runtime</span><span class="p">()</span>
+        <span class="n">worker</span> <span class="o">=</span> <span class="p">(</span><span class="n">make_worker</span> <span class="ow">or</span> <span class="n">Worker</span><span class="p">)(</span>
+            <span class="n">runtime</span><span class="o">.</span><span class="n">interpreter</span><span class="p">(),</span> <span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"mlx_driver"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">runtime</span><span class="o">.</span><span class="n">workdir</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">worker</span><span class="o">.</span><span class="n">call</span><span class="p">({</span><span class="s2">"op"</span><span class="p">:</span> <span class="s2">"load"</span><span class="p">,</span> <span class="s2">"model"</span><span class="p">:</span> <span class="n">model_variant</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">model_variant</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Output samples per second."""</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">"sample_rate"</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Codec frames per second."""</span>
+        <span class="k">return</span> <span class="n">_rate_or_default</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"frame_rate"</span><span class="p">))</span>
+
+<div class="viewcode-block" id="MlxBackend.text">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sampling</span><span class="p">:</span> <span class="n">Sampling</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""``seconds`` of mono audio for ``prompt``, ``(frames,)``."""</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+        <span class="k">if</span> <span class="n">seconds</span> <span class="o">&gt;</span> <span class="n">MLX_MAX_SECONDS</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"musicgen (mlx): </span><span class="si">{</span><span class="n">seconds</span><span class="si">}</span><span class="s2"> s is past MusicGen's </span><span class="si">{</span><span class="n">MLX_MAX_SECONDS</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> s "</span>
+                <span class="s2">"context; the take degrades after it."</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampling</span><span class="o">.</span><span class="n">top_p</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"musicgen (mlx): top_p=</span><span class="si">{</span><span class="n">sampling</span><span class="o">.</span><span class="n">top_p</span><span class="si">}</span><span class="s2"> is ignored; the MLX port "</span>
+                <span class="s2">"samples with top_k only."</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"arioso_mlx_mg_"</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"audio.npy"</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"op"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span>
+                    <span class="s2">"model"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_variant</span><span class="p">,</span>
+                    <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+                    <span class="s2">"seconds"</span><span class="p">:</span> <span class="n">seconds</span><span class="p">,</span>
+                    <span class="s2">"top_k"</span><span class="p">:</span> <span class="n">sampling</span><span class="o">.</span><span class="n">top_k</span><span class="p">,</span>
+                    <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">sampling</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+                    <span class="s2">"guidance"</span><span class="p">:</span> <span class="n">sampling</span><span class="o">.</span><span class="n">guidance</span><span class="p">,</span>
+                    <span class="s2">"out"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.melody">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.melody">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">melody</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">sampling</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Not on MLX: the selection sends melody takes to another backend."""</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">"musicgen: the MLX backend does not follow melodies; "</span>
+            <span class="sa">f</span><span class="s2">"unset $</span><span class="si">{</span><span class="n">BACKEND_ENV_VAR</span><span class="si">}</span><span class="s2"> (or set it to transformers)."</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.continuation">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.continuation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">continuation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">tail</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">sampling</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Not on MLX: the selection sends continuations to another backend."""</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">"musicgen: the MLX backend does not continue audio; "</span>
+            <span class="sa">f</span><span class="s2">"unset $</span><span class="si">{</span><span class="n">BACKEND_ENV_VAR</span><span class="si">}</span><span class="s2"> (or set it to transformers)."</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MlxBackend.close">
+<a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Stop the worker (the model is released)."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="c1">#: The backends by the name ``$ARIOSO_MUSICGEN_BACKEND`` takes.</span>
+<span class="n">BACKENDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"audiocraft"</span><span class="p">:</span> <span class="n">AudiocraftBackend</span><span class="p">,</span>
+    <span class="s2">"transformers"</span><span class="p">:</span> <span class="n">TransformersBackend</span><span class="p">,</span>
+    <span class="s2">"mlx"</span><span class="p">:</span> <span class="n">MlxBackend</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 
                 </article>

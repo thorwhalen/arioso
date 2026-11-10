@@ -9,6 +9,11 @@ arioso.platforms.musicgen.backends
    .. autosummary::
    
       DEFAULT_FRAME_RATE
+      BACKEND_ENV_VAR
+      MLX_MAX_SECONDS
+      MLX_CHECKPOINTS
+      TASKS
+      BACKENDS
    
    .. rubric:: Functions
 
@@ -22,6 +27,7 @@ arioso.platforms.musicgen.backends
    
       AudiocraftBackend
       Backend
+      MlxBackend
       Sampling
       TransformersBackend
    

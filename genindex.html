@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -1243,6 +1243,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult">AudioResult (class in arioso.base)</a>
 </li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.available">available() (arioso.platforms.musicgen.backends.MlxBackend class method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1250,6 +1252,12 @@ window.runMermaid = runMermaid;</script>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend">Backend (class in arioso.platforms.musicgen.backends)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.BACKEND_ENV_VAR">BACKEND_ENV_VAR (in module arioso.platforms.musicgen.backends)</a>
+</li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.BACKENDS">BACKENDS (in module arioso.platforms.musicgen.backends)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1261,6 +1269,8 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.can_continue">(arioso.platforms.musicgen.backends.Backend class method)</a>
+</li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.can_continue">(arioso.platforms.musicgen.backends.MlxBackend class method)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.can_continue">(arioso.platforms.musicgen.backends.TransformersBackend class method)</a>
 </li>
@@ -1274,11 +1284,15 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/arioso.translation.html#arioso.translation.check_supported_params">check_supported_params() (in module arioso.translation)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.magenta_rt.adapter.html#arioso.platforms.magenta_rt.adapter.Adapter.close">close() (arioso.platforms.magenta_rt.adapter.Adapter method)</a>
+
+      <ul>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.close">(arioso.platforms.musicgen.backends.MlxBackend method)</a>
 </li>
-      <li><a href="_autosummary/arioso.base.html#arioso.base.CatalogMatchError.code">code (arioso.base.CatalogMatchError attribute)</a>
-</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/arioso.base.html#arioso.base.CatalogMatchError.code">code (arioso.base.CatalogMatchError attribute)</a>
+</li>
       <li><a href="_autosummary/arioso.cli.html#arioso.cli.commands">commands (in module arioso.cli)</a>
 </li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.COMMERCIAL_USE_VALUES">COMMERCIAL_USE_VALUES (in module arioso.base)</a>
@@ -1297,6 +1311,8 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.continuation">(arioso.platforms.musicgen.backends.Backend method)</a>
+</li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.continuation">(arioso.platforms.musicgen.backends.MlxBackend method)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.continuation">(arioso.platforms.musicgen.backends.TransformersBackend method)</a>
 </li>
@@ -1361,16 +1377,18 @@ window.runMermaid = runMermaid;</script>
       </ul></li>
       <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts.flat">flat() (arioso.named_prompts.NamedPrompts method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.NamedPrompts.flat_names">flat_names() (arioso.named_prompts.NamedPrompts method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult.format">format (arioso.base.AudioResult attribute)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.frame_rate">frame_rate (arioso.platforms.musicgen.backends.AudiocraftBackend property)</a>
 
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.frame_rate">(arioso.platforms.musicgen.backends.Backend property)</a>
+</li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.frame_rate">(arioso.platforms.musicgen.backends.MlxBackend property)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.frame_rate">(arioso.platforms.musicgen.backends.TransformersBackend property)</a>
 </li>
@@ -1484,6 +1502,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.load">load() (arioso.platforms.musicgen.backends.AudiocraftBackend class method)</a>
 
       <ul>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.load">(arioso.platforms.musicgen.backends.MlxBackend class method)</a>
+</li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.load">(arioso.platforms.musicgen.backends.TransformersBackend class method)</a>
 </li>
       </ul></li>
@@ -1516,10 +1536,18 @@ window.runMermaid = runMermaid;</script>
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.melody">(arioso.platforms.musicgen.backends.Backend method)</a>
 </li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.melody">(arioso.platforms.musicgen.backends.MlxBackend method)</a>
+</li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.melody">(arioso.platforms.musicgen.backends.TransformersBackend method)</a>
 </li>
       </ul></li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.Song.metadata">metadata (arioso.base.Song attribute)</a>
+</li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS">MLX_CHECKPOINTS (in module arioso.platforms.musicgen.backends)</a>
+</li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MLX_MAX_SECONDS">MLX_MAX_SECONDS (in module arioso.platforms.musicgen.backends)</a>
+</li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend">MlxBackend (class in arioso.platforms.musicgen.backends)</a>
 </li>
       <li>
     module
@@ -1708,11 +1736,13 @@ window.runMermaid = runMermaid;</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.compare.html#arioso.compare.read_records">read_records() (in module arioso.compare)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.registry.html#arioso.registry.register_platform">register_platform() (in module arioso.registry)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.named_prompts.html#arioso.named_prompts.remove_prompt">remove_prompt() (in module arioso.named_prompts)</a>
+</li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.runtime">runtime() (arioso.platforms.musicgen.backends.MlxBackend static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1730,6 +1760,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.sample_rate">(arioso.platforms.musicgen.backends.AudiocraftBackend property)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.sample_rate">(arioso.platforms.musicgen.backends.Backend property)</a>
+</li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.sample_rate">(arioso.platforms.musicgen.backends.MlxBackend property)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.sample_rate">(arioso.platforms.musicgen.backends.TransformersBackend property)</a>
 </li>
@@ -1768,6 +1800,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/arioso.platforms.sunoapi.task_store.html#arioso.platforms.sunoapi.task_store.SunoTasks">SunoTasks (class in arioso.platforms.sunoapi.task_store)</a>
 </li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.supports">supports() (arioso.platforms.musicgen.backends.MlxBackend class method)</a>
+</li>
       <li><a href="_autosummary/arioso.html#arioso.supports_audio_input">supports_audio_input() (in module arioso)</a>
 </li>
   </ul></td>
@@ -1780,12 +1814,16 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/arioso.platforms.sunoapi.adapter.html#arioso.platforms.sunoapi.adapter.Adapter.tasks">tasks (arioso.platforms.sunoapi.adapter.Adapter property)</a>
 </li>
+      <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TASKS">TASKS (in module arioso.platforms.musicgen.backends)</a>
+</li>
       <li><a href="_autosummary/arioso.compare.html#arioso.compare.tempo_error">tempo_error() (in module arioso.compare)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.AudiocraftBackend.text">text() (arioso.platforms.musicgen.backends.AudiocraftBackend method)</a>
 
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.Backend.text">(arioso.platforms.musicgen.backends.Backend method)</a>
+</li>
+        <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.text">(arioso.platforms.musicgen.backends.MlxBackend method)</a>
 </li>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.text">(arioso.platforms.musicgen.backends.TransformersBackend method)</a>
 </li>

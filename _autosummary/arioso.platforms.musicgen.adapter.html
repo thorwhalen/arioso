@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -422,7 +422,7 @@
                   
   <section id="module-arioso.platforms.musicgen.adapter">
 <span id="arioso-platforms-musicgen-adapter"></span><h1>arioso.platforms.musicgen.adapter<a class="headerlink" href="#module-arioso.platforms.musicgen.adapter" title="Link to this heading">#</a></h1>
-<p>MusicGen adapter using audiocraft (preferred) or transformers.</p>
+<p>MusicGen adapter using MLX (text, Apple Silicon), audiocraft or transformers.</p>
 <p>The adapter holds the modes; <code class="docutils literal notranslate"><span class="pre">backends.py</span></code> holds how each library runs them.</p>
 <p>Supports text-to-music generation and, via <code class="docutils literal notranslate"><span class="pre">facebook/musicgen-melody</span></code>,
 melody-conditioned generation (the <code class="docutils literal notranslate"><span class="pre">melody</span></code> affordance / <code class="docutils literal notranslate"><span class="pre">arioso.enhance</span></code>
@@ -461,8 +461,9 @@ composition; thorwhalen/arioso#29).</p>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>MusicGen adapter with lazy model loading.</p>
 <p><code class="docutils literal notranslate"><span class="pre">backend_for</span></code> (model variant -&gt; backend class) chooses the library without
-loading weights: <code class="docutils literal notranslate"><span class="pre">audiocraft</span></code> when it imports, else the HuggingFace
-<code class="docutils literal notranslate"><span class="pre">transformers</span></code> pipeline (<code class="xref py py-func docutils literal notranslate"><span class="pre">select_backend_class()</span></code>). The chosen class is
+loading weights (<code class="xref py py-func docutils literal notranslate"><span class="pre">select_backend_class()</span></code>: MLX for text takes on Apple Silicon when
+its runtime is installed, else <code class="docutils literal notranslate"><span class="pre">audiocraft</span></code> when it imports, else <code class="docutils literal notranslate"><span class="pre">transformers</span></code>);
+a chooser that takes a <code class="docutils literal notranslate"><span class="pre">task</span></code> keyword is told the task. The chosen class is
 asked what it can do (<code class="docutils literal notranslate"><span class="pre">can_continue</span></code>) and then loads the weights, so the class
 that answers is the class that loads. <code class="docutils literal notranslate"><span class="pre">load_backend</span></code> (model variant -&gt;
 <code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code>) replaces the choice and the loading together: nothing is asked

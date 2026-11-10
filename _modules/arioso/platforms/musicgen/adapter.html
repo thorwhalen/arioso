@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../../../../_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -715,7 +715,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for arioso.platforms.musicgen.adapter</h1><div class="highlight"><pre>
-<span></span><span class="sd">"""MusicGen adapter using audiocraft (preferred) or transformers.</span>
+<span></span><span class="sd">"""MusicGen adapter using MLX (text, Apple Silicon), audiocraft or transformers.</span>
 
 <span class="sd">The adapter holds the modes; ``backends.py`` holds how each library runs them.</span>
 
@@ -758,8 +758,9 @@ window.runMermaid = runMermaid;</script>
 <span class="w">    </span><span class="sd">"""MusicGen adapter with lazy model loading.</span>
 
 <span class="sd">    ``backend_for`` (model variant -&gt; backend class) chooses the library without</span>
-<span class="sd">    loading weights: ``audiocraft`` when it imports, else the HuggingFace</span>
-<span class="sd">    ``transformers`` pipeline (:func:`select_backend_class`). The chosen class is</span>
+<span class="sd">    loading weights (:func:`select_backend_class`: MLX for text takes on Apple Silicon when</span>
+<span class="sd">    its runtime is installed, else ``audiocraft`` when it imports, else ``transformers``);</span>
+<span class="sd">    a chooser that takes a ``task`` keyword is told the task. The chosen class is</span>
 <span class="sd">    asked what it can do (``can_continue``) and then loads the weights, so the class</span>
 <span class="sd">    that answers is the class that loads. ``load_backend`` (model variant -&gt;</span>
 <span class="sd">    :class:`Backend`) replaces the choice and the loading together: nothing is asked</span>
@@ -779,8 +780,9 @@ window.runMermaid = runMermaid;</script>
             <span class="n">backend_for</span> <span class="o">=</span> <span class="n">select_backend_class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span> <span class="o">=</span> <span class="n">backend_for</span>  <span class="c1"># None: the injected loader owns the choice</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span> <span class="o">=</span> <span class="n">load_backend</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">backend_for</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Backend</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># (model variant, its backend)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span> <span class="o">=</span> <span class="n">load_backend</span>
+        <span class="c1"># ((model variant, backend class), its backend): one loaded at a time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">Backend</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Adapter.generate">
 <a class="viewcode-back" href="../../../../_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.Adapter.generate">[docs]</a>
@@ -862,7 +864,7 @@ window.runMermaid = runMermaid;</script>
 
         <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"melody"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="s2">"facebook/musicgen-melody"</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"text"</span> <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"melody"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">melody</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">audio</span><span class="p">,</span> <span class="n">extra</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="n">sampling</span><span class="p">),</span> <span class="p">{}</span>
         <span class="k">else</span><span class="p">:</span>
@@ -878,10 +880,44 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""The *model* loaded (once per variant) behind the interface of its library."""</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">model</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_class_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Backend</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The backend class for *task*; ``None`` when an injected loader owns the choice.</span>
+
+<span class="sd">        A chooser that takes a ``task`` keyword (as :func:`select_backend_class` does) is</span>
+<span class="sd">        told the task; one that takes the variant only gets the variant.</span>
+<span class="sd">        """</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">takes_task</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"task"</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">takes_task</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"text"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The *model* loaded behind the interface of the library that runs *task*.</span>
+
+<span class="sd">        One backend is kept loaded; switching library or variant closes the previous one</span>
+<span class="sd">        first (an MLX worker holds its model in another process). So on a Mac with the MLX</span>
+<span class="sd">        runtime, alternating text takes with melody or continuation takes reloads a model</span>
+<span class="sd">        at each switch: batch takes by task.</span>
+<span class="sd">        """</span>
+        <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_for</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"close"</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">backend</span> <span class="o">=</span> <span class="n">backend_class</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_continue</span><span class="p">(</span>
@@ -907,7 +943,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"Song or (array, sample_rate)), not a hosted clip id or URL."</span>
             <span class="p">)</span>
         <span class="c1"># refuse before loading a multi-GB checkpoint that cannot do this</span>
-        <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_for</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_for</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"continuation"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend_class</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">backend_class</span><span class="o">.</span><span class="n">can_continue</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"musicgen: </span><span class="si">{</span><span class="n">model</span><span class="si">!r}</span><span class="s2"> cannot continue audio with "</span>
@@ -915,7 +951,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"to extend). Use a non-melody checkpoint such as "</span>
                 <span class="sa">f</span><span class="s2">"'facebook/musicgen-small'."</span>
             <span class="p">)</span>
-        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"continuation"</span><span class="p">)</span>
         <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">sample_rate</span>
         <span class="c1"># Prompt lengths are whole codec frames, so the model re-decodes the</span>
         <span class="c1"># prompt to exactly as many samples as it was given, and dropping that</span>

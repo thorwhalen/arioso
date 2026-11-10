@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -567,7 +567,19 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </div>
 <section id="musicgen-local-no-api-key">
 <h3>MusicGen (local, no API key)<a class="headerlink" href="#musicgen-local-no-api-key" title="Link to this heading">#</a></h3>
-<p>Runs on your machine. Tries <code class="docutils literal notranslate"><span class="pre">audiocraft</span></code> first, falls back to HuggingFace <code class="docutils literal notranslate"><span class="pre">transformers</span></code>.</p>
+<p>Runs on your machine, with one of three libraries:</p>
+<ul>
+<li><p><strong>MLX</strong> (Apple Silicon, text prompts): Apple’s port in <code class="docutils literal notranslate"><span class="pre">ml-explore/mlx-examples</span></code>, run in its own environment by a worker. On an M1 Max a 10 s clip of <code class="docutils literal notranslate"><span class="pre">musicgen-small</span></code> takes about 11 s, against 3 to 6 minutes with <code class="docutils literal notranslate"><span class="pre">transformers</span></code> on the GPU. It is used for text takes whenever its runtime is installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">depth</span> <span class="mi">1</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ml</span><span class="o">-</span><span class="n">explore</span><span class="o">/</span><span class="n">mlx</span><span class="o">-</span><span class="n">examples</span> <span class="o">~/.</span><span class="n">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">arioso</span><span class="o">/</span><span class="n">runtimes</span><span class="o">/</span><span class="n">mlx</span><span class="o">-</span><span class="n">examples</span>
+<span class="n">cd</span> <span class="o">~/.</span><span class="n">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">arioso</span><span class="o">/</span><span class="n">runtimes</span><span class="o">/</span><span class="n">mlx</span><span class="o">-</span><span class="n">examples</span><span class="o">/</span><span class="n">musicgen</span> <span class="o">&amp;&amp;</span> <span class="n">uv</span> <span class="n">venv</span> <span class="o">.</span><span class="n">venv</span> <span class="o">--</span><span class="n">python</span> <span class="mf">3.12</span> <span class="o">&amp;&amp;</span> <span class="n">uv</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">python</span> <span class="o">.</span><span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>(or point <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MLX_EXAMPLES_DIR</span></code> at an existing checkout). It runs Meta’s mono text checkpoints (<code class="docutils literal notranslate"><span class="pre">facebook/musicgen-small</span></code>, <code class="docutils literal notranslate"><span class="pre">-medium</span></code>, <code class="docutils literal notranslate"><span class="pre">-large</span></code>); <code class="docutils literal notranslate"><span class="pre">top_p</span></code> is ignored there, and takes past MusicGen’s 30 s context are warned about. Alternating text takes with melody or continuation takes reloads a model at each switch, so batch them by kind.</p>
+</li>
+<li><p><strong>audiocraft</strong>, Meta’s library, when it imports.</p></li>
+<li><p><strong>transformers</strong> otherwise. On Apple Silicon the text checkpoints run on the CPU unless <code class="docutils literal notranslate"><span class="pre">ARIOSO_TORCH_DEVICE=mps</span></code>: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.</p></li>
+</ul>
+<p>Melody-following and continuation always use audiocraft or transformers. <code class="docutils literal notranslate"><span class="pre">ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers</span></code> forces one (<code class="docutils literal notranslate"><span class="pre">mlx</span></code> for text takes only).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="s2">"chill lofi beats"</span><span class="p">,</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span>
@@ -581,7 +593,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </section>
 <section id="local-models-in-their-own-environments-stable-audio-3-magenta-realtime-2-ace-step-1-5">
 <h3>Local models in their own environments (Stable Audio 3, Magenta RealTime 2, ACE-Step 1.5)<a class="headerlink" href="#local-models-in-their-own-environments-stable-audio-3-magenta-realtime-2-ace-step-1-5" title="Link to this heading">#</a></h3>
-<p>Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises <code class="docutils literal notranslate"><span class="pre">RuntimeNotInstalled</span></code> with those commands. Runtimes live under <code class="docutils literal notranslate"><span class="pre">~/.local/share/arioso/runtimes/&lt;name&gt;</span></code> unless <code class="docutils literal notranslate"><span class="pre">$ARIOSO_RUNTIMES_DIR</span></code> or the platform’s own variable (<code class="docutils literal notranslate"><span class="pre">$ARIOSO_SA3_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MAGENTA_RT_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_ACE_STEP_DIR</span></code>) points elsewhere. Magenta RealTime and ACE-Step keep one worker process alive, so the model loads once per session.</p>
+<p>Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises <code class="docutils literal notranslate"><span class="pre">RuntimeNotInstalled</span></code> with those commands. Runtimes live under <code class="docutils literal notranslate"><span class="pre">~/.local/share/arioso/runtimes/&lt;name&gt;</span></code> unless <code class="docutils literal notranslate"><span class="pre">$ARIOSO_RUNTIMES_DIR</span></code> or the platform’s own variable (<code class="docutils literal notranslate"><span class="pre">$ARIOSO_SA3_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MAGENTA_RT_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_ACE_STEP_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MLX_EXAMPLES_DIR</span></code> for MusicGen on MLX) points elsewhere. Magenta RealTime, ACE-Step and MusicGen on MLX keep one worker process alive, so the model loads once per session.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># Stable Audio 3 (Stability's MLX build, Apple Silicon): model="sm-music" (default), "sm-sfx" or "medium"</span>
@@ -1024,7 +1036,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-10 10:21 UTC from <a href="https://github.com/thorwhalen/arioso/commit/8808f069ed225c558fa061e1dcb1b66d4cd0b283">8808f06</a> (main) · arioso 0.0.45 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-10 10:24 UTC from <a href="https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07">ffd0943</a> (main) · arioso 0.0.46 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

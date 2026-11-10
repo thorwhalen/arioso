@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
+    <script src="../_static/documentation_options.js?v=eb4c61eb"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.45" />
+  <meta name="docsearch:version" content="0.0.46" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -422,18 +422,41 @@
                   
   <section id="module-arioso.platforms.musicgen.backends">
 <span id="arioso-platforms-musicgen-backends"></span><h1>arioso.platforms.musicgen.backends<a class="headerlink" href="#module-arioso.platforms.musicgen.backends" title="Link to this heading">#</a></h1>
-<p>The two ways to run MusicGen, behind one interface (thorwhalen/arioso#31).</p>
+<p>The ways to run MusicGen, behind one interface (thorwhalen/arioso#31, #54).</p>
 <p>The adapter holds the modes (text, melody, continuation: window checks, chaining, splicing); a
 backend holds what one library needs to load a model and run it in each of them. <code class="docutils literal notranslate"><span class="pre">audiocraft</span></code>
-is Meta’s library, <code class="docutils literal notranslate"><span class="pre">transformers</span></code> the HuggingFace port the adapter falls back to. Each backend
-wraps a model that is already loaded, so building one is free; <code class="docutils literal notranslate"><span class="pre">load</span></code> is what loads one.</p>
-<p>Both return the model’s own output layout for text and melody, <code class="docutils literal notranslate"><span class="pre">(channels,</span> <span class="pre">frames)</span></code> from
-audiocraft and <code class="docutils literal notranslate"><span class="pre">(frames,)</span></code> from transformers’ first channel, and mono for a continuation.</p>
+is Meta’s library, <code class="docutils literal notranslate"><span class="pre">transformers</span></code> the HuggingFace port, and <code class="docutils literal notranslate"><span class="pre">mlx</span></code> Apple’s MLX port
+(<code class="docutils literal notranslate"><span class="pre">ml-explore/mlx-examples</span></code>), which runs in its own environment through a worker and only
+does text. Each backend wraps a model that is already loaded, so building one is free;
+<code class="docutils literal notranslate"><span class="pre">load</span></code> is what loads one.</p>
+<p>Which one runs (<a class="reference internal" href="#arioso.platforms.musicgen.backends.select_backend_class" title="arioso.platforms.musicgen.backends.select_backend_class"><code class="xref py py-func docutils literal notranslate"><span class="pre">select_backend_class()</span></code></a>): <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MUSICGEN_BACKEND</span></code> when set; else
+MLX for a text take on Apple Silicon when its runtime is installed; else audiocraft when it
+imports; else transformers. On Apple Silicon, transformers runs on the CPU unless
+<code class="docutils literal notranslate"><span class="pre">$ARIOSO_TORCH_DEVICE</span></code> says otherwise: on MPS it was 15-30x slower and grew Metal memory
+on every decoding step (42 GB after three 10 s clips on an M1 Max).</p>
+<p>audiocraft and transformers return the model’s own layout for text and melody,
+<code class="docutils literal notranslate"><span class="pre">(channels,</span> <span class="pre">frames)</span></code> from audiocraft and <code class="docutils literal notranslate"><span class="pre">(frames,)</span></code> from transformers’ first channel, and
+mono for a continuation; MLX returns <code class="docutils literal notranslate"><span class="pre">(frames,)</span></code>.</p>
 <p class="rubric">Module Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE" title="arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_FRAME_RATE</span></code></a></p></td>
 <td><p>Codec frames per second, used when a model does not report its own.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.BACKEND_ENV_VAR" title="arioso.platforms.musicgen.backends.BACKEND_ENV_VAR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BACKEND_ENV_VAR</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">audiocraft</span></code>, <code class="docutils literal notranslate"><span class="pre">transformers</span></code> or <code class="docutils literal notranslate"><span class="pre">mlx</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.MLX_MAX_SECONDS" title="arioso.platforms.musicgen.backends.MLX_MAX_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLX_MAX_SECONDS</span></code></a></p></td>
+<td><p>MusicGen's context in seconds (1500 frames); the MLX port does not stop there itself.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS" title="arioso.platforms.musicgen.backends.MLX_CHECKPOINTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLX_CHECKPOINTS</span></code></a></p></td>
+<td><p>The checkpoints the MLX port loads.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.TASKS" title="arioso.platforms.musicgen.backends.TASKS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TASKS</span></code></a></p></td>
+<td><p>plain text, follow a melody, or continue audio.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.BACKENDS" title="arioso.platforms.musicgen.backends.BACKENDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BACKENDS</span></code></a></p></td>
+<td><p>The backends by the name <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MUSICGEN_BACKEND</span></code> takes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -441,8 +464,8 @@ audiocraft and <code class="docutils literal notranslate"><span class="pre">(fra
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.select_backend_class" title="arioso.platforms.musicgen.backends.select_backend_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_backend_class</span></code></a>(model_variant)</p></td>
-<td><p>The library that runs <code class="docutils literal notranslate"><span class="pre">model_variant</span></code>: audiocraft when it imports, else transformers.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.select_backend_class" title="arioso.platforms.musicgen.backends.select_backend_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_backend_class</span></code></a>(model_variant, *[, task])</p></td>
+<td><p>The library that runs <code class="docutils literal notranslate"><span class="pre">model_variant</span></code> for <code class="docutils literal notranslate"><span class="pre">task</span></code> (see the module docstring).</p></td>
 </tr>
 </tbody>
 </table>
@@ -456,10 +479,13 @@ audiocraft and <code class="docutils literal notranslate"><span class="pre">(fra
 <tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.Backend" title="arioso.platforms.musicgen.backends.Backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backend</span></code></a>(*args, **kwargs)</p></td>
 <td><p>What the adapter needs from a library that runs a loaded MusicGen model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.Sampling" title="arioso.platforms.musicgen.backends.Sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sampling</span></code></a>(*, temperature, top_k, top_p, guidance)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.MlxBackend" title="arioso.platforms.musicgen.backends.MlxBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MlxBackend</span></code></a>(worker, model_variant, info)</p></td>
+<td><p>MusicGen on MLX, in the <code class="docutils literal notranslate"><span class="pre">mlx-examples</span></code> runtime's own process (text only).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.Sampling" title="arioso.platforms.musicgen.backends.Sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sampling</span></code></a>(*, temperature, top_k, top_p, guidance)</p></td>
 <td><p>Sampling settings shared by every MusicGen mode.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.TransformersBackend" title="arioso.platforms.musicgen.backends.TransformersBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransformersBackend</span></code></a>(model, processor)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.musicgen.backends.TransformersBackend" title="arioso.platforms.musicgen.backends.TransformersBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransformersBackend</span></code></a>(model, processor)</p></td>
 <td><p>A loaded transformers <code class="docutils literal notranslate"><span class="pre">Musicgen(Melody)ForConditionalGeneration</span></code> and its processor.</p></td>
 </tr>
 </tbody>
@@ -580,6 +606,23 @@ audiocraft and <code class="docutils literal notranslate"><span class="pre">(fra
 
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.BACKENDS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">BACKENDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'audiocraft':</span> <span class="pre">&lt;class</span> <span class="pre">'arioso.platforms.musicgen.backends.AudiocraftBackend'&gt;,</span> <span class="pre">'mlx':</span> <span class="pre">&lt;class</span> <span class="pre">'arioso.platforms.musicgen.backends.MlxBackend'&gt;,</span> <span class="pre">'transformers':</span> <span class="pre">&lt;class</span> <span class="pre">'arioso.platforms.musicgen.backends.TransformersBackend'&gt;}</span></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.BACKENDS" title="Link to this definition">#</a></dt>
+<dd><p>The backends by the name <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MUSICGEN_BACKEND</span></code> takes.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.BACKEND_ENV_VAR">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">BACKEND_ENV_VAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ARIOSO_MUSICGEN_BACKEND'</span></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.BACKEND_ENV_VAR" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">audiocraft</span></code>, <code class="docutils literal notranslate"><span class="pre">transformers</span></code> or <code class="docutils literal notranslate"><span class="pre">mlx</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Forces a backend</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.Backend">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">Backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#Backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.Backend" title="Link to this definition">#</a></dt>
@@ -649,12 +692,146 @@ audiocraft and <code class="docutils literal notranslate"><span class="pre">(fra
 <dd><p>Codec frames per second, used when a model does not report its own.</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MLX_CHECKPOINTS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">MLX_CHECKPOINTS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'facebook/musicgen-large',</span> <span class="pre">'facebook/musicgen-medium',</span> <span class="pre">'facebook/musicgen-small'})</span></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS" title="Link to this definition">#</a></dt>
+<dd><p>The checkpoints the MLX port loads.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MLX_MAX_SECONDS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">MLX_MAX_SECONDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30.0</span></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.MLX_MAX_SECONDS" title="Link to this definition">#</a></dt>
+<dd><p>MusicGen’s context in seconds (1500 frames); the MLX port does not stop there itself.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">MlxBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>MusicGen on MLX, in the <code class="docutils literal notranslate"><span class="pre">mlx-examples</span></code> runtime’s own process (text only).</p>
+<p>The model lives in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Worker</span></code> running
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">arioso.platforms.musicgen._mlx_driver</span></code>; audio comes back through a <code class="docutils literal notranslate"><span class="pre">.npy</span></code> file.
+<code class="docutils literal notranslate"><span class="pre">top_p</span></code> has no MLX counterpart (a non-zero one is warned about and ignored).</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.available">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.available" title="Link to this definition">#</a></dt>
+<dd><p>Apple Silicon, a supported checkpoint, and the runtime installed (cheap).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.can_continue">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">can_continue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.can_continue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.can_continue" title="Link to this definition">#</a></dt>
+<dd><p>No: the MLX port generates from text only.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.close" title="Link to this definition">#</a></dt>
+<dd><p>Stop the worker (the model is released).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.continuation">
+<span class="sig-name descname"><span class="pre">continuation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tail</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.continuation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.continuation" title="Link to this definition">#</a></dt>
+<dd><p>Not on MLX: the selection sends continuations to another backend.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.frame_rate">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frame_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.frame_rate" title="Link to this definition">#</a></dt>
+<dd><p>Codec frames per second.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.load">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_worker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.load" title="Link to this definition">#</a></dt>
+<dd><p>Start the worker and load <code class="docutils literal notranslate"><span class="pre">model_variant</span></code> in it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – For a checkpoint the MLX port does not run.</p></li>
+<li><p><strong>arioso._isolated.RuntimeNotInstalled</strong> – With the commands that install it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#arioso.platforms.musicgen.backends.MlxBackend" title="arioso.platforms.musicgen.backends.MlxBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">MlxBackend</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.melody">
+<span class="sig-name descname"><span class="pre">melody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.melody"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.melody" title="Link to this definition">#</a></dt>
+<dd><p>Not on MLX: the selection sends melody takes to another backend.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.runtime">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">runtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.runtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.runtime" title="Link to this definition">#</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">mlx-examples</span></code> runtime (see the musicgen config’s <code class="docutils literal notranslate"><span class="pre">mlx_runtime</span></code>).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.sample_rate">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sample_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.sample_rate" title="Link to this definition">#</a></dt>
+<dd><p>Output samples per second.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.supports">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">supports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.supports"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.supports" title="Link to this definition">#</a></dt>
+<dd><p>Whether the MLX port runs <code class="docutils literal notranslate"><span class="pre">model_variant</span></code>: Meta’s mono text checkpoints only
+(the port reads their audiocraft <code class="docutils literal notranslate"><span class="pre">state_dict.bin</span></code>; fine-tunes in transformers
+format have none).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.MlxBackend.text">
+<span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#MlxBackend.text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.MlxBackend.text" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">seconds</span></code> of mono audio for <code class="docutils literal notranslate"><span class="pre">prompt</span></code>, <code class="docutils literal notranslate"><span class="pre">(frames,)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.Sampling">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">Sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guidance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#Sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.Sampling" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Sampling settings shared by every MusicGen mode.</p>
 <dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.TASKS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">TASKS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('text',</span> <span class="pre">'melody',</span> <span class="pre">'continuation')</span></span><a class="headerlink" href="#arioso.platforms.musicgen.backends.TASKS" title="Link to this definition">#</a></dt>
+<dd><p>plain text, follow a melody, or continue audio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>What a backend is asked to do</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -719,7 +896,7 @@ config does not say, or it has none.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.TransformersBackend.load">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#TransformersBackend.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.TransformersBackend.load" title="Link to this definition">#</a></dt>
-<dd><p>Load <code class="docutils literal notranslate"><span class="pre">model_variant</span></code> and its processor with transformers, on <code class="xref py py-func docutils literal notranslate"><span class="pre">torch_device()</span></code>.</p>
+<dd><p>Load <code class="docutils literal notranslate"><span class="pre">model_variant</span></code> and its processor with transformers, on <code class="xref py py-func docutils literal notranslate"><span class="pre">_transformers_device()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>model_variant</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – A MusicGen checkpoint name; a melody variant gets the
@@ -787,10 +964,10 @@ melody-specific model class.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="arioso.platforms.musicgen.backends.select_backend_class">
-<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">select_backend_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#select_backend_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.select_backend_class" title="Link to this definition">#</a></dt>
-<dd><p>The library that runs <code class="docutils literal notranslate"><span class="pre">model_variant</span></code>: audiocraft when it imports, else transformers.</p>
-<p>Imports audiocraft but loads no checkpoint, so it can be asked before a multi-GB
-one is read; a present but broken install falls back like a missing one.</p>
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.musicgen.backends.</span></span><span class="sig-name descname"><span class="pre">select_backend_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_variant</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/musicgen/backends.html#select_backend_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.musicgen.backends.select_backend_class" title="Link to this definition">#</a></dt>
+<dd><p>The library that runs <code class="docutils literal notranslate"><span class="pre">model_variant</span></code> for <code class="docutils literal notranslate"><span class="pre">task</span></code> (see the module docstring).</p>
+<p>Loads no checkpoint, so it can be asked before a multi-GB one is read; a present but
+broken audiocraft install falls back like a missing one.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference internal" href="#arioso.platforms.musicgen.backends.Backend" title="arioso.platforms.musicgen.backends.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>]</span></p>
@@ -857,6 +1034,8 @@ one is read; a present but broken install falls back like a missing one.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.AudiocraftBackend.text"><code class="docutils literal notranslate"><span class="pre">AudiocraftBackend.text()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.BACKENDS"><code class="docutils literal notranslate"><span class="pre">BACKENDS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.BACKEND_ENV_VAR"><code class="docutils literal notranslate"><span class="pre">BACKEND_ENV_VAR</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.Backend.can_continue"><code class="docutils literal notranslate"><span class="pre">Backend.can_continue()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.Backend.continuation"><code class="docutils literal notranslate"><span class="pre">Backend.continuation()</span></code></a></li>
@@ -867,7 +1046,24 @@ one is read; a present but broken install falls back like a missing one.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.DEFAULT_FRAME_RATE"><code class="docutils literal notranslate"><span class="pre">DEFAULT_FRAME_RATE</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS"><code class="docutils literal notranslate"><span class="pre">MLX_CHECKPOINTS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MLX_MAX_SECONDS"><code class="docutils literal notranslate"><span class="pre">MLX_MAX_SECONDS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend"><code class="docutils literal notranslate"><span class="pre">MlxBackend</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.available"><code class="docutils literal notranslate"><span class="pre">MlxBackend.available()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.can_continue"><code class="docutils literal notranslate"><span class="pre">MlxBackend.can_continue()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.close"><code class="docutils literal notranslate"><span class="pre">MlxBackend.close()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.continuation"><code class="docutils literal notranslate"><span class="pre">MlxBackend.continuation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.frame_rate"><code class="docutils literal notranslate"><span class="pre">MlxBackend.frame_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.load"><code class="docutils literal notranslate"><span class="pre">MlxBackend.load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.melody"><code class="docutils literal notranslate"><span class="pre">MlxBackend.melody()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.runtime"><code class="docutils literal notranslate"><span class="pre">MlxBackend.runtime()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.sample_rate"><code class="docutils literal notranslate"><span class="pre">MlxBackend.sample_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.supports"><code class="docutils literal notranslate"><span class="pre">MlxBackend.supports()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.MlxBackend.text"><code class="docutils literal notranslate"><span class="pre">MlxBackend.text()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.Sampling"><code class="docutils literal notranslate"><span class="pre">Sampling</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.TASKS"><code class="docutils literal notranslate"><span class="pre">TASKS</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.TransformersBackend"><code class="docutils literal notranslate"><span class="pre">TransformersBackend</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.TransformersBackend.audio_channels"><code class="docutils literal notranslate"><span class="pre">TransformersBackend.audio_channels</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.musicgen.backends.TransformersBackend.can_continue"><code class="docutils literal notranslate"><span class="pre">TransformersBackend.can_continue()</span></code></a></li>

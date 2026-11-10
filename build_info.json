@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-10T10:21:26Z",
+  "built_at": "2026-11-10T10:24:46Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.45",
+    "version": "0.0.46",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "8808f069ed225c558fa061e1dcb1b66d4cd0b283",
-    "short_commit": "8808f06",
+    "commit": "ffd094361041e6aac8081ca9311c5dcca445ef07",
+    "short_commit": "ffd0943",
     "branch": "main",
     "tags": [
-      "0.0.45"
+      "0.0.46"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/8808f069ed225c558fa061e1dcb1b66d4cd0b283",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/ffd094361041e6aac8081ca9311c5dcca445ef07",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "ad9a9225faa0a9846ff92c6aa827c66e97000cca",
+    "sha": "0c96fdd25c29bc16b250db3a06c3ab1c1b481d18",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "42798021192",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/42798021192",
+    "run_id": "42798499635",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/42798499635",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,18 +58,20 @@
   },
   "site": {
     "modules_documented": 66,
-    "objects_documented": 175
+    "objects_documented": 192
   },
   "pypi": {
     "checked": true,
     "latest": "0.0.45",
-    "relation": "same",
+    "relation": "ahead",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout 8808f069ed225c558fa061e1dcb1b66d4cd0b283\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout ffd094361041e6aac8081ca9311c5dcca445ef07\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.0.46) is ahead of the latest release on PyPI (0.0.45): these docs describe unreleased code."
+    ]
   }
 }

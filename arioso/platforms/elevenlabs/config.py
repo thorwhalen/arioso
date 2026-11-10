@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://elevenlabs.io",
     "tier": "structured",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "api_key",
         "env_var": "ELEVENLABS_API_KEY",

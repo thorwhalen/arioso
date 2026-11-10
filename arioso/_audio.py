@@ -264,6 +264,88 @@ def to_audio_ref(value: Any) -> AudioRef:
 
 
 # --------------------------------------------------------------------------------------------
+# Egress: writing a generated Song to a file
+
+
+def _write_pcm16_wav(frames, sample_rate: int, path: str) -> None:
+    """Write float ``(frames, channels)`` audio as 16-bit PCM with the stdlib."""
+    import wave
+
+    import numpy as np
+
+    pcm = (np.clip(frames, -1.0, 1.0) * np.iinfo(np.int16).max).astype("<i2")
+    with wave.open(path, "wb") as out:
+        out.setnchannels(pcm.shape[1])
+        out.setsampwidth(2)
+        out.setframerate(int(sample_rate))
+        out.writeframes(pcm.tobytes())
+
+
+def write_wav(array, sample_rate: int, path) -> str:
+    """Write a waveform to a WAV file and return its path.
+
+    Uses ``soundfile`` when it is installed, else the stdlib ``wave`` module
+    (16-bit PCM). ``array`` may be ``(frames,)``, ``(channels, frames)``,
+    ``(frames, channels)`` or carry leading batch axes of size 1.
+    """
+    import numpy as np
+
+    audio = np.asarray(array)
+    while audio.ndim > 2 and audio.shape[0] == 1:
+        audio = audio[0]
+    frames = _channels_first(audio).T  # writers want (frames, channels)
+    path = str(path)
+    try:
+        import soundfile
+    except ImportError:
+        _write_pcm16_wav(frames, sample_rate, path)
+    else:
+        soundfile.write(path, frames, int(sample_rate))
+    return path
+
+
+def save_song(song, path) -> Path:
+    """Write *song*'s audio to *path* and return the path written.
+
+    A waveform is written as WAV. Encoded bytes are written as they are, in
+    their format (e.g. ``mp3``). Either way, a path whose suffix differs from
+    the format gets the format's suffix, so the file's name never lies about
+    its contents.
+    A song that only has a URL is downloaded first (:func:`arioso.fetch_audio`).
+
+    Raises:
+        ValueError: If the song is not complete or carries no audio.
+    """
+    from arioso.base import Song
+
+    if not isinstance(song, Song):
+        raise TypeError(f"save_song expects a Song, got {type(song).__name__}")
+    path = Path(path)
+    audio = song.audio
+    if audio.audio_array is not None:
+        if not audio.sample_rate:
+            raise ValueError("The song's waveform has no sample rate.")
+        return Path(
+            write_wav(audio.audio_array, audio.sample_rate, path.with_suffix(".wav"))
+        )
+    if audio.audio_bytes is None and audio.audio_url:
+        from arioso import fetch_audio
+
+        audio = fetch_audio(song).audio
+    if audio.audio_bytes is None:
+        raise ValueError(
+            f"The {song.platform or 'generated'} song has no audio to save "
+            f"(status {song.status!r}). Hosted platforms that finish later need "
+            "arioso.check_status(song) first."
+        )
+    suffix = f".{audio.format.lower()}" if audio.format else path.suffix
+    if suffix and suffix != path.suffix.lower():
+        path = path.with_suffix(suffix)
+    path.write_bytes(audio.audio_bytes)
+    return path
+
+
+# --------------------------------------------------------------------------------------------
 # Pitch and DSP primitives (numpy is imported where used, so ``import arioso`` stays light)
 
 

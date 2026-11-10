@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://github.com/Harmonai-org/sample-generator",
     "tier": "low_level",
     "access_type": "python_lib",
+    "weights_license": "MIT",
+    "commercial_use": "yes",
     "auth": {"type": "none"},
     "dependencies": [],
     "optional_dependencies": ["diffusers", "torch"],

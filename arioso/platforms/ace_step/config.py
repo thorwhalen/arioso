@@ -10,6 +10,8 @@ PLATFORM_CONFIG = {
     "website": "https://fal.ai/models/fal-ai/ace-step",
     "tier": "structured",
     "access_type": "rest_api",
+    "weights_license": "Apache-2.0",
+    "commercial_use": "yes",
     "auth": {"type": "api_key", "env_var": "FAL_KEY"},
     "dependencies": [],
     "optional_dependencies": ["fal_client", "requests"],

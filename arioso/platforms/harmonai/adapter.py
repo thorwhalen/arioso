@@ -23,7 +23,7 @@ class Adapter:
         from diffusers import DanceDiffusionPipeline
 
         self._pipe = DanceDiffusionPipeline.from_pretrained(
-            "harmonai/jmann-small-190k-steps"
+            "harmonai/jmann-small-190k"
         )
 
     def generate(

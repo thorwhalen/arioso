@@ -18,7 +18,7 @@ Initial models generate 1--3 seconds of audio. The system also supports audio in
 between two tracks and style transfer / regeneration.
 
 - GitHub: <https://github.com/Harmonai-org/sample-generator>
-- HuggingFace model (jmann-small): <https://huggingface.co/harmonai/jmann-small-190k-steps>
+- HuggingFace model (jmann-small): <https://huggingface.co/harmonai/jmann-small-190k>
 - HuggingFace diffusers docs: <https://huggingface.co/docs/diffusers/api/pipelines/dance_diffusion>
 - Replicate API: <https://replicate.com/harmonai/dance-diffusion>
 
@@ -36,7 +36,7 @@ Generation is shaped by three levers only:
 |-------|--------|
 | **seed** | Different seeds produce different outputs. This is the primary way to explore the output space. |
 | **num_steps** | More diffusion steps yield higher-quality audio, with diminishing returns past ~100 steps. |
-| **Model checkpoint** | The pre-trained model determines the musical style. For example, `jmann-small-190k-steps` tends toward electronic/ambient textures. |
+| **Model checkpoint** | The pre-trained model determines the musical style. For example, `jmann-small-190k` tends toward electronic/ambient textures. |
 
 ### When to use Dance Diffusion
 
@@ -62,7 +62,7 @@ If you need text-conditioned music generation, use one of the following instead:
 | Type | Python library (local inference via [diffusers](https://huggingface.co/docs/diffusers/)) |
 | Dependencies | `diffusers`, `torch` |
 | Authentication | None |
-| Default model | `harmonai/jmann-small-190k-steps` |
+| Default model | `harmonai/jmann-small-190k` |
 | Output format | WAV, 48 kHz, numpy array |
 
 ### Parameters

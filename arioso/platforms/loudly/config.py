@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://loudly.com",
     "tier": "structured",
     "access_type": "rest_api",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "bearer_token",
         "env_var": "LOUDLY_API_KEY",

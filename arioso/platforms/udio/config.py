@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://udio.com",
     "tier": "structured",
     "access_type": "python_lib",
+    "weights_license": "proprietary",
+    "commercial_use": "provider terms",
     "auth": {
         "type": "cookie",
         "env_var": "UDIO_AUTH_COOKIE",

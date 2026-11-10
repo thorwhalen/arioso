@@ -64,14 +64,24 @@ def get_platform(name: str) -> dict:
     Raises:
         KeyError: If the platform is not found.
     """
-    if name not in _registry:
-        discover_platforms()
-    if name not in _registry:
-        raise KeyError(f"Unknown platform: {name!r}. Known: {list(_registry)}")
+    get_config(name)  # discovers, or raises for an unknown name
     entry = _registry[name]
     if entry["adapter"] is None:
         entry["adapter"] = _load_adapter(name, entry["config"])
     return entry
+
+
+def get_config(name: str) -> dict:
+    """The PLATFORM_CONFIG of platform *name*, without loading its adapter.
+
+    Raises:
+        KeyError: If the platform is not found.
+    """
+    if name not in _registry:
+        discover_platforms()
+    if name not in _registry:
+        raise KeyError(f"Unknown platform: {name!r}. Known: {list(_registry)}")
+    return _registry[name]["config"]
 
 
 def list_platforms() -> list[str]:

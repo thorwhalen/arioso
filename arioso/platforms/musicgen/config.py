@@ -6,6 +6,8 @@ PLATFORM_CONFIG = {
     "website": "https://github.com/facebookresearch/audiocraft",
     "tier": "low_level",
     "access_type": "python_lib",
+    "weights_license": "CC-BY-NC-4.0",
+    "commercial_use": "no",
     "auth": {"type": "none"},
     "dependencies": [],
     "optional_dependencies": ["audiocraft", "transformers", "torch"],

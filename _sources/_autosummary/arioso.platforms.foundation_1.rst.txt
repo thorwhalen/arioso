@@ -1,0 +1,14 @@
+arioso.platforms.foundation\_1
+==============================
+
+.. automodule:: arioso.platforms.foundation_1
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   adapter
+   config

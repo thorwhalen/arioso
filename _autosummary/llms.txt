@@ -20,6 +20,9 @@
 - [arioso.platforms.elevenlabs](arioso.platforms.elevenlabs.html.md): ElevenLabs Music platform for arioso.
 - [arioso.platforms.elevenlabs.adapter](arioso.platforms.elevenlabs.adapter.html.md): ElevenLabs Music adapter.
 - [arioso.platforms.elevenlabs.config](arioso.platforms.elevenlabs.config.html.md): ElevenLabs Music platform configuration.
+- [arioso.platforms.foundation_1](arioso.platforms.foundation_1.html.md): Foundation-1 platform (local, stable-audio-tools in its own environment) for arioso.
+- [arioso.platforms.foundation_1.adapter](arioso.platforms.foundation_1.adapter.html.md): Foundation-1 adapter: stable-audio-tools in its own environment, one worker per adapter.
+- [arioso.platforms.foundation_1.config](arioso.platforms.foundation_1.config.html.md): Foundation-1 platform configuration (local, stable-audio-tools in its own environment).
 - [arioso.platforms.harmonai](arioso.platforms.harmonai.html.md): Harmonai (Dance Diffusion) platform for arioso.
 - [arioso.platforms.harmonai.adapter](arioso.platforms.harmonai.adapter.html.md): Harmonai (Dance Diffusion) adapter using diffusers.
 - [arioso.platforms.harmonai.config](arioso.platforms.harmonai.config.html.md): Harmonai (Dance Diffusion) platform configuration.

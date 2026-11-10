@@ -1,0 +1,34 @@
+arioso.platforms.foundation\_1.adapter
+======================================
+
+.. automodule:: arioso.platforms.foundation_1.adapter
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BEATS_PER_BAR
+      WINDOW_SECONDS
+      DFLT_SAMPLER
+      WORKER_ENV
+      TARGET_NOTE_TAG
+      DFLT_NOTE_SECONDS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      build_prompt
+      cached_weights
+      hf_hub_cache
+      normalize_key
+      normalize_note
+      parse_key
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
+   

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="arioso.platforms.foundation_1.adapter.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="arioso.platforms.foundation_1.adapter.html.md">
+<link rel="describedby" href="llms.txt">
+    <title>arioso.platforms.foundation_1.adapter &#8212; arioso</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=3baad687" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/arioso.platforms.foundation_1.adapter';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="arioso.platforms.foundation_1.config" href="arioso.platforms.foundation_1.config.html" />
+    <link rel="prev" title="arioso.platforms.foundation_1" href="arioso.platforms.foundation_1.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.51" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">arioso</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/arioso" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="arioso.html">arioso</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="arioso.base.html">arioso.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.cli.html">arioso.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.compare.html">arioso.compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.named_prompts.html">arioso.named_prompts</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="arioso.platforms.html">arioso.platforms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.ace_step.html">arioso.platforms.ace_step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.beatoven.html">arioso.platforms.beatoven</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l3 current active"><a class="reference internal" href="arioso.platforms.foundation_1.html">arioso.platforms.foundation_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.harmonai.html">arioso.platforms.harmonai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.jen.html">arioso.platforms.jen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.loudly.html">arioso.platforms.loudly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria2.html">arioso.platforms.lyria2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.lyria_rt.html">arioso.platforms.lyria_rt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.magenta_rt.html">arioso.platforms.magenta_rt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.mubert.html">arioso.platforms.mubert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.musicgen.html">arioso.platforms.musicgen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.riffusion.html">arioso.platforms.riffusion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio.html">arioso.platforms.stable_audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio_25.html">arioso.platforms.stable_audio_25</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.stable_audio_3.html">arioso.platforms.stable_audio_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.sunoapi.html">arioso.platforms.sunoapi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.udio.html">arioso.platforms.udio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.yue.html">arioso.platforms.yue</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.registry.html">arioso.registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.services.html">arioso.services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.tools.html">arioso.tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.translation.html">arioso.translation</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="arioso.html" class="nav-link">arioso</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="arioso.platforms.html" class="nav-link">arioso.platforms</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="arioso.platforms.foundation_1.html" class="nav-link">arioso.platforms.foundation_1</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">arioso.platforms.foundation_1.adapter</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-arioso.platforms.foundation_1.adapter">
+<span id="arioso-platforms-foundation-1-adapter"></span><h1>arioso.platforms.foundation_1.adapter<a class="headerlink" href="#module-arioso.platforms.foundation_1.adapter" title="Link to this heading">#</a></h1>
+<p>Foundation-1 adapter: stable-audio-tools in its own environment, one worker per adapter.</p>
+<p>The model loads once, in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Worker</span></code> running
+<code class="docutils literal notranslate"><span class="pre">arioso/_workers/foundation_1_worker.py</span></code> with the Python of the <code class="docutils literal notranslate"><span class="pre">foundation-1</span></code>
+environment, which <code class="xref py py-func docutils literal notranslate"><span class="pre">ensure_env()</span></code> builds on first use (pinned
+stable-audio-tools, torch 2.7). <code class="docutils literal notranslate"><span class="pre">make_worker=</span></code> and <code class="docutils literal notranslate"><span class="pre">ensure_env=</span></code> are the seams.</p>
+<p>Foundation-1 reads a tag prompt: instrument family and sub-family, timbre, notation and FX
+tags, then <code class="docutils literal notranslate"><span class="pre">&quot;&lt;N&gt;</span> <span class="pre">Bars,</span> <span class="pre">&lt;BPM&gt;</span> <span class="pre">BPM,</span> <span class="pre">&lt;key&gt;&quot;</span></code> (see <a class="reference internal" href="#arioso.platforms.foundation_1.adapter.build_prompt" title="arioso.platforms.foundation_1.adapter.build_prompt"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_prompt()</span></code></a>). arioso’s <code class="docutils literal notranslate"><span class="pre">bpm</span></code>
+and <code class="docutils literal notranslate"><span class="pre">key</span></code> become those tags; a loop’s length follows from its bars and tempo, so with a
+tempo the clip is exactly <code class="docutils literal notranslate"><span class="pre">bars</span></code> bars of 4/4 (<code class="docutils literal notranslate"><span class="pre">bars=</span></code> 4 or 8, else the count nearest
+to <code class="docutils literal notranslate"><span class="pre">duration</span></code>). Without one, <code class="docutils literal notranslate"><span class="pre">duration</span></code> is the clip length (a one-shot or free clip).</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.BEATS_PER_BAR" title="arioso.platforms.foundation_1.adapter.BEATS_PER_BAR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BEATS_PER_BAR</span></code></a></p></td>
+<td><p>Beats in a bar (the loops are 4/4).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.WINDOW_SECONDS" title="arioso.platforms.foundation_1.adapter.WINDOW_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WINDOW_SECONDS</span></code></a></p></td>
+<td><p>Seconds of audio the model renders at most (its 882000-sample window at 44.1 kHz).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.DFLT_SAMPLER" title="arioso.platforms.foundation_1.adapter.DFLT_SAMPLER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_SAMPLER</span></code></a></p></td>
+<td><p>stable-audio-tools' sampler and noise schedule used for Stable Audio Open 1.0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.WORKER_ENV" title="arioso.platforms.foundation_1.adapter.WORKER_ENV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WORKER_ENV</span></code></a></p></td>
+<td><p>MPS falls back to the CPU for an operator it lacks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG" title="arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TARGET_NOTE_TAG</span></code></a></p></td>
+<td><p>The tag before a one-shot's pitch, and the keybeds checkpoint's single-note prefix (<code class="docutils literal notranslate"><span class="pre">keybed_training_strategy.md</span></code> in the model repository).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS" title="arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_NOTE_SECONDS</span></code></a></p></td>
+<td><p>A one-shot's length when no duration is given (the keybed notes were trained at 3 s).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.build_prompt" title="arioso.platforms.foundation_1.adapter.build_prompt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_prompt</span></code></a>(prompt, *[, bpm, key, bars, ...])</p></td>
+<td><p>The tag prompt, the clip's seconds and the timing it used, from arioso's controls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.cached_weights" title="arioso.platforms.foundation_1.adapter.cached_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cached_weights</span></code></a>([model, config])</p></td>
+<td><p>The local path of <code class="docutils literal notranslate"><span class="pre">model</span></code>'s checkpoint in the Hugging Face cache, or None if absent.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.hf_hub_cache" title="arioso.platforms.foundation_1.adapter.hf_hub_cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hf_hub_cache</span></code></a>()</p></td>
+<td><p>The Hugging Face hub cache: <code class="docutils literal notranslate"><span class="pre">$HF_HUB_CACHE</span></code>, else <code class="docutils literal notranslate"><span class="pre">$HF_HOME/hub</span></code>, else the default.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.normalize_key" title="arioso.platforms.foundation_1.adapter.normalize_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_key</span></code></a>(key)</p></td>
+<td><p>A key as Foundation-1's tags spell it: <code class="docutils literal notranslate"><span class="pre">&quot;Am&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;A</span> <span class="pre">minor&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;f#&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;F#</span> <span class="pre">major&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.normalize_note" title="arioso.platforms.foundation_1.adapter.normalize_note"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_note</span></code></a>(note)</p></td>
+<td><p>A pitch as the tags spell it (<code class="docutils literal notranslate"><span class="pre">&quot;c#3&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;C#3&quot;</span></code>); a ValueError if it is not one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.parse_key" title="arioso.platforms.foundation_1.adapter.parse_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_key</span></code></a>(key)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(spelling,</span> <span class="pre">pitch_class,</span> <span class="pre">mode)</span></code> of a key, or None if <code class="docutils literal notranslate"><span class="pre">key</span></code> is not one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.foundation_1.adapter.Adapter" title="arioso.platforms.foundation_1.adapter.Adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adapter</span></code></a>([config, make_worker, ensure_env, ...])</p></td>
+<td><p>Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.Adapter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_worker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'ps.isolated.Worker'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">ensure_env&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_supported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_is_supported&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#Adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.Adapter" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.Adapter.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#Adapter.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.Adapter.close" title="Link to this definition">#</a></dt>
+<dd><p>Stop the worker (the loaded model is released).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.Adapter.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'foundation-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guidance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dpmpp-3m-sde'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#Adapter.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.Adapter.generate" title="Link to this definition">#</a></dt>
+<dd><p>Render a loop or a one-shot for the tag prompt <code class="docutils literal notranslate"><span class="pre">prompt</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Foundation-1 tags, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;Synth</span> <span class="pre">Lead,</span> <span class="pre">Warm,</span> <span class="pre">Arp,</span> <span class="pre">Medium</span> <span class="pre">Reverb&quot;</span></code>
+(instrument, timbre, notation, FX; see the model card). Passed through,
+with the bar, tempo and key tags appended when given as arguments.</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Seconds; without a tempo, the clip length (default 10), with one,
+only the hint for the bar count.</p></li>
+<li><p><strong>bpm</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Tempo, appended as <code class="docutils literal notranslate"><span class="pre">&quot;&lt;bpm&gt;</span> <span class="pre">BPM&quot;</span></code> (trained on 100-150, see the config).</p></li>
+<li><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Key, appended as e.g. <code class="docutils literal notranslate"><span class="pre">&quot;E</span> <span class="pre">minor&quot;</span></code> (<code class="docutils literal notranslate"><span class="pre">&quot;Em&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;E</span> <span class="pre">minor&quot;</span></code> both work).</p></li>
+<li><p><strong>bars</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – 4 or 8, with a tempo: the loop is exactly that many 4/4 bars.</p></li>
+<li><p><strong>note</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – A one-shot’s pitch (<code class="docutils literal notranslate"><span class="pre">&quot;C3&quot;</span></code>), appended as <code class="docutils literal notranslate"><span class="pre">&quot;Target</span> <span class="pre">Note,</span> <span class="pre">C3&quot;</span></code>; with
+<code class="docutils literal notranslate"><span class="pre">model=&quot;1.2-keybeds&quot;</span></code> the prompt takes that checkpoint’s single-note
+form (<code class="docutils literal notranslate"><span class="pre">&quot;Keybed,</span> <span class="pre">Timbre</span> <span class="pre">Profile,</span> <span class="pre">...&quot;</span></code>). Default length 3 s.</p></li>
+<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – <code class="docutils literal notranslate"><span class="pre">&quot;foundation-1&quot;</span></code> (loops), <code class="docutils literal notranslate"><span class="pre">&quot;1.2-samples&quot;</span></code> (loops and one-shots) or
+<code class="docutils literal notranslate"><span class="pre">&quot;1.2-keybeds&quot;</span></code> (pitch-consistent one-shots).</p></li>
+<li><p><strong>num_steps</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Sampler steps.</p></li>
+<li><p><strong>guidance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – CFG scale.</p></li>
+<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Seed; a fresh one is drawn and recorded when None.</p></li>
+<li><p><strong>negative_prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – What to steer away from.</p></li>
+<li><p><strong>sampler</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – stable-audio-tools sampler type.</p></li>
+<li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – <code class="docutils literal notranslate"><span class="pre">&quot;mps&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cuda&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;cpu&quot;</span></code>; default: the best available.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.BEATS_PER_BAR">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">BEATS_PER_BAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.BEATS_PER_BAR" title="Link to this definition">#</a></dt>
+<dd><p>Beats in a bar (the loops are 4/4).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">DFLT_NOTE_SECONDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.0</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS" title="Link to this definition">#</a></dt>
+<dd><p>A one-shot’s length when no duration is given (the keybed notes were trained at 3 s).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.DFLT_SAMPLER">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">DFLT_SAMPLER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dpmpp-3m-sde'</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.DFLT_SAMPLER" title="Link to this definition">#</a></dt>
+<dd><p>stable-audio-tools’ sampler and noise schedule used for Stable Audio Open 1.0.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">TARGET_NOTE_TAG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Target</span> <span class="pre">Note'</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG" title="Link to this definition">#</a></dt>
+<dd><p>The tag before a one-shot’s pitch, and the keybeds checkpoint’s single-note prefix
+(<code class="docutils literal notranslate"><span class="pre">keybed_training_strategy.md</span></code> in the model repository).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.WINDOW_SECONDS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">WINDOW_SECONDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20.0</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.WINDOW_SECONDS" title="Link to this definition">#</a></dt>
+<dd><p>Seconds of audio the model renders at most (its 882000-sample window at 44.1 kHz).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.WORKER_ENV">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">WORKER_ENV</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'PYTORCH_ENABLE_MPS_FALLBACK':</span> <span class="pre">'1',</span> <span class="pre">'TOKENIZERS_PARALLELISM':</span> <span class="pre">'false'}</span></span><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.WORKER_ENV" title="Link to this definition">#</a></dt>
+<dd><p>MPS falls back to the CPU for an operator it lacks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Variables for the worker</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.build_prompt">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">build_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">bpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keybed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supported_bars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4,</span> <span class="pre">8)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#build_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.build_prompt" title="Link to this definition">#</a></dt>
+<dd><p>The tag prompt, the clip’s seconds and the timing it used, from arioso’s controls.</p>
+<p>Tags already in <code class="docutils literal notranslate"><span class="pre">prompt</span></code> are read and must agree with the arguments (<code class="docutils literal notranslate"><span class="pre">&quot;140</span> <span class="pre">BPM&quot;</span></code>
+with <code class="docutils literal notranslate"><span class="pre">bpm=120</span></code> is an error; keys compare by pitch class and mode, so <code class="docutils literal notranslate"><span class="pre">&quot;Cb</span> <span class="pre">major&quot;</span></code>
+agrees with <code class="docutils literal notranslate"><span class="pre">&quot;B</span> <span class="pre">major&quot;</span></code>); a short key tag (<code class="docutils literal notranslate"><span class="pre">&quot;Am&quot;</span></code>) is spelt out. Missing tags go
+in the model card’s order, <code class="docutils literal notranslate"><span class="pre">...,</span> <span class="pre">8</span> <span class="pre">Bars,</span> <span class="pre">140</span> <span class="pre">BPM,</span> <span class="pre">E</span> <span class="pre">minor</span></code>: bars before the tempo
+(also when only the tempo was in the prompt), the key last.</p>
+<p>With a tempo (<code class="docutils literal notranslate"><span class="pre">bpm</span></code> or a <code class="docutils literal notranslate"><span class="pre">BPM</span></code> tag) the clip is <code class="docutils literal notranslate"><span class="pre">bars</span></code> bars of 4/4: <code class="docutils literal notranslate"><span class="pre">bars</span></code>,
+else a <code class="docutils literal notranslate"><span class="pre">Bars</span></code> tag, else the supported count nearest to <code class="docutils literal notranslate"><span class="pre">duration</span> <span class="pre">*</span> <span class="pre">bpm</span> <span class="pre">/</span> <span class="pre">240</span></code> (4
+without a duration); a <code class="docutils literal notranslate"><span class="pre">duration</span></code> more than a bar away from that warns. Without a
+tempo the clip is <code class="docutils literal notranslate"><span class="pre">duration</span></code> seconds (default 10).</p>
+<p><code class="docutils literal notranslate"><span class="pre">note</span></code> makes a one-shot at that pitch: <code class="docutils literal notranslate"><span class="pre">&quot;Target</span> <span class="pre">Note,</span> <span class="pre">&lt;note&gt;&quot;</span></code> is appended (no
+tempo or bars then; default length 3 s; a key goes before it; a <code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">Note</span></code> already
+in the prompt is read like the other tags), and with <code class="docutils literal notranslate"><span class="pre">keybed=True</span></code> (the keybeds
+checkpoint) the prompt starts with its single-note prefix <code class="docutils literal notranslate"><span class="pre">&quot;Keybed,</span> <span class="pre">Timbre</span> <span class="pre">Profile&quot;</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">build_prompt</span><span class="p">(</span><span class="s2">"Synth Lead, Warm, Arp"</span><span class="p">,</span> <span class="n">bpm</span><span class="o">=</span><span class="mi">140</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"Em"</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="go">('Synth Lead, Warm, Arp, 8 Bars, 140 BPM, E minor', 13.714285714285714, {'bpm': 140, 'bars': 8, 'key': 'E minor', 'note': None})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">build_prompt</span><span class="p">(</span><span class="s2">"Grand Piano, Bright"</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">"c3"</span><span class="p">,</span> <span class="n">keybed</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">('Keybed, Timbre Profile, Grand Piano, Bright, Target Note, C3', 3.0)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.cached_weights">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">cached_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'foundation-1'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#cached_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.cached_weights" title="Link to this definition">#</a></dt>
+<dd><p>The local path of <code class="docutils literal notranslate"><span class="pre">model</span></code>’s checkpoint in the Hugging Face cache, or None if absent.</p>
+<p>Looks at the pinned revision only (no network, no huggingface_hub import).</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.hf_hub_cache">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">hf_hub_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#hf_hub_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.hf_hub_cache" title="Link to this definition">#</a></dt>
+<dd><p>The Hugging Face hub cache: <code class="docutils literal notranslate"><span class="pre">$HF_HUB_CACHE</span></code>, else <code class="docutils literal notranslate"><span class="pre">$HF_HOME/hub</span></code>, else the default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.normalize_key">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">normalize_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#normalize_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.normalize_key" title="Link to this definition">#</a></dt>
+<dd><p>A key as Foundation-1’s tags spell it: <code class="docutils literal notranslate"><span class="pre">&quot;Am&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;A</span> <span class="pre">minor&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;f#&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;F#</span> <span class="pre">major&quot;</span></code>.</p>
+<p>Anything that is not a key comes back stripped, unchanged.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">normalize_key</span><span class="p">(</span><span class="s2">"Am"</span><span class="p">),</span> <span class="n">normalize_key</span><span class="p">(</span><span class="s2">"C# minor"</span><span class="p">),</span> <span class="n">normalize_key</span><span class="p">(</span><span class="s2">"eb"</span><span class="p">)</span>
+<span class="go">('A minor', 'C# minor', 'Eb major')</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.normalize_note">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">normalize_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">note</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#normalize_note"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.normalize_note" title="Link to this definition">#</a></dt>
+<dd><p>A pitch as the tags spell it (<code class="docutils literal notranslate"><span class="pre">&quot;c#3&quot;</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">&quot;C#3&quot;</span></code>); a ValueError if it is not one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.platforms.foundation_1.adapter.parse_key">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.foundation_1.adapter.</span></span><span class="sig-name descname"><span class="pre">parse_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/platforms/foundation_1/adapter.html#parse_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.platforms.foundation_1.adapter.parse_key" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(spelling,</span> <span class="pre">pitch_class,</span> <span class="pre">mode)</span></code> of a key, or None if <code class="docutils literal notranslate"><span class="pre">key</span></code> is not one.</p>
+<p>The spelling is the tags’ (<code class="docutils literal notranslate"><span class="pre">&quot;A</span> <span class="pre">minor&quot;</span></code>); the pitch class compares enharmonics.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_key</span><span class="p">(</span><span class="s2">"Am"</span><span class="p">),</span> <span class="n">parse_key</span><span class="p">(</span><span class="s2">"f# major"</span><span class="p">),</span> <span class="n">parse_key</span><span class="p">(</span><span class="s2">"Bell"</span><span class="p">)</span>
+<span class="go">(('A minor', 9, 'minor'), ('F# major', 6, 'major'), None)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="arioso.platforms.foundation_1.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">arioso.platforms.foundation_1</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="arioso.platforms.foundation_1.config.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">arioso.platforms.foundation_1.config</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.Adapter.close"><code class="docutils literal notranslate"><span class="pre">Adapter.close()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.Adapter.generate"><code class="docutils literal notranslate"><span class="pre">Adapter.generate()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.BEATS_PER_BAR"><code class="docutils literal notranslate"><span class="pre">BEATS_PER_BAR</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS"><code class="docutils literal notranslate"><span class="pre">DFLT_NOTE_SECONDS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.DFLT_SAMPLER"><code class="docutils literal notranslate"><span class="pre">DFLT_SAMPLER</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG"><code class="docutils literal notranslate"><span class="pre">TARGET_NOTE_TAG</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.WINDOW_SECONDS"><code class="docutils literal notranslate"><span class="pre">WINDOW_SECONDS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.WORKER_ENV"><code class="docutils literal notranslate"><span class="pre">WORKER_ENV</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.build_prompt"><code class="docutils literal notranslate"><span class="pre">build_prompt()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.cached_weights"><code class="docutils literal notranslate"><span class="pre">cached_weights()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.hf_hub_cache"><code class="docutils literal notranslate"><span class="pre">hf_hub_cache()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.normalize_key"><code class="docutils literal notranslate"><span class="pre">normalize_key()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.normalize_note"><code class="docutils literal notranslate"><span class="pre">normalize_note()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.foundation_1.adapter.parse_key"><code class="docutils literal notranslate"><span class="pre">parse_key()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/arioso.platforms.foundation_1.adapter.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

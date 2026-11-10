@@ -22,6 +22,9 @@
 - [arioso.platforms.elevenlabs](_autosummary/arioso.platforms.elevenlabs.html.md): ElevenLabs Music platform for arioso.
 - [arioso.platforms.elevenlabs.adapter](_autosummary/arioso.platforms.elevenlabs.adapter.html.md): ElevenLabs Music adapter.
 - [arioso.platforms.elevenlabs.config](_autosummary/arioso.platforms.elevenlabs.config.html.md): ElevenLabs Music platform configuration.
+- [arioso.platforms.foundation_1](_autosummary/arioso.platforms.foundation_1.html.md): Foundation-1 platform (local, stable-audio-tools in its own environment) for arioso.
+- [arioso.platforms.foundation_1.adapter](_autosummary/arioso.platforms.foundation_1.adapter.html.md): Foundation-1 adapter: stable-audio-tools in its own environment, one worker per adapter.
+- [arioso.platforms.foundation_1.config](_autosummary/arioso.platforms.foundation_1.config.html.md): Foundation-1 platform configuration (local, stable-audio-tools in its own environment).
 - [arioso.platforms.harmonai](_autosummary/arioso.platforms.harmonai.html.md): Harmonai (Dance Diffusion) platform for arioso.
 - [arioso.platforms.harmonai.adapter](_autosummary/arioso.platforms.harmonai.adapter.html.md): Harmonai (Dance Diffusion) adapter using diffusers.
 - [arioso.platforms.harmonai.config](_autosummary/arioso.platforms.harmonai.config.html.md): Harmonai (Dance Diffusion) platform configuration.
@@ -74,7 +77,7 @@
 - [arioso.tools](_autosummary/arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](_autosummary/arioso.translation.html.md): Parameter translation layer.
 - [For AI agents](ai-agents.html.md): &#96;arioso&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 15:06 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-10 15:47 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

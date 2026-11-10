@@ -1,0 +1,21 @@
+arioso.platforms.foundation\_1.config
+=====================================
+
+.. automodule:: arioso.platforms.foundation_1.config
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SUPPORTED_BARS
+      RESOLVED_ON
+      REQUIREMENTS
+      T5
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      env_spec
+   

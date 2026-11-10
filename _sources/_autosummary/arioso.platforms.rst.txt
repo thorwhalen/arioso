@@ -13,6 +13,7 @@ arioso.platforms
    ace_step
    beatoven
    elevenlabs
+   foundation_1
    harmonai
    jen
    loudly

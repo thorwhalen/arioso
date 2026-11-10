@@ -1,4 +1,4 @@
-> built 2026-11-10 15:06 UTC from 60a92f8 (main) · arioso 0.0.50. Details: build_info.json
+> built 2026-11-10 15:47 UTC from 471a26c (main) · arioso 0.0.51. Details: build_info.json
 
 # index.html.md
 
@@ -152,7 +152,7 @@ For a source in a generator’s own phrasing, `musicgen_variation(voice, "C#", p
 
 ## Platforms
 
-16 platforms are included, spanning local models, REST APIs, and SDK-based services:
+19 platforms are included, spanning local models, REST APIs, and SDK-based services:
 
 | Platform                   | Access                                            | Auth                                 | Install                               |
 |----------------------------|---------------------------------------------------|--------------------------------------|---------------------------------------|
@@ -160,6 +160,9 @@ For a source in a generator’s own phrasing, `musicgen_variation(voice, "C#", p
 | **Stable Audio Open**      | Local (diffusers)                                 | None                                 | `pip install arioso[stable-audio]`    |
 | **Harmonai**               | Local (diffusers)                                 | None                                 | `pip install arioso[harmonai]`        |
 | **Riffusion**              | Local (diffusers)                                 | None                                 | `pip install arioso[riffusion]`       |
+| **Stable Audio 3**         | Local (MLX runtime, Apple Silicon)                | None                                 | runtime: see below                    |
+| **Magenta RealTime 2**     | Local (MLX runtime, Apple Silicon)                | None                                 | runtime: see below                    |
+| **Foundation-1**           | Local (stable-audio-tools, own environment)       | None                                 | built on first use: see below         |
 | **ElevenLabs**             | REST API                                          | `ELEVENLABS_API_KEY`                 | `pip install arioso[elevenlabs]`      |
 | **Suno** (via sunoapi.org) | REST API                                          | `SUNO_API_KEY`                       | `pip install arioso[sunoapi]`         |
 | **Google Lyria 2**         | REST (Vertex AI)                                  | `GOOGLE_CLOUD_PROJECT` + gcloud auth | `pip install arioso[lyria2]`          |
@@ -244,6 +247,42 @@ song = arioso.generate(
 | `stable_audio_3`   | Stability AI Community License (+ Gemma terms for its text encoder) | free under US$1M annual revenue |
 | `magenta_rt`       | CC-BY-4.0                                                           | yes, with attribution           |
 | `ace_step` (local) | MIT                                                                 | yes                             |
+| `foundation_1`     | Stability AI Community License                                      | free under US$1M annual revenue |
+
+### Foundation-1 (local loops and one-shots, stable-audio-tools)
+
+[Foundation-1](https://huggingface.co/RoyalCities/Foundation-1) is a Stable Audio Open 1.0 fine-tune for instrument loops and one-shots, prompted with tags: instrument family and sub-family, timbre, notation and FX, then bars, tempo and key (`"Synth Lead, Warm, Arp, Medium Reverb, 8 Bars, 140 BPM, E minor"`; the tag list is in the model card’s `Master_Tag_Reference.md`). The prompt is passed through; `bpm` and `key` are appended as those tags. With a tempo the clip is exactly `bars` bars of 4/4 (`bars=4` or `8`, else the count nearest to `duration`); without one, `duration` is the clip length (at most 20 s). Tags already in the prompt are read (a short key such as `Am` is spelt out; a contradiction with the arguments is an error), and missing ones go in the card’s order. `note="C3"` makes a one-shot at that pitch (`Target Note, C3` appended, 3 s by default). Three checkpoints share one model: `model="foundation-1"` (loops, the default), `"1.2-samples"` (loops and one-shots) and `"1.2-keybeds"` (pitch-consistent one-shots; with `note=` the prompt takes that checkpoint’s single-note form, `Keybed, Timbre Profile, ..., Target Note, C3`).
+
+stable-audio-tools pins its own torch and Python 3.10, so arioso builds an environment for it with `uv` on first use (once, under `~/.local/share/arioso/envs/foundation-1`, or `$ARIOSO_ENVS_DIR`; `$ARIOSO_FOUNDATION_1_ENV` names an existing one instead) from pinned requirements resolved with `--exclude-newer`, and runs the model in one worker process there. Each checkpoint (2.4 GB) and the T5-base text encoder download once to the Hugging Face cache, at pinned revisions, and are read from it without network calls afterwards. On a Mac it needs Apple Silicon (torch 2.7 has no Intel macOS wheels). It runs on CUDA, Apple MPS or the CPU (`device=` to choose). On MPS it samples with plain classifier-free guidance, as Stable Audio Open does: stable-audio-tools’ default adaptive projected guidance computes in float64, which MPS does not support, so it is turned off, and `PYTORCH_ENABLE_MPS_FALLBACK=1` lets any operator MPS lacks run on the CPU.
+
+```python
+import arioso
+
+# A 4-bar loop at 100 BPM in A minor (9.6 s)
+song = arioso.generate(
+    "Rhodes Piano, Warm, Chord Progression, Low Reverb",
+    platform="foundation_1",
+    bpm=100,
+    key="Am",
+    bars=4,
+    seed=7,
+)
+song.metadata[
+    "prompt_sent"
+]  # 'Rhodes Piano, Warm, Chord Progression, Low Reverb, 4 Bars, 100 BPM, A minor'
+
+# A one-shot: no tempo, so duration is the length
+song = arioso.generate(
+    "Grand Piano, Near, Bright, Hit",
+    platform="foundation_1",
+    model="1.2-samples",
+    duration=3,
+)
+```
+
+Measured on an M1 Max (64 GB, MPS, the default 100 steps): a 10 s clip takes 70 s once the model is loaded (92 s for the first, loading included), about 7 times real time, and the worker process peaks at 14 GB.
+
+Building playable sampler instruments from the keybeds checkpoint (many notes from one descriptor, sliced and mapped) is not covered yet: see [#66](https://github.com/thorwhalen/arioso/issues/66).
 
 ### ElevenLabs
 
@@ -1734,6 +1773,276 @@ ElevenLabs Music platform for arioso.
 | [`config`](_autosummary/arioso.platforms.elevenlabs.config.html.md#module-arioso.platforms.elevenlabs.config)     | ElevenLabs Music platform configuration. |
 
 
+# _autosummary/arioso.platforms.foundation_1.adapter.html.md
+
+# arioso.platforms.foundation_1.adapter
+
+Foundation-1 adapter: stable-audio-tools in its own environment, one worker per adapter.
+
+The model loads once, in a `Worker` running
+`arioso/_workers/foundation_1_worker.py` with the Python of the `foundation-1`
+environment, which `ensure_env()` builds on first use (pinned
+stable-audio-tools, torch 2.7). `make_worker=` and `ensure_env=` are the seams.
+
+Foundation-1 reads a tag prompt: instrument family and sub-family, timbre, notation and FX
+tags, then `"<N> Bars, <BPM> BPM, <key>"` (see [`build_prompt()`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.build_prompt)). arioso’s `bpm`
+and `key` become those tags; a loop’s length follows from its bars and tempo, so with a
+tempo the clip is exactly `bars` bars of 4/4 (`bars=` 4 or 8, else the count nearest
+to `duration`). Without one, `duration` is the clip length (a one-shot or free clip).
+
+### Module Attributes
+
+| [`BEATS_PER_BAR`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.BEATS_PER_BAR)     | Beats in a bar (the loops are 4/4).                                                                                                         |
+|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| [`WINDOW_SECONDS`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.WINDOW_SECONDS)    | Seconds of audio the model renders at most (its 882000-sample window at 44.1 kHz).                                                          |
+| [`DFLT_SAMPLER`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.DFLT_SAMPLER)      | stable-audio-tools' sampler and noise schedule used for Stable Audio Open 1.0.                                                              |
+| [`WORKER_ENV`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.WORKER_ENV)        | MPS falls back to the CPU for an operator it lacks.                                                                                         |
+| [`TARGET_NOTE_TAG`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG)   | The tag before a one-shot's pitch, and the keybeds checkpoint's single-note prefix (`keybed_training_strategy.md` in the model repository). |
+| [`DFLT_NOTE_SECONDS`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS) | A one-shot's length when no duration is given (the keybed notes were trained at 3 s).                                                       |
+
+### Functions
+
+| [`build_prompt`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.build_prompt)(prompt, \*[, bpm, key, bars, ...])   | The tag prompt, the clip's seconds and the timing it used, from arioso's controls.    |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`cached_weights`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.cached_weights)([model, config])                   | The local path of `model`'s checkpoint in the Hugging Face cache, or None if absent.  |
+| [`hf_hub_cache`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.hf_hub_cache)()                                    | The Hugging Face hub cache: `$HF_HUB_CACHE`, else `$HF_HOME/hub`, else the default.   |
+| [`normalize_key`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.normalize_key)(key)                                | A key as Foundation-1's tags spell it: `"Am"` -> `"A minor"`, `"f#"` -> `"F# major"`. |
+| [`normalize_note`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.normalize_note)(note)                              | A pitch as the tags spell it (`"c#3"` -> `"C#3"`); a ValueError if it is not one.     |
+| [`parse_key`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.parse_key)(key)                                    | `(spelling, pitch_class, mode)` of a key, or None if `key` is not one.                |
+
+### Classes
+
+| [`Adapter`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#arioso.platforms.foundation_1.adapter.Adapter)([config, make_worker, ensure_env, ...])   | Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).   |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+
+### *class* arioso.platforms.foundation_1.adapter.Adapter(config=None, \*, make_worker=<class 'ps.isolated.Worker'>, ensure_env=<function ensure_env>, is_supported=<function \_is_supported>)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Local Foundation-1 adapter (stable-audio-tools, MPS / CUDA / CPU).
+
+#### close()
+
+Stop the worker (the loaded model is released).
+
+#### generate(prompt, , duration=None, bpm=None, key=None, bars=None, note=None, model='foundation-1', num_steps=100, guidance=7.0, seed=None, negative_prompt=None, sampler='dpmpp-3m-sde', device=None, \*\*kwargs)
+
+Render a loop or a one-shot for the tag prompt `prompt`.
+
+* **Parameters:**
+  * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Foundation-1 tags, e.g. `"Synth Lead, Warm, Arp, Medium Reverb"`
+    (instrument, timbre, notation, FX; see the model card). Passed through,
+    with the bar, tempo and key tags appended when given as arguments.
+  * **duration** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Seconds; without a tempo, the clip length (default 10), with one,
+    only the hint for the bar count.
+  * **bpm** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Tempo, appended as `"<bpm> BPM"` (trained on 100-150, see the config).
+  * **key** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Key, appended as e.g. `"E minor"` (`"Em"` and `"E minor"` both work).
+  * **bars** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – 4 or 8, with a tempo: the loop is exactly that many 4/4 bars.
+  * **note** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – A one-shot’s pitch (`"C3"`), appended as `"Target Note, C3"`; with
+    `model="1.2-keybeds"` the prompt takes that checkpoint’s single-note
+    form (`"Keybed, Timbre Profile, ..."`). Default length 3 s.
+  * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"foundation-1"` (loops), `"1.2-samples"` (loops and one-shots) or
+    `"1.2-keybeds"` (pitch-consistent one-shots).
+  * **num_steps** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Sampler steps.
+  * **guidance** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – CFG scale.
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Seed; a fresh one is drawn and recorded when None.
+  * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to steer away from.
+  * **sampler** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – stable-audio-tools sampler type.
+  * **device** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – `"mps"`, `"cuda"` or `"cpu"`; default: the best available.
+* **Returns:**
+  A complete Song (44.1 kHz stereo wav), the prompt sent in its metadata.
+
+### arioso.platforms.foundation_1.adapter.BEATS_PER_BAR *= 4*
+
+Beats in a bar (the loops are 4/4).
+
+### arioso.platforms.foundation_1.adapter.DFLT_NOTE_SECONDS *= 3.0*
+
+A one-shot’s length when no duration is given (the keybed notes were trained at 3 s).
+
+### arioso.platforms.foundation_1.adapter.DFLT_SAMPLER *= 'dpmpp-3m-sde'*
+
+stable-audio-tools’ sampler and noise schedule used for Stable Audio Open 1.0.
+
+### arioso.platforms.foundation_1.adapter.TARGET_NOTE_TAG *= 'Target Note'*
+
+The tag before a one-shot’s pitch, and the keybeds checkpoint’s single-note prefix
+(`keybed_training_strategy.md` in the model repository).
+
+### arioso.platforms.foundation_1.adapter.WINDOW_SECONDS *= 20.0*
+
+Seconds of audio the model renders at most (its 882000-sample window at 44.1 kHz).
+
+### arioso.platforms.foundation_1.adapter.WORKER_ENV *= {'PYTORCH_ENABLE_MPS_FALLBACK': '1', 'TOKENIZERS_PARALLELISM': 'false'}*
+
+MPS falls back to the CPU for an operator it lacks.
+
+* **Type:**
+  Variables for the worker
+
+### arioso.platforms.foundation_1.adapter.build_prompt(prompt, , bpm=None, key=None, bars=None, duration=None, note=None, keybed=False, supported_bars=(4, 8))
+
+The tag prompt, the clip’s seconds and the timing it used, from arioso’s controls.
+
+Tags already in `prompt` are read and must agree with the arguments (`"140 BPM"`
+with `bpm=120` is an error; keys compare by pitch class and mode, so `"Cb major"`
+agrees with `"B major"`); a short key tag (`"Am"`) is spelt out. Missing tags go
+in the model card’s order, `..., 8 Bars, 140 BPM, E minor`: bars before the tempo
+(also when only the tempo was in the prompt), the key last.
+
+With a tempo (`bpm` or a `BPM` tag) the clip is `bars` bars of 4/4: `bars`,
+else a `Bars` tag, else the supported count nearest to `duration * bpm / 240` (4
+without a duration); a `duration` more than a bar away from that warns. Without a
+tempo the clip is `duration` seconds (default 10).
+
+`note` makes a one-shot at that pitch: `"Target Note, <note>"` is appended (no
+tempo or bars then; default length 3 s; a key goes before it; a `Target Note` already
+in the prompt is read like the other tags), and with `keybed=True` (the keybeds
+checkpoint) the prompt starts with its single-note prefix `"Keybed, Timbre Profile"`.
+
+```pycon
+>>> build_prompt("Synth Lead, Warm, Arp", bpm=140, key="Em", duration=12)
+('Synth Lead, Warm, Arp, 8 Bars, 140 BPM, E minor', 13.714285714285714, {'bpm': 140, 'bars': 8, 'key': 'E minor', 'note': None})
+>>> build_prompt("Grand Piano, Bright", note="c3", keybed=True)[:2]
+('Keybed, Timbre Profile, Grand Piano, Bright, Target Note, C3', 3.0)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float), [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)]
+
+### arioso.platforms.foundation_1.adapter.cached_weights(model='foundation-1', , config=None)
+
+The local path of `model`’s checkpoint in the Hugging Face cache, or None if absent.
+
+Looks at the pinned revision only (no network, no huggingface_hub import).
+
+### arioso.platforms.foundation_1.adapter.hf_hub_cache()
+
+The Hugging Face hub cache: `$HF_HUB_CACHE`, else `$HF_HOME/hub`, else the default.
+
+* **Return type:**
+  [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)
+
+### arioso.platforms.foundation_1.adapter.normalize_key(key)
+
+A key as Foundation-1’s tags spell it: `"Am"` -> `"A minor"`, `"f#"` -> `"F# major"`.
+
+Anything that is not a key comes back stripped, unchanged.
+
+```pycon
+>>> normalize_key("Am"), normalize_key("C# minor"), normalize_key("eb")
+('A minor', 'C# minor', 'Eb major')
+```
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### arioso.platforms.foundation_1.adapter.normalize_note(note)
+
+A pitch as the tags spell it (`"c#3"` -> `"C#3"`); a ValueError if it is not one.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### arioso.platforms.foundation_1.adapter.parse_key(key)
+
+`(spelling, pitch_class, mode)` of a key, or None if `key` is not one.
+
+The spelling is the tags’ (`"A minor"`); the pitch class compares enharmonics.
+
+```pycon
+>>> parse_key("Am"), parse_key("f# major"), parse_key("Bell")
+(('A minor', 9, 'minor'), ('F# major', 6, 'major'), None)
+```
+
+
+# _autosummary/arioso.platforms.foundation_1.config.html.md
+
+# arioso.platforms.foundation_1.config
+
+Foundation-1 platform configuration (local, stable-audio-tools in its own environment).
+
+Foundation-1 (`RoyalCities/Foundation-1` on the Hugging Face Hub, ungated) is a fine-tune
+of Stable Audio Open 1.0 for structured, tempo- and bar-aware instrument loops and
+one-shots: one `model_config.json` (a stable-audio-tools `diffusion_cond` model: oobleck
+VAE, T5-base prompt encoder, `seconds_start`/`seconds_total`, DiT; 44.1 kHz stereo, a
+20 s window) shared by three checkpoints. Weights: Stability AI Community License (free
+for research and non-commercial use, commercial use below US$1M annual revenue). Verified
+against the model card, `Master_Tag_Reference.md` and `model_config.json` at the
+revision below on 2026-11-10.
+
+stable-audio-tools pins its own torch and Python (`<3.11`), so it runs in an environment
+arioso builds once with `uv` (`EnvSpec`, under
+`~/.local/share/arioso/envs/foundation-1`; `$ARIOSO_FOUNDATION_1_ENV` names an existing
+environment instead); weights go to the Hugging Face cache. torch 2.7 has no Intel macOS
+wheels, so on a Mac it needs Apple Silicon.
+
+### Module Attributes
+
+| [`SUPPORTED_BARS`](_autosummary/arioso.platforms.foundation_1.config.html.md#arioso.platforms.foundation_1.config.SUPPORTED_BARS)   | bar counts and tempos the loops were trained on.                                                                                                                     |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`RESOLVED_ON`](_autosummary/arioso.platforms.foundation_1.config.html.md#arioso.platforms.foundation_1.config.RESOLVED_ON)      | uv ignores anything published later, so the packages left unpinned below resolve to the same versions on every machine.                                              |
+| [`REQUIREMENTS`](_autosummary/arioso.platforms.foundation_1.config.html.md#arioso.platforms.foundation_1.config.REQUIREMENTS)     | stable-audio-tools and the packages whose versions decide its behaviour, pinned (the set resolved on RESOLVED_ON); the rest follow from these and `--exclude-newer`. |
+| [`T5`](_autosummary/arioso.platforms.foundation_1.config.html.md#arioso.platforms.foundation_1.config.T5)               | the worker fetches these files at this revision and points the conditioner at them, so nothing is looked up online once they are cached.                             |
+
+### Functions
+
+| [`env_spec`](_autosummary/arioso.platforms.foundation_1.config.html.md#arioso.platforms.foundation_1.config.env_spec)([system])   | The environment for `system` (`platform.system()` by default).   |
+|-----------------------------------------------------------------------|------------------------------------------------------------------|
+
+### arioso.platforms.foundation_1.config.REQUIREMENTS *= ('stable-audio-tools==0.0.20', 'torch==2.7.1', 'torchaudio==2.7.1', 'transformers==4.57.1', 'tokenizers==0.22.1', 'huggingface-hub==0.36.0', 'safetensors==0.6.2', 'numpy==1.26.4', 'scipy==1.15.3', 'sentencepiece==0.1.99', 'torchsde==0.2.6', 'soundfile==0.13.1', 'pytorch-lightning==2.5.5', '--exclude-newer=2026-11-10T00:00:00Z')*
+
+stable-audio-tools and the packages whose versions decide its behaviour, pinned (the
+set resolved on RESOLVED_ON); the rest follow from these and `--exclude-newer`.
+
+### arioso.platforms.foundation_1.config.RESOLVED_ON *= '2026-11-10'*
+
+uv ignores anything published later, so
+the packages left unpinned below resolve to the same versions on every machine.
+
+* **Type:**
+  The date the requirements were resolved on
+
+### arioso.platforms.foundation_1.config.SUPPORTED_BARS *= (4, 8)*
+
+bar counts and tempos the loops were trained on.
+
+* **Type:**
+  The model card’s prompt grammar
+
+### arioso.platforms.foundation_1.config.T5 *= {'files': ('config.json', 'generation_config.json', 'model.safetensors', 'spiece.model', 'tokenizer.json'), 'repo_id': 'google-t5/t5-base', 'revision': 'a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1'}*
+
+the worker
+fetches these files at this revision and points the conditioner at them, so nothing
+is looked up online once they are cached.
+
+* **Type:**
+  The T5-base text encoder the model’s prompt conditioner loads, pinned
+
+### arioso.platforms.foundation_1.config.env_spec(system=None)
+
+The environment for `system` (`platform.system()` by default).
+
+On Linux uv picks the torch wheel matching the machine’s accelerator (CUDA or CPU)
+instead of PyPI’s default CUDA build; macOS wheels carry MPS, there is no index to pick.
+
+* **Return type:**
+  `EnvSpec`
+
+
+# _autosummary/arioso.platforms.foundation_1.html.md
+
+# arioso.platforms.foundation_1
+
+Foundation-1 platform (local, stable-audio-tools in its own environment) for arioso.
+
+### Modules
+
+| [`adapter`](_autosummary/arioso.platforms.foundation_1.adapter.html.md#module-arioso.platforms.foundation_1.adapter)   | Foundation-1 adapter: stable-audio-tools in its own environment, one worker per adapter.   |
+|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [`config`](_autosummary/arioso.platforms.foundation_1.config.html.md#module-arioso.platforms.foundation_1.config)     | Foundation-1 platform configuration (local, stable-audio-tools in its own environment).    |
+
+
 # _autosummary/arioso.platforms.harmonai.adapter.html.md
 
 # arioso.platforms.harmonai.adapter
@@ -1802,25 +2111,26 @@ auto-discovered by [`arioso.registry.discover_platforms()`](_autosummary/arioso.
 
 ### Modules
 
-| [`ace_step`](_autosummary/arioso.platforms.ace_step.html.md#module-arioso.platforms.ace_step)               | ACE-Step (hosted on fal.ai) platform for arioso.                        |
-|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`beatoven`](_autosummary/arioso.platforms.beatoven.html.md#module-arioso.platforms.beatoven)               | Beatoven.ai platform for arioso.                                        |
-| [`elevenlabs`](_autosummary/arioso.platforms.elevenlabs.html.md#module-arioso.platforms.elevenlabs)           | ElevenLabs Music platform for arioso.                                   |
-| [`harmonai`](_autosummary/arioso.platforms.harmonai.html.md#module-arioso.platforms.harmonai)               | Harmonai (Dance Diffusion) platform for arioso.                         |
-| [`jen`](_autosummary/arioso.platforms.jen.html.md#module-arioso.platforms.jen)                         | Jen platform for arioso.                                                |
-| [`loudly`](_autosummary/arioso.platforms.loudly.html.md#module-arioso.platforms.loudly)                   | Loudly platform for arioso.                                             |
-| [`lyria2`](_autosummary/arioso.platforms.lyria2.html.md#module-arioso.platforms.lyria2)                   | Google Lyria 2 platform for arioso.                                     |
-| [`lyria_rt`](_autosummary/arioso.platforms.lyria_rt.html.md#module-arioso.platforms.lyria_rt)               | Google Lyria RealTime platform for arioso.                              |
-| [`magenta_rt`](_autosummary/arioso.platforms.magenta_rt.html.md#module-arioso.platforms.magenta_rt)           | Magenta RealTime 2 platform (local, MLX) for arioso.                    |
-| [`mubert`](_autosummary/arioso.platforms.mubert.html.md#module-arioso.platforms.mubert)                   | Mubert platform for arioso.                                             |
-| [`musicgen`](_autosummary/arioso.platforms.musicgen.html.md#module-arioso.platforms.musicgen)               | MusicGen platform for arioso.                                           |
-| [`riffusion`](_autosummary/arioso.platforms.riffusion.html.md#module-arioso.platforms.riffusion)             | Riffusion platform for arioso.                                          |
-| [`stable_audio`](_autosummary/arioso.platforms.stable_audio.html.md#module-arioso.platforms.stable_audio)       | Stable Audio Open platform for arioso.                                  |
-| [`stable_audio_25`](_autosummary/arioso.platforms.stable_audio_25.html.md#module-arioso.platforms.stable_audio_25) | Stable Audio 2.5 (hosted on fal.ai) platform for arioso.                |
-| [`stable_audio_3`](_autosummary/arioso.platforms.stable_audio_3.html.md#module-arioso.platforms.stable_audio_3)   | Stable Audio 3 platform (local, Stability's pure-MLX build) for arioso. |
-| [`sunoapi`](_autosummary/arioso.platforms.sunoapi.html.md#module-arioso.platforms.sunoapi)                 | Suno platform (via sunoapi.org) for arioso.                             |
-| [`udio`](_autosummary/arioso.platforms.udio.html.md#module-arioso.platforms.udio)                       | Udio platform (via UdioWrapper) for arioso.                             |
-| [`yue`](_autosummary/arioso.platforms.yue.html.md#module-arioso.platforms.yue)                         | YuE platform for arioso.                                                |
+| [`ace_step`](_autosummary/arioso.platforms.ace_step.html.md#module-arioso.platforms.ace_step)               | ACE-Step (hosted on fal.ai) platform for arioso.                                     |
+|----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`beatoven`](_autosummary/arioso.platforms.beatoven.html.md#module-arioso.platforms.beatoven)               | Beatoven.ai platform for arioso.                                                     |
+| [`elevenlabs`](_autosummary/arioso.platforms.elevenlabs.html.md#module-arioso.platforms.elevenlabs)           | ElevenLabs Music platform for arioso.                                                |
+| [`foundation_1`](_autosummary/arioso.platforms.foundation_1.html.md#module-arioso.platforms.foundation_1)       | Foundation-1 platform (local, stable-audio-tools in its own environment) for arioso. |
+| [`harmonai`](_autosummary/arioso.platforms.harmonai.html.md#module-arioso.platforms.harmonai)               | Harmonai (Dance Diffusion) platform for arioso.                                      |
+| [`jen`](_autosummary/arioso.platforms.jen.html.md#module-arioso.platforms.jen)                         | Jen platform for arioso.                                                             |
+| [`loudly`](_autosummary/arioso.platforms.loudly.html.md#module-arioso.platforms.loudly)                   | Loudly platform for arioso.                                                          |
+| [`lyria2`](_autosummary/arioso.platforms.lyria2.html.md#module-arioso.platforms.lyria2)                   | Google Lyria 2 platform for arioso.                                                  |
+| [`lyria_rt`](_autosummary/arioso.platforms.lyria_rt.html.md#module-arioso.platforms.lyria_rt)               | Google Lyria RealTime platform for arioso.                                           |
+| [`magenta_rt`](_autosummary/arioso.platforms.magenta_rt.html.md#module-arioso.platforms.magenta_rt)           | Magenta RealTime 2 platform (local, MLX) for arioso.                                 |
+| [`mubert`](_autosummary/arioso.platforms.mubert.html.md#module-arioso.platforms.mubert)                   | Mubert platform for arioso.                                                          |
+| [`musicgen`](_autosummary/arioso.platforms.musicgen.html.md#module-arioso.platforms.musicgen)               | MusicGen platform for arioso.                                                        |
+| [`riffusion`](_autosummary/arioso.platforms.riffusion.html.md#module-arioso.platforms.riffusion)             | Riffusion platform for arioso.                                                       |
+| [`stable_audio`](_autosummary/arioso.platforms.stable_audio.html.md#module-arioso.platforms.stable_audio)       | Stable Audio Open platform for arioso.                                               |
+| [`stable_audio_25`](_autosummary/arioso.platforms.stable_audio_25.html.md#module-arioso.platforms.stable_audio_25) | Stable Audio 2.5 (hosted on fal.ai) platform for arioso.                             |
+| [`stable_audio_3`](_autosummary/arioso.platforms.stable_audio_3.html.md#module-arioso.platforms.stable_audio_3)   | Stable Audio 3 platform (local, Stability's pure-MLX build) for arioso.              |
+| [`sunoapi`](_autosummary/arioso.platforms.sunoapi.html.md#module-arioso.platforms.sunoapi)                 | Suno platform (via sunoapi.org) for arioso.                                          |
+| [`udio`](_autosummary/arioso.platforms.udio.html.md#module-arioso.platforms.udio)                       | Udio platform (via UdioWrapper) for arioso.                                          |
+| [`yue`](_autosummary/arioso.platforms.yue.html.md#module-arioso.platforms.yue)                         | YuE platform for arioso.                                                             |
 
 
 # _autosummary/arioso.platforms.jen.adapter.html.md
@@ -3385,7 +3695,7 @@ Manually register a platform (for third-party plugins).
 
 # arioso.services
 
-### arioso.services *= ServiceCollection(ace_step, beatoven, elevenlabs, harmonai, jen, loudly, lyria2, lyria_rt, magenta_rt, mubert, musicgen, riffusion, stable_audio, stable_audio_25, stable_audio_3, sunoapi, udio, yue)*
+### arioso.services *= ServiceCollection(ace_step, beatoven, elevenlabs, foundation_1, harmonai, jen, loudly, lyria2, lyria_rt, magenta_rt, mubert, musicgen, riffusion, stable_audio, stable_audio_25, stable_audio_3, sunoapi, udio, yue)*
 
 Lazy mapping of platform names to `ServiceHandle` objects.
 
@@ -3563,18 +3873,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 15:06 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/60a92f806726ed6723ecb09f23f9c997aea4ed31"><code>60a92f8</code></a> on branch <code>main</code>, for **arioso 0.0.50** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-10 15:47 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda"><code>471a26c</code></a> on branch <code>main</code>, for **arioso 0.0.51** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.51) is ahead of the latest release on PyPI (0.0.50): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/60a92f806726ed6723ecb09f23f9c997aea4ed31"><code>60a92f806726ed6723ecb09f23f9c997aea4ed31</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda"><code>471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.50</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.51</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3583,9 +3895,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42840272726">42840272726</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42847384029">42847384029</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>84808f7eb69fa6e1b9ebcfad9725b0904e4ee7d2</code> (in the history of the built commit) |
+| Event commit | <code>75d27d17410399085118f6e165e74491f49fe93d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3610,13 +3922,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.50/">0.0.50</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.50/">0.0.50</a>, older than the documented version (0.0.51).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 60a92f806726ed6723ecb09f23f9c997aea4ed31
+git checkout 471a26c6f96b7384e9f6dc43c4a9f4daa7d73cda
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

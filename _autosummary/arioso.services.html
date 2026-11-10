@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=e072a57b"></script>
+    <script src="../_static/documentation_options.js?v=440a2162"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.50" />
+  <meta name="docsearch:version" content="0.0.51" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -328,6 +328,7 @@
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.ace_step.html">arioso.platforms.ace_step</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.beatoven.html">arioso.platforms.beatoven</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.elevenlabs.html">arioso.platforms.elevenlabs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="arioso.platforms.foundation_1.html">arioso.platforms.foundation_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.harmonai.html">arioso.platforms.harmonai</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.jen.html">arioso.platforms.jen</a></li>
 <li class="toctree-l3"><a class="reference internal" href="arioso.platforms.loudly.html">arioso.platforms.loudly</a></li>
@@ -418,7 +419,7 @@
 <h1>arioso.services<a class="headerlink" href="#arioso-services" title="Link to this heading">#</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="arioso.services">
-<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">services</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ServiceCollection(ace_step,</span> <span class="pre">beatoven,</span> <span class="pre">elevenlabs,</span> <span class="pre">harmonai,</span> <span class="pre">jen,</span> <span class="pre">loudly,</span> <span class="pre">lyria2,</span> <span class="pre">lyria_rt,</span> <span class="pre">magenta_rt,</span> <span class="pre">mubert,</span> <span class="pre">musicgen,</span> <span class="pre">riffusion,</span> <span class="pre">stable_audio,</span> <span class="pre">stable_audio_25,</span> <span class="pre">stable_audio_3,</span> <span class="pre">sunoapi,</span> <span class="pre">udio,</span> <span class="pre">yue)</span></span><a class="headerlink" href="#arioso.services" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">arioso.</span></span><span class="sig-name descname"><span class="pre">services</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ServiceCollection(ace_step,</span> <span class="pre">beatoven,</span> <span class="pre">elevenlabs,</span> <span class="pre">foundation_1,</span> <span class="pre">harmonai,</span> <span class="pre">jen,</span> <span class="pre">loudly,</span> <span class="pre">lyria2,</span> <span class="pre">lyria_rt,</span> <span class="pre">magenta_rt,</span> <span class="pre">mubert,</span> <span class="pre">musicgen,</span> <span class="pre">riffusion,</span> <span class="pre">stable_audio,</span> <span class="pre">stable_audio_25,</span> <span class="pre">stable_audio_3,</span> <span class="pre">sunoapi,</span> <span class="pre">udio,</span> <span class="pre">yue)</span></span><a class="headerlink" href="#arioso.services" title="Link to this definition">#</a></dt>
 <dd><p>Lazy mapping of platform names to <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceHandle</span></code> objects.</p>
 <p>Supports both <code class="docutils literal notranslate"><span class="pre">services[&quot;sunoapi&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">services.sunoapi</span></code>,
 both returning the same <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceHandle</span></code>.</p>

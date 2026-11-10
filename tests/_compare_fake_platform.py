@@ -75,9 +75,27 @@ def _config(name, access_type="python_lib", commercial_use="yes"):
     }
 
 
-register_platform("fake_clicks", _config("fake_clicks"), _Clicks())
-register_platform(
-    "fake_hosted", _config("fake_hosted", "rest_api", "provider terms"), _Clicks()
-)
-register_platform("fake_oneshot", _config("fake_oneshot"), _OneShot())
-register_platform("fake_broken", _config("fake_broken"), _Broken())
+#: The fake platforms by name: (config, adapter).
+PLATFORMS = {
+    "fake_clicks": (_config("fake_clicks"), _Clicks()),
+    "fake_hosted": (_config("fake_hosted", "rest_api", "provider terms"), _Clicks()),
+    "fake_oneshot": (_config("fake_oneshot"), _OneShot()),
+    "fake_broken": (_config("fake_broken"), _Broken()),
+}
+
+
+def register():
+    """Add the fake platforms to arioso's registry (idempotent)."""
+    for name, (config, adapter) in PLATFORMS.items():
+        register_platform(name, config, adapter)
+
+
+def unregister():
+    """Take them out again, so other tests see only the real platforms."""
+    from arioso.registry import _registry
+
+    for name in PLATFORMS:
+        _registry.pop(name, None)
+
+
+register()  # on import: a child process preloads this module to get them

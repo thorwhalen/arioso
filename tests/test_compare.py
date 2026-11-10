@@ -13,7 +13,6 @@ import pytest
 
 import arioso.compare as ac
 from arioso.__main__ import main
-from arioso.registry import _registry
 
 FAKE = "tests._compare_fake_platform"
 REPO = Path(__file__).resolve().parents[1]
@@ -28,17 +27,10 @@ def fakes():
     import importlib
 
     module = importlib.import_module(FAKE)
+    module.register()
     module.CALLS.clear()
-    for name in (
-        "fake_clicks",
-        "fake_hosted",
-        "fake_broken",
-        "fake_oneshot",
-    ):  # re-register if a test popped them
-        if name not in _registry:
-            importlib.reload(module)
-            break
     yield module
+    module.unregister()
 
 
 def _run(contenders, tmp_path, **kwargs):

@@ -452,7 +452,9 @@ def _run_child(cmd, log, *, timeout) -> "int | str":
     """
     from ps.util import NEW_PROCESS_GROUP, kill_process_tree
 
-    proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, **NEW_PROCESS_GROUP)
+    proc = subprocess.Popen(
+        cmd, stdout=log, stderr=subprocess.STDOUT, **NEW_PROCESS_GROUP
+    )
     try:
         return proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:

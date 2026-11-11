@@ -296,7 +296,7 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
     @functools.wraps(native_func)
     def validated_generate(prompt: str, **kwargs):
         check_supported_params(kwargs, guard_config)
-        _validate_kwargs(kwargs, supported, param_map, platform_name)
+        validate_params(kwargs, config, platform_name)
         kwargs = {k: v for k, v in kwargs.items() if k in accepted}
         return native_func(prompt, **kwargs)
 
@@ -311,11 +311,30 @@ def _make_validated_generate(native_func, config: dict, platform_name: str):
     return validated_generate
 
 
+def validate_params(kwargs: dict, config: dict, platform_name: str = ""):
+    """Check ``kwargs`` against a platform config: the types, bounds and choices
+    its ``param_map`` and ``adapter_params`` specs declare (what
+    :func:`arioso.param_schema` reports). Raises ValueError on a value out of range.
+
+    Used by both :func:`arioso.generate` and ``arioso.services.<p>.generate``.
+    """
+    extras = config.get("adapter_params") or {}
+    _validate_kwargs(
+        kwargs,
+        set(config.get("supported_affordances", ())),
+        config.get("param_map", {}),
+        platform_name or config.get("name", ""),
+        extras=extras if isinstance(extras, dict) else {},
+    )
+
+
 def _validate_kwargs(
     kwargs: dict,
     supported: set,
     param_map: dict,
     platform_name: str,
+    *,
+    extras: dict | None = None,
 ):
     """Validate kwargs against the platform's declared capabilities.
 
@@ -325,9 +344,10 @@ def _validate_kwargs(
     """
     from arioso.base import AFFORDANCES
 
+    extras = {k: v for k, v in (extras or {}).items() if isinstance(v, dict)}
     for key, value in kwargs.items():
-        if value is None:
-            continue
+        if value is None or (isinstance(value, str) and value == ""):
+            continue  # not given (adapters default many strings to "")
 
         # Type check against the platform's own "type" for the parameter, else
         # AFFORDANCES (soft warning). An affordance whose form differs between
@@ -346,22 +366,32 @@ def _validate_kwargs(
                         stacklevel=4,
                     )
 
-        # Choices / range validation from param_map
-        if key in param_map:
-            mapping = param_map[key]
+        # Choices / range validation: the platform's spec for the parameter (its
+        # param_map entry, or its adapter_params spec), over the affordance's own
+        # bounds, so what param_schema reports is what is enforced.
+        affordance = AFFORDANCES.get(key)
+        bounds = {
+            "minimum": getattr(affordance, "minimum", None),
+            "maximum": getattr(affordance, "maximum", None),
+        }
+        spec = param_map.get(key) or extras.get(key) or {}
+        if "unset" in spec and value == spec["unset"]:
+            continue  # the value that means "not given" (Suno's duration=0)
+        if spec or any(v is not None for v in bounds.values()):
+            mapping = {**bounds, **spec}
             choices = mapping.get("choices") or mapping.get("enum")
             if choices and value not in choices:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be one of "
                     f"{choices}, got {value!r}"
                 )
-            min_val = mapping.get("min")
+            min_val = mapping.get("min", mapping.get("minimum"))
             if min_val is not None and value < min_val:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be >= {min_val}, "
                     f"got {value!r}"
                 )
-            max_val = mapping.get("max")
+            max_val = mapping.get("max", mapping.get("maximum"))
             if max_val is not None and value > max_val:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be <= {max_val}, "

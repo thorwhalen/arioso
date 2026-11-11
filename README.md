@@ -361,6 +361,19 @@ Each platform maps these to its native parameter names automatically.
 For example, `instrumental=True` becomes `make_instrumental=True` for Suno
 and `force_instrumental=True` for ElevenLabs.
 
+### Parameter schemas (for forms, agents and validators)
+
+`arioso.param_schema(platform)` returns the parameters a platform accepts as JSON Schema: each one's type, bounds or choices, a title and a description. Unified names are marked `"x-arioso": {"group": "common"}`; parameters only that platform has (Suno's `weirdness`, `style_weight`, `vocal_gender`, ...) are marked `"extra"`. A front end can render the common part once and reveal a platform's extras when it is selected.
+
+```python
+schema = arioso.param_schema("sunoapi")
+schema["properties"]["audio_input_strength"]   # {'type': 'number', 'minimum': 0, 'maximum': 1, 'title': 'Audio Influence', ...}
+schema["x-arioso"]["extra"]                    # ['weirdness', 'style_weight', 'vocal_gender', 'variety']
+arioso.common_params(["sunoapi", "elevenlabs"])  # the names both accept
+```
+
+From a shell: `arioso schema sunoapi`.
+
 ## Output
 
 Every call returns a `Song` object:

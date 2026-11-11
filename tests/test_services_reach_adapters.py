@@ -38,7 +38,14 @@ def _sample(name, config):
 
     aff = AFFORDANCES.get(name)
     kind = getattr(aff, "type", str)
-    lo = spec.get("min", getattr(aff, "min", None))
+    lo = next(
+        (
+            v
+            for v in (spec.get("min"), spec.get("minimum"), getattr(aff, "minimum", None))
+            if v is not None
+        ),
+        None,
+    )
     if kind is bool:
         return True
     if kind in (int, float):

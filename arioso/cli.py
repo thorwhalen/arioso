@@ -141,5 +141,36 @@ def compare(
     return lines
 
 
+def schema(platform: str, *, indent: int = 2) -> str:
+    """Print the JSON Schema of the parameters a platform accepts.
+
+    Common parameters (shared names across platforms) are marked
+    ``"x-arioso": {"group": "common"}``; the platform's own extras ``"extra"``.
+    A web form, an agent tool or a validator can be generated from it.
+
+    Args:
+        platform: The platform (see ``arioso platforms``).
+        indent: JSON indentation (0: one line).
+
+    Returns:
+        The schema as JSON.
+    """
+    import json
+
+    import arioso
+    from arioso.schema import param_schema
+
+    if platform not in arioso.list_platforms():
+        raise ValueError(
+            f"Unknown platform {platform!r}. See `arioso platforms` for the list."
+        )
+    return json.dumps(param_schema(platform), indent=indent or None)
+
+
 #: The commands of the ``arioso`` command line (the SSOT its parser is built from).
-commands = {"generate": generate, "platforms": platforms, "compare": compare}
+commands = {
+    "generate": generate,
+    "platforms": platforms,
+    "compare": compare,
+    "schema": schema,
+}

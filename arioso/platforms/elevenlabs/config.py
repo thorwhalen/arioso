@@ -19,33 +19,53 @@ PLATFORM_CONFIG = {
         "prompt": {
             "native_name": "prompt",
             "required": True,
+            "title": "Prompt",
+            "description": "Genre, mood, instruments, structure and story of the "
+            "track, in plain words.",
+            "multiline": True,
         },
         "duration": {
             "native_name": "music_length_ms",
             "coerce": lambda x: int(x * 1000),
             "coerce_back": lambda x: x / 1000,
             "native_default": 30000,
+            "title": "Duration",
+            "description": "Length in seconds (3 s to 10 min).",
+            "minimum": 3,
+            "maximum": 600,
+            "default": 30,
         },
         "lyrics": {
             "native_name": None,
             "adapter_handled": True,
+            "title": "Lyrics",
+            "multiline": True,
         },
         "instrumental": {
             "native_name": "force_instrumental",
+            "title": "Instrumental",
+            "default": False,
         },
         "model": {
             "native_name": "model_id",
             "native_default": "music_v1",
+            "title": "Model",
+            "examples": ["music_v1"],
         },
         "seed": {
             "native_name": "seed",
+            "title": "Seed",
+            "advanced": True,
         },
         "output_format": {
             "native_name": "output_format",
             "native_default": "mp3_44100_128",
+            "advanced": True,
         },
         "watermark": {
             "native_name": "sign_with_c2pa",
+            "title": "C2PA signature",
+            "advanced": True,
         },
         "title": {
             "native_name": None,
@@ -54,6 +74,7 @@ PLATFORM_CONFIG = {
         "structure": {
             "native_name": None,
             "adapter_handled": True,
+            "advanced": True,
         },
     },
     "supported_affordances": [

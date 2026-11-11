@@ -127,12 +127,20 @@ class Affordance:
         type: Expected Python type.
         description: Human-readable description.
         default: Default value (None means no default / required).
+        minimum: Smallest meaningful value, for bounded numbers (None: unbounded).
+        maximum: Largest meaningful value, for bounded numbers (None: unbounded).
+        title: Short display name (empty: derived from ``name``). A platform's
+            ``param_map`` entry may give its own (Suno calls
+            ``audio_input_strength`` "Audio Influence").
     """
 
     name: str
     type: type
     description: str
     default: Any = None
+    minimum: Optional[float] = None
+    maximum: Optional[float] = None
+    title: str = ""
 
 
 AFFORDANCES: dict[str, Affordance] = {
@@ -143,8 +151,8 @@ AFFORDANCES: dict[str, Affordance] = {
     "bpm": Affordance("bpm", int, "Beats per minute"),
     "key": Affordance("key", str, 'Musical key (e.g. "C major")'),
     "genre": Affordance("genre", str, "Genre tag or category"),
-    "energy": Affordance("energy", float, "Energy/intensity level 0-1"),
-    "brightness": Affordance("brightness", float, "Spectral brightness 0-1"),
+    "energy": Affordance("energy", float, "Energy/intensity level 0-1", minimum=0, maximum=1),
+    "brightness": Affordance("brightness", float, "Spectral brightness 0-1", minimum=0, maximum=1),
     "instruments": Affordance("instruments", list, "Instrument selection"),
     "instrumental": Affordance("instrumental", bool, "Force instrumental-only output"),
     "title": Affordance("title", str, "Song title"),
@@ -157,7 +165,14 @@ AFFORDANCES: dict[str, Affordance] = {
         "waveform -- normalized by arioso._audio.to_audio_ref",
     ),
     "audio_input_strength": Affordance(
-        "audio_input_strength", float, "How much reference audio influences output 0-1"
+        "audio_input_strength",
+        float,
+        "How much the input audio shapes the output, 0-1: 0 leaves it to the text, "
+        "1 follows the audio closely. Platforms whose native control runs the other "
+        "way (a noise level, Stable Audio's strength) are inverted by their adapter",
+        minimum=0,
+        maximum=1,
+        title="Audio influence",
     ),
     "melody": Affordance(
         "melody",
@@ -194,9 +209,11 @@ AFFORDANCES: dict[str, Affordance] = {
     "batch_size": Affordance("batch_size", int, "Number of outputs per request"),
     "output_format": Affordance("output_format", str, "Desired output format"),
     "bitrate": Affordance("bitrate", int, "Audio bitrate in kbps"),
-    "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence"),
+    "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence", minimum=0),
     "interpolation_alpha": Affordance(
-        "interpolation_alpha", float, "Blend between two prompts 0-1"
+        "interpolation_alpha", float, "Blend between two prompts 0-1",
+        minimum=0,
+        maximum=1,
     ),
     "wait_for_completion": Affordance(
         "wait_for_completion", bool, "Block until audio is ready"

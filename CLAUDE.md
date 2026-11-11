@@ -13,6 +13,7 @@ arioso/
     base.py                      # Song, AudioResult dataclasses; AFFORDANCES constant
     registry.py                  # Platform auto-discovery and lazy loading
     translation.py               # Parameter name translation via i2.Ingress
+    schema.py                    # param_schema(): JSON Schema of a platform's params (common + extras)
     _util.py                     # Auth helpers, HTTP session factory, torch_device()/torch_dtype()
     cli.py                       # Functions behind the `arioso` command (no CLI library)
     compare.py                   # compare(): platforms x prompts -> records (time, memory, checks), page
@@ -77,6 +78,7 @@ Source locations for reference:
 - Every PLATFORM_CONFIG declares `weights_license` and `commercial_use` (verified from the model card or provider terms; `unclear` when they do not settle it, rather than a guess)
 - Local torch platforms choose their device with `arioso._util.torch_device()`
 - All platform parameters use unified affordance names (see `AFFORDANCES` in `base.py`)
+- Platform-only parameters go in `adapter_params` as a dict of name to spec (`type`, `title`, `description`, `minimum`/`maximum`, `choices`, `default`), so `param_schema` can describe them; a `param_map` entry takes the same keys. `default` is in unified units; `native_default` never reaches a schema
 - No emojis in code or docs
 - Tests in `tests/`, examples in `examples/`, scratch in `scrap/`
 

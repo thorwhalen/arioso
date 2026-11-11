@@ -19,6 +19,9 @@ Usage::
     # Every platform with its access type and weights licence
     arioso.platform_table()
 
+    # The parameters a platform accepts, as JSON Schema (common + its extras)
+    arioso.param_schema("sunoapi")
+
     # Rich platform access via services
     s = arioso.services.sunoapi
     s.generate("jazz piano", duration=30)       # unified names
@@ -38,6 +41,7 @@ from arioso.base import (
     CatalogMatchError,
 )
 from arioso.services import ServiceCollection, SliceMapping
+from arioso.schema import param_schema, common_params
 
 services = ServiceCollection()
 generators = SliceMapping(services, "generate")

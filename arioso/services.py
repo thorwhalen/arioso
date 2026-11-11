@@ -346,22 +346,28 @@ def _validate_kwargs(
                         stacklevel=4,
                     )
 
-        # Choices / range validation from param_map
-        if key in param_map:
-            mapping = param_map[key]
+        # Choices / range validation: the platform's param_map entry, else the
+        # affordance's own bounds (so a schema's minimum/maximum is also enforced).
+        affordance = AFFORDANCES.get(key)
+        bounds = {
+            "minimum": getattr(affordance, "minimum", None),
+            "maximum": getattr(affordance, "maximum", None),
+        }
+        if key in param_map or any(v is not None for v in bounds.values()):
+            mapping = {**bounds, **param_map.get(key, {})}
             choices = mapping.get("choices") or mapping.get("enum")
             if choices and value not in choices:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be one of "
                     f"{choices}, got {value!r}"
                 )
-            min_val = mapping.get("min")
+            min_val = mapping.get("min", mapping.get("minimum"))
             if min_val is not None and value < min_val:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be >= {min_val}, "
                     f"got {value!r}"
                 )
-            max_val = mapping.get("max")
+            max_val = mapping.get("max", mapping.get("maximum"))
             if max_val is not None and value > max_val:
                 raise ValueError(
                     f"{platform_name}: parameter {key!r} must be <= {max_val}, "

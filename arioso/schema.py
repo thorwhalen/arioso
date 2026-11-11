@@ -203,7 +203,11 @@ def schema_from_config(config: dict) -> dict:
         if mapping.get("required"):
             required.append(name)
     for name, spec in _extras(config).items():
-        if name in properties or name in MECHANICS_EXTRAS or (spec or {}).get("mechanics"):
+        if (
+            name in properties
+            or name in MECHANICS_EXTRAS
+            or (spec or {}).get("mechanics")
+        ):
             continue
         properties[name] = _extra_property(name, spec)
         extra.append(name)

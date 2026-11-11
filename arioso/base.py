@@ -151,8 +151,12 @@ AFFORDANCES: dict[str, Affordance] = {
     "bpm": Affordance("bpm", int, "Beats per minute"),
     "key": Affordance("key", str, 'Musical key (e.g. "C major")'),
     "genre": Affordance("genre", str, "Genre tag or category"),
-    "energy": Affordance("energy", float, "Energy/intensity level 0-1", minimum=0, maximum=1),
-    "brightness": Affordance("brightness", float, "Spectral brightness 0-1", minimum=0, maximum=1),
+    "energy": Affordance(
+        "energy", float, "Energy/intensity level 0-1", minimum=0, maximum=1
+    ),
+    "brightness": Affordance(
+        "brightness", float, "Spectral brightness 0-1", minimum=0, maximum=1
+    ),
     "instruments": Affordance("instruments", list, "Instrument selection"),
     "instrumental": Affordance("instrumental", bool, "Force instrumental-only output"),
     "title": Affordance("title", str, "Song title"),
@@ -212,7 +216,9 @@ AFFORDANCES: dict[str, Affordance] = {
     "bitrate": Affordance("bitrate", int, "Audio bitrate in kbps"),
     "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence"),
     "interpolation_alpha": Affordance(
-        "interpolation_alpha", float, "Blend between two prompts 0-1",
+        "interpolation_alpha",
+        float,
+        "Blend between two prompts 0-1",
         minimum=0,
         maximum=1,
     ),

@@ -367,8 +367,10 @@ and `force_instrumental=True` for ElevenLabs.
 
 ```python
 schema = arioso.param_schema("sunoapi")
-schema["properties"]["audio_input_strength"]   # {'type': 'number', 'minimum': 0, 'maximum': 1, 'title': 'Audio Influence', ...}
-schema["x-arioso"]["extra"]                    # ['weirdness', 'style_weight', 'vocal_gender', 'variety']
+schema["properties"][
+    "audio_input_strength"
+]  # {'type': 'number', 'minimum': 0, 'maximum': 1, 'title': 'Audio Influence', ...}
+schema["x-arioso"]["extra"]  # ['weirdness', 'style_weight', 'vocal_gender', 'variety']
 arioso.common_params(["sunoapi", "elevenlabs"])  # the names both accept
 ```
 

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -829,6 +829,19 @@ the platform supports — unsupported ones are warned about and ignored.</p>
 <p>Each platform maps these to its native parameter names automatically.
 For example, <code class="docutils literal notranslate"><span class="pre">instrumental=True</span></code> becomes <code class="docutils literal notranslate"><span class="pre">make_instrumental=True</span></code> for Suno
 and <code class="docutils literal notranslate"><span class="pre">force_instrumental=True</span></code> for ElevenLabs.</p>
+<section id="parameter-schemas-for-forms-agents-and-validators">
+<h3>Parameter schemas (for forms, agents and validators)<a class="headerlink" href="#parameter-schemas-for-forms-agents-and-validators" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">arioso.param_schema(platform)</span></code> returns the parameters a platform accepts as JSON Schema: each one’s type, bounds or choices, a title and a description. Unified names are marked <code class="docutils literal notranslate"><span class="pre">&quot;x-arioso&quot;:</span> <span class="pre">{&quot;group&quot;:</span> <span class="pre">&quot;common&quot;}</span></code>; parameters only that platform has (Suno’s <code class="docutils literal notranslate"><span class="pre">weirdness</span></code>, <code class="docutils literal notranslate"><span class="pre">style_weight</span></code>, <code class="docutils literal notranslate"><span class="pre">vocal_gender</span></code>, …) are marked <code class="docutils literal notranslate"><span class="pre">&quot;extra&quot;</span></code>. A front end can render the common part once and reveal a platform’s extras when it is selected.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">param_schema</span><span class="p">(</span><span class="s2">"sunoapi"</span><span class="p">)</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"properties"</span><span class="p">][</span>
+    <span class="s2">"audio_input_strength"</span>
+<span class="p">]</span>  <span class="c1"># {'type': 'number', 'minimum': 0, 'maximum': 1, 'title': 'Audio Influence', ...}</span>
+<span class="n">schema</span><span class="p">[</span><span class="s2">"x-arioso"</span><span class="p">][</span><span class="s2">"extra"</span><span class="p">]</span>  <span class="c1"># ['weirdness', 'style_weight', 'vocal_gender', 'variety']</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">common_params</span><span class="p">([</span><span class="s2">"sunoapi"</span><span class="p">,</span> <span class="s2">"elevenlabs"</span><span class="p">])</span>  <span class="c1"># the names both accept</span>
+</pre></div>
+</div>
+<p>From a shell: <code class="docutils literal notranslate"><span class="pre">arioso</span> <span class="pre">schema</span> <span class="pre">sunoapi</span></code>.</p>
+</section>
 </section>
 <section id="output">
 <h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
@@ -1088,7 +1101,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-10 20:48 UTC from <a href="https://github.com/thorwhalen/arioso/commit/d2fcbe5d7c4590e97d52c05f5a3e3c624f993f11">d2fcbe5</a> (main) · arioso 0.0.53 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-11 16:19 UTC from <a href="https://github.com/thorwhalen/arioso/commit/bceba8adf30feaca7f8f51d31ed88f8a55c279e2">bceba8a</a> (main) · arioso 0.0.54 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               
@@ -1143,7 +1156,10 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#suno-via-sunoapi-org">Suno (via sunoapi.org)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-schemas-for-forms-agents-and-validators">Parameter schemas (for forms, agents and validators)</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-platform">Adding a new platform</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#minimal-example-rest-api">Minimal example (REST API)</a></li>

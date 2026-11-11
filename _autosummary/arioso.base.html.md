@@ -12,17 +12,17 @@ set of affordance names that all platform adapters map to.
 
 ### Classes
 
-| [`Affordance`](#arioso.base.Affordance)(name, type, description[, default])   | Descriptor for a unified parameter affordance.           |
-|---------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| [`AudioResult`](#arioso.base.AudioResult)([audio_bytes, audio_url, ...])       | Unified audio output from any music generation platform. |
-| [`Song`](#arioso.base.Song)([id, title, status, audio, metadata, ...])  | A generated song with its metadata and audio data.       |
+| [`Affordance`](#arioso.base.Affordance)(name, type, description[, ...])      | Descriptor for a unified parameter affordance.           |
+|--------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| [`AudioResult`](#arioso.base.AudioResult)([audio_bytes, audio_url, ...])      | Unified audio output from any music generation platform. |
+| [`Song`](#arioso.base.Song)([id, title, status, audio, metadata, ...]) | A generated song with its metadata and audio data.       |
 
 ### Exceptions
 
 | [`CatalogMatchError`](#arioso.base.CatalogMatchError)(message, \*[, task_id, code])   | A platform refused the input audio because it matches a catalogued recording.   |
 |----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 
-### *class* arioso.base.Affordance(name, type, description, default=None)
+### *class* arioso.base.Affordance(name, type, description, default=None, minimum=None, maximum=None, title='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -55,6 +55,29 @@ Default value (None means no default / required).
 
 * **Type:**
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+#### minimum
+
+Smallest meaningful value, for bounded numbers (None: unbounded).
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### maximum
+
+Largest meaningful value, for bounded numbers (None: unbounded).
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### title
+
+Short display name (empty: derived from `name`). A platform’s
+`param_map` entry may give its own (Suno calls
+`audio_input_strength` “Audio Influence”).
+
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### *class* arioso.base.AudioResult(audio_bytes=None, audio_url='', audio_array=None, sample_rate=0, format='', duration_seconds=0.0)
 

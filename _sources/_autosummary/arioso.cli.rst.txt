@@ -17,4 +17,5 @@ arioso.cli
       compare
       generate
       platforms
+      schema
    

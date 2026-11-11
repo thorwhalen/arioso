@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="../_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -347,6 +347,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.registry.html">arioso.registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.schema.html">arioso.schema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.services.html">arioso.services</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.tools.html">arioso.tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.translation.html">arioso.translation</a></li>
@@ -432,6 +433,9 @@
 
 <span class="c1"># Every platform with its access type and weights licence</span>
 <span class="n">arioso</span><span class="o">.</span><span class="n">platform_table</span><span class="p">()</span>
+
+<span class="c1"># The parameters a platform accepts, as JSON Schema (common + its extras)</span>
+<span class="n">arioso</span><span class="o">.</span><span class="n">param_schema</span><span class="p">(</span><span class="s2">"sunoapi"</span><span class="p">)</span>
 
 <span class="c1"># Rich platform access via services</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">sunoapi</span>
@@ -725,13 +729,16 @@ is loaded. <code class="docutils literal notranslate"><span class="pre">commerci
 <tr class="row-even"><td><p><a class="reference internal" href="arioso.registry.html#module-arioso.registry" title="arioso.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
 <td><p>Platform registry with auto-discovery and lazy loading.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="arioso.services.html#arioso.services" title="arioso.services"><code class="xref py py-obj docutils literal notranslate"><span class="pre">services</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.schema.html#module-arioso.schema" title="arioso.schema"><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code></a></p></td>
+<td><p>Machine-readable parameter schemas: what each platform accepts, as JSON Schema.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.services.html#arioso.services" title="arioso.services"><code class="xref py py-obj docutils literal notranslate"><span class="pre">services</span></code></a></p></td>
 <td><p>Lazy mapping of platform names to <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceHandle</span></code> objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="arioso.tools.html#module-arioso.tools" title="arioso.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="arioso.tools.html#module-arioso.tools" title="arioso.tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tools</span></code></a></p></td>
 <td><p>High-level tools for common arioso workflows (submit, poll, download).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="arioso.translation.html#module-arioso.translation" title="arioso.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="arioso.translation.html#module-arioso.translation" title="arioso.translation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translation</span></code></a></p></td>
 <td><p>Parameter translation layer.</p></td>
 </tr>
 </tbody>

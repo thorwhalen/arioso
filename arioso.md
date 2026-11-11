@@ -1,4 +1,4 @@
-> built 2026-11-10 20:48 UTC from d2fcbe5 (main) · arioso 0.0.53. Details: build_info.json
+> built 2026-11-11 16:19 UTC from bceba8a (main) · arioso 0.0.54. Details: build_info.json
 
 # index.html.md
 
@@ -365,6 +365,21 @@ Each platform maps these to its native parameter names automatically.
 For example, `instrumental=True` becomes `make_instrumental=True` for Suno
 and `force_instrumental=True` for ElevenLabs.
 
+### Parameter schemas (for forms, agents and validators)
+
+`arioso.param_schema(platform)` returns the parameters a platform accepts as JSON Schema: each one’s type, bounds or choices, a title and a description. Unified names are marked `"x-arioso": {"group": "common"}`; parameters only that platform has (Suno’s `weirdness`, `style_weight`, `vocal_gender`, …) are marked `"extra"`. A front end can render the common part once and reveal a platform’s extras when it is selected.
+
+```python
+schema = arioso.param_schema("sunoapi")
+schema["properties"][
+    "audio_input_strength"
+]  # {'type': 'number', 'minimum': 0, 'maximum': 1, 'title': 'Audio Influence', ...}
+schema["x-arioso"]["extra"]  # ['weirdness', 'style_weight', 'vocal_gender', 'variety']
+arioso.common_params(["sunoapi", "elevenlabs"])  # the names both accept
+```
+
+From a shell: `arioso schema sunoapi`.
+
 ## Output
 
 Every call returns a `Song` object:
@@ -611,17 +626,17 @@ set of affordance names that all platform adapters map to.
 
 ### Classes
 
-| [`Affordance`](_autosummary/arioso.base.html.md#arioso.base.Affordance)(name, type, description[, default])   | Descriptor for a unified parameter affordance.           |
-|---------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| [`AudioResult`](_autosummary/arioso.base.html.md#arioso.base.AudioResult)([audio_bytes, audio_url, ...])       | Unified audio output from any music generation platform. |
-| [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)([id, title, status, audio, metadata, ...])  | A generated song with its metadata and audio data.       |
+| [`Affordance`](_autosummary/arioso.base.html.md#arioso.base.Affordance)(name, type, description[, ...])      | Descriptor for a unified parameter affordance.           |
+|--------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| [`AudioResult`](_autosummary/arioso.base.html.md#arioso.base.AudioResult)([audio_bytes, audio_url, ...])      | Unified audio output from any music generation platform. |
+| [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)([id, title, status, audio, metadata, ...]) | A generated song with its metadata and audio data.       |
 
 ### Exceptions
 
 | [`CatalogMatchError`](_autosummary/arioso.base.html.md#arioso.base.CatalogMatchError)(message, \*[, task_id, code])   | A platform refused the input audio because it matches a catalogued recording.   |
 |----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 
-### *class* arioso.base.Affordance(name, type, description, default=None)
+### *class* arioso.base.Affordance(name, type, description, default=None, minimum=None, maximum=None, title='')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -654,6 +669,29 @@ Default value (None means no default / required).
 
 * **Type:**
   [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
+#### minimum
+
+Smallest meaningful value, for bounded numbers (None: unbounded).
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### maximum
+
+Largest meaningful value, for bounded numbers (None: unbounded).
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+#### title
+
+Short display name (empty: derived from `name`). A platform’s
+`param_map` entry may give its own (Suno calls
+`audio_input_strength` “Audio Influence”).
+
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 ### *class* arioso.base.AudioResult(audio_bytes=None, audio_url='', audio_array=None, sample_rate=0, format='', duration_seconds=0.0)
 
@@ -829,8 +867,9 @@ Plain functions with no CLI library in sight: `arioso.__main__` projects
 |------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 | [`generate`](_autosummary/arioso.cli.html.md#arioso.cli.generate)(prompt, \*[, platform, duration, ...])     | Generate music from a text prompt and write it to a file.                            |
 | [`platforms`](_autosummary/arioso.cli.html.md#arioso.cli.platforms)()                                         | List the platforms with their access type, weights licence and commercial use.       |
+| [`schema`](_autosummary/arioso.cli.html.md#arioso.cli.schema)(platform, \*[, indent])                      | Print the JSON Schema of the parameters a platform accepts.                          |
 
-### arioso.cli.commands *= {'compare': <function compare>, 'generate': <function generate>, 'platforms': <function platforms>}*
+### arioso.cli.commands *= {'compare': <function compare>, 'generate': <function generate>, 'platforms': <function platforms>, 'schema': <function schema>}*
 
 The commands of the `arioso` command line (the SSOT its parser is built from).
 
@@ -890,6 +929,22 @@ List the platforms with their access type, weights licence and commercial use.
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 * **Returns:**
   The table’s lines, a header first.
+
+### arioso.cli.schema(platform, , indent=2)
+
+Print the JSON Schema of the parameters a platform accepts.
+
+Common parameters (shared names across platforms) are marked
+`"x-arioso": {"group": "common"}`; the platform’s own extras `"extra"`.
+A web form, an agent tool or a validator can be generated from it.
+
+* **Parameters:**
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The platform (see `arioso platforms`).
+  * **indent** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – JSON indentation (0: one line).
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+* **Returns:**
+  The schema as JSON.
 
 
 # _autosummary/arioso.compare.html.md
@@ -1202,6 +1257,9 @@ arioso.get_platform_info("musicgen")
 # Every platform with its access type and weights licence
 arioso.platform_table()
 
+# The parameters a platform accepts, as JSON Schema (common + its extras)
+arioso.param_schema("sunoapi")
+
 # Rich platform access via services
 s = arioso.services.sunoapi
 s.generate("jazz piano", duration=30)       # unified names
@@ -1417,6 +1475,7 @@ arioso.supports_audio_input("mubert")        # False
 | [`named_prompts`](_autosummary/arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.           |
 | [`platforms`](_autosummary/arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                         |
 | [`registry`](_autosummary/arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                               |
+| [`schema`](_autosummary/arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.       |
 | [`services`](_autosummary/arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                            |
 | [`tools`](_autosummary/arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                |
 | [`translation`](_autosummary/arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                          |
@@ -3695,6 +3754,123 @@ Manually register a platform (for third-party plugins).
   * **adapter** ([`Any`](https://docs.python.org/3/library/typing.html#typing.Any)) – Optional pre-instantiated adapter object or class.
 
 
+# _autosummary/arioso.schema.html.md
+
+# arioso.schema
+
+Machine-readable parameter schemas: what each platform accepts, as JSON Schema.
+
+A front end, an agent or a form generator needs more than the parameter names: it
+needs each parameter’s type, its bounds or choices, a display title and whether it
+is shared across platforms. [`param_schema()`](_autosummary/arioso.schema.html.md#arioso.schema.param_schema) assembles that from the two places
+arioso already keeps it, so nothing is restated:
+
+- **common** parameters are the unified affordances (`arioso.base.AFFORDANCES`)
+  a platform lists in `supported_affordances`; their type, description and bounds
+  come from the affordance, overridden by the platform’s `param_map` entry
+  (`title`, `description`, `minimum`/`min`, `maximum`/`max`,
+  `choices`, `default`, `type`).
+- **extra** parameters are the platform’s own `adapter_params`. A platform may
+  declare them as a dict of name to spec (the same keys as a `param_map` entry,
+  `type` being a Python type); a bare list of names is still accepted, and such
+  extras are marked `untyped` so a form can leave them out.
+
+`native_default` is never used as a default: it is in the platform’s units
+(milliseconds, a noise level), not the unified ones. A unified default is the
+`default` key.
+
+Example:
+
+```default
+>>> schema = param_schema("sunoapi")
+>>> schema["properties"]["weirdness"]["x-arioso"]["group"]
+'extra'
+>>> schema["properties"]["audio_input_strength"]["maximum"]
+1
+```
+
+### Module Attributes
+
+| [`AUDIO_AFFORDANCES`](_autosummary/arioso.schema.html.md#arioso.schema.AUDIO_AFFORDANCES)     | Affordances whose value is audio (a file, bytes, a waveform), not a scalar.                  |
+|------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| [`MECHANICS_AFFORDANCES`](_autosummary/arioso.schema.html.md#arioso.schema.MECHANICS_AFFORDANCES) | Affordances that steer the call rather than the music; left out of schemas.                  |
+| [`OPERATION_AFFORDANCES`](_autosummary/arioso.schema.html.md#arioso.schema.OPERATION_AFFORDANCES) | Operations a platform supports, from the affordance that enables each.                       |
+| [`MECHANICS_EXTRAS`](_autosummary/arioso.schema.html.md#arioso.schema.MECHANICS_EXTRAS)      | Extras that steer the call (transport, process, device), not the music; left out of schemas. |
+
+### Functions
+
+| [`common_params`](_autosummary/arioso.schema.html.md#arioso.schema.common_params)(platforms)   | The unified parameters every one of `platforms` supports, in the first one's order.                                                                                                                    |
+|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`operations`](_autosummary/arioso.schema.html.md#arioso.schema.operations)(config)         | What a platform can do, from its config: `generate` plus the operations its supported affordances enable (`cover` for `audio_input`, ...), or the config's own `operations` list when it declares one. |
+| [`param_schema`](_autosummary/arioso.schema.html.md#arioso.schema.param_schema)(platform)     | The JSON Schema (draft 2020-12) of the parameters `platform` accepts.                                                                                                                                  |
+| [`schema_from_config`](_autosummary/arioso.schema.html.md#arioso.schema.schema_from_config)(config) | The JSON Schema of a platform config (see [`param_schema()`](_autosummary/arioso.schema.html.md#arioso.schema.param_schema)).                                                                                            |
+
+### arioso.schema.AUDIO_AFFORDANCES *= frozenset({'audio_input', 'melody', 'reference_audio'})*
+
+Affordances whose value is audio (a file, bytes, a waveform), not a scalar.
+
+### arioso.schema.MECHANICS_AFFORDANCES *= frozenset({'wait_for_completion'})*
+
+Affordances that steer the call rather than the music; left out of schemas.
+
+### arioso.schema.MECHANICS_EXTRAS *= frozenset({'device', 'fetch', 'runtime', 'timeout'})*
+
+Extras that steer the call (transport, process, device), not the music;
+left out of schemas. A spec can also say `"mechanics": True`.
+
+### arioso.schema.OPERATION_AFFORDANCES *= {'cover': 'audio_input', 'extend': 'continue_from', 'inpaint': 'mask_start', 'melody': 'melody', 'style_reference': 'reference_audio'}*
+
+Operations a platform supports, from the affordance that enables each.
+
+### arioso.schema.common_params(platforms)
+
+The unified parameters every one of `platforms` supports, in the first one’s order.
+
+Use it to lay out the part of a form that does not change when the user
+switches platform.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### arioso.schema.operations(config)
+
+What a platform can do, from its config: `generate` plus the operations its
+supported affordances enable (`cover` for `audio_input`, …), or the
+config’s own `operations` list when it declares one.
+
+```pycon
+>>> operations({"supported_affordances": ["prompt", "audio_input"]})
+['generate', 'cover']
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### arioso.schema.param_schema(platform)
+
+The JSON Schema (draft 2020-12) of the parameters `platform` accepts.
+
+Each property carries `x-arioso.group`: `"common"` for a unified
+affordance (the same name on every platform that has it) or `"extra"` for a
+parameter only this platform has. The schema’s own `x-arioso` lists both
+groups and the platform’s `operations`. Reads the config only, so no adapter
+or optional dependency is loaded.
+
+* **Parameters:**
+  **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Platform identifier (see [`arioso.list_platforms()`](_autosummary/arioso.html.md#arioso.list_platforms)).
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+* **Returns:**
+  A JSON-ready dict.
+
+### arioso.schema.schema_from_config(config)
+
+The JSON Schema of a platform config (see [`param_schema()`](_autosummary/arioso.schema.html.md#arioso.schema.param_schema)).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+
 # _autosummary/arioso.services.html.md
 
 # arioso.services
@@ -3877,7 +4053,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-10 20:48 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/d2fcbe5d7c4590e97d52c05f5a3e3c624f993f11"><code>d2fcbe5</code></a> on branch <code>main</code>, for **arioso 0.0.53** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-11 16:19 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/bceba8adf30feaca7f8f51d31ed88f8a55c279e2"><code>bceba8a</code></a> on branch <code>main</code>, for **arioso 0.0.54** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -3886,9 +4062,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/d2fcbe5d7c4590e97d52c05f5a3e3c624f993f11"><code>d2fcbe5d7c4590e97d52c05f5a3e3c624f993f11</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/bceba8adf30feaca7f8f51d31ed88f8a55c279e2"><code>bceba8adf30feaca7f8f51d31ed88f8a55c279e2</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.53</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.54</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -3897,9 +4073,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/42898295731">42898295731</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/43056521111">43056521111</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>06f3725c0806436a2d7c445dddaa7ec8db049bbe</code> (in the history of the built commit) |
+| Event commit | <code>d71b5dc250bfb08dd7afce98fc9dbd738ba03595</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -3924,13 +4100,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.53/">0.0.53</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.54/">0.0.54</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout d2fcbe5d7c4590e97d52c05f5a3e3c624f993f11
+git checkout bceba8adf30feaca7f8f51d31ed88f8a55c279e2
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

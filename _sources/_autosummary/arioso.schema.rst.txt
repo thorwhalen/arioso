@@ -1,0 +1,24 @@
+arioso.schema
+=============
+
+.. automodule:: arioso.schema
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      AUDIO_AFFORDANCES
+      MECHANICS_AFFORDANCES
+      OPERATION_AFFORDANCES
+      MECHANICS_EXTRAS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      common_params
+      operations
+      param_schema
+      schema_from_config
+   

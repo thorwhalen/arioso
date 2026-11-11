@@ -22,6 +22,9 @@ arioso.get_platform_info("musicgen")
 # Every platform with its access type and weights licence
 arioso.platform_table()
 
+# The parameters a platform accepts, as JSON Schema (common + its extras)
+arioso.param_schema("sunoapi")
+
 # Rich platform access via services
 s = arioso.services.sunoapi
 s.generate("jazz piano", duration=30)       # unified names
@@ -237,6 +240,7 @@ arioso.supports_audio_input("mubert")        # False
 | [`named_prompts`](arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.           |
 | [`platforms`](arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                         |
 | [`registry`](arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                               |
+| [`schema`](arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.       |
 | [`services`](arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                            |
 | [`tools`](arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                |
 | [`translation`](arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                          |

@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="../../../../_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -725,6 +725,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">CatalogMatchError</span><span class="p">,</span> <span class="n">Song</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms._base_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRestAdapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.platforms.sunoapi.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLATFORM_CONFIG</span>
 
 <span class="c1"># Model versions accepted by sunoapi.org (2026-10: the V6 family is current; the rest still</span>
 <span class="c1"># accepted but deprecated).</span>
@@ -741,8 +742,15 @@ window.runMermaid = runMermaid;</script>
 <span class="p">)</span>
 <span class="c1"># Models that honour an exact ``duration`` (10-360 s).</span>
 <span class="n">SUNO_DURATION_MODELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"V6"</span><span class="p">,</span> <span class="s2">"V6_WILD"</span><span class="p">,</span> <span class="s2">"V6_MINI"</span><span class="p">,</span> <span class="s2">"V5_5"</span><span class="p">)</span>
-<span class="n">SUNO_DURATION_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">360</span><span class="p">)</span>
-<span class="n">SUNO_VARIETY_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="c1"># The ranges are the config's (what param_schema reports), not restated here.</span>
+<span class="n">SUNO_DURATION_RANGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"param_map"</span><span class="p">][</span><span class="s2">"duration"</span><span class="p">][</span><span class="s2">"minimum"</span><span class="p">],</span>
+    <span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"param_map"</span><span class="p">][</span><span class="s2">"duration"</span><span class="p">][</span><span class="s2">"maximum"</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">SUNO_VARIETY_RANGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"adapter_params"</span><span class="p">][</span><span class="s2">"variety"</span><span class="p">][</span><span class="s2">"minimum"</span><span class="p">],</span>
+    <span class="n">PLATFORM_CONFIG</span><span class="p">[</span><span class="s2">"adapter_params"</span><span class="p">][</span><span class="s2">"variety"</span><span class="p">][</span><span class="s2">"maximum"</span><span class="p">],</span>
+<span class="p">)</span>
 
 <span class="c1"># File upload base URL (separate from the generation API).</span>
 <span class="c1"># Configurable via env var in case the provider changes domains again.</span>
@@ -1009,6 +1017,24 @@ window.runMermaid = runMermaid;</script>
                     <span class="s2">"lyrics as lyrics"</span><span class="p">,</span>
                     <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                 <span class="p">)</span>
+            <span class="n">unsupported</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">duration</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">"variety"</span><span class="p">,</span> <span class="n">variety</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">"vocal_gender"</span><span class="p">,</span> <span class="n">vocal_gender</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">unsupported</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"sunoapi: upload-cover (audio_input) does not take </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unsupported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">style_weight</span> <span class="ow">or</span> <span class="n">weirdness</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">custom_mode</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">"sunoapi: style_weight and weirdness only work in custom mode; "</span>
+                    <span class="s2">"pass genre= or title= (or lyrics=) to switch to it"</span>
+                <span class="p">)</span>
             <span class="n">source</span><span class="p">,</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">_cover_source</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_cover</span><span class="p">(</span>
@@ -1021,6 +1047,8 @@ window.runMermaid = runMermaid;</script>
                     <span class="n">callback_url</span><span class="o">=</span><span class="n">callback_url</span><span class="p">,</span>
                     <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
                     <span class="n">audio_weight</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
+                    <span class="n">style_weight</span><span class="o">=</span><span class="n">style_weight</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weirdness</span><span class="o">=</span><span class="n">weirdness</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
                     <span class="n">wait_for_completion</span><span class="o">=</span><span class="n">wait_for_completion</span><span class="p">,</span>
                     <span class="n">poll_interval</span><span class="o">=</span><span class="n">poll_interval</span><span class="p">,</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>

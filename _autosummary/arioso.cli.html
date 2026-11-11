@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="../_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -347,6 +347,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.registry.html">arioso.registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arioso.schema.html">arioso.schema</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.services.html">arioso.services</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.tools.html">arioso.tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arioso.translation.html">arioso.translation</a></li>
@@ -441,12 +442,15 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#arioso.cli.platforms" title="arioso.cli.platforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">platforms</span></code></a>()</p></td>
 <td><p>List the platforms with their access type, weights licence and commercial use.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#arioso.cli.schema" title="arioso.cli.schema"><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code></a>(platform, *[, indent])</p></td>
+<td><p>Print the JSON Schema of the parameters a platform accepts.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <dl class="py data">
 <dt class="sig sig-object py" id="arioso.cli.commands">
-<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">commands</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'compare':</span> <span class="pre">&lt;function</span> <span class="pre">compare&gt;,</span> <span class="pre">'generate':</span> <span class="pre">&lt;function</span> <span class="pre">generate&gt;,</span> <span class="pre">'platforms':</span> <span class="pre">&lt;function</span> <span class="pre">platforms&gt;}</span></span><a class="headerlink" href="#arioso.cli.commands" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">commands</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'compare':</span> <span class="pre">&lt;function</span> <span class="pre">compare&gt;,</span> <span class="pre">'generate':</span> <span class="pre">&lt;function</span> <span class="pre">generate&gt;,</span> <span class="pre">'platforms':</span> <span class="pre">&lt;function</span> <span class="pre">platforms&gt;,</span> <span class="pre">'schema':</span> <span class="pre">&lt;function</span> <span class="pre">schema&gt;}</span></span><a class="headerlink" href="#arioso.cli.commands" title="Link to this definition">#</a></dt>
 <dd><p>The commands of the <code class="docutils literal notranslate"><span class="pre">arioso</span></code> command line (the SSOT its parser is built from).</p>
 </dd></dl>
 
@@ -528,6 +532,29 @@ way the suffix follows the format.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="arioso.cli.schema">
+<span class="sig-prename descclassname"><span class="pre">arioso.cli.</span></span><span class="sig-name descname"><span class="pre">schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arioso/cli.html#schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#arioso.cli.schema" title="Link to this definition">#</a></dt>
+<dd><p>Print the JSON Schema of the parameters a platform accepts.</p>
+<p>Common parameters (shared names across platforms) are marked
+<code class="docutils literal notranslate"><span class="pre">&quot;x-arioso&quot;:</span> <span class="pre">{&quot;group&quot;:</span> <span class="pre">&quot;common&quot;}</span></code>; the platform’s own extras <code class="docutils literal notranslate"><span class="pre">&quot;extra&quot;</span></code>.
+A web form, an agent tool or a validator can be generated from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>platform</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The platform (see <code class="docutils literal notranslate"><span class="pre">arioso</span> <span class="pre">platforms</span></code>).</p></li>
+<li><p><strong>indent</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – JSON indentation (0: one line).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The schema as JSON.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -581,6 +608,7 @@ way the suffix follows the format.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.compare"><code class="docutils literal notranslate"><span class="pre">compare()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.generate"><code class="docutils literal notranslate"><span class="pre">generate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.platforms"><code class="docutils literal notranslate"><span class="pre">platforms()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.cli.schema"><code class="docutils literal notranslate"><span class="pre">schema()</span></code></a></li>
 </ul>
   </nav></div>
 

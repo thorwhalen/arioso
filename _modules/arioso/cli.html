@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="../../_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -867,8 +867,42 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="schema">
+<a class="viewcode-back" href="../../_autosummary/arioso.cli.html#arioso.cli.schema">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">schema</span><span class="p">(</span><span class="n">platform</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Print the JSON Schema of the parameters a platform accepts.</span>
+
+<span class="sd">    Common parameters (shared names across platforms) are marked</span>
+<span class="sd">    ``"x-arioso": {"group": "common"}``; the platform's own extras ``"extra"``.</span>
+<span class="sd">    A web form, an agent tool or a validator can be generated from it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        platform: The platform (see ``arioso platforms``).</span>
+<span class="sd">        indent: JSON indentation (0: one line).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The schema as JSON.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">param_schema</span>
+
+    <span class="k">if</span> <span class="n">platform</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Unknown platform </span><span class="si">{</span><span class="n">platform</span><span class="si">!r}</span><span class="s2">. See `arioso platforms` for the list."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">param_schema</span><span class="p">(</span><span class="n">platform</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+
 <span class="c1">#: The commands of the ``arioso`` command line (the SSOT its parser is built from).</span>
-<span class="n">commands</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"generate"</span><span class="p">:</span> <span class="n">generate</span><span class="p">,</span> <span class="s2">"platforms"</span><span class="p">:</span> <span class="n">platforms</span><span class="p">,</span> <span class="s2">"compare"</span><span class="p">:</span> <span class="n">compare</span><span class="p">}</span>
+<span class="n">commands</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"generate"</span><span class="p">:</span> <span class="n">generate</span><span class="p">,</span>
+    <span class="s2">"platforms"</span><span class="p">:</span> <span class="n">platforms</span><span class="p">,</span>
+    <span class="s2">"compare"</span><span class="p">:</span> <span class="n">compare</span><span class="p">,</span>
+    <span class="s2">"schema"</span><span class="p">:</span> <span class="n">schema</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 
                 </article>

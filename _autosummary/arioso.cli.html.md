@@ -16,8 +16,9 @@ Plain functions with no CLI library in sight: `arioso.__main__` projects
 |------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 | [`generate`](#arioso.cli.generate)(prompt, \*[, platform, duration, ...])     | Generate music from a text prompt and write it to a file.                            |
 | [`platforms`](#arioso.cli.platforms)()                                         | List the platforms with their access type, weights licence and commercial use.       |
+| [`schema`](#arioso.cli.schema)(platform, \*[, indent])                      | Print the JSON Schema of the parameters a platform accepts.                          |
 
-### arioso.cli.commands *= {'compare': <function compare>, 'generate': <function generate>, 'platforms': <function platforms>}*
+### arioso.cli.commands *= {'compare': <function compare>, 'generate': <function generate>, 'platforms': <function platforms>, 'schema': <function schema>}*
 
 The commands of the `arioso` command line (the SSOT its parser is built from).
 
@@ -77,3 +78,19 @@ List the platforms with their access type, weights licence and commercial use.
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 * **Returns:**
   The table’s lines, a header first.
+
+### arioso.cli.schema(platform, , indent=2)
+
+Print the JSON Schema of the parameters a platform accepts.
+
+Common parameters (shared names across platforms) are marked
+`"x-arioso": {"group": "common"}`; the platform’s own extras `"extra"`.
+A web form, an agent tool or a validator can be generated from it.
+
+* **Parameters:**
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The platform (see `arioso platforms`).
+  * **indent** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – JSON indentation (0: one line).
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+* **Returns:**
+  The schema as JSON.

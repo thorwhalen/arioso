@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="../../_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -855,12 +855,20 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        type: Expected Python type.</span>
 <span class="sd">        description: Human-readable description.</span>
 <span class="sd">        default: Default value (None means no default / required).</span>
+<span class="sd">        minimum: Smallest meaningful value, for bounded numbers (None: unbounded).</span>
+<span class="sd">        maximum: Largest meaningful value, for bounded numbers (None: unbounded).</span>
+<span class="sd">        title: Short display name (empty: derived from ``name``). A platform's</span>
+<span class="sd">            ``param_map`` entry may give its own (Suno calls</span>
+<span class="sd">            ``audio_input_strength`` "Audio Influence").</span>
 <span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="nb">type</span><span class="p">:</span> <span class="nb">type</span>
     <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span></div>
 
 
 
@@ -872,8 +880,12 @@ window.runMermaid = runMermaid;</script>
     <span class="s2">"bpm"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"bpm"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Beats per minute"</span><span class="p">),</span>
     <span class="s2">"key"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"key"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">'Musical key (e.g. "C major")'</span><span class="p">),</span>
     <span class="s2">"genre"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"genre"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Genre tag or category"</span><span class="p">),</span>
-    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"energy"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Energy/intensity level 0-1"</span><span class="p">),</span>
-    <span class="s2">"brightness"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"brightness"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Spectral brightness 0-1"</span><span class="p">),</span>
+    <span class="s2">"energy"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"energy"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Energy/intensity level 0-1"</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">),</span>
+    <span class="s2">"brightness"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"brightness"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Spectral brightness 0-1"</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maximum</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">),</span>
     <span class="s2">"instruments"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"instruments"</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="s2">"Instrument selection"</span><span class="p">),</span>
     <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"instrumental"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Force instrumental-only output"</span><span class="p">),</span>
     <span class="s2">"title"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"title"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Song title"</span><span class="p">),</span>
@@ -886,7 +898,15 @@ window.runMermaid = runMermaid;</script>
         <span class="s2">"waveform -- normalized by arioso._audio.to_audio_ref"</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="s2">"audio_input_strength"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">"audio_input_strength"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"How much reference audio influences output 0-1"</span>
+        <span class="s2">"audio_input_strength"</span><span class="p">,</span>
+        <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">"How much the input audio shapes the output, 0-1: 0 leaves it to the text, "</span>
+        <span class="s2">"1 follows the audio closely. Some platforms' native control runs the other "</span>
+        <span class="s2">"way (a noise level, Stable Audio's strength) and is not inverted yet: see "</span>
+        <span class="s2">"thorwhalen/arioso#74"</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Audio influence"</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="s2">"melody"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
         <span class="s2">"melody"</span><span class="p">,</span>
@@ -925,7 +945,11 @@ window.runMermaid = runMermaid;</script>
     <span class="s2">"bitrate"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"bitrate"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Audio bitrate in kbps"</span><span class="p">),</span>
     <span class="s2">"prompt_weight"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"prompt_weight"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Strength of prompt adherence"</span><span class="p">),</span>
     <span class="s2">"interpolation_alpha"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
-        <span class="s2">"interpolation_alpha"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Blend between two prompts 0-1"</span>
+        <span class="s2">"interpolation_alpha"</span><span class="p">,</span>
+        <span class="nb">float</span><span class="p">,</span>
+        <span class="s2">"Blend between two prompts 0-1"</span><span class="p">,</span>
+        <span class="n">minimum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maximum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="s2">"wait_for_completion"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
         <span class="s2">"wait_for_completion"</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"Block until audio is ready"</span>

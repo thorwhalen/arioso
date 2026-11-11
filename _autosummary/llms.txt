@@ -71,6 +71,7 @@
 - [arioso.platforms.yue.adapter](arioso.platforms.yue.adapter.html.md): YuE adapter supporting fal.ai REST API and local CLI backends.
 - [arioso.platforms.yue.config](arioso.platforms.yue.config.html.md): YuE platform configuration.
 - [arioso.registry](arioso.registry.html.md): Platform registry with auto-discovery and lazy loading.
+- [arioso.schema](arioso.schema.html.md): Machine-readable parameter schemas: what each platform accepts, as JSON Schema.
 - [arioso.services](arioso.services.html.md): Lazy mapping of platform names to &#96;ServiceHandle&#96; objects.
 - [arioso.tools](arioso.tools.html.md): High-level tools for common arioso workflows (submit, poll, download).
 - [arioso.translation](arioso.translation.html.md): Parameter translation layer.

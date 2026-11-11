@@ -1,4 +1,4 @@
-> built 2026-11-11 16:19 UTC from bceba8a (main) · arioso 0.0.54. Details: build_info.json
+> built 2026-11-11 17:44 UTC from 324467f (main) · arioso 0.0.55. Details: build_info.json
 
 # index.html.md
 
@@ -1781,6 +1781,11 @@ Uses `ho.route_to_func` to auto-generate the raw callable from the
 ElevenLabs OpenAPI spec, then handles parameter translation for
 complex fields like `composition_plan`.
 
+### Module Attributes
+
+| [`SECTION_MS`](_autosummary/arioso.platforms.elevenlabs.adapter.html.md#arioso.platforms.elevenlabs.adapter.SECTION_MS)   | ElevenLabs' limits on a composition plan (POST /v1/music, docs 2026-11).   |
+|---------------------------------------------------------------|----------------------------------------------------------------------------|
+
 ### Classes
 
 | [`Adapter`](_autosummary/arioso.platforms.elevenlabs.adapter.html.md#arioso.platforms.elevenlabs.adapter.Adapter)(config)   | ElevenLabs Music adapter with OpenAPI-based function generation.   |
@@ -1802,15 +1807,22 @@ Generate music using the ElevenLabs Music API.
   * **instrumental** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – If True, generate without vocals.
   * **model** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Model ID.
   * **output_format** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Output format string (e.g. ‘mp3_44100_128’).
-  * **lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Custom lyrics text.
-  * **title** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Song title.
-  * **structure** ([`list`](https://docs.python.org/3/builtins/stdtypes.html#list)) – Song section structure (list of dicts).
+  * **lyrics** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Lyrics to sing. `[Section]` lines (or blank lines) split them into
+    sections; they turn the request into a composition plan.
+  * **title** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Song title. Kept on the returned Song only: the API has no title.
+  * **structure** ([`list`](https://docs.python.org/3/builtins/stdtypes.html#list)) – Your own composition-plan sections (`music_v1`) or chunks
+    (`music_v2*`), sent as given.
   * **watermark** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Apply C2PA content watermark.
-  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed (streaming endpoint only).
+  * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Random seed; only with a composition plan (the API refuses it with
+    a plain prompt, so it is dropped there, with a warning).
 * **Return type:**
   [`Song`](_autosummary/arioso.base.html.md#arioso.base.Song)
 * **Returns:**
   A Song with audio_bytes populated.
+
+### arioso.platforms.elevenlabs.adapter.SECTION_MS *= (3000, 120000)*
+
+ElevenLabs’ limits on a composition plan (POST /v1/music, docs 2026-11).
 
 
 # _autosummary/arioso.platforms.elevenlabs.config.html.md
@@ -4053,7 +4065,7 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-11 16:19 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/bceba8adf30feaca7f8f51d31ed88f8a55c279e2"><code>bceba8a</code></a> on branch <code>main</code>, for **arioso 0.0.54** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-11 17:44 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/324467f68642bab943f34c9b4d13e85aa48bd40c"><code>324467f</code></a> on branch <code>main</code>, for **arioso 0.0.55** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4062,9 +4074,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/bceba8adf30feaca7f8f51d31ed88f8a55c279e2"><code>bceba8adf30feaca7f8f51d31ed88f8a55c279e2</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/324467f68642bab943f34c9b4d13e85aa48bd40c"><code>324467f68642bab943f34c9b4d13e85aa48bd40c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.54</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.55</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4073,9 +4085,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/43056521111">43056521111</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/43070487478">43070487478</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d71b5dc250bfb08dd7afce98fc9dbd738ba03595</code> (in the history of the built commit) |
+| Event commit | <code>5d33aa06e649cecc6084ccf85d103b97ea5dd156</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4100,13 +4112,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.54/">0.0.54</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.55/">0.0.55</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout bceba8adf30feaca7f8f51d31ed88f8a55c279e2
+git checkout 324467f68642bab943f34c9b4d13e85aa48bd40c
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../../../../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -857,6 +857,18 @@ window.runMermaid = runMermaid;</script>
     <span class="k">return</span> <span class="n">controls</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_optional_text</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrumental</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The upload endpoints' optional text fields, only those given (lyrics only with vocals).</span>
+
+<span class="sd">    &gt;&gt;&gt; _optional_text(style="folk", title="", lyrics="la", instrumental=True)</span>
+<span class="sd">    {'style': 'folk'}</span>
+<span class="sd">    """</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"style"</span><span class="p">:</span> <span class="n">style</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="n">title</span><span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span><span class="p">:</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">"lyrics"</span><span class="p">]</span> <span class="o">=</span> <span class="n">lyrics</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Raise RuntimeError if the API response indicates an error."""</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s2">"code"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -995,9 +1007,8 @@ window.runMermaid = runMermaid;</script>
         <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">audio_input</span><span class="p">:</span>
-            <span class="c1"># Same customMode rules as below, expressed in upload_cover's terms:</span>
-            <span class="c1"># its customMode is "style or title", and its prompt is the lyrics</span>
-            <span class="c1"># in custom mode, the description otherwise.</span>
+            <span class="c1"># upload-cover: the description becomes the style when no Styles are given,</span>
+            <span class="c1"># and only real lyrics are sent as lyrics (its `prompt` is sung).</span>
             <span class="k">if</span> <span class="n">continue_from</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">"sunoapi: audio_input and continue_from are two different "</span>
@@ -1009,39 +1020,18 @@ window.runMermaid = runMermaid;</script>
                     <span class="s2">"(upload-cover has no start point)"</span><span class="p">,</span>
                     <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="p">(</span><span class="n">genre</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span> <span class="k">if</span> <span class="n">custom_mode</span> <span class="k">else</span> <span class="s2">""</span>
-            <span class="k">if</span> <span class="n">custom_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">"sunoapi: upload-cover runs in non-custom mode without a "</span>
-                    <span class="s2">"style or title; pass genre, title or a prompt to keep the "</span>
-                    <span class="s2">"lyrics as lyrics"</span><span class="p">,</span>
-                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="n">unsupported</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span>
-                    <span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">duration</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s2">"variety"</span><span class="p">,</span> <span class="n">variety</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s2">"vocal_gender"</span><span class="p">,</span> <span class="n">vocal_gender</span><span class="p">),</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
-            <span class="p">}</span>
-            <span class="k">if</span> <span class="n">unsupported</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variety</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">"sunoapi: upload-cover (audio_input) does not take </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unsupported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="s2">"sunoapi: upload-cover (audio_input) does not take ['variety']"</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">style_weight</span> <span class="ow">or</span> <span class="n">weirdness</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">custom_mode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">"sunoapi: style_weight and weirdness only work in custom mode; "</span>
-                    <span class="s2">"pass genre= or title= (or lyrics=) to switch to it"</span>
-                <span class="p">)</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">genre</span> <span class="ow">or</span> <span class="n">prompt</span>
             <span class="n">source</span><span class="p">,</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">_cover_source</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_cover</span><span class="p">(</span>
                     <span class="n">source</span><span class="p">,</span>
                     <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
                     <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                    <span class="n">prompt</span><span class="o">=</span><span class="p">(</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span> <span class="k">if</span> <span class="n">custom_mode</span> <span class="k">else</span> <span class="n">prompt</span><span class="p">,</span>
+                    <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span><span class="p">,</span>
                     <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
                     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                     <span class="n">callback_url</span><span class="o">=</span><span class="n">callback_url</span><span class="p">,</span>
@@ -1049,6 +1039,8 @@ window.runMermaid = runMermaid;</script>
                     <span class="n">audio_weight</span><span class="o">=</span><span class="n">audio_input_strength</span><span class="p">,</span>
                     <span class="n">style_weight</span><span class="o">=</span><span class="n">style_weight</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
                     <span class="n">weirdness</span><span class="o">=</span><span class="n">weirdness</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">vocal_gender</span><span class="o">=</span><span class="n">vocal_gender</span><span class="p">,</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
                     <span class="n">wait_for_completion</span><span class="o">=</span><span class="n">wait_for_completion</span><span class="p">,</span>
                     <span class="n">poll_interval</span><span class="o">=</span><span class="n">poll_interval</span><span class="p">,</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
@@ -1204,6 +1196,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">audio_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">style_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
@@ -1248,26 +1241,24 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">)</span>
-
+        <span class="c1"># No simple mode (docs.sunoapi.org, 2026-11): text is optional, `prompt` is the</span>
+        <span class="c1"># lyrics, and continueAt, when given, must fall inside the source.</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">"uploadUrl"</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
             <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
             <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
             <span class="s2">"callBackUrl"</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
-            <span class="s2">"defaultParamFlag"</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
         <span class="p">}</span>
-
-        <span class="c1"># continueAt is required by the API; default to 0 (start of audio)</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">"continueAt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span> <span class="ow">or</span> <span class="mi">0</span>
-
-        <span class="k">if</span> <span class="n">custom_mode</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
-            <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span> <span class="ow">and</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+        <span class="k">if</span> <span class="n">continue_at</span><span class="p">:</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"continueAt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">continue_at</span>
+        <span class="n">payload</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">_optional_text</span><span class="p">(</span>
+                <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">,</span>
+                <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s2">"negativeTags"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
@@ -1334,6 +1325,9 @@ window.runMermaid = runMermaid;</script>
         <span class="n">audio_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">style_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">weirdness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">vocal_gender</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">wait_for_completion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
@@ -1350,8 +1344,12 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">                Max 8 minutes.</span>
 <span class="sd">            style: Genre/style tags for the cover.</span>
 <span class="sd">            title: Song title.</span>
-<span class="sd">            prompt: Lyrics or text prompt. In non-custom mode (no style/title),</span>
-<span class="sd">                this is the main prompt (max 500 chars).</span>
+<span class="sd">            prompt: Lyrics (the endpoint's ``prompt`` field is lyrics); kept for</span>
+<span class="sd">                callers that pass lyrics this way. Prefer ``lyrics``.</span>
+<span class="sd">            lyrics: Lyrics to sing. Omit to send none (wrong lyrics are worse than</span>
+<span class="sd">                none: they are sung).</span>
+<span class="sd">            vocal_gender: ``"m"`` or ``"f"``.</span>
+<span class="sd">            duration: Target length in seconds (V5_5 and the V6 family).</span>
 <span class="sd">            instrumental: If True, generate without vocals.</span>
 <span class="sd">            model: Suno model version ({models}).</span>
 <span class="sd">            callback_url: Webhook URL. Defaults to SUNO_CALLBACK_URL env var.</span>
@@ -1380,35 +1378,35 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">"got: </span><span class="si">{</span><span class="n">audio_source</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="n">custom_mode</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">style</span> <span class="ow">or</span> <span class="n">title</span><span class="p">)</span>
-
+        <span class="c1"># The endpoint has no simple mode (docs.sunoapi.org, 2026-11): style, title and</span>
+        <span class="c1"># lyrics are all optional, and its `prompt` field IS the lyrics. A description</span>
+        <span class="c1"># must never go there, or it is sung; with no lyrics, none are sent.</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">"uploadUrl"</span><span class="p">:</span> <span class="n">upload_url</span><span class="p">,</span>
             <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
             <span class="s2">"instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
             <span class="s2">"callBackUrl"</span><span class="p">:</span> <span class="n">callback_url</span><span class="p">,</span>
-            <span class="s2">"customMode"</span><span class="p">:</span> <span class="n">custom_mode</span><span class="p">,</span>
         <span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">custom_mode</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"style"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
-            <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumental</span> <span class="ow">and</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">prompt</span><span class="p">:</span>
-                <span class="n">payload</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
-
+        <span class="n">payload</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">_optional_text</span><span class="p">(</span>
+                <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span> <span class="ow">or</span> <span class="n">prompt</span><span class="p">,</span>
+                <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">negative_prompt</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s2">"negativeTags"</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_prompt</span>
         <span class="k">if</span> <span class="n">audio_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">"audioWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">audio_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"audioWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">audio_weight</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">style_weight</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">"styleWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="n">style_weight</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"styleWeight"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">style_weight</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">weirdness</span><span class="p">:</span>
-            <span class="n">payload</span><span class="p">[</span><span class="s2">"weirdnessConstraint"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weirdness</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"weirdnessConstraint"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">weirdness</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vocal_gender</span><span class="p">:</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"vocalGender"</span><span class="p">]</span> <span class="o">=</span> <span class="n">vocal_gender</span>
+        <span class="k">if</span> <span class="n">duration</span><span class="p">:</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">]</span> <span class="o">=</span> <span class="n">duration</span>
 
         <span class="n">endpoint</span> <span class="o">=</span> <span class="s2">"/api/v1/generate/upload-cover"</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>

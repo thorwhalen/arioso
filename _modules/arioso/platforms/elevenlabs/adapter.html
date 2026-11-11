@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../../../../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -722,6 +722,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">complex fields like ``composition_plan``.</span>
 <span class="sd">"""</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioResult</span><span class="p">,</span> <span class="n">Song</span>
@@ -802,39 +803,31 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            instrumental: If True, generate without vocals.</span>
 <span class="sd">            model: Model ID.</span>
 <span class="sd">            output_format: Output format string (e.g. 'mp3_44100_128').</span>
-<span class="sd">            lyrics: Custom lyrics text.</span>
-<span class="sd">            title: Song title.</span>
-<span class="sd">            structure: Song section structure (list of dicts).</span>
+<span class="sd">            lyrics: Lyrics to sing. ``[Section]`` lines (or blank lines) split them into</span>
+<span class="sd">                sections; they turn the request into a composition plan.</span>
+<span class="sd">            title: Song title. Kept on the returned Song only: the API has no title.</span>
+<span class="sd">            structure: Your own composition-plan sections (``music_v1``) or chunks</span>
+<span class="sd">                (``music_v2*``), sent as given.</span>
 <span class="sd">            watermark: Apply C2PA content watermark.</span>
-<span class="sd">            seed: Random seed (streaming endpoint only).</span>
+<span class="sd">            seed: Random seed; only with a composition plan (the API refuses it with</span>
+<span class="sd">                a plain prompt, so it is dropped there, with a warning).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A Song with audio_bytes populated.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_func</span><span class="p">()</span>
 
-        <span class="n">native_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
-            <span class="s2">"music_length_ms"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
-            <span class="s2">"force_instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
-            <span class="s2">"model_id"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
-            <span class="s2">"output_format"</span><span class="p">:</span> <span class="n">output_format</span><span class="p">,</span>
-            <span class="s2">"sign_with_c2pa"</span><span class="p">:</span> <span class="n">watermark</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">native_kwargs</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
-
-        <span class="c1"># Build composition_plan for lyrics/title/structure</span>
-        <span class="k">if</span> <span class="n">lyrics</span> <span class="ow">or</span> <span class="n">title</span> <span class="ow">or</span> <span class="n">structure</span><span class="p">:</span>
-            <span class="n">composition_plan</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-                <span class="n">composition_plan</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
-            <span class="k">if</span> <span class="n">structure</span><span class="p">:</span>
-                <span class="n">composition_plan</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure</span>
-            <span class="k">elif</span> <span class="n">lyrics</span><span class="p">:</span>
-                <span class="n">composition_plan</span><span class="p">[</span><span class="s2">"sections"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"lyrics"</span><span class="p">:</span> <span class="n">lyrics</span><span class="p">}]</span>
-            <span class="n">native_kwargs</span><span class="p">[</span><span class="s2">"composition_plan"</span><span class="p">]</span> <span class="o">=</span> <span class="n">composition_plan</span>
+        <span class="n">native_kwargs</span> <span class="o">=</span> <span class="n">_music_request</span><span class="p">(</span>
+            <span class="n">prompt</span><span class="p">,</span>
+            <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+            <span class="n">instrumental</span><span class="o">=</span><span class="n">instrumental</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">lyrics</span><span class="o">=</span><span class="n">lyrics</span><span class="p">,</span>
+            <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">native_kwargs</span><span class="p">[</span><span class="s2">"output_format"</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_format</span>
+        <span class="n">native_kwargs</span><span class="p">[</span><span class="s2">"sign_with_c2pa"</span><span class="p">]</span> <span class="o">=</span> <span class="n">watermark</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_func</span><span class="p">(</span><span class="o">**</span><span class="n">native_kwargs</span><span class="p">)</span>
@@ -873,6 +866,117 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span></div>
 </div>
 
+
+
+<span class="c1">#: ElevenLabs' limits on a composition plan (POST /v1/music, docs 2026-11).</span>
+<span class="n">SECTION_MS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">120000</span><span class="p">)</span>
+<span class="n">MAX_LINES</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">MAX_LINE_CHARS</span> <span class="o">=</span> <span class="mi">200</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lyric_sections</span><span class="p">(</span><span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">"""``[(name, lines)]`` from lyrics: ``[Verse]``-style lines and blank lines split them.</span>
+
+<span class="sd">    &gt;&gt;&gt; _lyric_sections("[Verse]\\na\\nb\\n\\n[Chorus]\\nc")</span>
+<span class="sd">    [('Verse', ['a', 'b']), ('Chorus', ['c'])]</span>
+<span class="sd">    """</span>
+    <span class="n">sections</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">lines</span> <span class="o">=</span> <span class="p">[],</span> <span class="s2">""</span><span class="p">,</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span> <span class="n">MAX_LINES</span><span class="p">):</span>
+                <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">name</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"Part </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">MAX_LINES</span><span class="p">])</span>
+                <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">lyrics</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\r</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"["</span><span class="p">)</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"]"</span><span class="p">):</span>
+            <span class="n">close</span><span class="p">()</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">lines</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">100</span><span class="p">],</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">close</span><span class="p">()</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">lines</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="n">MAX_LINE_CHARS</span><span class="p">])</span>
+    <span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sections</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_music_request</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">instrumental</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">lyrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The POST /v1/music body: a plain ``prompt``, or a ``composition_plan`` when there</span>
+<span class="sd">    are lyrics or a structure (the two are mutually exclusive, and ``seed``,</span>
+<span class="sd">    ``music_length_ms`` and ``force_instrumental`` belong to one side each).</span>
+<span class="sd">    """</span>
+    <span class="n">sing</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">lyrics</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">instrumental</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">sing</span> <span class="ow">or</span> <span class="n">structure</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">"elevenlabs: seed only works with a composition plan; dropped"</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">"music_length_ms"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+            <span class="s2">"force_instrumental"</span><span class="p">:</span> <span class="n">instrumental</span><span class="p">,</span>
+            <span class="s2">"model_id"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="n">styles</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">prompt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">prompt</span><span class="p">]</span> <span class="k">if</span> <span class="n">prompt</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">structure</span><span class="p">:</span>
+        <span class="n">plan</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">{</span><span class="s2">"chunks"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">structure</span><span class="p">)}</span>
+            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"music_v2"</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="s2">"positive_global_styles"</span><span class="p">:</span> <span class="n">styles</span><span class="p">,</span>
+                <span class="s2">"negative_global_styles"</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">"sections"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">structure</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">_lyric_sections</span><span class="p">(</span><span class="n">lyrics</span><span class="p">)</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">SECTION_MS</span>
+        <span class="n">each</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">hi</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)))))</span>
+        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"music_v2"</span><span class="p">):</span>
+            <span class="n">plan</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"chunks"</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span>
+                        <span class="s2">"duration_ms"</span><span class="p">:</span> <span class="n">each</span><span class="p">,</span>
+                        <span class="s2">"positive_styles"</span><span class="p">:</span> <span class="n">styles</span><span class="p">,</span>
+                    <span class="p">}</span>
+                    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">lines</span> <span class="ow">in</span> <span class="n">parts</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plan</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"positive_global_styles"</span><span class="p">:</span> <span class="n">styles</span><span class="p">,</span>
+                <span class="s2">"negative_global_styles"</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">"sections"</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">"section_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="s2">"positive_local_styles"</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s2">"negative_local_styles"</span><span class="p">:</span> <span class="p">[],</span>
+                        <span class="s2">"duration_ms"</span><span class="p">:</span> <span class="n">each</span><span class="p">,</span>
+                        <span class="s2">"lines"</span><span class="p">:</span> <span class="n">lines</span><span class="p">,</span>
+                    <span class="p">}</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">lines</span> <span class="ow">in</span> <span class="n">parts</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"composition_plan"</span><span class="p">:</span> <span class="n">plan</span><span class="p">,</span> <span class="s2">"model_id"</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s2">"seed"</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span>
+    <span class="k">return</span> <span class="n">body</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_bind_header_param</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>

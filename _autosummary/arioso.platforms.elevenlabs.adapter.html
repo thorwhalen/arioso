@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -428,6 +428,15 @@
 <p>Uses <code class="docutils literal notranslate"><span class="pre">ho.route_to_func</span></code> to auto-generate the raw callable from the
 ElevenLabs OpenAPI spec, then handles parameter translation for
 complex fields like <code class="docutils literal notranslate"><span class="pre">composition_plan</span></code>.</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.elevenlabs.adapter.SECTION_MS" title="arioso.platforms.elevenlabs.adapter.SECTION_MS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SECTION_MS</span></code></a></p></td>
+<td><p>ElevenLabs' limits on a composition plan (POST /v1/music, docs 2026-11).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
@@ -456,11 +465,14 @@ complex fields like <code class="docutils literal notranslate"><span class="pre"
 <li><p><strong>instrumental</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If True, generate without vocals.</p></li>
 <li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Model ID.</p></li>
 <li><p><strong>output_format</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Output format string (e.g. ‘mp3_44100_128’).</p></li>
-<li><p><strong>lyrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Custom lyrics text.</p></li>
-<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Song title.</p></li>
-<li><p><strong>structure</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span>) – Song section structure (list of dicts).</p></li>
+<li><p><strong>lyrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Lyrics to sing. <code class="docutils literal notranslate"><span class="pre">[Section]</span></code> lines (or blank lines) split them into
+sections; they turn the request into a composition plan.</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Song title. Kept on the returned Song only: the API has no title.</p></li>
+<li><p><strong>structure</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span>) – Your own composition-plan sections (<code class="docutils literal notranslate"><span class="pre">music_v1</span></code>) or chunks
+(<code class="docutils literal notranslate"><span class="pre">music_v2*</span></code>), sent as given.</p></li>
 <li><p><strong>watermark</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Apply C2PA content watermark.</p></li>
-<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Random seed (streaming endpoint only).</p></li>
+<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Random seed; only with a composition plan (the API refuses it with
+a plain prompt, so it is dropped there, with a warning).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -472,6 +484,12 @@ complex fields like <code class="docutils literal notranslate"><span class="pre"
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.elevenlabs.adapter.SECTION_MS">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.elevenlabs.adapter.</span></span><span class="sig-name descname"><span class="pre">SECTION_MS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3000,</span> <span class="pre">120000)</span></span><a class="headerlink" href="#arioso.platforms.elevenlabs.adapter.SECTION_MS" title="Link to this definition">#</a></dt>
+<dd><p>ElevenLabs’ limits on a composition plan (POST /v1/music, docs 2026-11).</p>
 </dd></dl>
 
 </section>
@@ -527,6 +545,7 @@ complex fields like <code class="docutils literal notranslate"><span class="pre"
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.elevenlabs.adapter.Adapter.generate"><code class="docutils literal notranslate"><span class="pre">Adapter.generate()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.elevenlabs.adapter.SECTION_MS"><code class="docutils literal notranslate"><span class="pre">SECTION_MS</span></code></a></li>
 </ul>
   </nav></div>
 

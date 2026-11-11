@@ -4,6 +4,12 @@ arioso.platforms.elevenlabs.adapter
 .. automodule:: arioso.platforms.elevenlabs.adapter
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SECTION_MS
+   
    .. rubric:: Classes
 
    .. autosummary::

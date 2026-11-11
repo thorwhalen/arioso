@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -793,8 +793,10 @@ window.runMermaid = runMermaid;</script>
 <span class="c1"># ``neutral`` (where a control starts; never sent by itself), ``scale_labels``</span>
 <span class="c1"># (the two ends of a slider), ``multiline``, ``advanced`` (fold it away),</span>
 <span class="c1"># ``requires`` (every one of these must be given too), ``requires_any`` (at</span>
-<span class="c1"># least one), ``operations`` (only for these operations), ``unset`` (the value</span>
-<span class="c1"># that means "not given"), ``examples``.</span>
+<span class="c1"># least one), ``requires_any_for`` (the operations ``requires_any`` holds for;</span>
+<span class="c1"># all when absent), ``optional_for`` (operations for which a required field is</span>
+<span class="c1"># not), ``operations`` (only for these operations), ``unset`` (the value that</span>
+<span class="c1"># means "not given"), ``examples``.</span>
 <span class="n">_HINT_KEYS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">"neutral"</span><span class="p">,</span>
     <span class="s2">"scale_labels"</span><span class="p">,</span>
@@ -802,6 +804,8 @@ window.runMermaid = runMermaid;</script>
     <span class="s2">"advanced"</span><span class="p">,</span>
     <span class="s2">"requires"</span><span class="p">,</span>
     <span class="s2">"requires_any"</span><span class="p">,</span>
+    <span class="s2">"requires_any_for"</span><span class="p">,</span>
+    <span class="s2">"optional_for"</span><span class="p">,</span>
     <span class="s2">"operations"</span><span class="p">,</span>
     <span class="s2">"unset"</span><span class="p">,</span>
     <span class="s2">"examples"</span><span class="p">,</span>

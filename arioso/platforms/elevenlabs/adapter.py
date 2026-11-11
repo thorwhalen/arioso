@@ -162,7 +162,9 @@ def _lyric_sections(lyrics: str) -> list[tuple[str, list[str]]]:
     def close():
         if lines:
             for i in range(0, len(lines), MAX_LINES):
-                sections.append((name or f"Part {len(sections) + 1}", lines[i : i + MAX_LINES]))
+                sections.append(
+                    (name or f"Part {len(sections) + 1}", lines[i : i + MAX_LINES])
+                )
 
     for raw in lyrics.replace("\r", "\n").split("\n"):
         line = raw.strip()
@@ -195,19 +197,28 @@ def _music_request(
     sing = bool(lyrics) and not instrumental
     if not (sing or structure):
         if seed is not None:
-            warnings.warn("elevenlabs: seed only works with a composition plan; dropped", stacklevel=3)
+            warnings.warn(
+                "elevenlabs: seed only works with a composition plan; dropped",
+                stacklevel=3,
+            )
         return {
             "prompt": prompt,
             "music_length_ms": int(duration * 1000),
             "force_instrumental": instrumental,
             "model_id": model,
         }
-    styles = [s.strip() for s in prompt.split(",") if s.strip()] or ([prompt] if prompt else [])
+    styles = [s.strip() for s in prompt.split(",") if s.strip()] or (
+        [prompt] if prompt else []
+    )
     if structure:
         plan = (
             {"chunks": list(structure)}
             if model.startswith("music_v2")
-            else {"positive_global_styles": styles, "negative_global_styles": [], "sections": list(structure)}
+            else {
+                "positive_global_styles": styles,
+                "negative_global_styles": [],
+                "sections": list(structure),
+            }
         )
     else:
         parts = _lyric_sections(lyrics)
@@ -216,7 +227,11 @@ def _music_request(
         if model.startswith("music_v2"):
             plan = {
                 "chunks": [
-                    {"text": "\n".join(lines), "duration_ms": each, "positive_styles": styles}
+                    {
+                        "text": "\n".join(lines),
+                        "duration_ms": each,
+                        "positive_styles": styles,
+                    }
                     for _, lines in parts
                 ]
             }

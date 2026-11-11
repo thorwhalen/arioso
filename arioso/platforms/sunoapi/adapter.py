@@ -302,7 +302,9 @@ class Adapter(BaseRestAdapter):
                     stacklevel=2,
                 )
             if variety is not None:
-                raise ValueError("sunoapi: upload-cover (audio_input) does not take ['variety']")
+                raise ValueError(
+                    "sunoapi: upload-cover (audio_input) does not take ['variety']"
+                )
             style = genre or prompt
             source, ref = _cover_source(audio_input)
             try:
@@ -527,7 +529,14 @@ class Adapter(BaseRestAdapter):
         }
         if continue_at:
             payload["continueAt"] = continue_at
-        payload.update(_optional_text(style=style, title=title, lyrics=lyrics or prompt, instrumental=instrumental))
+        payload.update(
+            _optional_text(
+                style=style,
+                title=title,
+                lyrics=lyrics or prompt,
+                instrumental=instrumental,
+            )
+        )
 
         if negative_prompt:
             payload["negativeTags"] = negative_prompt
@@ -656,7 +665,14 @@ class Adapter(BaseRestAdapter):
             "instrumental": instrumental,
             "callBackUrl": callback_url,
         }
-        payload.update(_optional_text(style=style, title=title, lyrics=lyrics or prompt, instrumental=instrumental))
+        payload.update(
+            _optional_text(
+                style=style,
+                title=title,
+                lyrics=lyrics or prompt,
+                instrumental=instrumental,
+            )
+        )
         if negative_prompt:
             payload["negativeTags"] = negative_prompt
         if audio_weight:

@@ -433,7 +433,11 @@ def _cover_session(mock_make_session):
 
 @patch("arioso.platforms._base_adapter.make_session")
 def test_sunoapi_audio_input_goes_to_upload_cover(mock_make_session):
-    """audio_input / audio_input_strength used to be declared but never read."""
+    """audio_input reaches upload-cover; a description is the style, never the lyrics.
+
+    upload-cover has no simple mode and its ``prompt`` field is the lyrics
+    (docs.sunoapi.org, 2026-11), so a description sent there would be sung.
+    """
     session = _cover_session(mock_make_session)
     songs = Adapter(PLATFORM_CONFIG).generate(
         "dreamy synth pop",
@@ -446,18 +450,27 @@ def test_sunoapi_audio_input_goes_to_upload_cover(mock_make_session):
     payload = kwargs["json"]
     assert payload["uploadUrl"] == "https://example.com/seed.mp3"
     assert payload["audioWeight"] == 0.7
-    assert payload["customMode"] is False
-    assert payload["prompt"] == "dreamy synth pop"
+    assert payload["style"] == "dreamy synth pop"
+    assert "customMode" not in payload
+    assert "prompt" not in payload and "lyrics" not in payload
     assert songs[0].id == "cover-task"
 
 
 @patch("arioso.platforms._base_adapter.make_session")
-def test_sunoapi_audio_input_keeps_generate_custom_mode_rules(mock_make_session):
-    """Lyrics + genre: style is the genre and the prompt carries the lyrics,
-    exactly as plain generation builds its customMode payload."""
+def test_sunoapi_cover_needs_no_text(mock_make_session):
+    """Audio alone is enough: no style, title or lyrics are invented."""
+    session = _cover_session(mock_make_session)
+    Adapter(PLATFORM_CONFIG).generate("", audio_input="https://example.com/seed.mp3", callback_url=CALLBACK_URL)
+    payload = session.post.call_args[1]["json"]
+    assert not {"style", "title", "lyrics", "prompt"} & set(payload)
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_sunoapi_cover_sends_lyrics_genre_title(mock_make_session):
+    """Lyrics + genre: the genre is the style and the lyrics go as lyrics."""
     session = _cover_session(mock_make_session)
     Adapter(PLATFORM_CONFIG).generate(
-        "ignored as style",
+        "a description, not lyrics",
         genre="folk",
         lyrics="la la la",
         title="T",
@@ -465,12 +478,8 @@ def test_sunoapi_audio_input_keeps_generate_custom_mode_rules(mock_make_session)
         callback_url=CALLBACK_URL,
     )
     payload = session.post.call_args[1]["json"]
-    assert payload["customMode"] is True
-    assert (payload["style"], payload["prompt"], payload["title"]) == (
-        "folk",
-        "la la la",
-        "T",
-    )
+    assert (payload["style"], payload["lyrics"], payload["title"]) == ("folk", "la la la", "T")
+    assert "prompt" not in payload
     assert "audioWeight" not in payload  # 0 leaves it to the API
 
 
@@ -528,8 +537,8 @@ def test_sunoapi_audio_input_warns_on_what_upload_cover_cannot_do(mock_make_sess
     adapter = Adapter(PLATFORM_CONFIG)
     with pytest.warns(UserWarning, match="continue_at is ignored"):
         adapter.generate("x", audio_input="https://e.x/a.mp3", continue_at=12)
-    with pytest.warns(UserWarning, match="non-custom mode"):
-        adapter.generate("", lyrics="la", audio_input="https://e.x/a.mp3")
+    with pytest.raises(ValueError, match="variety"):
+        adapter.generate("x", audio_input="https://e.x/a.mp3", variety=2)
 
 
 @patch("arioso.platforms._base_adapter.make_session")

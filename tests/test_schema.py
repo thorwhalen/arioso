@@ -120,6 +120,9 @@ def test_cover_forwards_custom_controls_and_refuses_the_rest(monkeypatch):
     assert (seen["style_weight"], seen["weirdness"]) == (0.7, 0.2)
     with pytest.raises(ValueError, match="variety"):
         adapter.generate("x", genre="jazz", audio_input="https://h/a.mp3", variety=2)
+    # no custom mode on upload-cover: the controls go through without Styles
+    adapter.generate("x", audio_input="https://h/a.mp3", weirdness=0.3)
+    assert seen["weirdness"] == 0.3
 
 
 def test_mechanics_extras_are_left_out():

@@ -76,8 +76,10 @@ _SPEC_KEYS = {
 # ``neutral`` (where a control starts; never sent by itself), ``scale_labels``
 # (the two ends of a slider), ``multiline``, ``advanced`` (fold it away),
 # ``requires`` (every one of these must be given too), ``requires_any`` (at
-# least one), ``operations`` (only for these operations), ``unset`` (the value
-# that means "not given"), ``examples``.
+# least one), ``requires_any_for`` (the operations ``requires_any`` holds for;
+# all when absent), ``optional_for`` (operations for which a required field is
+# not), ``operations`` (only for these operations), ``unset`` (the value that
+# means "not given"), ``examples``.
 _HINT_KEYS = (
     "neutral",
     "scale_labels",
@@ -85,6 +87,8 @@ _HINT_KEYS = (
     "advanced",
     "requires",
     "requires_any",
+    "requires_any_for",
+    "optional_for",
     "operations",
     "unset",
     "examples",

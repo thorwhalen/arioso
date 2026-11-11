@@ -154,10 +154,10 @@ def submit_cover(
         assert callable(source_prep), "source_prep must be a callable function"
         source_path = source_prep(source_path)
 
+    # upload-cover's `prompt` field is the lyrics; a description belongs in the style.
     songs = adapter.upload_cover(
         source_path,
-        style=style,
-        prompt=prompt,
+        style=style or prompt,
         instrumental=instrumental,
         model=model,
         audio_weight=audio_weight,

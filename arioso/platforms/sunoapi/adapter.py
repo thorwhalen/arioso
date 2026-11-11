@@ -140,6 +140,18 @@ def _custom_controls(
     return controls
 
 
+def _optional_text(*, style: str, title: str, lyrics: str, instrumental: bool) -> dict:
+    """The upload endpoints' optional text fields, only those given (lyrics only with vocals).
+
+    >>> _optional_text(style="folk", title="", lyrics="la", instrumental=True)
+    {'style': 'folk'}
+    """
+    fields = {"style": style, "title": title}
+    if not instrumental:
+        fields["lyrics"] = lyrics
+    return {k: v for k, v in fields.items() if v}
+
+
 def _check_api_error(data: dict):
     """Raise RuntimeError if the API response indicates an error."""
     if isinstance(data, dict) and data.get("code") and data["code"] != 200:
@@ -276,9 +288,8 @@ class Adapter(BaseRestAdapter):
         custom_mode = bool(lyrics or genre or title)
 
         if audio_input:
-            # Same customMode rules as below, expressed in upload_cover's terms:
-            # its customMode is "style or title", and its prompt is the lyrics
-            # in custom mode, the description otherwise.
+            # upload-cover: the description becomes the style when no Styles are given,
+            # and only real lyrics are sent as lyrics (its `prompt` is sung).
             if continue_from:
                 raise ValueError(
                     "sunoapi: audio_input and continue_from are two different "
@@ -290,39 +301,16 @@ class Adapter(BaseRestAdapter):
                     "(upload-cover has no start point)",
                     stacklevel=2,
                 )
-            style = (genre or prompt) if custom_mode else ""
-            if custom_mode and not (style or title):
-                warnings.warn(
-                    "sunoapi: upload-cover runs in non-custom mode without a "
-                    "style or title; pass genre, title or a prompt to keep the "
-                    "lyrics as lyrics",
-                    stacklevel=2,
-                )
-            unsupported = {
-                name: value
-                for name, value in (
-                    ("duration", duration),
-                    ("variety", variety),
-                    ("vocal_gender", vocal_gender),
-                )
-                if value not in (None, 0, "")
-            }
-            if unsupported:
-                raise ValueError(
-                    f"sunoapi: upload-cover (audio_input) does not take {sorted(unsupported)}"
-                )
-            if (style_weight or weirdness) and not custom_mode:
-                raise ValueError(
-                    "sunoapi: style_weight and weirdness only work in custom mode; "
-                    "pass genre= or title= (or lyrics=) to switch to it"
-                )
+            if variety is not None:
+                raise ValueError("sunoapi: upload-cover (audio_input) does not take ['variety']")
+            style = genre or prompt
             source, ref = _cover_source(audio_input)
             try:
                 return self.upload_cover(
                     source,
                     style=style,
                     title=title,
-                    prompt=(lyrics or prompt) if custom_mode else prompt,
+                    lyrics=lyrics,
                     instrumental=instrumental,
                     model=model,
                     callback_url=callback_url,
@@ -330,6 +318,8 @@ class Adapter(BaseRestAdapter):
                     audio_weight=audio_input_strength,
                     style_weight=style_weight or 0,
                     weirdness=weirdness or 0,
+                    vocal_gender=vocal_gender,
+                    duration=duration,
                     wait_for_completion=wait_for_completion,
                     poll_interval=poll_interval,
                     timeout=timeout,
@@ -482,6 +472,7 @@ class Adapter(BaseRestAdapter):
         negative_prompt: str = "",
         audio_weight: float = 0,
         style_weight: float = 0,
+        lyrics: str = "",
         wait_for_completion: bool = False,
         poll_interval: float = 5.0,
         timeout: float = 300.0,
@@ -526,26 +517,17 @@ class Adapter(BaseRestAdapter):
                 f"got: {audio_source!r}"
             )
 
-        custom_mode = bool(style or title or prompt)
-
+        # No simple mode (docs.sunoapi.org, 2026-11): text is optional, `prompt` is the
+        # lyrics, and continueAt, when given, must fall inside the source.
         payload = {
             "uploadUrl": upload_url,
             "model": model,
             "instrumental": instrumental,
             "callBackUrl": callback_url,
-            "defaultParamFlag": custom_mode,
         }
-
-        # continueAt is required by the API; default to 0 (start of audio)
-        payload["continueAt"] = continue_at or 0
-
-        if custom_mode:
-            if style:
-                payload["style"] = style
-            if title:
-                payload["title"] = title
-            if not instrumental and prompt:
-                payload["prompt"] = prompt
+        if continue_at:
+            payload["continueAt"] = continue_at
+        payload.update(_optional_text(style=style, title=title, lyrics=lyrics or prompt, instrumental=instrumental))
 
         if negative_prompt:
             payload["negativeTags"] = negative_prompt
@@ -612,6 +594,9 @@ class Adapter(BaseRestAdapter):
         audio_weight: float = 0,
         style_weight: float = 0,
         weirdness: float = 0,
+        lyrics: str = "",
+        vocal_gender: str = "",
+        duration: float = 0,
         wait_for_completion: bool = False,
         poll_interval: float = 5.0,
         timeout: float = 300.0,
@@ -628,8 +613,12 @@ class Adapter(BaseRestAdapter):
                 Max 8 minutes.
             style: Genre/style tags for the cover.
             title: Song title.
-            prompt: Lyrics or text prompt. In non-custom mode (no style/title),
-                this is the main prompt (max 500 chars).
+            prompt: Lyrics (the endpoint's ``prompt`` field is lyrics); kept for
+                callers that pass lyrics this way. Prefer ``lyrics``.
+            lyrics: Lyrics to sing. Omit to send none (wrong lyrics are worse than
+                none: they are sung).
+            vocal_gender: ``"m"`` or ``"f"``.
+            duration: Target length in seconds (V5_5 and the V6 family).
             instrumental: If True, generate without vocals.
             model: Suno model version ({models}).
             callback_url: Webhook URL. Defaults to SUNO_CALLBACK_URL env var.
@@ -658,35 +647,28 @@ class Adapter(BaseRestAdapter):
                 f"got: {audio_source!r}"
             )
 
-        custom_mode = bool(style or title)
-
+        # The endpoint has no simple mode (docs.sunoapi.org, 2026-11): style, title and
+        # lyrics are all optional, and its `prompt` field IS the lyrics. A description
+        # must never go there, or it is sung; with no lyrics, none are sent.
         payload = {
             "uploadUrl": upload_url,
             "model": model,
             "instrumental": instrumental,
             "callBackUrl": callback_url,
-            "customMode": custom_mode,
         }
-
-        if custom_mode:
-            if style:
-                payload["style"] = style
-            if title:
-                payload["title"] = title
-            if not instrumental and prompt:
-                payload["prompt"] = prompt
-        else:
-            if prompt:
-                payload["prompt"] = prompt
-
+        payload.update(_optional_text(style=style, title=title, lyrics=lyrics or prompt, instrumental=instrumental))
         if negative_prompt:
             payload["negativeTags"] = negative_prompt
         if audio_weight:
-            payload["audioWeight"] = audio_weight
+            payload["audioWeight"] = round(audio_weight, 2)
         if style_weight:
-            payload["styleWeight"] = style_weight
+            payload["styleWeight"] = round(style_weight, 2)
         if weirdness:
-            payload["weirdnessConstraint"] = weirdness
+            payload["weirdnessConstraint"] = round(weirdness, 2)
+        if vocal_gender:
+            payload["vocalGender"] = vocal_gender
+        if duration:
+            payload["duration"] = duration
 
         endpoint = "/api/v1/generate/upload-cover"
         response = self.session.post(f"{self.base_url}{endpoint}", json=payload)

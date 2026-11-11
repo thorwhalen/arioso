@@ -13,8 +13,10 @@ PLATFORM_CONFIG = {
         "env_var": "SUNO_API_KEY",
     },
     "dependencies": ["requests"],
-    # title/description/minimum/maximum/choices/default: what param_schema reports
+    # title/description/minimum/maximum/choices: what param_schema reports
     # (arioso.schema); Suno's own UI names ("Styles", "Audio Influence") as titles.
+    # No `default` where the API decides when the value is left out: a form would
+    # send it. `neutral` is where a slider starts (a hint, never sent by itself).
     "param_map": {
         "prompt": {
             "native_name": "prompt",
@@ -55,7 +57,6 @@ PLATFORM_CONFIG = {
             "native_name": "model",
             "native_default": "V6",
             "title": "Model",
-            "default": "V6",
             "choices": [
                 "V6",
                 "V6_WILD",
@@ -77,6 +78,7 @@ PLATFORM_CONFIG = {
             "empty lets Suno decide.",
             "minimum": 10,
             "maximum": 360,
+            "unset": 0,  # 0 (the adapter's default) lets Suno decide
             "advanced": True,
         },
         "continue_from": {
@@ -104,9 +106,9 @@ PLATFORM_CONFIG = {
             "title": "Audio Influence",
             "description": "How closely the result follows the uploaded audio. "
             "Not used for instrumentals.",
-            "default": 0.5,
+            "neutral": 0.5,
             "scale_labels": ["Loose", "Faithful"],
-            "requires": "audio_input",
+            "requires": ["audio_input"],
         },
     },
     "supported_affordances": [
@@ -123,8 +125,8 @@ PLATFORM_CONFIG = {
         "audio_input",
         "audio_input_strength",
     ],
-    # Suno-only generate controls, passed to the adapter under these names
-    # (custom mode only; ranges are validated again in adapter._custom_controls).
+    # Suno-only generate controls, passed to the adapter under these names. All
+    # custom mode only (they need genre, title or lyrics): `requires_any` says so.
     "adapter_params": {
         "weirdness": {
             "type": float,
@@ -133,8 +135,9 @@ PLATFORM_CONFIG = {
             "normal result (weirdnessConstraint).",
             "minimum": 0,
             "maximum": 1,
-            "default": 0.5,
+            "neutral": 0.5,
             "scale_labels": ["Safe", "Chaos"],
+            "requires_any": ["genre", "title", "lyrics"],
         },
         "style_weight": {
             "type": float,
@@ -142,14 +145,17 @@ PLATFORM_CONFIG = {
             "description": "How strictly the Styles text is followed (styleWeight).",
             "minimum": 0,
             "maximum": 1,
-            "default": 0.5,
+            "neutral": 0.5,
             "scale_labels": ["Loose", "Strong"],
+            "requires_any": ["genre", "title", "lyrics"],
         },
         "vocal_gender": {
             "type": str,
             "title": "Vocal Gender",
             "description": "Preferred singing voice: m or f (vocalGender).",
             "choices": ["m", "f"],
+            "requires_any": ["genre", "title", "lyrics"],
+            "operations": ["generate"],
         },
         "variety": {
             "type": int,
@@ -159,6 +165,8 @@ PLATFORM_CONFIG = {
             "minimum": 0,
             "maximum": 4,
             "advanced": True,
+            "requires_any": ["genre", "title", "lyrics"],
+            "operations": ["generate"],
         },
     },
     "on_unsupported_param": "warn",

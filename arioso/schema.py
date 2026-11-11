@@ -72,8 +72,27 @@ _SPEC_KEYS = {
     "multiple_of": "multipleOf",
 }
 
-# Spec keys that are presentation hints, kept under ``x-arioso``.
-_HINT_KEYS = ("scale_labels", "multiline", "advanced", "requires")
+# Spec keys that are hints for a form or an agent, kept under ``x-arioso``:
+# ``neutral`` (where a control starts; never sent by itself), ``scale_labels``
+# (the two ends of a slider), ``multiline``, ``advanced`` (fold it away),
+# ``requires`` (every one of these must be given too), ``requires_any`` (at
+# least one), ``operations`` (only for these operations), ``unset`` (the value
+# that means "not given"), ``examples``.
+_HINT_KEYS = (
+    "neutral",
+    "scale_labels",
+    "multiline",
+    "advanced",
+    "requires",
+    "requires_any",
+    "operations",
+    "unset",
+    "examples",
+)
+
+#: Extras that steer the call (transport, process, device), not the music;
+#: left out of schemas. A spec can also say ``"mechanics": True``.
+MECHANICS_EXTRAS = frozenset({"fetch", "timeout", "device", "runtime"})
 
 
 def _title(name: str) -> str:
@@ -105,9 +124,14 @@ def _common_property(name: str, mapping: dict) -> dict:
     from arioso.base import AFFORDANCES
 
     affordance = AFFORDANCES[name]
-    if name in AUDIO_AFFORDANCES:
-        prop = {"type": "string", "contentMediaType": "audio/*"}
+    is_clip_id = mapping.get("type") is str
+    if name in AUDIO_AFFORDANCES or (name == "continue_from" and not is_clip_id):
+        # In JSON the audio is a URL (a form uploads first, then passes the URL).
+        prop = {"type": "string", "format": "uri", "contentMediaType": "audio/*"}
         kind = "audio"
+    elif name == "continue_from":
+        prop = {"type": "string"}
+        kind = "clip"
     else:
         prop = {}
         json_type = _json_type(affordance.type)
@@ -179,7 +203,7 @@ def schema_from_config(config: dict) -> dict:
         if mapping.get("required"):
             required.append(name)
     for name, spec in _extras(config).items():
-        if name in properties:
+        if name in properties or name in MECHANICS_EXTRAS or (spec or {}).get("mechanics"):
             continue
         properties[name] = _extra_property(name, spec)
         extra.append(name)

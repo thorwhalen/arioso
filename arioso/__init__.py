@@ -70,9 +70,12 @@ def generate(prompt: str, *, platform: str = "musicgen", **kwargs) -> Song:
     from arioso.registry import get_platform
     from arioso.translation import check_supported_params
 
+    from arioso.services import validate_params
+
     entry = get_platform(platform)
     adapter = entry["adapter"]
     check_supported_params(kwargs, entry["config"])
+    validate_params(kwargs, entry["config"], platform)
 
     if hasattr(adapter, "generate"):
         result = adapter.generate(prompt, **kwargs)
@@ -95,9 +98,12 @@ def generate_many(prompt: str, *, platform: str = "musicgen", **kwargs) -> list[
     from arioso.registry import get_platform
     from arioso.translation import check_supported_params
 
+    from arioso.services import validate_params
+
     entry = get_platform(platform)
     adapter = entry["adapter"]
     check_supported_params(kwargs, entry["config"])
+    validate_params(kwargs, entry["config"], platform)
 
     if hasattr(adapter, "generate"):
         result = adapter.generate(prompt, **kwargs)

@@ -168,8 +168,9 @@ AFFORDANCES: dict[str, Affordance] = {
         "audio_input_strength",
         float,
         "How much the input audio shapes the output, 0-1: 0 leaves it to the text, "
-        "1 follows the audio closely. Platforms whose native control runs the other "
-        "way (a noise level, Stable Audio's strength) are inverted by their adapter",
+        "1 follows the audio closely. Some platforms' native control runs the other "
+        "way (a noise level, Stable Audio's strength) and is not inverted yet: see "
+        "thorwhalen/arioso#74",
         minimum=0,
         maximum=1,
         title="Audio influence",
@@ -209,7 +210,7 @@ AFFORDANCES: dict[str, Affordance] = {
     "batch_size": Affordance("batch_size", int, "Number of outputs per request"),
     "output_format": Affordance("output_format", str, "Desired output format"),
     "bitrate": Affordance("bitrate", int, "Audio bitrate in kbps"),
-    "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence", minimum=0),
+    "prompt_weight": Affordance("prompt_weight", float, "Strength of prompt adherence"),
     "interpolation_alpha": Affordance(
         "interpolation_alpha", float, "Blend between two prompts 0-1",
         minimum=0,

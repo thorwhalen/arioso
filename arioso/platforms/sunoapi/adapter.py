@@ -8,6 +8,7 @@ from pathlib import Path
 
 from arioso.base import AudioResult, CatalogMatchError, Song
 from arioso.platforms._base_adapter import BaseRestAdapter
+from arioso.platforms.sunoapi.config import PLATFORM_CONFIG
 
 # Model versions accepted by sunoapi.org (2026-10: the V6 family is current; the rest still
 # accepted but deprecated).
@@ -24,8 +25,15 @@ SUNO_MODELS = (
 )
 # Models that honour an exact ``duration`` (10-360 s).
 SUNO_DURATION_MODELS = ("V6", "V6_WILD", "V6_MINI", "V5_5")
-SUNO_DURATION_RANGE = (10, 360)
-SUNO_VARIETY_RANGE = (0, 4)
+# The ranges are the config's (what param_schema reports), not restated here.
+SUNO_DURATION_RANGE = (
+    PLATFORM_CONFIG["param_map"]["duration"]["minimum"],
+    PLATFORM_CONFIG["param_map"]["duration"]["maximum"],
+)
+SUNO_VARIETY_RANGE = (
+    PLATFORM_CONFIG["adapter_params"]["variety"]["minimum"],
+    PLATFORM_CONFIG["adapter_params"]["variety"]["maximum"],
+)
 
 # File upload base URL (separate from the generation API).
 # Configurable via env var in case the provider changes domains again.
@@ -290,6 +298,24 @@ class Adapter(BaseRestAdapter):
                     "lyrics as lyrics",
                     stacklevel=2,
                 )
+            unsupported = {
+                name: value
+                for name, value in (
+                    ("duration", duration),
+                    ("variety", variety),
+                    ("vocal_gender", vocal_gender),
+                )
+                if value not in (None, 0, "")
+            }
+            if unsupported:
+                raise ValueError(
+                    f"sunoapi: upload-cover (audio_input) does not take {sorted(unsupported)}"
+                )
+            if (style_weight or weirdness) and not custom_mode:
+                raise ValueError(
+                    "sunoapi: style_weight and weirdness only work in custom mode; "
+                    "pass genre= or title= (or lyrics=) to switch to it"
+                )
             source, ref = _cover_source(audio_input)
             try:
                 return self.upload_cover(
@@ -302,6 +328,8 @@ class Adapter(BaseRestAdapter):
                     callback_url=callback_url,
                     negative_prompt=negative_prompt,
                     audio_weight=audio_input_strength,
+                    style_weight=style_weight or 0,
+                    weirdness=weirdness or 0,
                     wait_for_completion=wait_for_completion,
                     poll_interval=poll_interval,
                     timeout=timeout,

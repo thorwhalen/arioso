@@ -5,6 +5,7 @@ ElevenLabs OpenAPI spec, then handles parameter translation for
 complex fields like ``composition_plan``.
 """
 
+import warnings
 import os
 
 from arioso.base import AudioResult, Song
@@ -81,39 +82,31 @@ class Adapter(BaseRestAdapter):
             instrumental: If True, generate without vocals.
             model: Model ID.
             output_format: Output format string (e.g. 'mp3_44100_128').
-            lyrics: Custom lyrics text.
-            title: Song title.
-            structure: Song section structure (list of dicts).
+            lyrics: Lyrics to sing. ``[Section]`` lines (or blank lines) split them into
+                sections; they turn the request into a composition plan.
+            title: Song title. Kept on the returned Song only: the API has no title.
+            structure: Your own composition-plan sections (``music_v1``) or chunks
+                (``music_v2*``), sent as given.
             watermark: Apply C2PA content watermark.
-            seed: Random seed (streaming endpoint only).
+            seed: Random seed; only with a composition plan (the API refuses it with
+                a plain prompt, so it is dropped there, with a warning).
 
         Returns:
             A Song with audio_bytes populated.
         """
         self._ensure_func()
 
-        native_kwargs = {
-            "prompt": prompt,
-            "music_length_ms": int(duration * 1000),
-            "force_instrumental": instrumental,
-            "model_id": model,
-            "output_format": output_format,
-            "sign_with_c2pa": watermark,
-        }
-
-        if seed is not None:
-            native_kwargs["seed"] = seed
-
-        # Build composition_plan for lyrics/title/structure
-        if lyrics or title or structure:
-            composition_plan = {}
-            if title:
-                composition_plan["title"] = title
-            if structure:
-                composition_plan["sections"] = structure
-            elif lyrics:
-                composition_plan["sections"] = [{"lyrics": lyrics}]
-            native_kwargs["composition_plan"] = composition_plan
+        native_kwargs = _music_request(
+            prompt,
+            duration=duration,
+            instrumental=instrumental,
+            model=model,
+            lyrics=lyrics,
+            structure=structure,
+            seed=seed,
+        )
+        native_kwargs["output_format"] = output_format
+        native_kwargs["sign_with_c2pa"] = watermark
 
         try:
             result = self._raw_func(**native_kwargs)
@@ -150,6 +143,102 @@ class Adapter(BaseRestAdapter):
             title=title,
             metadata={"model": model, "output_format": output_format},
         )
+
+
+#: ElevenLabs' limits on a composition plan (POST /v1/music, docs 2026-11).
+SECTION_MS = (3000, 120000)
+MAX_LINES = 30
+MAX_LINE_CHARS = 200
+
+
+def _lyric_sections(lyrics: str) -> list[tuple[str, list[str]]]:
+    """``[(name, lines)]`` from lyrics: ``[Verse]``-style lines and blank lines split them.
+
+    >>> _lyric_sections("[Verse]\\na\\nb\\n\\n[Chorus]\\nc")
+    [('Verse', ['a', 'b']), ('Chorus', ['c'])]
+    """
+    sections, name, lines = [], "", []
+
+    def close():
+        if lines:
+            for i in range(0, len(lines), MAX_LINES):
+                sections.append((name or f"Part {len(sections) + 1}", lines[i : i + MAX_LINES]))
+
+    for raw in lyrics.replace("\r", "\n").split("\n"):
+        line = raw.strip()
+        if line.startswith("[") and line.endswith("]"):
+            close()
+            name, lines = line[1:-1].strip()[:100], []
+        elif not line:
+            close()
+            name, lines = "", []
+        else:
+            lines.append(line[:MAX_LINE_CHARS])
+    close()
+    return sections
+
+
+def _music_request(
+    prompt: str,
+    *,
+    duration: float,
+    instrumental: bool,
+    model: str,
+    lyrics: str = "",
+    structure=None,
+    seed=None,
+) -> dict:
+    """The POST /v1/music body: a plain ``prompt``, or a ``composition_plan`` when there
+    are lyrics or a structure (the two are mutually exclusive, and ``seed``,
+    ``music_length_ms`` and ``force_instrumental`` belong to one side each).
+    """
+    sing = bool(lyrics) and not instrumental
+    if not (sing or structure):
+        if seed is not None:
+            warnings.warn("elevenlabs: seed only works with a composition plan; dropped", stacklevel=3)
+        return {
+            "prompt": prompt,
+            "music_length_ms": int(duration * 1000),
+            "force_instrumental": instrumental,
+            "model_id": model,
+        }
+    styles = [s.strip() for s in prompt.split(",") if s.strip()] or ([prompt] if prompt else [])
+    if structure:
+        plan = (
+            {"chunks": list(structure)}
+            if model.startswith("music_v2")
+            else {"positive_global_styles": styles, "negative_global_styles": [], "sections": list(structure)}
+        )
+    else:
+        parts = _lyric_sections(lyrics)
+        lo, hi = SECTION_MS
+        each = max(lo, min(hi, int(duration * 1000 / max(1, len(parts)))))
+        if model.startswith("music_v2"):
+            plan = {
+                "chunks": [
+                    {"text": "\n".join(lines), "duration_ms": each, "positive_styles": styles}
+                    for _, lines in parts
+                ]
+            }
+        else:
+            plan = {
+                "positive_global_styles": styles,
+                "negative_global_styles": [],
+                "sections": [
+                    {
+                        "section_name": name,
+                        "positive_local_styles": [],
+                        "negative_local_styles": [],
+                        "duration_ms": each,
+                        "lines": lines,
+                    }
+                    for name, lines in parts
+                ],
+            }
+    body = {"composition_plan": plan, "model_id": model}
+    if seed is not None:
+        body["seed"] = seed
+    return body
 
 
 def _bind_header_param(func, header: str, value: str):

@@ -50,7 +50,7 @@ PLATFORM_CONFIG = {
             "native_name": "model_id",
             "native_default": "music_v1",
             "title": "Model",
-            "examples": ["music_v1"],
+            "examples": ["music_v1", "music_v2", "music_v2_5"],
         },
         "seed": {
             "native_name": "seed",

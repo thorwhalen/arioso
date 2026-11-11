@@ -23,8 +23,10 @@ PLATFORM_CONFIG = {
             "required": True,
             "title": "Song description",
             "description": "What the song is about and how it should feel. With "
-            "Styles or Lyrics given, it is used as the style when Styles is empty.",
+            "Styles or Lyrics given, it is used as the style when Styles is empty. "
+            "Optional for a cover or an extension: the audio is enough.",
             "multiline": True,
+            "optional_for": ["cover", "extend"],
         },
         "genre": {
             "native_name": "style",
@@ -38,7 +40,8 @@ PLATFORM_CONFIG = {
             "adapter_handled": True,
             "title": "Lyrics",
             "description": "Your lyrics, with [Verse]/[Chorus] tags if you like. "
-            "Up to 5,000 characters on V6.",
+            "Up to 5,000 characters on V6. Leave empty rather than guess: "
+            "wrong lyrics are sung.",
             "multiline": True,
         },
         "title": {"native_name": "title", "title": "Title"},
@@ -104,8 +107,7 @@ PLATFORM_CONFIG = {
             "native_name": "audioWeight",
             "adapter_handled": True,
             "title": "Audio Influence",
-            "description": "How closely the result follows the uploaded audio. "
-            "Not used for instrumentals.",
+            "description": "How closely the result follows the uploaded audio.",
             "neutral": 0.5,
             "scale_labels": ["Loose", "Faithful"],
             "requires": ["audio_input"],
@@ -138,6 +140,7 @@ PLATFORM_CONFIG = {
             "neutral": 0.5,
             "scale_labels": ["Safe", "Chaos"],
             "requires_any": ["genre", "title", "lyrics"],
+            "requires_any_for": ["generate"],
         },
         "style_weight": {
             "type": float,
@@ -148,6 +151,7 @@ PLATFORM_CONFIG = {
             "neutral": 0.5,
             "scale_labels": ["Loose", "Strong"],
             "requires_any": ["genre", "title", "lyrics"],
+            "requires_any_for": ["generate"],
         },
         "vocal_gender": {
             "type": str,
@@ -155,6 +159,7 @@ PLATFORM_CONFIG = {
             "description": "Preferred singing voice: m or f (vocalGender).",
             "choices": ["m", "f"],
             "requires_any": ["genre", "title", "lyrics"],
+            "requires_any_for": ["generate"],
             "operations": ["generate"],
         },
         "variety": {
@@ -166,6 +171,7 @@ PLATFORM_CONFIG = {
             "maximum": 4,
             "advanced": True,
             "requires_any": ["genre", "title", "lyrics"],
+            "requires_any_for": ["generate"],
             "operations": ["generate"],
         },
     },

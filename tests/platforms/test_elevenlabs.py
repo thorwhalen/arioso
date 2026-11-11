@@ -71,11 +71,41 @@ def test_elevenlabs_generate_with_lyrics(mock_make_session):
         title="My Song",
     )
 
+    # The documented music_v1 plan (POST /v1/music, 2026-11): prompt and plan are
+    # mutually exclusive, and the API has no title (a title-only plan was a 422).
     call_kwargs = adapter._raw_func.call_args[1]
-    assert "composition_plan" in call_kwargs
+    assert "prompt" not in call_kwargs and "music_length_ms" not in call_kwargs
     plan = call_kwargs["composition_plan"]
-    assert plan["title"] == "My Song"
-    assert plan["sections"] == [{"lyrics": "Hello world"}]
+    assert "title" not in plan
+    assert plan["positive_global_styles"] == ["pop song"]
+    (section,) = plan["sections"]
+    assert section["lines"] == ["Hello world"]
+    assert set(section) == {"section_name", "positive_local_styles", "negative_local_styles", "duration_ms", "lines"}
+
+
+@patch("arioso.platforms._base_adapter.make_session")
+def test_elevenlabs_title_alone_keeps_the_plain_prompt(mock_make_session):
+    """The 422: a title used to turn a plain prompt into an invalid title-only plan."""
+    mock_make_session.return_value = MagicMock()
+    adapter = Adapter(PLATFORM_CONFIG)
+    adapter._raw_func = MagicMock(return_value=b"audio")
+    song = adapter.generate("Lied with chamber music accompaniment", title="Cora Kisses", seed=3)
+    call_kwargs = adapter._raw_func.call_args[1]
+    assert call_kwargs["prompt"] == "Lied with chamber music accompaniment"
+    assert "composition_plan" not in call_kwargs and "seed" not in call_kwargs
+    assert song.title == "Cora Kisses"
+
+
+def test_elevenlabs_lyric_sections_respect_the_limits():
+    from arioso.platforms.elevenlabs.adapter import _music_request
+
+    lyrics = "[Verse]\n" + "\n".join(f"line {i}" for i in range(40)) + "\n\n[Chorus]\nla"
+    body = _music_request("x", duration=600, instrumental=False, model="music_v1", lyrics=lyrics)
+    sections = body["composition_plan"]["sections"]
+    assert [len(s["lines"]) for s in sections] == [30, 10, 1]
+    assert all(3000 <= s["duration_ms"] <= 120000 for s in sections)
+    v2 = _music_request("x", duration=60, instrumental=False, model="music_v2", lyrics="a\nb")
+    assert v2["composition_plan"]["chunks"][0]["text"] == "a\nb"
 
 
 @patch("arioso.platforms._base_adapter.make_session")

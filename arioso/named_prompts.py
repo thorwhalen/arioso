@@ -106,11 +106,11 @@ def _make_yaml_store(root_dir: Path, *, writable: bool = False):
         base_cls,
         name="YamlPromptStore",
         # key transform: 'artists' <-> 'artists.yaml'
-        key_of_id=lambda _id: _id.removesuffix(".yaml"),
-        id_of_key=lambda k: k if k.endswith(".yaml") else f"{k}.yaml",
+        key_decoder=lambda _id: _id.removesuffix(".yaml"),
+        key_encoder=lambda k: k if k.endswith(".yaml") else f"{k}.yaml",
         # value transform: YAML text <-> dict
-        obj_of_data=lambda data: _yaml_text_to_dict(data),
-        data_of_obj=lambda obj: _dict_to_yaml_text(obj),
+        value_decoder=lambda data: _yaml_text_to_dict(data),
+        value_encoder=lambda obj: _dict_to_yaml_text(obj),
     )
 
     store = store_cls(str(root_dir))

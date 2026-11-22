@@ -208,7 +208,9 @@ def render_plan(keys, size: int = CHUNK_NOTES) -> list:
     return [c for c in chunks(range(low, high + 1), size) if asked.intersection(c)]
 
 
-def _bands(audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS) -> tuple:
+def _bands(
+    audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS
+) -> tuple:
     """Spectral energy within a quarter tone of the octave below ``key``, of ``key``, and in all,
     over the first ``seconds`` of ``audio``."""
     seg = np.asarray(audio, dtype=float)[: max(1, int(seconds * rate))]
@@ -259,9 +261,7 @@ def is_octave_low(audio, rate: int, key: int) -> bool:
     return bool(sub_octave_db(audio, rate, key) > OCTAVE_LOW_DB)
 
 
-def cover_plan(
-    keys, low_keys, *, max_stretch: int = MAX_COVER_STRETCH
-) -> dict:
+def cover_plan(keys, low_keys, *, max_stretch: int = MAX_COVER_STRETCH) -> dict:
     """Which on-pitch key covers each octave-low key: ``{low key: covering key}``.
 
     The covering key is the one the sampler maps over that key (:func:`arioso.sampler_export.key_ranges`
@@ -346,7 +346,9 @@ def render_keybed(
     from arioso.sampler_export import channels_first, choose_fold, mono
 
     if octave_low not in OCTAVE_LOW_POLICIES:
-        raise ValueError(f"keybed: octave_low must be one of {OCTAVE_LOW_POLICIES}, not {octave_low!r}")
+        raise ValueError(
+            f"keybed: octave_low must be one of {OCTAVE_LOW_POLICIES}, not {octave_low!r}"
+        )
     keys = sorted(set(int(k) for k in keys))
     groups = render_plan(keys, chunk) if fill else chunks(keys, chunk)
     asked = set(keys)
@@ -419,7 +421,11 @@ def render_keybed(
             f"keybed: {[note_name(k) for k in covered]} came back an octave low and are "
             f"covered by their on-pitch neighbours ({', '.join(f'{note_name(k)} by {note_name(g)}' for k, g in covered.items())})"
         )
-    low = [note_name(k) for k, db in sub.items() if db > SUB_OCTAVE_WARN_DB and k not in covered]
+    low = [
+        note_name(k)
+        for k, db in sub.items()
+        if db > SUB_OCTAVE_WARN_DB and k not in covered
+    ]
     if low:
         warnings.warn(
             f"keybed: the octave below dominates {low}; they may sound an octave low "

@@ -22,6 +22,9 @@ Usage::
     # The parameters a platform accepts, as JSON Schema (common + its extras)
     arioso.param_schema("sunoapi")
 
+    # Cover every song in a folder (lyrics kept, takes saved, resumable)
+    arioso.cover_folder("~/songs", "~/covers", platform="sunoapi")
+
     # Rich platform access via services
     s = arioso.services.sunoapi
     s.generate("jazz piano", duration=30)       # unified names
@@ -42,6 +45,7 @@ from arioso.base import (
 )
 from arioso.services import ServiceCollection, SliceMapping
 from arioso.schema import param_schema, common_params
+from arioso.cover import cover_folder
 
 services = ServiceCollection()
 generators = SliceMapping(services, "generate")

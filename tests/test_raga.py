@@ -27,7 +27,7 @@ def test_every_raga_is_self_consistent(name):
     r = RAGAS[name]
     assert r.aroha[-1] == 12 and r.avaroha[0] == 12 and r.avaroha[-1] == 0
     assert r.allows([r.vadi, r.samvadi])
-    assert r.chalan and all(r.allows(p) for p in r.chalan)
+    assert r.chalan and all(r.permits(p) for p in r.chalan)  # the table obeys itself
     assert r.vadi % 12 != r.samvadi % 12
 
 
@@ -125,3 +125,80 @@ def test_the_contour_places_the_line_on_sa_and_renders_over_the_drone():
     assert np.isnan(c.midi).any()  # breaths and the gaps between sections are silent
     y, sr = melody_over_drone(c, "D", sr=8000, lead_in_s=0.5)
     assert y.shape[0] / sr > piece.seconds
+
+
+def test_a_spread_chord_is_one_onset_and_its_top_note():
+    chord = [(0.000, 1, 60), (0.002, 1, 64), (0.004, 1, 67)]
+    assert skyline(chord + [(1.0, 2, 62)]) == [(0.0, 1, 67), (1.0, 2, 62)]
+
+
+def test_a_held_note_does_not_end_a_phrase_but_a_rest_does():
+    q, h = 0.5, 1.0  # quarter and half notes, held to the next onset
+    durs = [q, q, h, q, q, h]
+    notes, t = [], 0.0
+    for d in durs:
+        notes.append((t, t + d, 60))
+        t += d
+    later = [(t + 2.0 + i * q, t + 2.0 + (i + 1) * q, 62) for i in range(3)]
+    assert [len(p) for p in phrases(notes + later)] == [6, 3]
+
+
+def test_the_raga_direction_rules_motifs():
+    bhimpalasi = RAGAS["bhimpalasi"]
+    assert not bhimpalasi.permits((0, 2, 3))  # R is skipped going up
+    score = _score([[0, 2, 3, 5]] * 2 + [[5, 3, 2, 0]] * 2, sa=60)
+    motifs = dict(raga_motifs(score, bhimpalasi, sa="C"))
+    assert (5, 3, 2, 0) in motifs and not any(m[:2] == (0, 2) for m in motifs)
+    with pytest.raises(ValueError, match="outside"):
+        compose(bhimpalasi, motifs=[(0, 2, 3)])
+
+
+def test_detuned_scores_and_a_wrong_sa():
+    in_tune = _score([[0, 2, 4, 6]] * 2)
+    detuned = [(a, b, p + 0.3) for a, b, p in in_tune]
+    assert raga_motifs(detuned, "yaman", sa="D") == raga_motifs(in_tune, "yaman", sa="D")
+    with pytest.warns(UserWarning, match="right Sa"):
+        raga_motifs(_score([[1, 3, 5, 8]] * 2), "yaman", sa="D")
+
+
+@pytest.mark.parametrize("name", sorted(RAGAS))
+@pytest.mark.parametrize("bpm", [40.0, 50.0, 60.0, 72.0, 90.0])
+def test_the_tihai_follows_the_pulse_and_lands_on_sam(name, bpm):
+    piece = compose(name, seed=0, bpm=bpm)
+    pulse, tihai = piece.sections["pulse"], piece.sections["tihai"]
+    cycles = (tihai[-1][0] - piece.pulse_start_s) / (piece.beats_per_cycle * 60 / bpm)
+    assert cycles == pytest.approx(round(cycles), abs=1e-9)
+    assert tihai[-1][0] == pytest.approx(piece.sam_s)
+    assert tihai[0][0] - pulse[-1][1] <= 60 / bpm  # no dead air before the tihai
+    alap = piece.sections["alap"]
+    assert alap[-1][2] == 0 and RAGAS[name].permits([o for *_, o in alap[-3:]])
+
+
+def test_motifs_from_json_and_bad_arguments():
+    piece = compose("yaman", motifs=[[[4, 6, 7, 9], 3]], seed=1)  # (motif, count), as lists
+    assert tuple(o for *_, o in piece.sections["pulse"][:4]) == (4, 6, 7, 9)
+    for bad in (dict(motifs=[()]), dict(bpm=0), dict(beats_per_cycle=0)):
+        with pytest.raises(ValueError):
+            compose("yaman", **bad)
+
+
+def test_the_contour_holds_sa_steady_unless_vibrato_is_asked():
+    piece = compose("yaman", seed=2, alap_phrases=1, pulse_phrases=1)
+    a, b, o = piece.sections["tihai"][-1]  # the final Sa, two beats
+    steady = piece.contour("D", fps=100)
+    seg = steady.midi[int(a * 100) + 5 : int(b * 100) - 5]
+    assert np.nanmax(seg) - np.nanmin(seg) < 1e-9
+    wavy = piece.contour("D", fps=100, vibrato_semitones=0.15)
+    seg = wavy.midi[int(a * 100) + 5 : int(b * 100) - 5]
+    assert np.nanmax(seg) - np.nanmin(seg) > 0.1
+
+
+def test_notes_are_in_time_order_and_take_a_note_name():
+    piece = compose("bhupali", seed=4)
+    notes = piece.notes("D")
+    assert notes == sorted(notes) and notes[0][2] == 62 + piece.sections["alap"][0][2]
+
+
+def test_no_alap_or_pulse_still_gives_a_tihai_on_sam():
+    piece = compose("kafi", alap_phrases=0, pulse_phrases=0)
+    assert piece.sections["alap"] == [] and piece.sections["tihai"][-1][2] == 0

@@ -5,14 +5,17 @@
 as a :class:`~arioso.seeds.Contour` for ``seeds.melody_over_drone``.
 
 - :data:`RAGAS`: degrees (aroha, avaroha), vadi and samvadi, and chalan phrases, written in
-  sargam (see :func:`swara`) in :data:`RAGA_TABLE`. These are common textbook values;
-  schools and gharanas differ, so a :class:`Raga` of your own is one call to
-  :meth:`Raga.from_sargam`.
-- :func:`raga_motifs`: the recurring n-grams of a score melody whose notes all lie in the
-  raga. Phrases are split on onset gaps, not note ends (MIDI notes are often staccato).
-- :func:`compose`: alap (raga phrases, free rhythm, held phrase ends, meend), a slow pulse
-  (motifs alternating with raga phrases), and a tihai landing on sam. Notes are in
-  semitones from Sa; :meth:`Composition.contour` places them on a Sa and glides the alap.
+  sargam (see :func:`swara`) in :data:`RAGA_TABLE`. These are common textbook values
+  (Bhatkhande); schools and gharanas differ, so a :class:`Raga` of your own is one call
+  to :meth:`Raga.from_sargam`, and ``ragas=`` takes a table of your own.
+- :func:`raga_motifs`: the recurring n-grams of a score melody that the raga permits
+  (its notes, rising by the aroha and falling by the avaroha). Chords are reduced to their
+  top note; phrases are split where a long onset gap is also a rest, so staccato notes
+  and long held notes both stay inside their phrase.
+- :func:`compose`: alap (raga phrases, free rhythm, held vadi and phrase ends, meend,
+  home to Sa by a chalan phrase), a slow pulse (motifs alternating with raga phrases,
+  continuing up to the tihai), and a tihai whose last Sa lands on sam. Notes are in
+  semitones from Sa; :meth:`Composition.contour` places them on a Sa.
 
 >>> yaman = RAGAS["yaman"]
 >>> yaman.degrees, swara("M#"), yaman.vadi
@@ -30,9 +33,10 @@ True
 
 from __future__ import annotations
 
+import warnings
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Iterable, Optional, Sequence, Union
+from typing import Iterable, Mapping, Optional, Sequence, Union
 
 import numpy as np
 
@@ -89,6 +93,22 @@ class Raga:
         degrees = set(self.degrees)
         return all(int(o) % 12 in degrees for o in offsets)
 
+    def permits(self, phrase: Sequence[int]) -> bool:
+        """Whether ``phrase`` moves as the raga does: each note reached by a rise is in
+        the aroha, each reached by a fall is in the avaroha (pitch classes).
+
+        >>> RAGAS["bhimpalasi"].permits((0, 2, 3)), RAGAS["bhimpalasi"].permits((3, 2, 0))
+        (False, True)
+        """
+        up = {o % 12 for o in self.aroha}
+        down = {o % 12 for o in self.avaroha}
+        if not self.allows(phrase):
+            return False
+        for a, b in zip(phrase, phrase[1:]):
+            if (b > a and b % 12 not in up) or (b < a and b % 12 not in down):
+                return False
+        return True
+
     @classmethod
     def from_sargam(
         cls, name: str, *, aroha: str, avaroha: str, vadi: str, samvadi: str, chalan=()
@@ -107,7 +127,7 @@ class Raga:
 #: The raga table, in sargam: common textbook values (Bhatkhande's thaat system).
 RAGA_TABLE = {
     "yaman": dict(
-        aroha=".N R G M# D N S'",
+        aroha=".N R G M# P D N S'",
         avaroha="S' N D P M# G R S",
         vadi="G",
         samvadi="N",
@@ -152,17 +172,25 @@ RAGA_TABLE = {
 RAGAS = {name: Raga.from_sargam(name, **spec) for name, spec in RAGA_TABLE.items()}
 
 
-def _raga(raga: Union[str, Raga]) -> Raga:
+def _raga(raga: Union[str, Raga], ragas: Mapping = RAGAS) -> Raga:
     if isinstance(raga, Raga):
         return raga
     try:
-        return RAGAS[raga.lower()]
+        return ragas[raga.lower()]
     except KeyError:
-        raise KeyError(f"unknown raga {raga!r}: one of {sorted(RAGAS)}, or a Raga") from None
+        raise KeyError(f"unknown raga {raga!r}: one of {sorted(ragas)}, or a Raga") from None
 
 
 # --------------------------------------------------------------------------------------------
 # Motifs from a score
+
+#: Onsets this close (seconds) are one chord, of which the skyline keeps the top note.
+CHORD_S = 0.03
+#: A phrase ends where the onset gap exceeds ``gap_ratio`` times the median one AND the rest
+#: before the next onset exceeds ``rest_ratio`` times it (a held note is not a phrase end).
+GAP_RATIO, REST_RATIO = 1.8, 0.5
+#: Below this share of the melody's notes in the raga, raga_motifs warns (wrong Sa or raga?).
+IN_RAGA_WARN_SHARE = 0.7
 
 
 def _sa_pc(sa) -> int:
@@ -171,23 +199,34 @@ def _sa_pc(sa) -> int:
     return pitch_class(sa) if isinstance(sa, str) else int(round(sa)) % 12
 
 
-def skyline(notes: Iterable[tuple]) -> list:
-    """``(start, end, pitch)`` notes, one per onset: the highest of those starting together."""
-    top = {}
-    for start, end, pitch in notes:
-        if start not in top or pitch > top[start][2]:
-            top[start] = (start, end, pitch)
-    return [top[s] for s in sorted(top)]
+def skyline(notes: Iterable[tuple], *, chord_s: float = CHORD_S) -> list:
+    """``(start, end, pitch)`` notes, one per onset: the highest of those starting within
+    ``chord_s`` of the first (a chord, however its notes are spread)."""
+    out = []
+    for note in sorted(notes):
+        if out and note[0] - out[-1][0] <= chord_s:
+            if note[2] > out[-1][2]:
+                out[-1] = (out[-1][0], note[1], note[2])
+        else:
+            out.append(tuple(note))
+    return out
 
 
-def phrases(notes: Sequence[tuple], *, gap_ratio: float = 1.8) -> list:
-    """Split onset-ordered notes into phrases where an onset gap exceeds ``gap_ratio`` times
-    the median one. Note ends are ignored: staccato notes still make one phrase."""
+def phrases(
+    notes: Sequence[tuple], *, gap_ratio: float = GAP_RATIO, rest_ratio: float = REST_RATIO
+) -> list:
+    """Split onset-ordered notes into phrases where the onset gap exceeds ``gap_ratio``
+    times the median one and the silence before the next onset exceeds ``rest_ratio``
+    times it. Staccato notes (long silences, regular onsets) and held notes (long onset
+    gap, no silence) stay inside their phrase."""
     if len(notes) < 2:
         return [list(notes)] if notes else []
     onsets = np.array([n[0] for n in notes], dtype=float)
+    ends = np.array([n[1] for n in notes], dtype=float)
     gaps = np.diff(onsets)
-    cut = gaps > gap_ratio * np.median(gaps)
+    med = np.median(gaps[gaps > 0]) if np.any(gaps > 0) else 0.0
+    rests = onsets[1:] - np.minimum(ends[:-1], onsets[1:])
+    cut = (gaps > gap_ratio * med) & (rests > rest_ratio * med)
     out, cur = [], [notes[0]]
     for note, new in zip(notes[1:], cut):
         if new:
@@ -198,6 +237,12 @@ def phrases(notes: Sequence[tuple], *, gap_ratio: float = 1.8) -> list:
     return out
 
 
+def _tuning(pitches: np.ndarray) -> float:
+    """The melody's offset from 12-TET in semitones (-0.5..0.5), as a circular mean."""
+    angle = np.angle(np.mean(np.exp(2j * np.pi * pitches)))
+    return float(angle / (2 * np.pi))
+
+
 def raga_motifs(
     notes: Iterable[tuple],
     raga: Union[str, Raga],
@@ -205,31 +250,46 @@ def raga_motifs(
     sa,
     lengths: Iterable[int] = (3, 4, 5),
     min_count: int = 2,
-    gap_ratio: float = 1.8,
+    gap_ratio: float = GAP_RATIO,
+    rest_ratio: float = REST_RATIO,
+    chord_s: float = CHORD_S,
     top: Optional[int] = None,
+    ragas: Mapping = RAGAS,
 ) -> list:
-    """The recurring n-grams of a score melody that lie in ``raga``: ``[(motif, count)]``.
+    """The recurring n-grams of a score melody that ``raga`` permits: ``[(motif, count)]``.
 
     ``notes`` are ``(start_s, end_s, midi_pitch)`` (from a MIDI track, say), reduced to their
-    :func:`skyline` and split into :func:`phrases`; n-grams never cross a phrase. A motif
-    is in semitones from the Sa at or below the melody's median pitch (``sa``: a note name or
-    a MIDI number, only its pitch class counts). A motif inside a longer one that occurs as
-    often is dropped (the longer one says it). Most notes covered first.
+    :func:`skyline`, retuned to 12-TET, and split into :func:`phrases`; n-grams never cross a
+    phrase and must move as the raga does (:meth:`Raga.permits`). A motif is in semitones
+    from the Sa at or below the melody's median pitch (``sa``: a note name or a MIDI
+    number, only its pitch class counts). A motif inside a longer one that occurs as often
+    is dropped (the longer one says it). Most notes covered first. Warns when few of the
+    melody's notes are in the raga (a wrong ``sa`` or raga).
     """
-    r = _raga(raga)
-    line = skyline(notes)
+    r = _raga(raga, ragas)
+    line = skyline(notes, chord_s=chord_s)
     if not line:
         return []
+    pitches = np.array([p for *_, p in line], dtype=float)
+    pitches = pitches - _tuning(pitches)
     pcs = _sa_pc(sa)
-    median = float(np.median([p for *_, p in line]))
-    base = median - ((median - pcs) % 12)  # the Sa at or below the median
-    counts = Counter()
-    for phrase in phrases(line, gap_ratio=gap_ratio):
-        offs = [int(round(p - base)) for *_, p in phrase]
+    median = float(np.median(pitches))
+    base = round(median) - ((round(median) - pcs) % 12)  # the Sa at or below the median
+    offsets = np.rint(pitches - base).astype(int)
+    share = np.mean([r.allows([o]) for o in offsets])
+    if share < IN_RAGA_WARN_SHARE:
+        warnings.warn(
+            f"raga_motifs: only {share:.0%} of the melody's notes are in {r.name} on "
+            f"Sa={sa!r}; is that the right Sa (or raga)?"
+        )
+    counts, i = Counter(), 0
+    for phrase in phrases(line, gap_ratio=gap_ratio, rest_ratio=rest_ratio):
+        offs = [int(o) for o in offsets[i : i + len(phrase)]]
+        i += len(phrase)
         for n in lengths:
-            for i in range(len(offs) - n + 1):
-                gram = tuple(offs[i : i + n])
-                if r.allows(gram):
+            for j in range(len(offs) - n + 1):
+                gram = tuple(offs[j : j + n])
+                if r.permits(gram):
                     counts[gram] += 1
     kept = {g: c for g, c in counts.items() if c >= min_count}
 
@@ -250,33 +310,57 @@ def raga_motifs(
 # --------------------------------------------------------------------------------------------
 # A small composer
 
-#: Alap: seconds per note (drawn between), the held phrase end, and the breath between phrases.
+#: Alap: seconds per note (drawn between), the held vadi and phrase end, and the breath.
 ALAP_NOTE_S, ALAP_HOLD_S, ALAP_BREATH_S = (0.5, 1.4), (1.8, 3.0), 0.6
-#: Meend: the glide between touching alap notes (the pulse and tihai glide less).
-MEEND_S, GLIDE_S = 0.25, 0.06
+#: Meend: the glide between touching notes of a section (the alap's notes touch; the pulse's
+#: and tihai's are detached, so they do not glide).
+MEEND_S = 0.25
+DFLT_GLIDES = {"alap": MEEND_S}
+#: The share of its slot a pulse note sounds (the rest is articulation).
+PULSE_LEGATO, TIHAI_LEGATO = 0.95, 0.9
 
 
 @dataclass
 class Composition:
-    """A composed line: per section, ``(start_s, end_s, semitones_from_sa)`` notes."""
+    """A composed line: per section, ``(start_s, end_s, semitones_from_sa)`` notes, and
+    the pulse's tempo, tala length and sam (seconds), for anything played along."""
 
     sections: dict = field(default_factory=dict)
+    bpm: Optional[float] = None
+    beats_per_cycle: Optional[int] = None
+    pulse_start_s: Optional[float] = None
+    sam_s: Optional[float] = None
 
-    def notes(self, sa=0) -> list:
-        """Every note in time order, pitched from ``sa`` (a MIDI number; 0 keeps offsets)."""
-        return [(a, b, sa + o) for part in self.sections.values() for a, b, o in part]
+    def notes(self, sa=0, *, octave: int = 4) -> list:
+        """Every note in time order, pitched from ``sa`` (a note name, put in ``octave``,
+        or a MIDI number; 0 keeps the offsets)."""
+        from arioso.seeds import sa_midi
+
+        base = sa_midi(sa, octave=octave) if isinstance(sa, str) else sa
+        return sorted(
+            (a, b, base + o) for part in self.sections.values() for a, b, o in part
+        )
 
     @property
     def seconds(self) -> float:
         return max((b for part in self.sections.values() for _, b, _ in part), default=0.0)
 
     def contour(
-        self, sa, *, octave: int = 4, fps: float = 100.0, meend_s: float = MEEND_S, glide_s=GLIDE_S
+        self,
+        sa,
+        *,
+        octave: int = 4,
+        fps: float = 100.0,
+        glides: Mapping = DFLT_GLIDES,
+        **notes_kwargs,
     ):
         """The line as a :class:`~arioso.seeds.Contour` on ``sa`` (a note name, put in
-        ``octave``, or a MIDI number); the alap glides ``meend_s`` between notes."""
+        ``octave``, or a MIDI number). ``glides``: seconds of glide between touching notes,
+        per section (others none). ``notes_kwargs`` go to ``seeds.notes_contour``; vibrato
+        is off unless asked (``vibrato_semitones=``): Sa and Pa are held steady."""
         from arioso.seeds import Contour, notes_contour, sa_midi
 
+        notes_kwargs.setdefault("vibrato_semitones", 0.0)
         base = sa_midi(sa, octave=octave)
         midi = np.full(int(np.ceil(self.seconds * fps)), np.nan)
         for name, part in self.sections.items():
@@ -284,12 +368,23 @@ class Composition:
                 continue
             t0 = part[0][0]
             local = [(a - t0, b - t0, base + o) for a, b, o in part]
-            g = meend_s if name == "alap" else glide_s
-            c = notes_contour(local, fps=fps, glide_s=g)
+            c = notes_contour(
+                local, fps=fps, glide_s=glides.get(name, 0.0), **notes_kwargs
+            )
             i = int(round(t0 * fps))
             n = min(len(c.midi), len(midi) - i)
             midi[i : i + n] = c.midi[:n]
         return Contour(midi=midi, fps=fps)
+
+
+def _motif(m) -> tuple:
+    """A motif, or a ``(motif, count)`` pair, as a tuple of ints (JSON lists welcome)."""
+    if len(m) == 2 and not np.isscalar(m[0]):
+        m = m[0]
+    m = tuple(int(o) for o in m)
+    if not m:
+        raise ValueError("an empty motif")
+    return m
 
 
 def compose(
@@ -303,24 +398,29 @@ def compose(
     beats_per_cycle: int = 16,
     tihai: Optional[Sequence[int]] = None,
     rng: Optional[np.random.Generator] = None,
+    ragas: Mapping = RAGAS,
 ) -> Composition:
     """Compose alap, then a slow pulse, then a tihai in ``raga``.
 
     Args:
-        raga: A name in :data:`RAGAS` or a :class:`Raga`.
+        raga: A name in ``ragas`` (default :data:`RAGAS`) or a :class:`Raga`.
         motifs: Phrases in semitones from Sa (:func:`raga_motifs`' motifs, or its
             ``(motif, count)`` pairs); the pulse alternates them with the raga's chalan.
-            Motifs outside the raga are refused.
+            Motifs the raga does not permit are refused.
         seed, rng: The alap's free rhythm is drawn from ``rng`` (default from ``seed``).
-        alap_phrases: Chalan phrases in the alap, each ending held, with a breath between.
-        pulse_phrases: Phrases in the pulse, one note per beat, the last held two beats.
+        alap_phrases: Phrases in the alap (the last one a chalan phrase home to Sa), each
+            ending held, the vadi held too, with a breath between.
+        pulse_phrases: Phrases in the pulse at least, one note per beat, the last of each
+            held two beats; more follow, and the last note holds, up to the tihai.
         bpm, beats_per_cycle: The pulse's tempo and tala length (16: tintal).
         tihai: The phrase played three times to land on sam (default: the first motif, or
             the last chalan phrase), with Sa added at its end when it lacks one.
     """
-    r = _raga(raga)
-    motifs = [tuple(m[0]) if m and isinstance(m[0], tuple) else tuple(m) for m in motifs]
-    wrong = [m for m in motifs if not r.allows(m)]
+    r = _raga(raga, ragas)
+    if bpm <= 0 or beats_per_cycle < 1:
+        raise ValueError(f"compose: bpm ({bpm}) must be > 0, beats_per_cycle ({beats_per_cycle}) >= 1")
+    motifs = [_motif(m) for m in motifs]
+    wrong = [m for m in motifs if not r.permits(m)]
     if wrong:
         raise ValueError(f"motifs outside {r.name}: {wrong}")
     if not r.chalan:
@@ -328,48 +428,72 @@ def compose(
     rng = rng or np.random.default_rng(seed)
     beat = 60.0 / bpm
 
+    # alap: chalan phrases in order, then one that comes home to Sa
+    home = [p for p in r.chalan if p[-1] == 0]
+    home = home[-1] if home else r.chalan[-1] + (0,)
+    rising = [p for p in r.chalan if p is not home]
+    plan = [rising[k % len(rising)] for k in range(max(0, alap_phrases - 1))] + [home]
     alap, t = [], 0.0
-    for k in range(alap_phrases):
-        phrase = r.chalan[k % len(r.chalan)]
-        if k == alap_phrases - 1 and phrase[-1] != 0:
-            phrase = phrase + (0,)  # the alap comes home to Sa
+    for phrase in plan[-alap_phrases:] if alap_phrases else []:
         for i, o in enumerate(phrase):
-            last = i == len(phrase) - 1
-            d = rng.uniform(*(ALAP_HOLD_S if last else ALAP_NOTE_S))
+            held = i == len(phrase) - 1 or o % 12 == r.vadi % 12
+            d = rng.uniform(*(ALAP_HOLD_S if held else ALAP_NOTE_S))
             alap.append((t, t + d, o))
             t += d
         t += ALAP_BREATH_S
 
-    # the pulse starts on a beat after the alap
-    t = np.ceil(t / beat) * beat
-    pulse, start = [], t
-    chalan = list(r.chalan)
-    for k in range(pulse_phrases):
-        if motifs and k % 2 == 0:
-            phrase = motifs[(k // 2) % len(motifs)]
-        else:
-            phrase = chalan[k % len(chalan)]
-        for i, o in enumerate(phrase):
-            d = 2 * beat if i == len(phrase) - 1 else beat
-            pulse.append((t, t + d * 0.95, o))
-            t += d
-        t += beat  # a beat's rest between phrases
+    # pulse and tihai, counted in half beats so sam is exact
+    half = beat / 2
+    start = int(np.ceil(t / half - 1e-9))  # the pulse starts on a half beat after the alap
+    phrase_t = tuple(tihai) if tihai else (motifs[0] if motifs else r.chalan[-1])
+    phrase_t = _motif(phrase_t)
+    if phrase_t[-1] != 0:
+        phrase_t = phrase_t + (0,)
+    if not r.permits(phrase_t):
+        raise ValueError(f"tihai {phrase_t} is outside {r.name}")
+    tihai_span = 3 * len(phrase_t) + 2 * 2 - 1  # half beats, first onset to last onset
 
-    phrase = tuple(tihai) if tihai else (motifs[0] if motifs else r.chalan[-1])
-    if not r.allows(phrase):
-        raise ValueError(f"tihai {phrase} is outside {r.name}")
-    if phrase[-1] != 0:
-        phrase = phrase + (0,)
-    unit, gap = beat / 2, beat  # half-beat notes, a beat between the three
-    span = 3 * len(phrase) * unit + 2 * gap - unit  # from first onset to the last onset
-    cycle = beats_per_cycle * beat
-    sam = np.ceil((t + span - start) / cycle) * cycle + start  # the last Sa lands here
-    t = sam - span
-    tih = []
+    def pulse_phrase(k):
+        if motifs and k % 2 == 0:
+            return motifs[(k // 2) % len(motifs)]
+        return r.chalan[k % len(r.chalan)]
+
+    def length(p):  # half beats: one beat a note, the last two, then a beat's rest
+        return 2 * (len(p) - 1) + 4 + 2
+
+    cycle = 2 * beats_per_cycle
+    pulse, h, k = [], start, 0
+    while True:
+        p = pulse_phrase(k)
+        if k >= pulse_phrases:  # enough: continue only while a whole phrase still fits
+            sam = start + -(-(h + tihai_span - start) // cycle) * cycle
+            if h + length(p) > sam - tihai_span:
+                break
+        for i, o in enumerate(p):
+            n = 4 if i == len(p) - 1 else 2
+            pulse.append([h, h + n * PULSE_LEGATO, o])
+            h += n
+        h += 2
+        k += 1
+    sam = start + -(-(h + tihai_span - start) // cycle) * cycle  # the last Sa lands here
+    first = sam - tihai_span
+    if pulse:  # hold the last note up to the tihai
+        pulse[-1][1] = max(pulse[-1][1], first - 1)
+    tih, h = [], first
     for rep in range(3):
-        for i, o in enumerate(phrase):
-            final = rep == 2 and i == len(phrase) - 1
-            tih.append((t, t + (2 * beat if final else unit * 0.9), o))
-            t += unit
-        t += gap
-    return Composition({"alap": alap, "pulse": pulse, "tihai": tih})
+        for i, o in enumerate(phrase_t):
+            final = rep == 2 and i == len(phrase_t) - 1
+            tih.append((h, h + (4 if final else TIHAI_LEGATO), o))
+            h += 1
+        h += 2
+
+    def seconds(notes):
+        return [(a * half, b * half, o) for a, b, o in notes]
+
+    return Composition(
+        {"alap": alap, "pulse": seconds(pulse), "tihai": seconds(tih)},
+        bpm=bpm,
+        beats_per_cycle=beats_per_cycle,
+        pulse_start_s=start * half,
+        sam_s=sam * half,
+    )

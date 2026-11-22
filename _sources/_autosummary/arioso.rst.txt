@@ -39,6 +39,7 @@
    keybed
    named_prompts
    platforms
+   raga
    registry
    sampler_export
    schema

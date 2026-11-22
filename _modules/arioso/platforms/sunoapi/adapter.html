@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=2bfb35b6"></script>
+    <script src="../../../../_static/documentation_options.js?v=c3e19674"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.57" />
+  <meta name="docsearch:version" content="0.0.58" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -870,9 +870,23 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_api_error</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Raise RuntimeError if the API response indicates an error."""</span>
+<span class="w">    </span><span class="sd">"""Raise if the API response indicates an error.</span>
+
+<span class="sd">    A 413 "matches an existing recording in our catalog" is a</span>
+<span class="sd">    :class:`~arioso.base.CatalogMatchError` (final), whether it comes at submit time</span>
+<span class="sd">    (here) or at poll time (:meth:`Adapter.get_status`); anything else a RuntimeError.</span>
+
+<span class="sd">    &gt;&gt;&gt; _check_api_error({"code": 413, "msg": "This audio matches an existing recording in our catalog."})</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    arioso.base.CatalogMatchError: sunoapi refused the audio (code 413): This audio matches an existing recording in our catalog.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s2">"code"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"msg"</span><span class="p">,</span> <span class="s2">"Unknown API error"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"code"</span><span class="p">])</span> <span class="o">==</span> <span class="s2">"413"</span> <span class="ow">and</span> <span class="s2">"catalog"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">CatalogMatchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"sunoapi refused the audio (code 413): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">"code"</span><span class="p">]</span>
+            <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sunoapi error (code </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">'code'</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 

@@ -9,6 +9,7 @@
 - [arioso.base](arioso.base.html.md): Core types and constants for arioso.
 - [arioso.cli](arioso.cli.html.md): The functions behind the &#96;arioso&#96; command line.
 - [arioso.compare](arioso.compare.html.md): Compare platforms on the same prompts: time, memory and objective checks, as records.
+- [arioso.cover](arioso.cover.html.md): Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable.
 - [arioso.named_prompts](arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.
 - [arioso.platforms](arioso.platforms.html.md): Platform packages for arioso.
 - [arioso.platforms.ace_step](arioso.platforms.ace_step.html.md): ACE-Step (hosted on fal.ai) platform for arioso.

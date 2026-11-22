@@ -1,4 +1,4 @@
-> built 2026-11-22 08:23 UTC from f21b773 (main) · arioso 0.0.57. Details: build_info.json
+> built 2026-11-22 11:23 UTC from 93197e3 (main) · arioso 0.0.58. Details: build_info.json
 
 # index.html.md
 
@@ -1231,6 +1231,182 @@ Relative tempo error, forgiving the half/double-time slips beat trackers make.
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
 
 
+# _autosummary/arioso.cover.html.md
+
+# arioso.cover
+
+Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable.
+
+[`cover_folder()`](_autosummary/arioso.cover.html.md#arioso.cover.cover_folder) is the loop around one-song `generate(audio_input=...)` that a folder
+job needs. Per source file it:
+
+1. skips the song when the folder’s manifest already records it as done or refused;
+2. reuses the cover task the manifest recorded for it, when a run stopped between
+   submitting and saving (so a crash or a re-run never pays twice), or else
+3. transcribes its lyrics (`transcribe`, default [`vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics): the vocal stem
+   from `denote.separate`, transcribed by `scribed`; only for a platform that takes
+   lyrics), so the cover keeps the words; no words heard makes it instrumental; and
+   submits one cover, recording the task id in the manifest before waiting for it;
+4. waits for it and saves every take as `<stem> (<platform> N).<ext>` in `dst`;
+5. records the outcome in the manifest (`dst/covers.jsonl`, JSON lines, the last line
+   of a song wins): `done`, `refused` (a [`CatalogMatchError`](_autosummary/arioso.base.html.md#arioso.base.CatalogMatchError),
+   final) or `error` (tried again on the next run: by reusing its task once, then by
+   submitting anew).
+
+```pycon
+>>> from arioso.base import AudioResult, Song
+>>> import tempfile, pathlib
+>>> src, dst = pathlib.Path(tempfile.mkdtemp()), pathlib.Path(tempfile.mkdtemp())
+>>> _ = (src / "Lullaby.wav").write_bytes(b"RIFF")
+>>> def fake(prompt, **kw):  # a platform that answers at once, with two takes
+...     return [Song(id=f"t{i}", status="complete", platform="fake",
+...                  audio=AudioResult(audio_bytes=b"ID3", format="mp3")) for i in (1, 2)]
+>>> [r["outcome"] for r in cover_folder(src, dst, platform="fake", generate=fake,
+...                                     transcribe=lambda p: "hush now")]
+['done']
+>>> sorted(p.name for p in dst.iterdir())
+['Lullaby (fake 1).mp3', 'Lullaby (fake 2).mp3', 'covers.jsonl']
+>>> cover_folder(src, dst, platform="fake", generate=fake, transcribe=None)  # resumed
+[]
+```
+
+### Module Attributes
+
+| [`AUDIO_EXTENSIONS`](_autosummary/arioso.cover.html.md#arioso.cover.AUDIO_EXTENSIONS)   | The audio files [`cover_folder()`](_autosummary/arioso.cover.html.md#arioso.cover.cover_folder) picks up from the source folder.   |
+|---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_MANIFEST`](_autosummary/arioso.cover.html.md#arioso.cover.DFLT_MANIFEST)      | The manifest's file name, inside the target folder.                                                                |
+| [`FINAL_OUTCOMES`](_autosummary/arioso.cover.html.md#arioso.cover.FINAL_OUTCOMES)     | Outcomes that end a song's job; `error` is tried again on the next run.                                            |
+| [`DFLT_STRENGTH`](_autosummary/arioso.cover.html.md#arioso.cover.DFLT_STRENGTH)      | a folder cover is meant to keep each song (the #69 run used 0.9).                                                  |
+| [`DFLT_POLL_INTERVAL`](_autosummary/arioso.cover.html.md#arioso.cover.DFLT_POLL_INTERVAL) | seconds between status checks, and the most to wait.                                                               |
+| [`DFLT_TIMEOUT`](_autosummary/arioso.cover.html.md#arioso.cover.DFLT_TIMEOUT)       | seconds between status checks, and the most to wait.                                                               |
+| [`AUTO`](_autosummary/arioso.cover.html.md#arioso.cover.AUTO)               | [`vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics) when the platform takes lyrics, else none.         |
+
+### Functions
+
+| [`cover_folder`](_autosummary/arioso.cover.html.md#arioso.cover.cover_folder)(src, dst, \*[, platform, ...])     | Cover every audio file in `src` with `platform`, takes saved in `dst`.          |
+|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`cover_params`](_autosummary/arioso.cover.html.md#arioso.cover.cover_params)(path, \*, lyrics, style, strength) | The cover call's keyword arguments for one song (unified names).                |
+| [`read_manifest`](_autosummary/arioso.cover.html.md#arioso.cover.read_manifest)(path)                             | The last record of each song in a manifest (JSON lines), by source file name.   |
+| [`save_takes`](_autosummary/arioso.cover.html.md#arioso.cover.save_takes)(songs, folder, stem, \*, platform)   | Write each take as `<stem> (<platform> N).<ext>`; returns their file names.     |
+| [`vocal_lyrics`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics)(path, \*[, separate, transcribe])  | The words sung in `path`: its vocal stem (`denote.separate`), transcribed.      |
+| [`wait_for_songs`](_autosummary/arioso.cover.html.md#arioso.cover.wait_for_songs)(songs, \*[, poll_interval, ...]) | `songs` once all complete, polled with `check` (default `arioso.check_status`). |
+
+### arioso.cover.AUDIO_EXTENSIONS *= ('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif')*
+
+The audio files [`cover_folder()`](_autosummary/arioso.cover.html.md#arioso.cover.cover_folder) picks up from the source folder.
+
+### arioso.cover.AUTO *= 'auto'*
+
+[`vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics) when the platform takes lyrics, else none.
+
+* **Type:**
+  `transcribe`’s default
+
+### arioso.cover.DFLT_MANIFEST *= 'covers.jsonl'*
+
+The manifest’s file name, inside the target folder.
+
+### arioso.cover.DFLT_POLL_INTERVAL *= 15.0*
+
+seconds between status checks, and the most to wait.
+
+* **Type:**
+  Waiting for a hosted cover
+
+### arioso.cover.DFLT_STRENGTH *= 0.9*
+
+a
+folder cover is meant to keep each song (the #69 run used 0.9).
+
+* **Type:**
+  How much the source shapes the cover. Higher than `tools.DFLT_AUDIO_WEIGHT` (0.5)
+
+### arioso.cover.DFLT_TIMEOUT *= 1200.0*
+
+seconds between status checks, and the most to wait.
+
+* **Type:**
+  Waiting for a hosted cover
+
+### arioso.cover.FINAL_OUTCOMES *= ('done', 'refused')*
+
+Outcomes that end a song’s job; `error` is tried again on the next run.
+
+### arioso.cover.cover_folder(src, dst, \*, platform='sunoapi', audio_input_strength=0.9, transcribe='auto', style=None, only=None, params=<function cover_params>, generate=None, wait=<function wait_for_songs>, manifest='covers.jsonl', extensions=('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif'), \*\*generate_kwargs)
+
+Cover every audio file in `src` with `platform`, takes saved in `dst`.
+
+Returns the records written this run (one per song attempted; songs the manifest
+already holds as done or refused are skipped). See the module docstring.
+
+* **Parameters:**
+  * **src** – The folder of source songs (files with one of `extensions`).
+  * **dst** – The folder for the takes and the manifest (created if missing).
+  * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – An arioso platform that takes `audio_input`.
+  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much the source shapes the cover, 0-1.
+  * **transcribe** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`None`](https://docs.python.org/3/builtins/constants.html#None)]) – `(path) -> lyrics`; `""` makes the cover instrumental, `None`
+    sends no lyrics. The default uses [`vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics) when `platform`
+    takes lyrics, and none otherwise.
+  * **style** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable), [`None`](https://docs.python.org/3/builtins/constants.html#None)]) – The style for every song, or `(path) -> style`; `None` sends none.
+  * **only** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Iterable`](https://docs.python.org/3/library/typing.html#typing.Iterable)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]) – Source stems to cover (default every file).
+  * **params** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(path, *, lyrics, style, strength) -> kwargs` for the cover call
+    (default [`cover_params()`](_autosummary/arioso.cover.html.md#arioso.cover.cover_params)); parameters `platform` does not take are
+    dropped.
+  * **generate** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(prompt, **kwargs) -> list[Song]`; default `arioso.generate_many`.
+  * **wait** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(songs) -> songs`, all complete (default [`wait_for_songs()`](_autosummary/arioso.cover.html.md#arioso.cover.wait_for_songs)).
+  * **manifest** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The manifest’s name in `dst`.
+  * **\*\*generate_kwargs** – Passed to every cover call (`model`, `vocal_gender`, …).
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+### arioso.cover.cover_params(path, , lyrics, style, strength)
+
+The cover call’s keyword arguments for one song (unified names).
+
+`lyrics=""` (no words heard) asks for an instrumental; `None` sends nothing.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### arioso.cover.read_manifest(path)
+
+The last record of each song in a manifest (JSON lines), by source file name.
+
+A line that does not parse (a run killed mid-write) is skipped.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### arioso.cover.save_takes(songs, folder, stem, , platform)
+
+Write each take as `<stem> (<platform> N).<ext>`; returns their file names.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+### arioso.cover.vocal_lyrics(path, , separate=None, transcribe=None, \*\*transcribe_kwargs)
+
+The words sung in `path`: its vocal stem (`denote.separate`), transcribed.
+
+One line per transcript segment; `""` when no words are heard. `separate` and
+`transcribe` default to `denote.separate` and `scribed.transcribe` (both
+imported only here; `pip install arioso[cover]`); `transcribe_kwargs` go to the
+transcriber (`backend`, `model`, `language`, …).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### arioso.cover.wait_for_songs(songs, , poll_interval=15.0, timeout=1200.0, check=None)
+
+`songs` once all complete, polled with `check` (default `arioso.check_status`).
+
+Songs already complete (a local platform) come back at once. Raises `TimeoutError`
+past `timeout`, and `RuntimeError` on a song in error.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+
 # _autosummary/arioso.html.md
 
 # arioso
@@ -1259,6 +1435,9 @@ arioso.platform_table()
 
 # The parameters a platform accepts, as JSON Schema (common + its extras)
 arioso.param_schema("sunoapi")
+
+# Cover every song in a folder (lyrics kept, takes saved, resumable)
+arioso.cover_folder("~/songs", "~/covers", platform="sunoapi")
 
 # Rich platform access via services
 s = arioso.services.sunoapi
@@ -1468,17 +1647,18 @@ arioso.supports_audio_input("mubert")        # False
 
 ### Modules
 
-| [`base`](_autosummary/arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                  |
-|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [`cli`](_autosummary/arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                       |
-| [`compare`](_autosummary/arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records. |
-| [`named_prompts`](_autosummary/arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.           |
-| [`platforms`](_autosummary/arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                         |
-| [`registry`](_autosummary/arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                               |
-| [`schema`](_autosummary/arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.       |
-| [`services`](_autosummary/arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                            |
-| [`tools`](_autosummary/arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                |
-| [`translation`](_autosummary/arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                          |
+| [`base`](_autosummary/arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                        |
+|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [`cli`](_autosummary/arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                             |
+| [`compare`](_autosummary/arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records.       |
+| [`cover`](_autosummary/arioso.cover.html.md#module-arioso.cover)                 | Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable. |
+| [`named_prompts`](_autosummary/arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.                 |
+| [`platforms`](_autosummary/arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                               |
+| [`registry`](_autosummary/arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                                     |
+| [`schema`](_autosummary/arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.             |
+| [`services`](_autosummary/arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                                  |
+| [`tools`](_autosummary/arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                      |
+| [`translation`](_autosummary/arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                                |
 
 
 # _autosummary/arioso.named_prompts.html.md
@@ -4065,20 +4245,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-22 08:23 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/f21b773292d343ae456a496674d8788c29605130"><code>f21b773</code></a> on branch <code>main</code>, for **arioso 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 11:23 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/93197e3e03606ea3c3cfd10c603d63c08e2020c3"><code>93197e3</code></a> on branch <code>main</code>, for **arioso 0.0.58** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.57) is ahead of the latest release on PyPI (0.0.56): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/f21b773292d343ae456a496674d8788c29605130"><code>f21b773292d343ae456a496674d8788c29605130</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/93197e3e03606ea3c3cfd10c603d63c08e2020c3"><code>93197e3e03606ea3c3cfd10c603d63c08e2020c3</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.57</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.58</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4087,9 +4265,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45002370928">45002370928</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45016817356">45016817356</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>c6cfbbd324098da8137ccd5e6a192e7edc0cdc20</code> (in the history of the built commit) |
+| Event commit | <code>446455c481547e7eb44034b225de1936a9c3bb5e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4114,13 +4292,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.56/">0.0.56</a>, older than the documented version (0.0.57).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.58/">0.0.58</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout f21b773292d343ae456a496674d8788c29605130
+git checkout 93197e3e03606ea3c3cfd10c603d63c08e2020c3
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

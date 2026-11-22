@@ -35,6 +35,7 @@
    base
    cli
    compare
+   cover
    keybed
    named_prompts
    platforms

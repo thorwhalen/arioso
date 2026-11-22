@@ -25,6 +25,9 @@ arioso.platform_table()
 # The parameters a platform accepts, as JSON Schema (common + its extras)
 arioso.param_schema("sunoapi")
 
+# Cover every song in a folder (lyrics kept, takes saved, resumable)
+arioso.cover_folder("~/songs", "~/covers", platform="sunoapi")
+
 # Rich platform access via services
 s = arioso.services.sunoapi
 s.generate("jazz piano", duration=30)       # unified names
@@ -233,14 +236,15 @@ arioso.supports_audio_input("mubert")        # False
 
 ### Modules
 
-| [`base`](arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                  |
-|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [`cli`](arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                       |
-| [`compare`](arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records. |
-| [`named_prompts`](arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.           |
-| [`platforms`](arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                         |
-| [`registry`](arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                               |
-| [`schema`](arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.       |
-| [`services`](arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                            |
-| [`tools`](arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                |
-| [`translation`](arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                          |
+| [`base`](arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                        |
+|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [`cli`](arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                             |
+| [`compare`](arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records.       |
+| [`cover`](arioso.cover.html.md#module-arioso.cover)                 | Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable. |
+| [`named_prompts`](arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.                 |
+| [`platforms`](arioso.platforms.html.md#module-arioso.platforms)         | Platform packages for arioso.                                                               |
+| [`registry`](arioso.registry.html.md#module-arioso.registry)           | Platform registry with auto-discovery and lazy loading.                                     |
+| [`schema`](arioso.schema.html.md#module-arioso.schema)               | Machine-readable parameter schemas: what each platform accepts, as JSON Schema.             |
+| [`services`](arioso.services.html.md#arioso.services)                  | Lazy mapping of platform names to `ServiceHandle` objects.                                  |
+| [`tools`](arioso.tools.html.md#module-arioso.tools)                 | High-level tools for common arioso workflows (submit, poll, download).                      |
+| [`translation`](arioso.translation.html.md#module-arioso.translation)     | Parameter translation layer.                                                                |

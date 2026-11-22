@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=2bfb35b6"></script>
+    <script src="../_static/documentation_options.js?v=c3e19674"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.57" />
+  <meta name="docsearch:version" content="0.0.58" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -736,6 +736,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    # The parameters a platform accepts, as JSON Schema (common + its extras)</span>
 <span class="sd">    arioso.param_schema("sunoapi")</span>
 
+<span class="sd">    # Cover every song in a folder (lyrics kept, takes saved, resumable)</span>
+<span class="sd">    arioso.cover_folder("~/songs", "~/covers", platform="sunoapi")</span>
+
 <span class="sd">    # Rich platform access via services</span>
 <span class="sd">    s = arioso.services.sunoapi</span>
 <span class="sd">    s.generate("jazz piano", duration=30)       # unified names</span>
@@ -756,6 +759,7 @@ window.runMermaid = runMermaid;</script>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.services</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceCollection</span><span class="p">,</span> <span class="n">SliceMapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">param_schema</span><span class="p">,</span> <span class="n">common_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">arioso.cover</span><span class="w"> </span><span class="kn">import</span> <span class="n">cover_folder</span>
 
 <span class="n">services</span> <span class="o">=</span> <span class="n">ServiceCollection</span><span class="p">()</span>
 <span class="n">generators</span> <span class="o">=</span> <span class="n">SliceMapping</span><span class="p">(</span><span class="n">services</span><span class="p">,</span> <span class="s2">"generate"</span><span class="p">)</span>

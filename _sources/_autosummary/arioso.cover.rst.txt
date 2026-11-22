@@ -1,0 +1,29 @@
+arioso.cover
+============
+
+.. automodule:: arioso.cover
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      AUDIO_EXTENSIONS
+      DFLT_MANIFEST
+      FINAL_OUTCOMES
+      DFLT_STRENGTH
+      DFLT_POLL_INTERVAL
+      DFLT_TIMEOUT
+      AUTO
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cover_folder
+      cover_params
+      read_manifest
+      save_takes
+      vocal_lyrics
+      wait_for_songs
+   

@@ -1,4 +1,4 @@
-> built 2026-11-22 16:58 UTC from 697e268 (main) · arioso 0.0.61. Details: build_info.json
+> built 2026-11-22 17:20 UTC from 7535131 (main) · arioso 0.0.62. Details: build_info.json
 
 # index.html.md
 
@@ -947,6 +947,127 @@ A web form, an agent tool or a validator can be generated from it.
   The schema as JSON.
 
 
+# _autosummary/arioso.closeness.html.md
+
+# arioso.closeness
+
+Is a take a cover of its source? Lyric recall when there are words, melody rank otherwise.
+
+Measured on the 2026-11-10 folder job (arioso#69, #81): six Suno upload-cover takes of three
+home-recorded children’s songs, scored against those three sources and three unrelated songs
+by the same family. `arioso.analysis.melody_match()` alone cannot answer “is this take a
+cover of that song”: a take’s score against its own source (0.57 to 0.71 on the mix) sits
+inside the range of its scores against unrelated songs (up to 0.66), so no fixed threshold
+separates them. Two signals did:
+
+- **lyric recall** (the source’s words found, in order, in the take’s words): 0.60 to 0.94
+  against the true source, at most 0.15 against any other, for every take with words;
+- **melody rank**: for the instrumental takes, the true source had the highest
+  `melody_match` of all six songs on the mix (by 0.05 to 0.11), though not in absolute terms.
+
+So [`cover_closeness()`](_autosummary/arioso.closeness.html.md#arioso.closeness.cover_closeness) reports both and gives a verdict from the one that applies: the
+words when the source and the take both have them, else the melody’s rank among
+`references` (other songs: the rest of the folder serves), else no verdict (“unclear”).
+
+```pycon
+>>> lyric_recall("stinky poo where are you", "oh stinky poo stinky poo where are you now")
+1.0
+>>> lyric_recall("stinky poo where are you", "climbing up the mountain")
+0.0
+>>> lyric_recall("", "anything") is None
+True
+```
+
+### Module Attributes
+
+| [`MIN_WORDS`](_autosummary/arioso.closeness.html.md#arioso.closeness.MIN_WORDS)       | The fewest words a side must have for its lyric recall to count.                                        |
+|------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| [`LYRIC_COVER`](_autosummary/arioso.closeness.html.md#arioso.closeness.LYRIC_COVER)     | the take sings the source's words (true pairs measured 0.60-0.94).                                      |
+| [`LYRIC_UNRELATED`](_autosummary/arioso.closeness.html.md#arioso.closeness.LYRIC_UNRELATED) | not the source's song (others measured <= 0.15).                                                        |
+| [`DFLT_SR`](_autosummary/arioso.closeness.html.md#arioso.closeness.DFLT_SR)         | The rate audio is read at for the melody comparison.                                                    |
+| [`AUTO`](_autosummary/arioso.closeness.html.md#arioso.closeness.AUTO)            | [`arioso.cover.vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics). |
+
+### Functions
+
+| [`cover_closeness`](_autosummary/arioso.closeness.html.md#arioso.closeness.cover_closeness)(source, takes, \*[, ...])   | How close each take is to `source`, and whether it is a cover of it.                        |
+|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [`lyric_recall`](_autosummary/arioso.closeness.html.md#arioso.closeness.lyric_recall)(source_text, take_text)        | The share of the source's words the take sings, in order (`None` when the source has none). |
+| [`words`](_autosummary/arioso.closeness.html.md#arioso.closeness.words)(text)                                 | The words of `text`, lowercased.                                                            |
+
+### arioso.closeness.AUTO *= 'auto'*
+
+[`arioso.cover.vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics).
+
+* **Type:**
+  `transcribe`’s default
+
+### arioso.closeness.DFLT_SR *= 22050*
+
+The rate audio is read at for the melody comparison.
+
+### arioso.closeness.LYRIC_COVER *= 0.4*
+
+the take sings the source’s words (true pairs measured 0.60-0.94).
+
+* **Type:**
+  Lyric recall at or above this
+
+### arioso.closeness.LYRIC_UNRELATED *= 0.25*
+
+not the source’s song (others measured <= 0.15).
+
+* **Type:**
+  Lyric recall at or below this, with words on both sides
+
+### arioso.closeness.MIN_WORDS *= 12*
+
+The fewest words a side must have for its lyric recall to count.
+
+### arioso.closeness.cover_closeness(source, takes, , references=(), transcribe='auto', source_text=None, melody=None, load=None, min_words=12)
+
+How close each take is to `source`, and whether it is a cover of it.
+
+Matches `cover_folder`’s `assess` keyword: `(source_path, take_paths) -> dict`;
+give it references with `functools.partial(cover_closeness, references=[...])`.
+
+* **Parameters:**
+  * **source** – The source song’s audio file.
+  * **takes** ([`Iterable`](https://docs.python.org/3/library/typing.html#typing.Iterable)) – The takes’ audio files.
+  * **references** ([`Iterable`](https://docs.python.org/3/library/typing.html#typing.Iterable)) – Other songs’ audio files, for the melody’s rank (the source itself, if
+    listed, is skipped). Without them a take with no words gets no verdict.
+  * **transcribe** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`None`](https://docs.python.org/3/builtins/constants.html#None)]) – `(path) -> text`; the default is [`arioso.cover.vocal_lyrics()`](_autosummary/arioso.cover.html.md#arioso.cover.vocal_lyrics)
+    (the vocal stem, transcribed: `pip install arioso[cover]`); `None` skips
+    the words.
+  * **source_text** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – The source’s words, when already known (it is then not transcribed).
+  * **melody** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)]) – `(take, source, sr) -> float`, default `arioso.analysis.melody_match()`.
+  * **load** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)]) – `(path) -> mono array` at `DFLT_SR`; default `librosa.load`.
+  * **min_words** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – The fewest words each side needs for the words to decide.
+* **Returns:**
+  name, “source_words”: n, “references”: [names], “takes”: {name:
+  {“lyric_recall”, “take_words”, “melody”, “melody_rank”, “verdict”, “why”}}}\`\`.
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### arioso.closeness.lyric_recall(source_text, take_text)
+
+The share of the source’s words the take sings, in order (`None` when the source has none).
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### arioso.closeness.words(text)
+
+The words of `text`, lowercased.
+
+```pycon
+>>> words("Stinky poo, where ARE you? Don't go!")
+['stinky', 'poo', 'where', 'are', 'you', "don't", 'go']
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
+
+
 # _autosummary/arioso.compare.html.md
 
 # arioso.compare
@@ -1247,7 +1368,9 @@ job needs. Per source file it:
    from `denote.separate`, transcribed by `scribed`; only for a platform that takes
    lyrics), so the cover keeps the words; no words heard makes it instrumental; and
    submits one cover, recording the task id in the manifest before waiting for it;
-4. waits for it and saves every take as `<stem> (<platform> N).<ext>` in `dst`;
+4. waits for it and saves every take as `<stem> (<platform> N).<ext>` in `dst`, and
+   checks them against the source when asked (`assess`, e.g.
+   [`arioso.closeness.cover_closeness()`](_autosummary/arioso.closeness.html.md#arioso.closeness.cover_closeness));
 5. records the outcome in the manifest (`dst/covers.jsonl`, JSON lines, the last line
    of a song wins): `done`, `refused` (a [`CatalogMatchError`](_autosummary/arioso.base.html.md#arioso.base.CatalogMatchError),
    final) or `error` (tried again on the next run: by reusing its task once, then by
@@ -1332,7 +1455,7 @@ seconds between status checks, and the most to wait.
 
 Outcomes that end a song’s job; `error` is tried again on the next run.
 
-### arioso.cover.cover_folder(src, dst, \*, platform='sunoapi', audio_input_strength=0.9, transcribe='auto', style=None, only=None, params=<function cover_params>, generate=None, wait=<function wait_for_songs>, manifest='covers.jsonl', extensions=('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif'), \*\*generate_kwargs)
+### arioso.cover.cover_folder(src, dst, \*, platform='sunoapi', audio_input_strength=0.9, transcribe='auto', style=None, only=None, params=<function cover_params>, generate=None, wait=<function wait_for_songs>, manifest='covers.jsonl', extensions=('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif'), assess=None, \*\*generate_kwargs)
 
 Cover every audio file in `src` with `platform`, takes saved in `dst`.
 
@@ -1355,6 +1478,11 @@ already holds as done or refused are skipped). See the module docstring.
   * **generate** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(prompt, **kwargs) -> list[Song]`; default `arioso.generate_many`.
   * **wait** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(songs) -> songs`, all complete (default [`wait_for_songs()`](_autosummary/arioso.cover.html.md#arioso.cover.wait_for_songs)).
   * **manifest** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The manifest’s name in `dst`.
+  * **assess** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)]) – `(source_path, take_paths) -> dict`, run on each song’s saved takes and
+    kept in its record as `assessment` (e.g.
+    `functools.partial(arioso.closeness.cover_closeness, references=<the other
+    sources>)`); a failure is recorded as `assessment_error` and does not undo
+    the takes.
   * **\*\*generate_kwargs** – Passed to every cover call (`model`, `vocal_gender`, …).
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)
@@ -1650,6 +1778,7 @@ arioso.supports_audio_input("mubert")        # False
 | [`base`](_autosummary/arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                        |
 |--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
 | [`cli`](_autosummary/arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                             |
+| [`closeness`](_autosummary/arioso.closeness.html.md#module-arioso.closeness)         | Is a take a cover of its source? Lyric recall when there are words, melody rank otherwise.  |
 | [`compare`](_autosummary/arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records.       |
 | [`cover`](_autosummary/arioso.cover.html.md#module-arioso.cover)                 | Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable. |
 | [`named_prompts`](_autosummary/arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.                 |
@@ -4245,20 +4374,18 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-22 16:58 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a"><code>697e268</code></a> on branch <code>main</code>, for **arioso 0.0.61** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 17:20 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/7535131b3e8e41f33c9683ff4665391aaad31c27"><code>7535131</code></a> on branch <code>main</code>, for **arioso 0.0.62** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.61) is ahead of the latest release on PyPI (0.0.60): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a"><code>697e268b1dbf98c33beafc6db35c42324300b88a</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/7535131b3e8e41f33c9683ff4665391aaad31c27"><code>7535131b3e8e41f33c9683ff4665391aaad31c27</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.61</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.62</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4267,9 +4394,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45046513033">45046513033</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45048636982">45048636982</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>e9cda5ef86ad9d708eba7eef11480b8abd5a67af</code> (in the history of the built commit) |
+| Event commit | <code>1a9a5416ed070ae78a6a6cfc2140dda4bd9965ed</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4294,13 +4421,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.60/">0.0.60</a>, older than the documented version (0.0.61).
+Latest release: <a href="https://pypi.org/project/arioso/0.0.62/">0.0.62</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 697e268b1dbf98c33beafc6db35c42324300b88a
+git checkout 7535131b3e8e41f33c9683ff4665391aaad31c27
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

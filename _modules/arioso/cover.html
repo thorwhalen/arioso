@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=e95a51ae"></script>
+    <script src="../../_static/documentation_options.js?v=dea2dbc4"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.61" />
+  <meta name="docsearch:version" content="0.0.62" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -727,7 +727,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">   from ``denote.separate``, transcribed by ``scribed``; only for a platform that takes</span>
 <span class="sd">   lyrics), so the cover keeps the words; no words heard makes it instrumental; and</span>
 <span class="sd">   submits one cover, recording the task id in the manifest before waiting for it;</span>
-<span class="sd">4. waits for it and saves every take as ``&lt;stem&gt; (&lt;platform&gt; N).&lt;ext&gt;`` in ``dst``;</span>
+<span class="sd">4. waits for it and saves every take as ``&lt;stem&gt; (&lt;platform&gt; N).&lt;ext&gt;`` in ``dst``, and</span>
+<span class="sd">   checks them against the source when asked (``assess``, e.g.</span>
+<span class="sd">   :func:`arioso.closeness.cover_closeness`);</span>
 <span class="sd">5. records the outcome in the manifest (``dst/covers.jsonl``, JSON lines, the last line</span>
 <span class="sd">   of a song wins): ``done``, ``refused`` (a :class:`~arioso.base.CatalogMatchError`,</span>
 <span class="sd">   final) or ``error`` (tried again on the next run: by reusing its task once, then by</span>
@@ -943,6 +945,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">wait</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">wait_for_songs</span><span class="p">,</span>
     <span class="n">manifest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_MANIFEST</span><span class="p">,</span>
     <span class="n">extensions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">AUDIO_EXTENSIONS</span><span class="p">,</span>
+    <span class="n">assess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">generate_kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Cover every audio file in ``src`` with ``platform``, takes saved in ``dst``.</span>
@@ -966,6 +969,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        generate: ``(prompt, **kwargs) -&gt; list[Song]``; default ``arioso.generate_many``.</span>
 <span class="sd">        wait: ``(songs) -&gt; songs``, all complete (default :func:`wait_for_songs`).</span>
 <span class="sd">        manifest: The manifest's name in ``dst``.</span>
+<span class="sd">        assess: ``(source_path, take_paths) -&gt; dict``, run on each song's saved takes and</span>
+<span class="sd">            kept in its record as ``assessment`` (e.g.</span>
+<span class="sd">            ``functools.partial(arioso.closeness.cover_closeness, references=&lt;the other</span>
+<span class="sd">            sources&gt;)``); a failure is recorded as ``assessment_error`` and does not undo</span>
+<span class="sd">            the takes.</span>
 <span class="sd">        **generate_kwargs: Passed to every cover call (``model``, ``vocal_gender``, ...).</span>
 <span class="sd">    """</span>
     <span class="n">src</span><span class="p">,</span> <span class="n">dst</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
@@ -1047,6 +1055,14 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">outcome</span><span class="o">=</span><span class="s2">"done"</span><span class="p">,</span>
                 <span class="n">takes</span><span class="o">=</span><span class="n">save_takes</span><span class="p">(</span><span class="n">wait</span><span class="p">(</span><span class="n">songs</span><span class="p">),</span> <span class="n">dst</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform</span><span class="p">),</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">assess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="s2">"assessment"</span><span class="p">]</span> <span class="o">=</span> <span class="n">assess</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="n">dst</span> <span class="o">/</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">[</span><span class="s2">"takes"</span><span class="p">]])</span>
+                <span class="k">except</span> <span class="p">(</span>
+                    <span class="ne">Exception</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># the takes are saved: a failed check never loses them</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="s2">"assessment_error"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+
         <span class="k">except</span> <span class="n">CatalogMatchError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># a policy refusal: final, never retried</span>
             <span class="n">rec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">outcome</span><span class="o">=</span><span class="s2">"refused"</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="n">rec</span><span class="p">[</span><span class="s2">"task_id"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"task_id"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">e</span><span class="o">.</span><span class="n">task_id</span>

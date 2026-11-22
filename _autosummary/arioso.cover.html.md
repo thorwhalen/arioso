@@ -12,7 +12,9 @@ job needs. Per source file it:
    from `denote.separate`, transcribed by `scribed`; only for a platform that takes
    lyrics), so the cover keeps the words; no words heard makes it instrumental; and
    submits one cover, recording the task id in the manifest before waiting for it;
-4. waits for it and saves every take as `<stem> (<platform> N).<ext>` in `dst`;
+4. waits for it and saves every take as `<stem> (<platform> N).<ext>` in `dst`, and
+   checks them against the source when asked (`assess`, e.g.
+   [`arioso.closeness.cover_closeness()`](arioso.closeness.html.md#arioso.closeness.cover_closeness));
 5. records the outcome in the manifest (`dst/covers.jsonl`, JSON lines, the last line
    of a song wins): `done`, `refused` (a [`CatalogMatchError`](arioso.base.html.md#arioso.base.CatalogMatchError),
    final) or `error` (tried again on the next run: by reusing its task once, then by
@@ -97,7 +99,7 @@ seconds between status checks, and the most to wait.
 
 Outcomes that end a song’s job; `error` is tried again on the next run.
 
-### arioso.cover.cover_folder(src, dst, \*, platform='sunoapi', audio_input_strength=0.9, transcribe='auto', style=None, only=None, params=<function cover_params>, generate=None, wait=<function wait_for_songs>, manifest='covers.jsonl', extensions=('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif'), \*\*generate_kwargs)
+### arioso.cover.cover_folder(src, dst, \*, platform='sunoapi', audio_input_strength=0.9, transcribe='auto', style=None, only=None, params=<function cover_params>, generate=None, wait=<function wait_for_songs>, manifest='covers.jsonl', extensions=('.wav', '.mp3', '.m4a', '.aac', '.flac', '.ogg', '.aiff', '.aif'), assess=None, \*\*generate_kwargs)
 
 Cover every audio file in `src` with `platform`, takes saved in `dst`.
 
@@ -120,6 +122,11 @@ already holds as done or refused are skipped). See the module docstring.
   * **generate** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(prompt, **kwargs) -> list[Song]`; default `arioso.generate_many`.
   * **wait** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – `(songs) -> songs`, all complete (default [`wait_for_songs()`](#arioso.cover.wait_for_songs)).
   * **manifest** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – The manifest’s name in `dst`.
+  * **assess** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)]) – `(source_path, take_paths) -> dict`, run on each song’s saved takes and
+    kept in its record as `assessment` (e.g.
+    `functools.partial(arioso.closeness.cover_closeness, references=<the other
+    sources>)`); a failure is recorded as `assessment_error` and does not undo
+    the takes.
   * **\*\*generate_kwargs** – Passed to every cover call (`model`, `vocal_gender`, …).
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)

@@ -1,0 +1,24 @@
+arioso.closeness
+================
+
+.. automodule:: arioso.closeness
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MIN_WORDS
+      LYRIC_COVER
+      LYRIC_UNRELATED
+      DFLT_SR
+      AUTO
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cover_closeness
+      lyric_recall
+      words
+   

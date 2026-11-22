@@ -8,6 +8,7 @@
 - [arioso](arioso.html.md): Arioso - Unified facade for AI music generation platforms.
 - [arioso.base](arioso.base.html.md): Core types and constants for arioso.
 - [arioso.cli](arioso.cli.html.md): The functions behind the &#96;arioso&#96; command line.
+- [arioso.closeness](arioso.closeness.html.md): Is a take a cover of its source? Lyric recall when there are words, melody rank otherwise.
 - [arioso.compare](arioso.compare.html.md): Compare platforms on the same prompts: time, memory and objective checks, as records.
 - [arioso.cover](arioso.cover.html.md): Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable.
 - [arioso.named_prompts](arioso.named_prompts.html.md): Named prompts: a ledger of (name, prompt_text) pairs organized by category.

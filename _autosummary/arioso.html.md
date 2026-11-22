@@ -239,6 +239,7 @@ arioso.supports_audio_input("mubert")        # False
 | [`base`](arioso.base.html.md#module-arioso.base)                   | Core types and constants for arioso.                                                        |
 |--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
 | [`cli`](arioso.cli.html.md#module-arioso.cli)                     | The functions behind the `arioso` command line.                                             |
+| [`closeness`](arioso.closeness.html.md#module-arioso.closeness)         | Is a take a cover of its source? Lyric recall when there are words, melody rank otherwise.  |
 | [`compare`](arioso.compare.html.md#module-arioso.compare)             | Compare platforms on the same prompts: time, memory and objective checks, as records.       |
 | [`cover`](arioso.cover.html.md#module-arioso.cover)                 | Cover every song in a folder: lyrics, one cover call per song, every take saved, resumable. |
 | [`named_prompts`](arioso.named_prompts.html.md#module-arioso.named_prompts) | Named prompts: a ledger of (name, prompt_text) pairs organized by category.                 |

@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=e95a51ae"></script>
+    <script src="_static/documentation_options.js?v=dea2dbc4"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.61" />
+  <meta name="docsearch:version" content="0.0.62" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -781,6 +781,13 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/arioso.cli.html#module-arioso.cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    arioso.closeness
+
+      <ul>
+        <li><a href="_autosummary/arioso.closeness.html#module-arioso.closeness">module</a>
 </li>
       </ul></li>
       <li>
@@ -1286,8 +1293,12 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.AudioResult">AudioResult (class in arioso.base)</a>
 </li>
-      <li><a href="_autosummary/arioso.cover.html#arioso.cover.AUTO">AUTO (in module arioso.cover)</a>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.AUTO">AUTO (in module arioso.closeness)</a>
+
+      <ul>
+        <li><a href="_autosummary/arioso.cover.html#arioso.cover.AUTO">(in module arioso.cover)</a>
 </li>
+      </ul></li>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MlxBackend.available">available() (arioso.platforms.musicgen.backends.MlxBackend class method)</a>
 </li>
   </ul></td>
@@ -1372,6 +1383,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.continuation">(arioso.platforms.musicgen.backends.TransformersBackend method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.cover_closeness">cover_closeness() (in module arioso.closeness)</a>
+</li>
       <li><a href="_autosummary/arioso.cover.html#arioso.cover.cover_folder">cover_folder() (in module arioso.cover)</a>
 </li>
       <li><a href="_autosummary/arioso.cover.html#arioso.cover.cover_params">cover_params() (in module arioso.cover)</a>
@@ -1403,6 +1416,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/arioso.compare.html#arioso.compare.DFLT_PROMPTS">DFLT_PROMPTS (in module arioso.compare)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.foundation_1.adapter.html#arioso.platforms.foundation_1.adapter.DFLT_SAMPLER">DFLT_SAMPLER (in module arioso.platforms.foundation_1.adapter)</a>
+</li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.DFLT_SR">DFLT_SR (in module arioso.closeness)</a>
 </li>
       <li><a href="_autosummary/arioso.cover.html#arioso.cover.DFLT_STRENGTH">DFLT_STRENGTH (in module arioso.cover)</a>
 </li>
@@ -1592,10 +1607,10 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.TransformersBackend.load">(arioso.platforms.musicgen.backends.TransformersBackend class method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.platforms.stable_audio.adapter.html#arioso.platforms.stable_audio.adapter.load_pipeline">load_pipeline() (in module arioso.platforms.stable_audio.adapter)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.compare.html#arioso.compare.load_prompts">load_prompts() (in module arioso.compare)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.ace_step.adapter.html#arioso.platforms.ace_step.adapter.Adapter.local">local (arioso.platforms.ace_step.adapter.Adapter property)</a>
@@ -1603,6 +1618,12 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/arioso.compare.html#arioso.compare.LOCAL_ACCESS_TYPES">LOCAL_ACCESS_TYPES (in module arioso.compare)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.ace_step.adapter.html#arioso.platforms.ace_step.adapter.LOCAL_ONLY">LOCAL_ONLY (in module arioso.platforms.ace_step.adapter)</a>
+</li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.LYRIC_COVER">LYRIC_COVER (in module arioso.closeness)</a>
+</li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.lyric_recall">lyric_recall() (in module arioso.closeness)</a>
+</li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.LYRIC_UNRELATED">LYRIC_UNRELATED (in module arioso.closeness)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1634,6 +1655,8 @@ window.runMermaid = runMermaid;</script>
       </ul></li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.Song.metadata">metadata (arioso.base.Song attribute)</a>
 </li>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.MIN_WORDS">MIN_WORDS (in module arioso.closeness)</a>
+</li>
       <li><a href="_autosummary/arioso.base.html#arioso.base.Affordance.minimum">minimum (arioso.base.Affordance attribute)</a>
 </li>
       <li><a href="_autosummary/arioso.platforms.musicgen.backends.html#arioso.platforms.musicgen.backends.MLX_CHECKPOINTS">MLX_CHECKPOINTS (in module arioso.platforms.musicgen.backends)</a>
@@ -1651,6 +1674,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/arioso.base.html#module-arioso.base">arioso.base</a>
 </li>
         <li><a href="_autosummary/arioso.cli.html#module-arioso.cli">arioso.cli</a>
+</li>
+        <li><a href="_autosummary/arioso.closeness.html#module-arioso.closeness">arioso.closeness</a>
 </li>
         <li><a href="_autosummary/arioso.compare.html#module-arioso.compare">arioso.compare</a>
 </li>
@@ -2007,14 +2032,16 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/arioso.tools.html#arioso.tools.wav_to_mp3">wav_to_mp3() (in module arioso.tools)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/arioso.platforms.foundation_1.adapter.html#arioso.platforms.foundation_1.adapter.WINDOW_SECONDS">WINDOW_SECONDS (in module arioso.platforms.foundation_1.adapter)</a>
 
       <ul>
         <li><a href="_autosummary/arioso.platforms.musicgen.adapter.html#arioso.platforms.musicgen.adapter.WINDOW_SECONDS">(in module arioso.platforms.musicgen.adapter)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/arioso.closeness.html#arioso.closeness.words">words() (in module arioso.closeness)</a>
+</li>
       <li><a href="_autosummary/arioso.platforms.foundation_1.adapter.html#arioso.platforms.foundation_1.adapter.WORKER_ENV">WORKER_ENV (in module arioso.platforms.foundation_1.adapter)</a>
 </li>
   </ul></td>

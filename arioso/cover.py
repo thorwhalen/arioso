@@ -10,7 +10,9 @@ job needs. Per source file it:
    from ``denote.separate``, transcribed by ``scribed``; only for a platform that takes
    lyrics), so the cover keeps the words; no words heard makes it instrumental; and
    submits one cover, recording the task id in the manifest before waiting for it;
-4. waits for it and saves every take as ``<stem> (<platform> N).<ext>`` in ``dst``;
+4. waits for it and saves every take as ``<stem> (<platform> N).<ext>`` in ``dst``, and
+   checks them against the source when asked (``assess``, e.g.
+   :func:`arioso.closeness.cover_closeness`);
 5. records the outcome in the manifest (``dst/covers.jsonl``, JSON lines, the last line
    of a song wins): ``done``, ``refused`` (a :class:`~arioso.base.CatalogMatchError`,
    final) or ``error`` (tried again on the next run: by reusing its task once, then by
@@ -209,6 +211,7 @@ def cover_folder(
     wait: Callable = wait_for_songs,
     manifest: str = DFLT_MANIFEST,
     extensions: Iterable[str] = AUDIO_EXTENSIONS,
+    assess: Optional[Callable] = None,
     **generate_kwargs,
 ) -> list:
     """Cover every audio file in ``src`` with ``platform``, takes saved in ``dst``.
@@ -232,6 +235,11 @@ def cover_folder(
         generate: ``(prompt, **kwargs) -> list[Song]``; default ``arioso.generate_many``.
         wait: ``(songs) -> songs``, all complete (default :func:`wait_for_songs`).
         manifest: The manifest's name in ``dst``.
+        assess: ``(source_path, take_paths) -> dict``, run on each song's saved takes and
+            kept in its record as ``assessment`` (e.g.
+            ``functools.partial(arioso.closeness.cover_closeness, references=<the other
+            sources>)``); a failure is recorded as ``assessment_error`` and does not undo
+            the takes.
         **generate_kwargs: Passed to every cover call (``model``, ``vocal_gender``, ...).
     """
     src, dst = Path(src), Path(dst)
@@ -313,6 +321,12 @@ def cover_folder(
                 outcome="done",
                 takes=save_takes(wait(songs), dst, f.stem, platform=platform),
             )
+            if assess is not None:
+                try:
+                    rec["assessment"] = assess(f, [dst / t for t in rec["takes"]])
+                except Exception as e:  # the takes are saved: a failed check never loses them
+                    rec["assessment_error"] = f"{type(e).__name__}: {e}"
+
         except CatalogMatchError as e:  # a policy refusal: final, never retried
             rec.update(outcome="refused", error=str(e))
             rec["task_id"] = rec.get("task_id") or e.task_id

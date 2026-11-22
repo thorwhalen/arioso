@@ -67,6 +67,14 @@ seeds = [
     "pretty_midi",
     "denote>=0.0.9",
 ]
+# arioso.cover: the default lyrics transcriber (vocal_lyrics): denote.separate's vocal stem,
+# transcribed by scribed (torch/torchaudio for the separator, a whisper backend for scribed).
+cover = [
+    "numpy",
+    "librosa>=0.10",
+    "denote>=0.0.9",
+    "scribed",
+]
 # arioso.compare: objective checks (level, clipping; tempo and key through denote).
 compare = [
     "numpy",

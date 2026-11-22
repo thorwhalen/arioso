@@ -153,9 +153,23 @@ def _optional_text(*, style: str, title: str, lyrics: str, instrumental: bool) -
 
 
 def _check_api_error(data: dict):
-    """Raise RuntimeError if the API response indicates an error."""
+    """Raise if the API response indicates an error.
+
+    A 413 "matches an existing recording in our catalog" is a
+    :class:`~arioso.base.CatalogMatchError` (final), whether it comes at submit time
+    (here) or at poll time (:meth:`Adapter.get_status`); anything else a RuntimeError.
+
+    >>> _check_api_error({"code": 413, "msg": "This audio matches an existing recording in our catalog."})
+    Traceback (most recent call last):
+    ...
+    arioso.base.CatalogMatchError: sunoapi refused the audio (code 413): This audio matches an existing recording in our catalog.
+    """
     if isinstance(data, dict) and data.get("code") and data["code"] != 200:
         msg = data.get("msg", "Unknown API error")
+        if str(data["code"]) == "413" and "catalog" in str(msg).lower():
+            raise CatalogMatchError(
+                f"sunoapi refused the audio (code 413): {msg}", code=data["code"]
+            )
         raise RuntimeError(f"sunoapi error (code {data['code']}): {msg}")
 
 

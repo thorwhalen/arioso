@@ -16,6 +16,7 @@ arioso/
     schema.py                    # param_schema(): JSON Schema of a platform's params (common + extras)
     _util.py                     # Auth helpers, HTTP session factory, torch_device()/torch_dtype()
     cli.py                       # Functions behind the `arioso` command (no CLI library)
+    cover.py                     # cover_folder(): cover a folder of songs (lyrics, takes, resumable manifest)
     compare.py                   # compare(): platforms x prompts -> records (time, memory, checks), page
     _measure.py                  # Peak memory of a live process (Metal-inclusive on macOS), free memory
     __main__.py                  # `arioso` / `python -m arioso`: projects cli.commands with cw

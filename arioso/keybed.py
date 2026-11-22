@@ -24,6 +24,14 @@ lone ``Target Note`` C4 was ambiguous (+2 dB). Each note's :func:`sub_octave_db`
 in the render's info, and a note where it dominates is warned about. (A periodicity
 tracker such as pyin follows that sub-octave and reads every note an octave low.)
 
+Some timbres come back an octave low in part of the register even in chromatic chunks,
+whatever the seed or the chunk's alignment (arioso#83: "Grand Piano, Warm" from B3 to
+A#4, D3 to E3 and C5, each sounding exactly twelve semitones under the key asked). Such
+a note cannot be pitched up honestly, so by default (``octave_low="cover"``) it is left
+out of the keybed and the nearest on-pitch notes cover its key (:func:`cover_plan`: the
+sampler stretches them at most :data:`MAX_COVER_STRETCH` semitones); the render's info
+says which key is covered by which.
+
 >>> keybed_prompt("Rhodes Piano, Warm", [60, 61])
 'Keybed, Sequence, Timbre Profile, Rhodes Piano, Warm, Dry, Chromatic Chunk, Note Sequence, C4, C#4'
 >>> keybed_prompt("Bass, Wet", [40, 45])
@@ -69,6 +77,16 @@ DFLT_PEAK = 0.89
 PITCH_CHECK_SECONDS = 0.5
 #: A note whose octave below is louder than its pitch by more than this (dB) is warned about.
 SUB_OCTAVE_WARN_DB = 0.0
+#: A note whose octave below is within this (dB) of its pitch, or louder, is octave-low:
+#: on real renders an on-pitch note's octave below is 4 to 30 dB under it, and notes at
+#: -0.0 or +0.2 dB peaked an octave low (arioso#83, "Grand Piano, Warm", C5 and A#4).
+OCTAVE_LOW_DB = -3.0
+#: The least share of a note's energy its pitch and octave-below bands must hold for it to be judged.
+MIN_PITCH_SHARE = 0.01
+#: The farthest a sampler may stretch an on-pitch note to cover an octave-low key (semitones).
+MAX_COVER_STRETCH = 6
+#: What :func:`render_keybed` does with octave-low notes.
+OCTAVE_LOW_POLICIES = ("cover", "keep")
 
 
 def note_name(key: int) -> str:
@@ -190,6 +208,22 @@ def render_plan(keys, size: int = CHUNK_NOTES) -> list:
     return [c for c in chunks(range(low, high + 1), size) if asked.intersection(c)]
 
 
+def _bands(audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS) -> tuple:
+    """Spectral energy within a quarter tone of the octave below ``key``, of ``key``, and in all,
+    over the first ``seconds`` of ``audio``."""
+    seg = np.asarray(audio, dtype=float)[: max(1, int(seconds * rate))]
+    spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)))) ** 2
+    freqs = np.fft.rfftfreq(len(seg), 1 / rate)
+    f = 440.0 * 2 ** ((key - 69) / 12)
+
+    def band(x):
+        return float(
+            spec[(freqs > x * 2 ** (-1 / 24)) & (freqs < x * 2 ** (1 / 24))].sum()
+        )
+
+    return band(f / 2), band(f), float(spec.sum())
+
+
 def sub_octave_db(
     audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS
 ) -> float:
@@ -202,18 +236,59 @@ def sub_octave_db(
     >>> round(sub_octave_db(np.sin(2 * np.pi * f * t) + 0.1 * np.sin(np.pi * f * t), rate, 60))
     -20
     """
-    seg = np.asarray(audio, dtype=float)[: max(1, int(seconds * rate))]
-    spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)))) ** 2
-    freqs = np.fft.rfftfreq(len(seg), 1 / rate)
-    f = 440.0 * 2 ** ((key - 69) / 12)
-
-    def band(x):
-        return float(
-            spec[(freqs > x * 2 ** (-1 / 24)) & (freqs < x * 2 ** (1 / 24))].sum()
-        )
-
+    below, at, _ = _bands(audio, rate, key, seconds=seconds)
     tiny = 1e-20
-    return 10 * np.log10((band(f / 2) + tiny) / (band(f) + tiny))
+    return 10 * np.log10((below + tiny) / (at + tiny))
+
+
+def is_octave_low(audio, rate: int, key: int) -> bool:
+    """Whether a rendered note sounds an octave under ``key``: its octave below is within
+    :data:`OCTAVE_LOW_DB` of its pitch, or louder, and the two hold at least
+    :data:`MIN_PITCH_SHARE` of its energy (a note with neither, such as noise or a
+    constant level, is not judged).
+
+    >>> rate = 8000; t = np.arange(rate) / rate; f = 440.0 * 2 ** ((60 - 69) / 12)
+    >>> is_octave_low(np.sin(np.pi * f * t), rate, 60), is_octave_low(np.sin(2 * np.pi * f * t), rate, 60)
+    (True, False)
+    >>> is_octave_low(np.full(rate, 0.1), rate, 60)
+    False
+    """
+    below, at, total = _bands(audio, rate, key)
+    if total <= 0 or (below + at) / total < MIN_PITCH_SHARE:
+        return False
+    return bool(sub_octave_db(audio, rate, key) > OCTAVE_LOW_DB)
+
+
+def cover_plan(
+    keys, low_keys, *, max_stretch: int = MAX_COVER_STRETCH
+) -> dict:
+    """Which on-pitch key covers each octave-low key: ``{low key: covering key}``.
+
+    The covering key is the one the sampler maps over that key (:func:`arioso.sampler_export.key_ranges`
+    over the keys left), so the plan is what will play. An octave-low key with no on-pitch
+    key within ``max_stretch`` semitones, or when every key is octave-low, is not covered
+    (it is kept, with its warning).
+
+    >>> cover_plan(range(56, 73), [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 72])
+    {59: 58, 60: 58, 61: 58, 62: 58, 63: 58, 64: 58, 65: 71, 66: 71, 67: 71, 68: 71, 69: 71, 70: 71, 72: 71}
+    >>> cover_plan([48, 60, 72], [60])  # twelve semitones from the nearest: kept
+    {}
+    """
+    from arioso.sampler_export import key_ranges
+
+    keys, low = sorted(set(keys)), set(low_keys) & set(keys)
+    while True:
+        good = [k for k in keys if k not in low]
+        if not good:
+            return {}
+        ranges = key_ranges(good)
+        covering = {
+            k: next(g for g, (lo, hi) in ranges.items() if lo <= k <= hi) for k in low
+        }
+        far = {k for k, g in covering.items() if abs(k - g) > max_stretch}
+        if not far:
+            return dict(sorted(covering.items()))
+        low -= far  # kept: they take their own place in the map, and the rest is planned again
 
 
 def _default_generate(prompt, **kwargs):
@@ -244,6 +319,8 @@ def render_keybed(
     peak: Optional[float] = DFLT_PEAK,
     window_seconds: Optional[float] = None,
     fill: bool = True,
+    octave_low: str = "cover",
+    max_stretch: int = MAX_COVER_STRETCH,
     **generate_kwargs,
 ) -> tuple:
     """Render one note per key; returns ``({key: (audio, rate)}, info)``.
@@ -257,12 +334,19 @@ def render_keybed(
     ``fill``: render every chunk chromatic (:func:`render_plan`) and keep the asked
     notes; ``False`` sends the asked keys as they are (non-adjacent keys as a plain
     note sequence, a lone key as a ``Target Note``), which can come back an octave low.
-    ``info`` holds the seed, per chunk its keys and the prompt actually sent, and per
-    kept key its :func:`sub_octave_db`.
+    ``octave_low``: what to do with a note whose octave below is within
+    :data:`OCTAVE_LOW_DB` of its pitch: ``"cover"`` leaves it out so the nearest on-pitch
+    notes cover its key (:func:`cover_plan`, at most ``max_stretch`` semitones away),
+    ``"keep"`` keeps it (it may sound an octave low).
+    ``info`` holds the seed, per chunk its keys and the prompt actually sent, per
+    rendered key its :func:`sub_octave_db`, the octave-low keys, and which key covers
+    each one left out (``covered``).
     """
     from arioso._isolated import draw_seed
     from arioso.sampler_export import channels_first, choose_fold, mono
 
+    if octave_low not in OCTAVE_LOW_POLICIES:
+        raise ValueError(f"keybed: octave_low must be one of {OCTAVE_LOW_POLICIES}, not {octave_low!r}")
     keys = sorted(set(int(k) for k in keys))
     groups = render_plan(keys, chunk) if fill else chunks(keys, chunk)
     asked = set(keys)
@@ -323,7 +407,19 @@ def render_keybed(
             note[:k] *= np.linspace(0.0, 1.0, k, dtype=np.float32)
             notes[key] = (note, rate)
     sub = {k: round(sub_octave_db(a, r, k), 1) for k, (a, r) in notes.items()}
-    low = [note_name(k) for k, db in sub.items() if db > SUB_OCTAVE_WARN_DB]
+    octave_low_keys = [k for k, (a, r) in notes.items() if is_octave_low(a, r, k)]
+    covered = (
+        cover_plan(notes, octave_low_keys, max_stretch=max_stretch)
+        if octave_low == "cover"
+        else {}
+    )
+    if covered:
+        notes = {k: v for k, v in notes.items() if k not in covered}
+        warnings.warn(
+            f"keybed: {[note_name(k) for k in covered]} came back an octave low and are "
+            f"covered by their on-pitch neighbours ({', '.join(f'{note_name(k)} by {note_name(g)}' for k, g in covered.items())})"
+        )
+    low = [note_name(k) for k, db in sub.items() if db > SUB_OCTAVE_WARN_DB and k not in covered]
     if low:
         warnings.warn(
             f"keybed: the octave below dominates {low}; they may sound an octave low "
@@ -334,7 +430,14 @@ def render_keybed(
         if loudest > 0:
             gain = peak / loudest
             notes = {k: (a * gain, r) for k, (a, r) in notes.items()}
-    return notes, {"seed": seed, "fold": fold, "chunks": sent, "sub_octave_db": sub}
+    return notes, {
+        "seed": seed,
+        "fold": fold,
+        "chunks": sent,
+        "sub_octave_db": sub,
+        "octave_low": octave_low_keys,
+        "covered": covered,
+    }
 
 
 def keybed_instrument(

@@ -190,7 +190,9 @@ def render_plan(keys, size: int = CHUNK_NOTES) -> list:
     return [c for c in chunks(range(low, high + 1), size) if asked.intersection(c)]
 
 
-def sub_octave_db(audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS) -> float:
+def sub_octave_db(
+    audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS
+) -> float:
     """How much louder the octave below ``key`` is than ``key`` itself, in dB, in the
     first ``seconds`` of ``audio`` (energy within a quarter tone of each). Above 0, a
     listener or a pitch tracker may hear the note an octave low.
@@ -206,7 +208,9 @@ def sub_octave_db(audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SE
     f = 440.0 * 2 ** ((key - 69) / 12)
 
     def band(x):
-        return float(spec[(freqs > x * 2 ** (-1 / 24)) & (freqs < x * 2 ** (1 / 24))].sum())
+        return float(
+            spec[(freqs > x * 2 ** (-1 / 24)) & (freqs < x * 2 ** (1 / 24))].sum()
+        )
 
     tiny = 1e-20
     return 10 * np.log10((band(f / 2) + tiny) / (band(f) + tiny))

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=4d22d5b7"></script>
+    <script src="_static/documentation_options.js?v=e95a51ae"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.60" />
+  <meta name="docsearch:version" content="0.0.61" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -692,7 +692,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </pre></div>
 </div>
 <p>Measured on an M1 Max (64 GB, MPS, the default 100 steps): a 10 s clip takes 70 s once the model is loaded (92 s for the first, loading included), about 7 times real time, and the worker process peaks at 14 GB.</p>
-<p>Building playable sampler instruments from the keybeds checkpoint (many notes from one descriptor, sliced and mapped) is not covered yet: see <a class="reference external" href="https://github.com/thorwhalen/arioso/issues/66">#66</a>.</p>
+<p>Playable sampler instruments from the keybeds checkpoint: <code class="docutils literal notranslate"><span class="pre">arioso.keybed.keybed_instrument(&quot;Rhodes</span> <span class="pre">Piano,</span> <span class="pre">Warm&quot;,</span> <span class="pre">folder)</span></code> renders every key from C3 to C5 in chromatic chunks with one seed and writes an SF2, an SFZ and a metadata JSON. Some timbres come back an octave low in part of the register (“Grand Piano, Warm” from B3 to A#4); such notes are left out and their on-pitch neighbours cover them, at most six semitones away (<code class="docutils literal notranslate"><span class="pre">octave_low=&quot;keep&quot;</span></code> keeps them), and the metadata says which key covers which.</p>
 </section>
 <section id="elevenlabs">
 <h3>ElevenLabs<a class="headerlink" href="#elevenlabs" title="Link to this heading">#</a></h3>
@@ -1101,7 +1101,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 11:40 UTC from <a href="https://github.com/thorwhalen/arioso/commit/e438f2aa9a53213e2960f85a943602aa7432d0a7">e438f2a</a> (main) · arioso 0.0.60 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 16:58 UTC from <a href="https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a">697e268</a> (main) · arioso 0.0.61 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

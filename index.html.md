@@ -278,7 +278,7 @@ song = arioso.generate(
 
 Measured on an M1 Max (64 GB, MPS, the default 100 steps): a 10 s clip takes 70 s once the model is loaded (92 s for the first, loading included), about 7 times real time, and the worker process peaks at 14 GB.
 
-Building playable sampler instruments from the keybeds checkpoint (many notes from one descriptor, sliced and mapped) is not covered yet: see [#66](https://github.com/thorwhalen/arioso/issues/66).
+Playable sampler instruments from the keybeds checkpoint: `arioso.keybed.keybed_instrument("Rhodes Piano, Warm", folder)` renders every key from C3 to C5 in chromatic chunks with one seed and writes an SF2, an SFZ and a metadata JSON. Some timbres come back an octave low in part of the register (“Grand Piano, Warm” from B3 to A#4); such notes are left out and their on-pitch neighbours cover them, at most six semitones away (`octave_low="keep"` keeps them), and the metadata says which key covers which.
 
 ### ElevenLabs
 

@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T11:40:40Z",
+  "built_at": "2026-11-22T16:58:58Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.60",
+    "version": "0.0.61",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "e438f2aa9a53213e2960f85a943602aa7432d0a7",
-    "short_commit": "e438f2a",
+    "commit": "697e268b1dbf98c33beafc6db35c42324300b88a",
+    "short_commit": "697e268",
     "branch": "main",
     "tags": [
-      "0.0.60"
+      "0.0.61"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/e438f2aa9a53213e2960f85a943602aa7432d0a7",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "0b4b3d88fa5cd4ce48f79191058e9ddb14711fe2",
+    "sha": "e9cda5ef86ad9d708eba7eef11480b8abd5a67af",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45018247652",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/45018247652",
+    "run_id": "45046513033",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/45046513033",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -63,13 +63,15 @@
   "pypi": {
     "checked": true,
     "latest": "0.0.60",
-    "relation": "same",
+    "relation": "ahead",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout e438f2aa9a53213e2960f85a943602aa7432d0a7\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout 697e268b1dbf98c33beafc6db35c42324300b88a\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.0.61) is ahead of the latest release on PyPI (0.0.60): these docs describe unreleased code."
+    ]
   }
 }

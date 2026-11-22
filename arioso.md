@@ -1,4 +1,4 @@
-> built 2026-11-22 11:40 UTC from e438f2a (main) · arioso 0.0.60. Details: build_info.json
+> built 2026-11-22 16:58 UTC from 697e268 (main) · arioso 0.0.61. Details: build_info.json
 
 # index.html.md
 
@@ -282,7 +282,7 @@ song = arioso.generate(
 
 Measured on an M1 Max (64 GB, MPS, the default 100 steps): a 10 s clip takes 70 s once the model is loaded (92 s for the first, loading included), about 7 times real time, and the worker process peaks at 14 GB.
 
-Building playable sampler instruments from the keybeds checkpoint (many notes from one descriptor, sliced and mapped) is not covered yet: see [#66](https://github.com/thorwhalen/arioso/issues/66).
+Playable sampler instruments from the keybeds checkpoint: `arioso.keybed.keybed_instrument("Rhodes Piano, Warm", folder)` renders every key from C3 to C5 in chromatic chunks with one seed and writes an SF2, an SFZ and a metadata JSON. Some timbres come back an octave low in part of the register (“Grand Piano, Warm” from B3 to A#4); such notes are left out and their on-pitch neighbours cover them, at most six semitones away (`octave_low="keep"` keeps them), and the metadata says which key covers which.
 
 ### ElevenLabs
 
@@ -4245,18 +4245,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-22 11:40 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/e438f2aa9a53213e2960f85a943602aa7432d0a7"><code>e438f2a</code></a> on branch <code>main</code>, for **arioso 0.0.60** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 16:58 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a"><code>697e268</code></a> on branch <code>main</code>, for **arioso 0.0.61** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.61) is ahead of the latest release on PyPI (0.0.60): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/e438f2aa9a53213e2960f85a943602aa7432d0a7"><code>e438f2aa9a53213e2960f85a943602aa7432d0a7</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/697e268b1dbf98c33beafc6db35c42324300b88a"><code>697e268b1dbf98c33beafc6db35c42324300b88a</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.60</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.61</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4265,9 +4267,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45018247652">45018247652</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45046513033">45046513033</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0b4b3d88fa5cd4ce48f79191058e9ddb14711fe2</code> (in the history of the built commit) |
+| Event commit | <code>e9cda5ef86ad9d708eba7eef11480b8abd5a67af</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4292,13 +4294,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.60/">0.0.60</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.60/">0.0.60</a>, older than the documented version (0.0.61).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout e438f2aa9a53213e2960f85a943602aa7432d0a7
+git checkout 697e268b1dbf98c33beafc6db35c42324300b88a
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

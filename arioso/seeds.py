@@ -20,6 +20,9 @@ Three steps, each a function whose seams are keyword arguments:
   makes a seed in a generator's own phrasing instead: MusicGen-melody on the voice over the drone,
   its bass removed (``highpass``) so the drone carries the bottom.
 
+To compose a line in a raga instead of taking one from a score or a recording, see :mod:`arioso.raga`
+(``compose(...).contour(sa)`` gives a :class:`Contour`).
+
 The core is numpy. ``librosa`` (the default f0 tracker), ``pretty_midi`` (reading MIDI) and
 ``denote`` (the default voice separator, with ``torch``/``torchaudio``) are imported only when used.
 

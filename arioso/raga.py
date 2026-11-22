@@ -178,7 +178,9 @@ def _raga(raga: Union[str, Raga], ragas: Mapping = RAGAS) -> Raga:
     try:
         return ragas[raga.lower()]
     except KeyError:
-        raise KeyError(f"unknown raga {raga!r}: one of {sorted(ragas)}, or a Raga") from None
+        raise KeyError(
+            f"unknown raga {raga!r}: one of {sorted(ragas)}, or a Raga"
+        ) from None
 
 
 # --------------------------------------------------------------------------------------------
@@ -213,7 +215,10 @@ def skyline(notes: Iterable[tuple], *, chord_s: float = CHORD_S) -> list:
 
 
 def phrases(
-    notes: Sequence[tuple], *, gap_ratio: float = GAP_RATIO, rest_ratio: float = REST_RATIO
+    notes: Sequence[tuple],
+    *,
+    gap_ratio: float = GAP_RATIO,
+    rest_ratio: float = REST_RATIO,
 ) -> list:
     """Split onset-ordered notes into phrases where the onset gap exceeds ``gap_ratio``
     times the median one and the silence before the next onset exceeds ``rest_ratio``
@@ -343,7 +348,9 @@ class Composition:
 
     @property
     def seconds(self) -> float:
-        return max((b for part in self.sections.values() for _, b, _ in part), default=0.0)
+        return max(
+            (b for part in self.sections.values() for _, b, _ in part), default=0.0
+        )
 
     def contour(
         self,
@@ -418,7 +425,9 @@ def compose(
     """
     r = _raga(raga, ragas)
     if bpm <= 0 or beats_per_cycle < 1:
-        raise ValueError(f"compose: bpm ({bpm}) must be > 0, beats_per_cycle ({beats_per_cycle}) >= 1")
+        raise ValueError(
+            f"compose: bpm ({bpm}) must be > 0, beats_per_cycle ({beats_per_cycle}) >= 1"
+        )
     motifs = [_motif(m) for m in motifs]
     wrong = [m for m in motifs if not r.permits(m)]
     if wrong:
@@ -444,7 +453,9 @@ def compose(
 
     # pulse and tihai, counted in half beats so sam is exact
     half = beat / 2
-    start = int(np.ceil(t / half - 1e-9))  # the pulse starts on a half beat after the alap
+    start = int(
+        np.ceil(t / half - 1e-9)
+    )  # the pulse starts on a half beat after the alap
     phrase_t = tuple(tihai) if tihai else (motifs[0] if motifs else r.chalan[-1])
     phrase_t = _motif(phrase_t)
     if phrase_t[-1] != 0:
@@ -475,7 +486,9 @@ def compose(
             h += n
         h += 2
         k += 1
-    sam = start + -(-(h + tihai_span - start) // cycle) * cycle  # the last Sa lands here
+    sam = (
+        start + -(-(h + tihai_span - start) // cycle) * cycle
+    )  # the last Sa lands here
     first = sam - tihai_span
     if pulse:  # hold the last note up to the tihai
         pulse[-1][1] = max(pulse[-1][1], first - 1)

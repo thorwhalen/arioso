@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import struct
+import warnings
 
 import numpy as np
 import pytest
@@ -12,12 +13,14 @@ import pytest
 from arioso.base import AudioResult, Song
 from arioso.keybed import (
     GAP_SECONDS,
+    KEY_RANGE,
     NOTE_SECONDS,
     chunks,
     keybed_instrument,
     keybed_prompt,
     note_name,
     render_keybed,
+    render_plan,
 )
 from arioso.sampler_export import key_ranges, write_sf2
 
@@ -152,7 +155,11 @@ def test_the_instrument_folder_has_sf2_sfz_wavs_and_metadata(tmp_path):
     assert (tmp_path / "Rhodes Piano" / "064.wav").is_file()
     meta = json.loads(paths["metadata"].read_text())
     assert meta["seed"] == 11 and meta["keys"] == [60, 64]
-    assert meta["chunks"][0]["prompt"] == keybed_prompt("Rhodes Piano, Warm", [60, 64])
+    # sent as one chromatic chunk around the two keys (arioso#73)
+    assert meta["chunks"][0]["prompt"] == keybed_prompt(
+        "Rhodes Piano, Warm", range(60, 66)
+    )
+    assert set(meta["sub_octave_db"]) == {"60", "64"}
     assert meta["render"] == {"seed": 11}
 
 
@@ -201,7 +208,7 @@ class Markers:
 
 def test_each_note_is_exactly_its_slot_no_gap_no_neighbour():
     notes, _ = render_keybed(
-        "Pad", [60, 61, 62, 63], generate=Markers(), seed=1, peak=None
+        "Pad", [60, 61, 62, 63], generate=Markers(), seed=1, peak=None, fill=False
     )
     fade, fade_in = int(0.02 * RATE), int(0.002 * RATE)
     for i, key in enumerate([60, 61, 62, 63]):
@@ -425,6 +432,46 @@ def test_the_default_generator_keeps_the_models_level(monkeypatch):
     )
 
 
+def test_every_chunk_sent_is_chromatic_and_only_the_asked_notes_come_back():
+    model = FakeModel()
+    keys = [57, 60, 64, 67, 72]  # the set that came back an octave low as one sequence
+    notes, info = render_keybed("Rhodes Piano, Warm", keys, generate=model, seed=7)
+    assert sorted(notes) == keys
+    assert all("Chromatic Chunk" in prompt for prompt, _, _ in model.calls)
+    assert [c["keys"] for c in info["chunks"]] == render_plan(keys)
+    for key in keys:  # each kept note is its own slot of the filled chunk: its pitch
+        audio, rate = notes[key]
+        assert _pitch(audio, rate) == pytest.approx(_freq(key), rel=0.02), key
+    assert all(db < -20 for db in info["sub_octave_db"].values())
+
+
+def test_the_plan_pads_short_runs_inside_the_models_range_and_skips_empty_chunks():
+    for keys in ([12], [108], [60], [40, 41], [24, 96], list(range(48, 73))):
+        plan = render_plan(keys)
+        assert all(b - a == 1 for c in plan for a, b in zip(c, c[1:])), keys
+        assert all(len(c) >= 3 for c in plan), keys
+        assert set(keys) <= {k for c in plan for k in c}, keys
+        assert all(set(keys) & set(c) for c in plan), keys
+        assert KEY_RANGE[0] <= plan[0][0] and plan[-1][-1] <= KEY_RANGE[1], keys
+    assert render_plan(range(48, 73)) == chunks(range(48, 73))  # the default register
+
+
+def test_a_note_whose_octave_below_dominates_is_warned_about():
+    def low(prompt, *, duration, seed):  # every note an octave low
+        names = prompt.split("Note Sequence, ")[1].split(", ")
+        by_name = {note_name(k): k for k in range(128)}
+        audio = np.zeros(int(round(duration * RATE)), dtype=np.float32)
+        t = np.arange(int(NOTE_SECONDS * RATE)) / RATE
+        for i, name in enumerate(names):
+            start = int(round(i * (NOTE_SECONDS + GAP_SECONDS) * RATE))
+            audio[start : start + len(t)] = np.sin(np.pi * _freq(by_name[name]) * t)
+        return Song(audio=AudioResult(audio_array=audio, sample_rate=RATE))
+
+    with pytest.warns(UserWarning, match="octave below dominates"):
+        _, info = render_keybed("Pad", [60], generate=low, seed=1)
+    assert info["sub_octave_db"][60] > 20
+
+
 def _keybed_weights():
     from arioso.platforms.foundation_1.adapter import cached_weights
 
@@ -436,16 +483,20 @@ def _keybed_weights():
     reason="real keybed render: needs the 1.2-keybeds weights and ARIOSO_RUN_INTEGRATION=1 (~14 GB peak)",
 )
 def test_a_real_keybed_is_three_notes_at_their_pitches(tmp_path):
-    paths = keybed_instrument("Grand Piano, Warm", tmp_path, [57, 60, 64], seed=7)
+    # Non-adjacent keys go as one chromatic chunk, A3..D4, measured on pitch for this
+    # timbre and seed (arioso#73; "Grand Piano, Warm" came back an octave low from B3 up
+    # even in chromatic chunks, which the sub-octave check reports).
+    keys = [57, 59, 62]
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # no note may come back an octave low
+        paths = keybed_instrument("Rhodes Piano, Warm", tmp_path, keys, seed=7)
     import soundfile as sf
 
     assert paths["sf2"].read_bytes()[:4] == b"RIFF"
-    for key in (
-        57,
-        60,
-        64,
-    ):  # the model was asked for these pitches: check it gave them
-        audio, rate = sf.read(tmp_path / "Grand Piano" / f"{key:03d}.wav")
+    meta = json.loads(paths["metadata"].read_text())
+    assert all(db < 0 for db in meta["sub_octave_db"].values())
+    for key in keys:  # the model was asked for these pitches: check it gave them
+        audio, rate = sf.read(tmp_path / "Rhodes Piano" / f"{key:03d}.wav")
         assert _pitch(audio[: rate // 2], rate) == pytest.approx(
             _freq(key), rel=0.03
         ), key

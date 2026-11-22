@@ -127,7 +127,9 @@ def wait_for_songs(
         if all(s.status == "complete" for s in songs):
             return songs
         if time.monotonic() - start > timeout:
-            raise TimeoutError(f"cover {songs[0].id!r} not complete after {timeout:g} s")
+            raise TimeoutError(
+                f"cover {songs[0].id!r} not complete after {timeout:g} s"
+            )
         songs = check(songs[0])
         if not all(s.status == "complete" for s in songs):
             time.sleep(poll_interval)
@@ -241,7 +243,9 @@ def cover_folder(
     )
     twins = [s for s, n in Counter(f.stem for f in files).items() if n > 1]
     if twins:  # their takes would share names
-        raise ValueError(f"cover_folder: several files share the stems {twins} in {src}")
+        raise ValueError(
+            f"cover_folder: several files share the stems {twins} in {src}"
+        )
     dst.mkdir(parents=True, exist_ok=True)
     takes_params = _platform_params(platform)
     if transcribe == AUTO:
@@ -273,7 +277,10 @@ def cover_folder(
         try:
             if task_id:
                 rec.update(
-                    {k: prev.get(k) for k in ("strength", "style", "lyrics", "instrumental")}
+                    {
+                        k: prev.get(k)
+                        for k in ("strength", "style", "lyrics", "instrumental")
+                    }
                 )
                 rec.update(task_id=task_id, reused_task=True)
                 songs = [Song(id=task_id, platform=platform, status="pending")]
@@ -299,9 +306,12 @@ def cover_folder(
                 songs = generate(song_style or "", **kwargs, **generate_kwargs)
                 task_id = songs[0].id if songs else None
                 rec["task_id"] = task_id
-                write({**rec, "outcome": "submitted"})  # before the wait: never pay twice
+                write(
+                    {**rec, "outcome": "submitted"}
+                )  # before the wait: never pay twice
             rec.update(
-                outcome="done", takes=save_takes(wait(songs), dst, f.stem, platform=platform)
+                outcome="done",
+                takes=save_takes(wait(songs), dst, f.stem, platform=platform),
             )
         except CatalogMatchError as e:  # a policy refusal: final, never retried
             rec.update(outcome="refused", error=str(e))

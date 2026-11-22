@@ -1,5 +1,7 @@
 """cover_folder: one cover per song, takes saved, refusals recorded, resumable, no double pay."""
 
+from pathlib import Path
+
 import pytest
 
 import arioso.cover as cover
@@ -24,7 +26,7 @@ class FakeCover:
 
     def __call__(self, prompt, **kwargs):
         self.calls.append({"prompt": prompt, **kwargs})
-        title = kwargs["audio_input"].rsplit("/", 1)[-1].rsplit(".", 1)[0]
+        title = Path(kwargs["audio_input"]).stem
         if title in self.refuse:
             raise CatalogMatchError("matches an existing recording", task_id="t-r")
         if title in self.fail:

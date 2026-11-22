@@ -31,3 +31,46 @@ def _suno_tasks_in_tmp(monkeypatch, tmp_path):
         return folder
 
     monkeypatch.setattr(task_store, "_default_data_dir", tmp_dir)
+
+
+_PAID_API_KEYS = (
+    "SUNO_API_KEY",
+    "ELEVENLABS_API_KEY",
+    "FAL_KEY",
+    "GOOGLE_API_KEY",
+    "GOOGLE_CLOUD_API_KEY",
+    "BEATOVEN_API_KEY",
+    "JEN_API_KEY",
+    "LOUDLY_API_KEY",
+)
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "network: the test may reach the real network (and spend real money)"
+    )
+
+
+@pytest.fixture(autouse=True)
+def _no_network_no_paid_keys(request, monkeypatch):
+    """Block outgoing network calls and unset paid-API keys, unless ``@pytest.mark.network``.
+
+    A test once reached sunoapi.org and spent a real generation because the dev
+    machine had ``SUNO_API_KEY`` set. Tests that need a key set it themselves with
+    ``monkeypatch.setenv``; tests that really want the network opt in with the marker.
+    """
+    if request.node.get_closest_marker("network"):
+        return
+    for name in _PAID_API_KEYS:
+        monkeypatch.delenv(name, raising=False)
+
+    def _blocked(*args, **kwargs):
+        raise RuntimeError(
+            "network access is blocked in tests; mark the test with @pytest.mark.network to allow it"
+        )
+
+    import socket
+
+    monkeypatch.setattr(socket.socket, "connect", _blocked)
+    monkeypatch.setattr(socket, "create_connection", _blocked)
+    monkeypatch.setattr(socket, "getaddrinfo", _blocked)

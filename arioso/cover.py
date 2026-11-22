@@ -324,7 +324,9 @@ def cover_folder(
             if assess is not None:
                 try:
                     rec["assessment"] = assess(f, [dst / t for t in rec["takes"]])
-                except Exception as e:  # the takes are saved: a failed check never loses them
+                except (
+                    Exception
+                ) as e:  # the takes are saved: a failed check never loses them
                     rec["assessment_error"] = f"{type(e).__name__}: {e}"
 
         except CatalogMatchError as e:  # a policy refusal: final, never retried

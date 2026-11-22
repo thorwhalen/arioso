@@ -59,11 +59,15 @@ def lyric_recall(source_text: str, take_text: str) -> Optional[float]:
     ref, hyp = words(source_text), words(take_text)
     if not ref:
         return None
-    blocks = difflib.SequenceMatcher(None, ref, hyp, autojunk=False).get_matching_blocks()
+    blocks = difflib.SequenceMatcher(
+        None, ref, hyp, autojunk=False
+    ).get_matching_blocks()
     return round(sum(b.size for b in blocks) / len(ref), 3)
 
 
-def _verdict(recall, take_words: int, source_words: int, rank, of: int, *, min_words: int) -> tuple:
+def _verdict(
+    recall, take_words: int, source_words: int, rank, of: int, *, min_words: int
+) -> tuple:
     """``(verdict, why)`` for one take: "cover", "not a cover" or "unclear"."""
     if source_words >= min_words and take_words >= min_words and recall is not None:
         if recall >= LYRIC_COVER:
@@ -74,7 +78,10 @@ def _verdict(recall, take_words: int, source_words: int, rank, of: int, *, min_w
         if rank == 1:
             return "cover", f"its melody is closest to the source's, of {of} songs"
         return "not a cover", f"{rank - 1} of {of - 1} other songs are closer in melody"
-    return "unclear", "no words to compare, and no other songs to rank the melody against"
+    return (
+        "unclear",
+        "no words to compare, and no other songs to rank the melody against",
+    )
 
 
 def cover_closeness(
@@ -139,7 +146,9 @@ def cover_closeness(
             scores = [float(melody(audio, a, DFLT_SR)) for a in other_audio]
             rank = 1 + sum(s > own for s in scores)
         n_take = len(words(take_text))
-        verdict, why = _verdict(recall, n_take, n_source, rank, len(others) + 1, min_words=min_words)
+        verdict, why = _verdict(
+            recall, n_take, n_source, rank, len(others) + 1, min_words=min_words
+        )
         out[take.name] = {
             "lyric_recall": recall,
             "take_words": n_take,

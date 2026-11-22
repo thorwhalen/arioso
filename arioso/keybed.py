@@ -14,6 +14,16 @@ brings the loudest note of the whole keybed to ``peak``, and the notes are mappe
 the keyboard (:mod:`arioso.sampler_export`: an SF2 that browser SoundFont synths load,
 and an SFZ).
 
+Every chunk sent is chromatic (``fill=True``), as the model was trained: keys that are
+not adjacent are rendered inside the chromatic run that spans them (a short run padded to
+a full chunk), and only the asked notes are kept. Measured on real renders (arioso#73,
+"Rhodes Piano, Warm", seed 7): in a non-chromatic sequence (A3, C4, E4, G4, C5) the
+octave below dominated E4, G4 and C5 (+0.7 to +9 dB over the asked pitch); in chromatic
+chunks every note peaked at its asked pitch, the octave below 6 to 16 dB under it; a
+lone ``Target Note`` C4 was ambiguous (+2 dB). Each note's :func:`sub_octave_db` is kept
+in the render's info, and a note where it dominates is warned about. (A periodicity
+tracker such as pyin follows that sub-octave and reads every note an octave low.)
+
 >>> keybed_prompt("Rhodes Piano, Warm", [60, 61])
 'Keybed, Sequence, Timbre Profile, Rhodes Piano, Warm, Dry, Chromatic Chunk, Note Sequence, C4, C#4'
 >>> keybed_prompt("Bass, Wet", [40, 45])
@@ -55,6 +65,10 @@ FX_WORDS = ("reverb", "delay", "distortion", "phaser", "bitcrush")
 SHORTFALL_SECONDS = 0.01
 #: The level of the loudest note after the keybed's one gain (about -1 dBFS).
 DFLT_PEAK = 0.89
+#: The start of a note whose spectrum :func:`sub_octave_db` reads.
+PITCH_CHECK_SECONDS = 0.5
+#: A note whose octave below is louder than its pitch by more than this (dB) is warned about.
+SUB_OCTAVE_WARN_DB = 0.0
 
 
 def note_name(key: int) -> str:
@@ -150,6 +164,54 @@ def chunks(keys, size: int = CHUNK_NOTES) -> list:
     return out
 
 
+def render_plan(keys, size: int = CHUNK_NOTES) -> list:
+    """The chromatic chunks that render ``keys``: their span filled in, padded to ``size``.
+
+    Chunks holding none of ``keys`` are left out, so far-apart keys cost one render each.
+
+    >>> render_plan([57, 60, 64, 67, 72])  # A3..C5: three chromatic chunks
+    [[57, 58, 59, 60, 61, 62], [63, 64, 65, 66, 67], [68, 69, 70, 71, 72]]
+    >>> render_plan([60])  # a lone key sits in a chromatic chunk too
+    [[58, 59, 60, 61, 62, 63]]
+    >>> [(c[0], c[-1]) for c in render_plan([24, 96])]
+    [(24, 29), (92, 96)]
+    """
+    keys = sorted(set(int(k) for k in keys))
+    if not keys:
+        raise ValueError("no keys to render")
+    _check_keys(keys)
+    low, high = keys[0], keys[-1]
+    short = size - (high - low + 1)
+    if short > 0:  # widen to a full chunk, around the keys, inside the model's range
+        low = max(KEY_RANGE[0], low - short // 2)
+        high = min(KEY_RANGE[1], low + size - 1)
+        low = max(KEY_RANGE[0], high - size + 1)
+    asked = set(keys)
+    return [c for c in chunks(range(low, high + 1), size) if asked.intersection(c)]
+
+
+def sub_octave_db(audio, rate: int, key: int, *, seconds: float = PITCH_CHECK_SECONDS) -> float:
+    """How much louder the octave below ``key`` is than ``key`` itself, in dB, in the
+    first ``seconds`` of ``audio`` (energy within a quarter tone of each). Above 0, a
+    listener or a pitch tracker may hear the note an octave low.
+
+    >>> rate = 8000; t = np.arange(rate) / rate
+    >>> f = 440.0 * 2 ** ((60 - 69) / 12)
+    >>> round(sub_octave_db(np.sin(2 * np.pi * f * t) + 0.1 * np.sin(np.pi * f * t), rate, 60))
+    -20
+    """
+    seg = np.asarray(audio, dtype=float)[: max(1, int(seconds * rate))]
+    spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)))) ** 2
+    freqs = np.fft.rfftfreq(len(seg), 1 / rate)
+    f = 440.0 * 2 ** ((key - 69) / 12)
+
+    def band(x):
+        return float(spec[(freqs > x * 2 ** (-1 / 24)) & (freqs < x * 2 ** (1 / 24))].sum())
+
+    tiny = 1e-20
+    return 10 * np.log10((band(f / 2) + tiny) / (band(f) + tiny))
+
+
 def _default_generate(prompt, **kwargs):
     import arioso
 
@@ -177,6 +239,7 @@ def render_keybed(
     gap_seconds: float = GAP_SECONDS,
     peak: Optional[float] = DFLT_PEAK,
     window_seconds: Optional[float] = None,
+    fill: bool = True,
     **generate_kwargs,
 ) -> tuple:
     """Render one note per key; returns ``({key: (audio, rate)}, info)``.
@@ -187,12 +250,18 @@ def render_keybed(
     every chunk. Every chunk is checked against the model's window (``window_seconds``,
     default the platform's) before anything renders. ``peak``: one gain for the whole
     keybed so its loudest note is there (None: leave the level as rendered).
-    ``info`` holds the seed and, per chunk, its keys and the prompt actually sent.
+    ``fill``: render every chunk chromatic (:func:`render_plan`) and keep the asked
+    notes; ``False`` sends the asked keys as they are (non-adjacent keys as a plain
+    note sequence, a lone key as a ``Target Note``), which can come back an octave low.
+    ``info`` holds the seed, per chunk its keys and the prompt actually sent, and per
+    kept key its :func:`sub_octave_db`.
     """
     from arioso._isolated import draw_seed
     from arioso.sampler_export import channels_first, choose_fold, mono
 
-    groups = chunks(keys, chunk)
+    keys = sorted(set(int(k) for k in keys))
+    groups = render_plan(keys, chunk) if fill else chunks(keys, chunk)
+    asked = set(keys)
     window = _window_seconds() if window_seconds is None else window_seconds
 
     def length(group):
@@ -242,17 +311,26 @@ def render_keybed(
                     f"{len(audio) / rate:.2f} s, short of note {note_name(key)}, which "
                     f"ends at {(start + size) / rate:.2f} s"
                 )
+            if key not in asked:  # rendered only to keep the chunk chromatic
+                continue
             k = min(fade, len(note))
             note[len(note) - k :] *= np.linspace(1.0, 0.0, k, dtype=np.float32)
             k = min(fade_in, len(note))
             note[:k] *= np.linspace(0.0, 1.0, k, dtype=np.float32)
             notes[key] = (note, rate)
+    sub = {k: round(sub_octave_db(a, r, k), 1) for k, (a, r) in notes.items()}
+    low = [note_name(k) for k, db in sub.items() if db > SUB_OCTAVE_WARN_DB]
+    if low:
+        warnings.warn(
+            f"keybed: the octave below dominates {low}; they may sound an octave low "
+            f"(sub_octave_db in the render's info)"
+        )
     if peak is not None:
         loudest = max(float(np.abs(a).max()) for a, _ in notes.values())
         if loudest > 0:
             gain = peak / loudest
             notes = {k: (a * gain, r) for k, (a, r) in notes.items()}
-    return notes, {"seed": seed, "fold": fold, "chunks": sent}
+    return notes, {"seed": seed, "fold": fold, "chunks": sent, "sub_octave_db": sub}
 
 
 def keybed_instrument(

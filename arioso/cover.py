@@ -4,14 +4,17 @@
 job needs. Per source file it:
 
 1. skips the song when the folder's manifest already records it as done or refused;
-2. transcribes its lyrics (``transcribe``, default :func:`vocal_lyrics`: the vocal stem
-   from ``denote.separate``, transcribed by ``scribed``), so the cover keeps the words;
-   no words heard means an instrumental cover;
-3. reuses a cover task already submitted for that song (``find_task``; for sunoapi, its
-   ``SunoTasks`` store), so a crash or a re-run never pays twice, or submits one;
-4. waits for it, saves every take as ``<stem> (<platform> N).<ext>`` in ``dst``;
-5. appends one record per song to ``dst/<manifest>`` (JSON lines): done, refused (a
-   :class:`~arioso.base.CatalogMatchError`, final) or error (retried on the next run).
+2. reuses the cover task the manifest recorded for it, when a run stopped between
+   submitting and saving (so a crash or a re-run never pays twice), or else
+3. transcribes its lyrics (``transcribe``, default :func:`vocal_lyrics`: the vocal stem
+   from ``denote.separate``, transcribed by ``scribed``; only for a platform that takes
+   lyrics), so the cover keeps the words; no words heard makes it instrumental; and
+   submits one cover, recording the task id in the manifest before waiting for it;
+4. waits for it and saves every take as ``<stem> (<platform> N).<ext>`` in ``dst``;
+5. records the outcome in the manifest (``dst/covers.jsonl``, JSON lines, the last line
+   of a song wins): ``done``, ``refused`` (a :class:`~arioso.base.CatalogMatchError`,
+   final) or ``error`` (tried again on the next run: by reusing its task once, then by
+   submitting anew).
 
 >>> from arioso.base import AudioResult, Song
 >>> import tempfile, pathlib
@@ -33,6 +36,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections import Counter
 from pathlib import Path
 from typing import Callable, Iterable, Optional, Union
 
@@ -42,14 +46,15 @@ from arioso.base import CatalogMatchError, Song
 AUDIO_EXTENSIONS = (".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg", ".aiff", ".aif")
 #: The manifest's file name, inside the target folder.
 DFLT_MANIFEST = "covers.jsonl"
-#: Outcomes that end a song's job; any other (an error) is tried again on the next run.
+#: Outcomes that end a song's job; ``error`` is tried again on the next run.
 FINAL_OUTCOMES = ("done", "refused")
-#: How much the source shapes the cover (upload-cover's ``audioWeight``), as in #69's run.
+#: How much the source shapes the cover. Higher than ``tools.DFLT_AUDIO_WEIGHT`` (0.5): a
+#: folder cover is meant to keep each song (the #69 run used 0.9).
 DFLT_STRENGTH = 0.9
 #: Waiting for a hosted cover: seconds between status checks, and the most to wait.
 DFLT_POLL_INTERVAL, DFLT_TIMEOUT = 15.0, 1200.0
-#: Task-store statuses that mean the task failed (it is resubmitted, not reused).
-_FAILED_STATUS_WORDS = ("FAIL", "ERROR")
+#: ``transcribe``'s default: :func:`vocal_lyrics` when the platform takes lyrics, else none.
+AUTO = "auto"
 
 
 def vocal_lyrics(path, *, separate=None, transcribe=None, **transcribe_kwargs) -> str:
@@ -57,13 +62,14 @@ def vocal_lyrics(path, *, separate=None, transcribe=None, **transcribe_kwargs) -
 
     One line per transcript segment; ``""`` when no words are heard. ``separate`` and
     ``transcribe`` default to ``denote.separate`` and ``scribed.transcribe`` (both
-    imported only here); ``transcribe_kwargs`` go to the transcriber (``backend``,
-    ``model``, ``language``, ...).
+    imported only here; ``pip install arioso[cover]``); ``transcribe_kwargs`` go to the
+    transcriber (``backend``, ``model``, ``language``, ...).
     """
     import tempfile
 
     import librosa
-    import soundfile as sf
+
+    from arioso._audio import write_wav
 
     if separate is None:
         from denote import separate
@@ -72,44 +78,29 @@ def vocal_lyrics(path, *, separate=None, transcribe=None, **transcribe_kwargs) -
     audio, rate = librosa.load(str(path), sr=None, mono=False)
     stems = separate(audio, sr=rate)
     with tempfile.TemporaryDirectory() as tmp:
-        wav = Path(tmp) / "vocals.wav"
-        sf.write(wav, _frames_last(stems.vocals).T, stems.sr)
+        wav = write_wav(stems.vocals, stems.sr, Path(tmp) / "vocals.wav")
         segments = transcribe(str(wav), **transcribe_kwargs)
         lines = [s.text.strip() for s in segments if s.text.strip()]
     return "\n".join(lines)
 
 
-def _frames_last(audio):
-    """``audio`` as ``(channels, frames)``, from mono or either orientation."""
-    import numpy as np
+def cover_params(
+    path, *, lyrics: Optional[str], style: Optional[str], strength: float
+) -> dict:
+    """The cover call's keyword arguments for one song (unified names).
 
-    audio = np.asarray(audio)
-    if audio.ndim == 1:
-        return audio[None, :]
-    return audio if audio.shape[0] <= audio.shape[1] else audio.T
-
-
-def find_suno_task(title: str, *, platform: str = "sunoapi") -> Optional[str]:
-    """The id of an upload-cover task already submitted for ``title``, not failed.
-
-    Looks in the platform adapter's task store (sunoapi's ``SunoTasks``); ``None`` for
-    a platform that keeps none.
+    ``lyrics=""`` (no words heard) asks for an instrumental; ``None`` sends nothing.
     """
-    from arioso.registry import get_platform
-
-    tasks = getattr(get_platform(platform)["adapter"], "tasks", None)
-    if tasks is None:
-        return None
-    for task_id in tasks:
-        rec = tasks[task_id]
-        status = str(rec.get("status", "")).upper()
-        if (
-            rec.get("operation") == "upload_cover"
-            and rec.get("request_params", {}).get("title") == title
-            and not any(w in status for w in _FAILED_STATUS_WORDS)
-        ):
-            return task_id
-    return None
+    params = dict(
+        audio_input=str(path), audio_input_strength=strength, title=Path(path).stem
+    )
+    if style:
+        params["genre"] = style
+    if lyrics:
+        params["lyrics"] = lyrics
+    elif lyrics == "":
+        params["instrumental"] = True
+    return params
 
 
 def wait_for_songs(
@@ -119,11 +110,13 @@ def wait_for_songs(
     timeout: float = DFLT_TIMEOUT,
     check: Callable = None,
 ) -> list:
-    """``songs`` once all complete: polled with ``check`` (default ``arioso.check_status``).
+    """``songs`` once all complete, polled with ``check`` (default ``arioso.check_status``).
 
-    Songs already complete (a local platform) come back as they are. Raises
-    ``TimeoutError`` past ``timeout``, and ``RuntimeError`` on a song in error.
+    Songs already complete (a local platform) come back at once. Raises ``TimeoutError``
+    past ``timeout``, and ``RuntimeError`` on a song in error.
     """
+    if not songs:
+        raise ValueError("no songs to wait for (the cover call returned none)")
     if check is None:
         from arioso import check_status as check
     start = time.monotonic()
@@ -131,12 +124,13 @@ def wait_for_songs(
         errors = [s for s in songs if s.is_error]
         if errors:
             raise RuntimeError(f"cover failed: {errors[0].error_message}")
-        if songs and all(s.status == "complete" for s in songs):
+        if all(s.status == "complete" for s in songs):
             return songs
         if time.monotonic() - start > timeout:
             raise TimeoutError(f"cover {songs[0].id!r} not complete after {timeout:g} s")
-        time.sleep(poll_interval)
         songs = check(songs[0])
+        if not all(s.status == "complete" for s in songs):
+            time.sleep(poll_interval)
 
 
 def save_takes(songs: list, folder, stem: str, *, platform: str) -> list:
@@ -144,7 +138,7 @@ def save_takes(songs: list, folder, stem: str, *, platform: str) -> list:
     from arioso._audio import save_song
 
     base = Path(folder)
-    # a dummy suffix: save_song puts the take's own format's suffix in its place
+    # a placeholder suffix: save_song puts the take's own format's suffix in its place
     return [
         save_song(song, base / f"{stem} ({platform} {i}).audio").name
         for i, song in enumerate(songs, 1)
@@ -152,12 +146,51 @@ def save_takes(songs: list, folder, stem: str, *, platform: str) -> list:
 
 
 def read_manifest(path) -> dict:
-    """The last record of each song in a manifest (JSON lines), by source file name."""
+    """The last record of each song in a manifest (JSON lines), by source file name.
+
+    A line that does not parse (a run killed mid-write) is skipped.
+    """
     path = Path(path)
     if not path.is_file():
         return {}
-    records = (json.loads(l) for l in path.read_text().splitlines() if l.strip())
-    return {r["source"]: r for r in records}
+    last = {}
+    for line in path.read_text().splitlines():
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(rec, dict) and "source" in rec:
+            last[rec["source"]] = rec
+    return last
+
+
+def _reusable_task(rec: Optional[dict]) -> Optional[str]:
+    """The task a song's last record says to wait for again, if any.
+
+    A ``submitted`` record (the run stopped while waiting) and an ``error`` after a fresh
+    submission are reused; an ``error`` that already came from a reused task is not (its
+    task is failed or expired), so the song is submitted anew.
+    """
+    if not rec or not rec.get("task_id"):
+        return None
+    if rec["outcome"] == "submitted":
+        return rec["task_id"]
+    if rec["outcome"] == "error" and not rec.get("reused_task"):
+        return rec["task_id"]
+    return None
+
+
+def _platform_params(platform: str) -> Optional[set]:
+    """The parameters ``platform`` takes, or ``None`` for one arioso does not know."""
+    from arioso.registry import get_config
+
+    try:
+        config = get_config(platform)
+    except KeyError:
+        return None
+    return set(config.get("supported_affordances", ())) | set(
+        config.get("adapter_params", ())
+    )
 
 
 def cover_folder(
@@ -166,11 +199,11 @@ def cover_folder(
     *,
     platform: str = "sunoapi",
     audio_input_strength: float = DFLT_STRENGTH,
-    transcribe: Optional[Callable] = vocal_lyrics,
+    transcribe: Union[Callable, str, None] = AUTO,
     style: Union[str, Callable, None] = None,
     only: Optional[Iterable[str]] = None,
+    params: Callable = cover_params,
     generate: Callable = None,
-    find_task: Optional[Callable] = None,
     wait: Callable = wait_for_songs,
     manifest: str = DFLT_MANIFEST,
     extensions: Iterable[str] = AUDIO_EXTENSIONS,
@@ -179,104 +212,102 @@ def cover_folder(
     """Cover every audio file in ``src`` with ``platform``, takes saved in ``dst``.
 
     Returns the records written this run (one per song attempted; songs the manifest
-    already holds as done or refused are skipped). See the module docstring for the
-    steps.
+    already holds as done or refused are skipped). See the module docstring.
 
     Args:
         src: The folder of source songs (files with one of ``extensions``).
         dst: The folder for the takes and the manifest (created if missing).
         platform: An arioso platform that takes ``audio_input``.
         audio_input_strength: How much the source shapes the cover, 0-1.
-        transcribe: ``(path) -> lyrics``; ``""`` makes the cover instrumental. ``None``
-            sends no lyrics (the platform hears the source as it is).
+        transcribe: ``(path) -> lyrics``; ``""`` makes the cover instrumental, ``None``
+            sends no lyrics. The default uses :func:`vocal_lyrics` when ``platform``
+            takes lyrics, and none otherwise.
         style: The style for every song, or ``(path) -> style``; ``None`` sends none.
         only: Source stems to cover (default every file).
+        params: ``(path, *, lyrics, style, strength) -> kwargs`` for the cover call
+            (default :func:`cover_params`); parameters ``platform`` does not take are
+            dropped.
         generate: ``(prompt, **kwargs) -> list[Song]``; default ``arioso.generate_many``.
-        find_task: ``(title) -> task id or None``, a cover already submitted for the
-            song; default :func:`find_suno_task` for sunoapi, none otherwise.
-        wait: ``(songs) -> songs``, all complete.
+        wait: ``(songs) -> songs``, all complete (default :func:`wait_for_songs`).
         manifest: The manifest's name in ``dst``.
         **generate_kwargs: Passed to every cover call (``model``, ``vocal_gender``, ...).
     """
     src, dst = Path(src), Path(dst)
-    dst.mkdir(parents=True, exist_ok=True)
-    if generate is None:
-        from functools import partial
-
-        import arioso
-
-        generate = partial(arioso.generate_many, platform=platform)
-    if find_task is None and platform == "sunoapi":
-        find_task = find_suno_task
     exts = {e.lower() for e in extensions}
-    only = set(only) if only is not None else None
-    ledger = dst / manifest
-    done = {
-        k for k, r in read_manifest(ledger).items() if r["outcome"] in FINAL_OUTCOMES
-    }
     files = sorted(
         f
         for f in src.iterdir()
         if f.suffix.lower() in exts and not f.name.startswith(".")
     )
-    records = []
-    for f in files:
-        if f.name in done or (only is not None and f.stem not in only):
-            continue
-        rec = {"source": f.name, "platform": platform, "strength": audio_input_strength}
-        try:
-            rec.update(
-                _cover_one(
-                    f,
-                    dst,
-                    platform=platform,
-                    strength=audio_input_strength,
-                    transcribe=transcribe,
-                    style=style(f) if callable(style) else style,
-                    generate=generate,
-                    find_task=find_task,
-                    wait=wait,
-                    **generate_kwargs,
-                )
-            )
-        except CatalogMatchError as e:  # a policy refusal: final, never retried
-            rec.update(outcome="refused", error=str(e), task_id=e.task_id)
-        except Exception as e:  # keep going; the next run retries (no double pay)
-            rec.update(outcome="error", error=f"{type(e).__name__}: {e}")
+    twins = [s for s, n in Counter(f.stem for f in files).items() if n > 1]
+    if twins:  # their takes would share names
+        raise ValueError(f"cover_folder: several files share the stems {twins} in {src}")
+    dst.mkdir(parents=True, exist_ok=True)
+    takes_params = _platform_params(platform)
+    if transcribe == AUTO:
+        takes_lyrics = takes_params is None or "lyrics" in takes_params
+        transcribe = vocal_lyrics if takes_lyrics else None
+    if generate is None:
+        from functools import partial
+
+        from arioso import generate_many
+
+        generate = partial(generate_many, platform=platform)
+    only = set(only) if only is not None else None
+    ledger = dst / manifest
+
+    def write(rec):
         with ledger.open("a") as fp:
             fp.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+    last = read_manifest(ledger)
+    records = []
+    for f in files:
+        prev = last.get(f.name)
+        if (prev and prev["outcome"] in FINAL_OUTCOMES) or (
+            only is not None and f.stem not in only
+        ):
+            continue
+        rec = {"source": f.name, "platform": platform}
+        task_id = _reusable_task(prev)
+        try:
+            if task_id:
+                rec.update(
+                    {k: prev.get(k) for k in ("strength", "style", "lyrics", "instrumental")}
+                )
+                rec.update(task_id=task_id, reused_task=True)
+                songs = [Song(id=task_id, platform=platform, status="pending")]
+            else:
+                lyrics = transcribe(f) if transcribe is not None else None
+                song_style = style(f) if callable(style) else style
+                kwargs = params(
+                    f, lyrics=lyrics, style=song_style, strength=audio_input_strength
+                )
+                if takes_params is not None:
+                    kwargs = {
+                        k: v
+                        for k, v in kwargs.items()
+                        if k in takes_params or k == "audio_input"
+                    }
+                rec.update(
+                    strength=audio_input_strength,
+                    style=song_style,
+                    lyrics=lyrics,
+                    instrumental=bool(kwargs.get("instrumental")),
+                    reused_task=False,
+                )
+                songs = generate(song_style or "", **kwargs, **generate_kwargs)
+                task_id = songs[0].id if songs else None
+                rec["task_id"] = task_id
+                write({**rec, "outcome": "submitted"})  # before the wait: never pay twice
+            rec.update(
+                outcome="done", takes=save_takes(wait(songs), dst, f.stem, platform=platform)
+            )
+        except CatalogMatchError as e:  # a policy refusal: final, never retried
+            rec.update(outcome="refused", error=str(e))
+            rec["task_id"] = rec.get("task_id") or e.task_id
+        except Exception as e:  # keep going; the next run retries (see _reusable_task)
+            rec.update(outcome="error", error=f"{type(e).__name__}: {e}")
+        write(rec)
         records.append(rec)
     return records
-
-
-def _cover_one(
-    path, dst, *, platform, strength, transcribe, style, generate, find_task, wait, **kw
-) -> dict:
-    title = path.stem
-    lyrics = transcribe(path) if transcribe is not None else None
-    instrumental = lyrics == ""
-    task_id = find_task(title) if find_task is not None else None
-    reused = task_id is not None
-    if reused:
-        songs = [Song(id=task_id, platform=platform, status="pending")]
-    else:
-        params = dict(audio_input=str(path), audio_input_strength=strength, title=title)
-        if style:
-            params["genre"] = style
-        if lyrics:
-            params["lyrics"] = lyrics
-        if instrumental:
-            params["instrumental"] = True
-        songs = generate(style or "", **params, **kw)
-        task_id = songs[0].id if songs else None
-    songs = wait(songs)
-    takes = save_takes(songs, dst, title, platform=platform)
-    return {
-        "outcome": "done",
-        "task_id": task_id,
-        "reused_task": reused,
-        "instrumental": instrumental,
-        "style": style,
-        "lyrics": lyrics,
-        "takes": takes,
-    }

@@ -1,12 +1,10 @@
 """cover_folder: one cover per song, takes saved, refusals recorded, resumable, no double pay."""
 
-import json
-
 import pytest
 
 import arioso.cover as cover
 from arioso.base import AudioResult, CatalogMatchError, Song
-from arioso.cover import cover_folder, find_suno_task, read_manifest, wait_for_songs
+from arioso.cover import cover_folder, read_manifest, wait_for_songs
 
 
 def _take(i, platform="fake"):
@@ -26,9 +24,10 @@ class FakeCover:
 
     def __call__(self, prompt, **kwargs):
         self.calls.append({"prompt": prompt, **kwargs})
-        if kwargs["title"] in self.refuse:
+        title = kwargs["audio_input"].rsplit("/", 1)[-1].rsplit(".", 1)[0]
+        if title in self.refuse:
             raise CatalogMatchError("matches an existing recording", task_id="t-r")
-        if kwargs["title"] in self.fail:
+        if title in self.fail:
             raise ConnectionError("network down")
         return [_take(1), _take(2)]
 
@@ -75,27 +74,43 @@ def test_a_refusal_is_final_and_an_error_is_retried(songs, tmp_path):
     assert len(fake.calls) == 4  # one more call, for the song that errored
 
 
-def test_a_task_already_submitted_is_reused_not_paid_again(songs, tmp_path):
-    fake, waited = FakeCover(), []
+def test_a_run_that_stopped_while_waiting_reuses_its_task(songs, tmp_path):
+    dst, fake = tmp_path / "out", FakeCover()
+
+    def crash(pending):
+        raise KeyboardInterrupt  # the process dies after submitting, before saving
+
+    with pytest.raises(KeyboardInterrupt):
+        cover_folder(songs, dst, platform="fake", generate=fake, transcribe=None, wait=crash)
+    assert read_manifest(dst / "covers.jsonl")["A song.wav"]["outcome"] == "submitted"
+
+    waited = []
 
     def wait(pending):
         waited.append(pending[0].id)
         return [_take(1), _take(2)]
 
     records = cover_folder(
-        songs,
-        tmp_path / "out",
-        platform="fake",
-        generate=fake,
-        transcribe=None,
-        find_task=lambda title: "old-task" if title == "A song" else None,
-        wait=wait,
-        only=["A song", "C hum"],
+        songs, dst, platform="fake", generate=fake, transcribe=None, wait=wait
     )
-    assert [r["reused_task"] for r in records] == [True, False]
-    assert [c["title"] for c in fake.calls] == ["C hum"]
-    assert waited[0] == "old-task"
-    assert "lyrics" not in fake.calls[0] and "instrumental" not in fake.calls[0]
+    assert [r["reused_task"] for r in records] == [True, False, False]
+    assert waited[0] == "take1"  # the task the first run submitted
+    assert len(fake.calls) == 3  # A once, then B and C: never A again
+
+
+def test_an_error_reuses_its_task_once_then_submits_anew(songs, tmp_path):
+    dst, fake = tmp_path / "out", FakeCover()
+
+    def expired(pending):
+        raise RuntimeError("audio expired")
+
+    run = dict(platform="fake", generate=fake, transcribe=None, only=["A song"])
+    assert cover_folder(songs, dst, wait=expired, **run)[0]["outcome"] == "error"
+    second = cover_folder(songs, dst, wait=expired, **run)[0]
+    assert second["reused_task"] and len(fake.calls) == 1
+    third = cover_folder(songs, dst, wait=lambda s: s, **run)[0]
+    assert third["outcome"] == "done" and not third["reused_task"]
+    assert len(fake.calls) == 2
 
 
 def test_style_is_sent_as_genre_and_as_the_prompt(songs, tmp_path):
@@ -115,23 +130,45 @@ def test_style_is_sent_as_genre_and_as_the_prompt(songs, tmp_path):
     assert call["model"] == "V5"
 
 
-def test_find_suno_task_skips_failed_and_other_operations(monkeypatch):
-    tasks = {
-        "t1": {"operation": "generate", "request_params": {"title": "A"}},
-        "t2": {"operation": "upload_cover", "status": "CREATE_TASK_FAILED", "request_params": {"title": "A"}},
-        "t3": {"operation": "upload_cover", "status": "SUCCESS", "request_params": {"title": "A"}},
-    }
-
-    class Adapter:
-        pass
-
-    adapter = Adapter()
-    adapter.tasks = tasks
-    monkeypatch.setattr(
-        "arioso.registry.get_platform", lambda name: {"adapter": adapter}
+def test_parameters_the_platform_does_not_take_are_dropped(songs, tmp_path):
+    fake = FakeCover()
+    cover_folder(
+        songs,
+        tmp_path / "out",
+        platform="musicgen",
+        generate=fake,
+        transcribe=lambda p: "words",
+        only=["A song"],
     )
-    assert find_suno_task("A") == "t3"
-    assert find_suno_task("B") is None
+    (call,) = fake.calls
+    assert "lyrics" not in call and "title" not in call
+    assert call["audio_input"].endswith("A song.wav")
+
+
+def test_lyrics_are_transcribed_only_for_a_platform_that_takes_them(
+    songs, tmp_path, monkeypatch
+):
+    heard = []
+    monkeypatch.setattr(cover, "vocal_lyrics", lambda p: heard.append(p.stem) or "la")
+    fake = FakeCover()
+    run = dict(generate=fake, only=["A song"], transcribe=cover.AUTO)
+    cover_folder(songs, tmp_path / "m", platform="musicgen", **run)
+    assert heard == []
+    cover_folder(songs, tmp_path / "s", platform="sunoapi", **run)
+    assert heard == ["A song"] and fake.calls[-1]["lyrics"] == "la"
+
+
+def test_two_files_with_one_stem_are_refused(tmp_path):
+    (tmp_path / "Song.wav").write_bytes(b"x")
+    (tmp_path / "Song.mp3").write_bytes(b"x")
+    with pytest.raises(ValueError, match="share the stems"):
+        cover_folder(tmp_path, tmp_path / "out", platform="fake", generate=FakeCover())
+
+
+def test_a_torn_manifest_line_is_skipped(tmp_path):
+    path = tmp_path / "covers.jsonl"
+    path.write_text('{"source": "a.wav", "outcome": "done"}\n{"source": "b.wa')
+    assert list(read_manifest(path)) == ["a.wav"]
 
 
 def test_wait_polls_until_complete_and_raises_on_error_or_timeout():
@@ -145,6 +182,8 @@ def test_wait_polls_until_complete_and_raises_on_error_or_timeout():
         wait_for_songs(failed, poll_interval=0, check=lambda s: failed)
     with pytest.raises(TimeoutError):
         wait_for_songs(pending, poll_interval=0, timeout=0, check=lambda s: pending)
+    with pytest.raises(ValueError, match="returned none"):
+        wait_for_songs([])
 
 
 def test_vocal_lyrics_transcribes_the_vocal_stem(tmp_path):
@@ -171,6 +210,23 @@ def test_vocal_lyrics_transcribes_the_vocal_stem(tmp_path):
         seen["kw"] = kw
         return [Segment(" la la "), Segment("  "), Segment("hush")]
 
-    text = cover.vocal_lyrics(path, separate=separate, transcribe=transcribe, language="en")
+    text = cover.vocal_lyrics(
+        path, separate=separate, transcribe=transcribe, language="en"
+    )
     assert text == "la la\nhush"
-    assert seen == {"shape": (2, 8000), "sr": 8000, "wav": (8000, 2), "kw": {"language": "en"}}
+    assert seen == {
+        "shape": (2, 8000),
+        "sr": 8000,
+        "wav": (8000, 2),
+        "kw": {"language": "en"},
+    }
+
+
+def test_a_catalog_refusal_at_submit_is_a_catalog_match_error():
+    from arioso.platforms.sunoapi.adapter import _check_api_error
+
+    with pytest.raises(CatalogMatchError):
+        _check_api_error({"code": 413, "msg": "matches an existing recording in our catalog"})
+    with pytest.raises(RuntimeError) as e:
+        _check_api_error({"code": 500, "msg": "boom"})
+    assert not isinstance(e.value, CatalogMatchError)

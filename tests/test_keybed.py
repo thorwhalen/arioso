@@ -472,6 +472,54 @@ def test_a_note_whose_octave_below_dominates_is_warned_about():
     assert info["sub_octave_db"][60] > 20
 
 
+def _octave_low_in(low_keys):
+    """A fake model rendering ``low_keys`` an octave low (as "Grand Piano, Warm" does) and the rest on pitch."""
+
+    def generate(prompt, *, duration, seed):
+        names = prompt.split("Note Sequence, ")[1].split(", ")
+        by_name = {note_name(k): k for k in range(128)}
+        audio = np.zeros(int(round(duration * RATE)), dtype=np.float32)
+        t = np.arange(int(NOTE_SECONDS * RATE)) / RATE
+        for i, name in enumerate(names):
+            key = by_name[name]
+            start = int(round(i * (NOTE_SECONDS + GAP_SECONDS) * RATE))
+            sounding = key - 12 if key in low_keys else key
+            audio[start : start + len(t)] = 0.5 * np.sin(2 * np.pi * _freq(sounding) * t)
+        return Song(audio=AudioResult(audio_array=audio, sample_rate=RATE))
+
+    return generate
+
+
+def test_octave_low_notes_are_left_out_and_covered_by_their_on_pitch_neighbours(tmp_path):
+    low = set(range(59, 71))  # B3..A#4, as measured on "Grand Piano, Warm" (arioso#83)
+    keys = range(52, 77)
+    with pytest.warns(UserWarning, match="covered by their on-pitch neighbours"):
+        notes, info = render_keybed("Grand Piano, Warm", keys, generate=_octave_low_in(low), seed=7)
+    assert set(info["octave_low"]) == low
+    assert set(info["covered"]) == low and not low & set(notes)
+    assert all(abs(k - g) <= 6 and g in notes for k, g in info["covered"].items())
+    ranges = key_ranges(notes)  # what the sampler will play: every key has an on-pitch sample at most 6 away
+    for key in keys:
+        root = next(r for r, (lo, hi) in ranges.items() if lo <= key <= hi)
+        assert abs(key - root) <= 6
+        assert abs(_pitch(notes[root][0], RATE) - _freq(root)) < 3
+    paths = keybed_instrument("Grand Piano, Warm", tmp_path, keys, generate=_octave_low_in(low), seed=7)
+    meta = json.loads(paths["metadata"].read_text())
+    assert {int(k): v for k, v in meta["covered"].items()} == info["covered"]
+
+
+def test_octave_low_notes_are_kept_when_asked_or_when_nothing_is_near_enough():
+    low = {60}
+    with pytest.warns(UserWarning, match="octave below dominates"):
+        notes, info = render_keybed("Pad", [60, 72], generate=_octave_low_in(low), seed=1, octave_low="keep")
+    assert 60 in notes and info["covered"] == {}
+    with pytest.warns(UserWarning, match="octave below dominates"):  # C5 is 12 semitones away: not covered
+        notes, info = render_keybed("Pad", [60, 72], generate=_octave_low_in(low), seed=1, fill=False)
+    assert 60 in notes and info["covered"] == {} and info["octave_low"] == [60]
+    with pytest.raises(ValueError, match="octave_low"):
+        render_keybed("Pad", [60], generate=_octave_low_in(low), seed=1, octave_low="shift")
+
+
 def _keybed_weights():
     from arioso.platforms.foundation_1.adapter import cached_weights
 

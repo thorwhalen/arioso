@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=dea2dbc4"></script>
+    <script src="_static/documentation_options.js?v=7ada5fdd"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.62" />
+  <meta name="docsearch:version" content="0.0.63" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -338,8 +338,7 @@
 <section id="arioso">
 <h1>arioso<a class="headerlink" href="#arioso" title="Link to this heading">#</a></h1>
 <p>Unified Python facade for AI music generation.</p>
-<p>One interface, many backends. Arioso wraps 16 AI music generation platforms —
-from local open-source models to commercial REST APIs — behind a single <code class="docutils literal notranslate"><span class="pre">generate()</span></code> call.</p>
+<p>One interface, many backends. Arioso wraps 16 AI music generation platforms — from local open-source models to commercial REST APIs — behind a single <code class="docutils literal notranslate"><span class="pre">generate()</span></code> call.</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">arioso</span>
@@ -348,6 +347,7 @@ from local open-source models to commercial REST APIs — behind a single <code 
 </section>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># Generate music (defaults to MusicGen, runs locally)</span>
@@ -388,9 +388,8 @@ from local open-source models to commercial REST APIs — behind a single <code 
 </section>
 <section id="enhance-existing-audio-audio-to-audio">
 <h2>Enhance existing audio (audio-to-audio)<a class="headerlink" href="#enhance-existing-audio-audio-to-audio" title="Link to this heading">#</a></h2>
-<p>Beyond text-to-music, arioso can transform audio you already have – e.g. turn a
-plain synthesized/”MIDI” render into something richer, or re-generate music that
-follows an input melody. This is the <code class="docutils literal notranslate"><span class="pre">enhance()</span></code> entry point:</p>
+<p>Beyond text-to-music, arioso can transform audio you already have – e.g. turn a plain synthesized/”MIDI” render into something richer, or re-generate music that follows an input melody. This is the <code class="docutils literal notranslate"><span class="pre">enhance()</span></code> entry point:</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="n">rendered</span> <span class="o">=</span> <span class="p">(</span>
@@ -418,6 +417,7 @@ follows an input melody. This is the <code class="docutils literal notranslate">
 </pre></div>
 </div>
 <p>To <em>extend</em> a recording rather than transform it, pass it as <code class="docutils literal notranslate"><span class="pre">continue_from</span></code> to <code class="docutils literal notranslate"><span class="pre">musicgen</span></code>. The last <code class="docutils literal notranslate"><span class="pre">prompt_seconds</span></code> (default 10) of the audio prompt the model, which writes <code class="docutils literal notranslate"><span class="pre">extend_seconds</span></code> (default <code class="docutils literal notranslate"><span class="pre">duration</span></code>) of what comes next, chained over <code class="docutils literal notranslate"><span class="pre">rounds</span></code> calls. The result is the original followed by the continuation; the continuation alone is in <code class="docutils literal notranslate"><span class="pre">song.metadata[&quot;continuation&quot;]</span></code>. It runs locally, so it also extends audio that a hosted extend route refuses (Suno’s <code class="docutils literal notranslate"><span class="pre">upload_extend</span></code> rejects uploads that match a catalogued composition).</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">longer</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="s2">"warm piano trio"</span><span class="p">,</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span>
@@ -429,18 +429,12 @@ follows an input melody. This is the <code class="docutils literal notranslate">
 <span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">enhance(audio,</span> <span class="pre">prompt='',</span> <span class="pre">*,</span> <span class="pre">platform='stable_audio',</span> <span class="pre">strength=None,</span> <span class="pre">as_='auto')</span></code>
-routes your audio into the platform’s audio-conditioning affordance
-(<code class="docutils literal notranslate"><span class="pre">audio_input</span></code>, <code class="docutils literal notranslate"><span class="pre">melody</span></code>, or <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) and generates. Input audio is
-accepted in any form a <code class="docutils literal notranslate"><span class="pre">Song</span></code>/<code class="docutils literal notranslate"><span class="pre">AudioResult</span></code>/<code class="docutils literal notranslate"><span class="pre">bytes</span></code>/path/<code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code>/
-numpy-waveform can take (normalized internally). Note that <code class="docutils literal notranslate"><span class="pre">stable_audio</span></code> via
-diffusers uses the input as an initial waveform (continuation/init) and has no
-<code class="docutils literal notranslate"><span class="pre">strength</span></code> knob (a value passed there is ignored with a warning); for a
-strength-controlled transform use <code class="docutils literal notranslate"><span class="pre">stable_audio_25</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">enhance(audio,</span> <span class="pre">prompt='',</span> <span class="pre">*,</span> <span class="pre">platform='stable_audio',</span> <span class="pre">strength=None,</span> <span class="pre">as_='auto')</span></code> routes your audio into the platform’s audio-conditioning affordance (<code class="docutils literal notranslate"><span class="pre">audio_input</span></code>, <code class="docutils literal notranslate"><span class="pre">melody</span></code>, or <code class="docutils literal notranslate"><span class="pre">reference_audio</span></code>) and generates. Input audio is accepted in any form a <code class="docutils literal notranslate"><span class="pre">Song</span></code>/<code class="docutils literal notranslate"><span class="pre">AudioResult</span></code>/<code class="docutils literal notranslate"><span class="pre">bytes</span></code>/path/<code class="docutils literal notranslate"><span class="pre">(array,</span> <span class="pre">sample_rate)</span></code>/ numpy-waveform can take (normalized internally). Note that <code class="docutils literal notranslate"><span class="pre">stable_audio</span></code> via diffusers uses the input as an initial waveform (continuation/init) and has no <code class="docutils literal notranslate"><span class="pre">strength</span></code> knob (a value passed there is ignored with a warning); for a strength-controlled transform use <code class="docutils literal notranslate"><span class="pre">stable_audio_25</span></code>.</p>
 </section>
 <section id="seeds-a-melody-over-a-drone">
 <h2>Seeds: a melody over a drone<a class="headerlink" href="#seeds-a-melody-over-a-drone" title="Link to this heading">#</a></h2>
 <p>To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source’s harmony static, so a source with no harmony gives takes that hold the drone. <code class="docutils literal notranslate"><span class="pre">arioso.seeds</span></code> builds that source from a recording or a score (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'arioso[seeds]'</span></code>; separating a voice from a mix goes through <code class="docutils literal notranslate"><span class="pre">denote</span></code>, which also needs <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>).</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">arioso.seeds</span><span class="w"> </span><span class="kn">import</span> <span class="n">melody_contour</span><span class="p">,</span> <span class="n">melody_over_drone</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">drone_report</span><span class="p">,</span> <span class="n">melody_match</span>
 
@@ -572,6 +566,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </tbody>
 </table>
 </div>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># See what's available</span>
 <span class="n">arioso</span><span class="o">.</span><span class="n">list_platforms</span><span class="p">()</span>
 <span class="c1"># ['beatoven', 'elevenlabs', 'harmonai', 'jen', 'loudly', 'lyria2', ...]</span>
@@ -597,6 +592,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 <li><p><strong>transformers</strong> otherwise. On Apple Silicon the text checkpoints run on the CPU unless <code class="docutils literal notranslate"><span class="pre">ARIOSO_TORCH_DEVICE=mps</span></code>: on MPS they were slower than the CPU and grew GPU memory with every step. The melody checkpoint keeps MPS.</p></li>
 </ul>
 <p>Melody-following and continuation always use audiocraft or transformers. <code class="docutils literal notranslate"><span class="pre">ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers</span></code> forces one (<code class="docutils literal notranslate"><span class="pre">mlx</span></code> for text takes only).</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="s2">"chill lofi beats"</span><span class="p">,</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span>
@@ -611,6 +607,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 <section id="local-models-in-their-own-environments-stable-audio-3-magenta-realtime-2-ace-step-1-5">
 <span id="local-models-in-their-own-environments-stable-audio-3-magenta-realtime-2-ace-step-15"></span><h3>Local models in their own environments (Stable Audio 3, Magenta RealTime 2, ACE-Step 1.5)<a class="headerlink" href="#local-models-in-their-own-environments-stable-audio-3-magenta-realtime-2-ace-step-1-5" title="Link to this heading">#</a></h3>
 <p>Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises <code class="docutils literal notranslate"><span class="pre">RuntimeNotInstalled</span></code> with those commands. Runtimes live under <code class="docutils literal notranslate"><span class="pre">~/.local/share/arioso/runtimes/&lt;name&gt;</span></code> unless <code class="docutils literal notranslate"><span class="pre">$ARIOSO_RUNTIMES_DIR</span></code> or the platform’s own variable (<code class="docutils literal notranslate"><span class="pre">$ARIOSO_SA3_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MAGENTA_RT_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_ACE_STEP_DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">$ARIOSO_MLX_EXAMPLES_DIR</span></code> for MusicGen on MLX) points elsewhere. Magenta RealTime, ACE-Step and MusicGen on MLX keep one worker process alive, so the model loads once per session.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># Stable Audio 3 (Stability's MLX build, Apple Silicon): model="sm-music" (default), "sm-sfx" or "medium"</span>
@@ -667,6 +664,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 <h3>Foundation-1 (local loops and one-shots, stable-audio-tools)<a class="headerlink" href="#foundation-1-local-loops-and-one-shots-stable-audio-tools" title="Link to this heading">#</a></h3>
 <p><a class="reference external" href="https://huggingface.co/RoyalCities/Foundation-1">Foundation-1</a> is a Stable Audio Open 1.0 fine-tune for instrument loops and one-shots, prompted with tags: instrument family and sub-family, timbre, notation and FX, then bars, tempo and key (<code class="docutils literal notranslate"><span class="pre">&quot;Synth</span> <span class="pre">Lead,</span> <span class="pre">Warm,</span> <span class="pre">Arp,</span> <span class="pre">Medium</span> <span class="pre">Reverb,</span> <span class="pre">8</span> <span class="pre">Bars,</span> <span class="pre">140</span> <span class="pre">BPM,</span> <span class="pre">E</span> <span class="pre">minor&quot;</span></code>; the tag list is in the model card’s <code class="docutils literal notranslate"><span class="pre">Master_Tag_Reference.md</span></code>). The prompt is passed through; <code class="docutils literal notranslate"><span class="pre">bpm</span></code> and <code class="docutils literal notranslate"><span class="pre">key</span></code> are appended as those tags. With a tempo the clip is exactly <code class="docutils literal notranslate"><span class="pre">bars</span></code> bars of 4/4 (<code class="docutils literal notranslate"><span class="pre">bars=4</span></code> or <code class="docutils literal notranslate"><span class="pre">8</span></code>, else the count nearest to <code class="docutils literal notranslate"><span class="pre">duration</span></code>); without one, <code class="docutils literal notranslate"><span class="pre">duration</span></code> is the clip length (at most 20 s). Tags already in the prompt are read (a short key such as <code class="docutils literal notranslate"><span class="pre">Am</span></code> is spelt out; a contradiction with the arguments is an error), and missing ones go in the card’s order. <code class="docutils literal notranslate"><span class="pre">note=&quot;C3&quot;</span></code> makes a one-shot at that pitch (<code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">Note,</span> <span class="pre">C3</span></code> appended, 3 s by default). Three checkpoints share one model: <code class="docutils literal notranslate"><span class="pre">model=&quot;foundation-1&quot;</span></code> (loops, the default), <code class="docutils literal notranslate"><span class="pre">&quot;1.2-samples&quot;</span></code> (loops and one-shots) and <code class="docutils literal notranslate"><span class="pre">&quot;1.2-keybeds&quot;</span></code> (pitch-consistent one-shots; with <code class="docutils literal notranslate"><span class="pre">note=</span></code> the prompt takes that checkpoint’s single-note form, <code class="docutils literal notranslate"><span class="pre">Keybed,</span> <span class="pre">Timbre</span> <span class="pre">Profile,</span> <span class="pre">...,</span> <span class="pre">Target</span> <span class="pre">Note,</span> <span class="pre">C3</span></code>).</p>
 <p>stable-audio-tools pins its own torch and Python 3.10, so arioso builds an environment for it with <code class="docutils literal notranslate"><span class="pre">uv</span></code> on first use (once, under <code class="docutils literal notranslate"><span class="pre">~/.local/share/arioso/envs/foundation-1</span></code>, or <code class="docutils literal notranslate"><span class="pre">$ARIOSO_ENVS_DIR</span></code>; <code class="docutils literal notranslate"><span class="pre">$ARIOSO_FOUNDATION_1_ENV</span></code> names an existing one instead) from pinned requirements resolved with <code class="docutils literal notranslate"><span class="pre">--exclude-newer</span></code>, and runs the model in one worker process there. Each checkpoint (2.4 GB) and the T5-base text encoder download once to the Hugging Face cache, at pinned revisions, and are read from it without network calls afterwards. On a Mac it needs Apple Silicon (torch 2.7 has no Intel macOS wheels). It runs on CUDA, Apple MPS or the CPU (<code class="docutils literal notranslate"><span class="pre">device=</span></code> to choose). On MPS it samples with plain classifier-free guidance, as Stable Audio Open does: stable-audio-tools’ default adaptive projected guidance computes in float64, which MPS does not support, so it is turned off, and <code class="docutils literal notranslate"><span class="pre">PYTORCH_ENABLE_MPS_FALLBACK=1</span></code> lets any operator MPS lacks run on the CPU.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arioso</span>
 
 <span class="c1"># A 4-bar loop at 100 BPM in A minor (9.6 s)</span>
@@ -697,6 +695,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 <section id="elevenlabs">
 <h3>ElevenLabs<a class="headerlink" href="#elevenlabs" title="Link to this heading">#</a></h3>
 <p>Needs <code class="docutils literal notranslate"><span class="pre">ELEVENLABS_API_KEY</span></code> environment variable.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="s2">"dramatic film score"</span><span class="p">,</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"elevenlabs"</span><span class="p">,</span>
@@ -718,6 +717,7 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 <section id="suno-via-sunoapi-org">
 <span id="suno-via-sunoapiorg"></span><h3>Suno (via sunoapi.org)<a class="headerlink" href="#suno-via-sunoapi-org" title="Link to this heading">#</a></h3>
 <p>Needs <code class="docutils literal notranslate"><span class="pre">SUNO_API_KEY</span></code> environment variable.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span>
     <span class="s2">"summer reggae vibes"</span><span class="p">,</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">,</span>
@@ -733,8 +733,8 @@ strength-controlled transform use <code class="docutils literal notranslate"><sp
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<p>All platforms share a common vocabulary of parameter names. Use any that
-the platform supports — unsupported ones are warned about and ignored.</p>
+<p>All platforms share a common vocabulary of parameter names. Use any that the platform supports — unsupported ones are warned about and ignored.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="s2">"ambient soundscape"</span><span class="p">,</span>  <span class="c1"># prompt (required)</span>
     <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">,</span>
@@ -826,12 +826,11 @@ the platform supports — unsupported ones are warned about and ignored.</p>
 </tbody>
 </table>
 </div>
-<p>Each platform maps these to its native parameter names automatically.
-For example, <code class="docutils literal notranslate"><span class="pre">instrumental=True</span></code> becomes <code class="docutils literal notranslate"><span class="pre">make_instrumental=True</span></code> for Suno
-and <code class="docutils literal notranslate"><span class="pre">force_instrumental=True</span></code> for ElevenLabs.</p>
+<p>Each platform maps these to its native parameter names automatically. For example, <code class="docutils literal notranslate"><span class="pre">instrumental=True</span></code> becomes <code class="docutils literal notranslate"><span class="pre">make_instrumental=True</span></code> for Suno and <code class="docutils literal notranslate"><span class="pre">force_instrumental=True</span></code> for ElevenLabs.</p>
 <section id="parameter-schemas-for-forms-agents-and-validators">
 <h3>Parameter schemas (for forms, agents and validators)<a class="headerlink" href="#parameter-schemas-for-forms-agents-and-validators" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">arioso.param_schema(platform)</span></code> returns the parameters a platform accepts as JSON Schema: each one’s type, bounds or choices, a title and a description. Unified names are marked <code class="docutils literal notranslate"><span class="pre">&quot;x-arioso&quot;:</span> <span class="pre">{&quot;group&quot;:</span> <span class="pre">&quot;common&quot;}</span></code>; parameters only that platform has (Suno’s <code class="docutils literal notranslate"><span class="pre">weirdness</span></code>, <code class="docutils literal notranslate"><span class="pre">style_weight</span></code>, <code class="docutils literal notranslate"><span class="pre">vocal_gender</span></code>, …) are marked <code class="docutils literal notranslate"><span class="pre">&quot;extra&quot;</span></code>. A front end can render the common part once and reveal a platform’s extras when it is selected.</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">param_schema</span><span class="p">(</span><span class="s2">"sunoapi"</span><span class="p">)</span>
 <span class="n">schema</span><span class="p">[</span><span class="s2">"properties"</span><span class="p">][</span>
     <span class="s2">"audio_input_strength"</span>
@@ -846,6 +845,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 <section id="output">
 <h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
 <p>Every call returns a <code class="docutils literal notranslate"><span class="pre">Song</span></code> object:</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">song</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"jazz piano"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"musicgen"</span><span class="p">)</span>
 
 <span class="n">song</span><span class="o">.</span><span class="n">status</span>  <span class="c1"># 'complete'</span>
@@ -867,6 +867,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 </pre></div>
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">generate_many()</span></code> when you want all results (some platforms return multiple):</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">songs</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">generate_many</span><span class="p">(</span><span class="s2">"pop song"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"sunoapi"</span><span class="p">)</span>
 <span class="c1"># Returns list[Song]</span>
 </pre></div>
@@ -874,8 +875,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 </section>
 <section id="adding-a-new-platform">
 <h2>Adding a new platform<a class="headerlink" href="#adding-a-new-platform" title="Link to this heading">#</a></h2>
-<p>Arioso uses a plugin architecture. Each platform is a subfolder under
-<code class="docutils literal notranslate"><span class="pre">arioso/platforms/</span></code> with two files:</p>
+<p>Arioso uses a plugin architecture. Each platform is a subfolder under <code class="docutils literal notranslate"><span class="pre">arioso/platforms/</span></code> with two files:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arioso</span><span class="o">/</span><span class="n">platforms</span><span class="o">/</span><span class="n">myplatform</span><span class="o">/</span>
     <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
     <span class="n">config</span><span class="o">.</span><span class="n">py</span>        <span class="c1"># required: declares PLATFORM_CONFIG</span>
@@ -885,6 +885,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 <section id="minimal-example-rest-api">
 <h3>Minimal example (REST API)<a class="headerlink" href="#minimal-example-rest-api" title="Link to this heading">#</a></h3>
 <p>For a REST API, you may only need <code class="docutils literal notranslate"><span class="pre">config.py</span></code>:</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># arioso/platforms/myplatform/config.py</span>
 
 <span class="n">PLATFORM_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -920,6 +921,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 <section id="custom-adapter-python-library">
 <h3>Custom adapter (Python library)<a class="headerlink" href="#custom-adapter-python-library" title="Link to this heading">#</a></h3>
 <p>For platforms that are Python libraries rather than REST APIs, add an <code class="docutils literal notranslate"><span class="pre">adapter.py</span></code>:</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># arioso/platforms/myplatform/adapter.py</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">arioso.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Song</span><span class="p">,</span> <span class="n">AudioResult</span>
@@ -946,6 +948,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 <section id="manual-registration">
 <h3>Manual registration<a class="headerlink" href="#manual-registration" title="Link to this heading">#</a></h3>
 <p>Third-party packages can register platforms at runtime:</p>
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">arioso.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_platform</span>
 
 <span class="n">register_platform</span><span class="p">(</span><span class="s2">"custom"</span><span class="p">,</span> <span class="n">my_config_dict</span><span class="p">,</span> <span class="n">my_adapter_instance</span><span class="p">)</span>
@@ -955,9 +958,7 @@ and <code class="docutils literal notranslate"><span class="pre">force_instrumen
 </section>
 <section id="platforms-without-public-apis">
 <h2>Platforms Without Public APIs<a class="headerlink" href="#platforms-without-public-apis" title="Link to this heading">#</a></h2>
-<p>The following platforms were considered during the design of arioso’s unified
-parameter vocabulary and affordance system, but do not have public APIs (nor a
-reliable third-party API wrapper). They are listed here for completeness.</p>
+<p>The following platforms were considered during the design of arioso’s unified parameter vocabulary and affordance system, but do not have public APIs (nor a reliable third-party API wrapper). They are listed here for completeness.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Platform</p></th>
@@ -1003,50 +1004,31 @@ reliable third-party API wrapper). They are listed here for completeness.</p>
 </section>
 <section id="research-background">
 <span id="research--background"></span><h2>Research &amp; Background<a class="headerlink" href="#research-background" title="Link to this heading">#</a></h2>
-<p>Arioso’s design is informed by extensive research into the AI music generation
-landscape. Two reference documents in <a class="reference internal" href="#misc/docs/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/</span></code></span></a> provide the
-full background:</p>
+<p>Arioso’s design is informed by extensive research into the AI music generation landscape. Two reference documents in <a class="reference external" href="https://github.com/thorwhalen/arioso/tree/HEAD/misc/docs"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">misc/docs/</span></code></span></a> provide the full background:</p>
 <section id="platform-comparison-and-api-landscape">
 <h3>Platform comparison and API landscape<a class="headerlink" href="#platform-comparison-and-api-landscape" title="Link to this heading">#</a></h3>
-<p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md"><span class="xref myst"><strong>AI Music Generation Tools: A Unified API Reference for 21 Platforms</strong></span></a>
-maps the full union of capabilities across every tool we investigated. Highlights:</p>
+<p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md"><span class="xref myst"><strong>AI Music Generation Tools: A Unified API Reference for 21 Platforms</strong></span></a> maps the full union of capabilities across every tool we investigated. Highlights:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#1-general-characteristics-comparison"><span class="xref myst">General characteristics comparison</span></a> —
-pricing, API availability, max length, sample rate, vocal support, and quality tier for 18 tools</p></li>
-<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#2-documentation-and-integration-links"><span class="xref myst">Documentation and integration links</span></a> —
-docs URLs, OpenAPI specs, Python/JS SDKs, and MCP servers per platform</p></li>
-<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#3-feature-affordance-matrix"><span class="xref myst">Feature affordance matrix</span></a> —
-which platforms support text prompts, negative prompts, lyrics, audio conditioning, melody conditioning, duration, BPM, key, genre tags, energy, instruments, and more</p></li>
-<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#4-unified-affordance-mapping-for-fa%C3%A7ade-design"><span class="xref myst">Unified affordance mapping</span></a> —
-the 40 common parameter names that arioso exposes, with native parameter names per platform</p></li>
-<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#5-complete-api-parameter-catalogs-for-key-tools"><span class="xref myst">Complete API parameter catalogs</span></a> —
-full endpoint and parameter documentation for Suno, ElevenLabs, MusicGen, Lyria RealTime, Stable Audio Open, and YuE</p></li>
+<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#1-general-characteristics-comparison"><span class="xref myst">General characteristics comparison</span></a> — pricing, API availability, max length, sample rate, vocal support, and quality tier for 18 tools</p></li>
+<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#2-documentation-and-integration-links"><span class="xref myst">Documentation and integration links</span></a> — docs URLs, OpenAPI specs, Python/JS SDKs, and MCP servers per platform</p></li>
+<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#3-feature-affordance-matrix"><span class="xref myst">Feature affordance matrix</span></a> — which platforms support text prompts, negative prompts, lyrics, audio conditioning, melody conditioning, duration, BPM, key, genre tags, energy, instruments, and more</p></li>
+<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#4-unified-affordance-mapping-for-fa%C3%A7ade-design"><span class="xref myst">Unified affordance mapping</span></a> — the 40 common parameter names that arioso exposes, with native parameter names per platform</p></li>
+<li><p><a class="reference internal" href="#misc/docs/AI%20music%20generation%20tools%20-%20a%20unified%20API%20reference%20for%2021%20platforms.md#5-complete-api-parameter-catalogs-for-key-tools"><span class="xref myst">Complete API parameter catalogs</span></a> — full endpoint and parameter documentation for Suno, ElevenLabs, MusicGen, Lyria RealTime, Stable Audio Open, and YuE</p></li>
 </ul>
 </section>
 <section id="prompt-engineering-across-platforms">
 <h3>Prompt engineering across platforms<a class="headerlink" href="#prompt-engineering-across-platforms" title="Link to this heading">#</a></h3>
-<p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md"><span class="xref myst"><strong>Prompt Engineering for Music AI Generation: A Resource Guide</strong></span></a>
-compiles 78 resources (papers, datasets, tools, taxonomies, and guides) covering
-how to write effective prompts for text-to-music systems. Key sections:</p>
+<p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md"><span class="xref myst"><strong>Prompt Engineering for Music AI Generation: A Resource Guide</strong></span></a> compiles 78 resources (papers, datasets, tools, taxonomies, and guides) covering how to write effective prompts for text-to-music systems. Key sections:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#a-papers-directly-addressing-prompt-engineering-for-music-generation"><span class="xref myst">Papers on prompt engineering techniques</span></a> —
-chain-of-thought prompting, prompt tuning, user studies, and structured prompting strategies</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#b-model-architecture-papers-revealing-how-text-prompts-are-processed"><span class="xref myst">Model architecture and text encoders</span></a> —
-how T5, CLAP, FLAN-T5, and MuLan encoders determine which prompt styles work best</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#c-text-audio-alignment-models-defining-the-prompt-embedding-space"><span class="xref myst">Text-audio alignment models</span></a> —
-CLAP, MuLan, LAION-CLAP, and how they shape the vocabulary space</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#d-how-numerical-parameters-interact-with-text-prompts"><span class="xref myst">CFG and parameter interactions</span></a> —
-how guidance scale, temperature, and other parameters interact with text prompts</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#e-music-captioning-datasets-defining-the-vocabulary-space"><span class="xref myst">Captioning datasets defining vocabulary</span></a> —
-MusicCaps, LP-MusicCaps, MusicBench, and 11 other datasets that trained these models</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#f-vocabulary-taxonomy-and-terminology-resources"><span class="xref myst">Vocabulary and taxonomy resources</span></a> —
-AudioSet ontology, Music Ontology, Cyanite AI taxonomy</p></li>
-<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#i-platform-specific-prompt-guides-and-prompt-builder-tools"><span class="xref myst">Platform-specific prompt guides</span></a> —
-official and community guides for Stable Audio, Udio, Lyria, Suno, ElevenLabs, and more</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#a-papers-directly-addressing-prompt-engineering-for-music-generation"><span class="xref myst">Papers on prompt engineering techniques</span></a> — chain-of-thought prompting, prompt tuning, user studies, and structured prompting strategies</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#b-model-architecture-papers-revealing-how-text-prompts-are-processed"><span class="xref myst">Model architecture and text encoders</span></a> — how T5, CLAP, FLAN-T5, and MuLan encoders determine which prompt styles work best</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#c-text-audio-alignment-models-defining-the-prompt-embedding-space"><span class="xref myst">Text-audio alignment models</span></a> — CLAP, MuLan, LAION-CLAP, and how they shape the vocabulary space</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#d-how-numerical-parameters-interact-with-text-prompts"><span class="xref myst">CFG and parameter interactions</span></a> — how guidance scale, temperature, and other parameters interact with text prompts</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#e-music-captioning-datasets-defining-the-vocabulary-space"><span class="xref myst">Captioning datasets defining vocabulary</span></a> — MusicCaps, LP-MusicCaps, MusicBench, and 11 other datasets that trained these models</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#f-vocabulary-taxonomy-and-terminology-resources"><span class="xref myst">Vocabulary and taxonomy resources</span></a> — AudioSet ontology, Music Ontology, Cyanite AI taxonomy</p></li>
+<li><p><a class="reference internal" href="#misc/docs/Prompt%20Engineering%20for%20Music%20AI%20Generation%20--%20A%20Resource%20Guide.md#i-platform-specific-prompt-guides-and-prompt-builder-tools"><span class="xref myst">Platform-specific prompt guides</span></a> — official and community guides for Stable Audio, Udio, Lyria, Suno, ElevenLabs, and more</p></li>
 </ul>
-<p>Each platform also has a <code class="docutils literal notranslate"><span class="pre">&lt;PLATFORM&gt;_REFERENCE.md</span></code> in its directory under
-<code class="docutils literal notranslate"><span class="pre">arioso/platforms/</span></code> with platform-specific prompt engineering guidance, API
-details, and links to further reading.</p>
+<p>Each platform also has a <code class="docutils literal notranslate"><span class="pre">&lt;PLATFORM&gt;_REFERENCE.md</span></code> in its directory under <code class="docutils literal notranslate"><span class="pre">arioso/platforms/</span></code> with platform-specific prompt engineering guidance, API details, and links to further reading.</p>
 </section>
 </section>
 <section id="architecture">
@@ -1080,20 +1062,10 @@ details, and links to further reading.</p>
 </div>
 <p>Key design choices:</p>
 <ul class="simple">
-<li><p><strong>Zero required dependencies.</strong> The core package imports nothing outside stdlib.
-Platform dependencies are lazy-imported when you first call <code class="docutils literal notranslate"><span class="pre">generate()</span></code>.</p></li>
-<li><p><strong>Config-driven plugins.</strong> Each platform declares a <code class="docutils literal notranslate"><span class="pre">PLATFORM_CONFIG</span></code> dict with
-parameter mappings, auth scheme, endpoints, and output format. Adding a platform
-is mostly configuration.</p></li>
-<li><p><strong>Automatic parameter translation.</strong> The translation layer renames unified
-affordance names to native platform names and applies type coercions
-(e.g. <code class="docutils literal notranslate"><span class="pre">duration</span></code> seconds to <code class="docutils literal notranslate"><span class="pre">music_length_ms</span></code> milliseconds for ElevenLabs)
-for platforms served by the config-generated REST adapter. A platform with its
-own <code class="docutils literal notranslate"><span class="pre">adapter.py</span></code> takes unified names directly, on every path
-(<code class="docutils literal notranslate"><span class="pre">arioso.generate</span></code> and <code class="docutils literal notranslate"><span class="pre">arioso.services.&lt;platform&gt;.generate</span></code> alike).</p></li>
-<li><p><strong>Leverages existing libraries.</strong> Uses
-<a class="reference external" href="https://github.com/i2mint/ho">ho</a> for OpenAPI-to-Python-function generation,
-<a class="reference external" href="https://github.com/i2mint/i2">i2</a> for signature manipulation and function wrapping.</p></li>
+<li><p><strong>Zero required dependencies.</strong> The core package imports nothing outside stdlib. Platform dependencies are lazy-imported when you first call <code class="docutils literal notranslate"><span class="pre">generate()</span></code>.</p></li>
+<li><p><strong>Config-driven plugins.</strong> Each platform declares a <code class="docutils literal notranslate"><span class="pre">PLATFORM_CONFIG</span></code> dict with parameter mappings, auth scheme, endpoints, and output format. Adding a platform is mostly configuration.</p></li>
+<li><p><strong>Automatic parameter translation.</strong> The translation layer renames unified affordance names to native platform names and applies type coercions (e.g. <code class="docutils literal notranslate"><span class="pre">duration</span></code> seconds to <code class="docutils literal notranslate"><span class="pre">music_length_ms</span></code> milliseconds for ElevenLabs) for platforms served by the config-generated REST adapter. A platform with its own <code class="docutils literal notranslate"><span class="pre">adapter.py</span></code> takes unified names directly, on every path (<code class="docutils literal notranslate"><span class="pre">arioso.generate</span></code> and <code class="docutils literal notranslate"><span class="pre">arioso.services.&lt;platform&gt;.generate</span></code> alike).</p></li>
+<li><p><strong>Leverages existing libraries.</strong> Uses <a class="reference external" href="https://github.com/i2mint/ho">ho</a> for OpenAPI-to-Python-function generation, <a class="reference external" href="https://github.com/i2mint/i2">i2</a> for signature manipulation and function wrapping.</p></li>
 </ul>
 <p class="epythet-aggregates">This documentation as a single file: <a href="arioso.md">arioso.md</a> (Markdown, for agents).</p>
 <div class="toctree-wrapper compound">
@@ -1101,7 +1073,7 @@ own <code class="docutils literal notranslate"><span class="pre">adapter.py</spa
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 17:20 UTC from <a href="https://github.com/thorwhalen/arioso/commit/7535131b3e8e41f33c9683ff4665391aaad31c27">7535131</a> (main) · arioso 0.0.62 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 08:05 UTC from <a href="https://github.com/thorwhalen/arioso/commit/aa4319be1675ea60c53bb8d009c8f3fc9870bf8e">aa4319b</a> (main) · arioso 0.0.63 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

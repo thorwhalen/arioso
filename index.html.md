@@ -4,8 +4,7 @@
 
 Unified Python facade for AI music generation.
 
-One interface, many backends. Arioso wraps 16 AI music generation platforms —
-from local open-source models to commercial REST APIs — behind a single `generate()` call.
+One interface, many backends. Arioso wraps 16 AI music generation platforms — from local open-source models to commercial REST APIs — behind a single `generate()` call.
 
 ## Install
 
@@ -15,6 +14,7 @@ pip install arioso
 
 ## Quick start
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 import arioso
 
@@ -64,10 +64,9 @@ In Python, `arioso.compare.compare(contenders, prompts)` yields the same records
 
 ## Enhance existing audio (audio-to-audio)
 
-Beyond text-to-music, arioso can transform audio you already have – e.g. turn a
-plain synthesized/”MIDI” render into something richer, or re-generate music that
-follows an input melody. This is the `enhance()` entry point:
+Beyond text-to-music, arioso can transform audio you already have – e.g. turn a plain synthesized/”MIDI” render into something richer, or re-generate music that follows an input melody. This is the `enhance()` entry point:
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 import arioso
 
@@ -97,6 +96,7 @@ arioso.supports_audio_input("mubert")  # False
 
 To *extend* a recording rather than transform it, pass it as `continue_from` to `musicgen`. The last `prompt_seconds` (default 10) of the audio prompt the model, which writes `extend_seconds` (default `duration`) of what comes next, chained over `rounds` calls. The result is the original followed by the continuation; the continuation alone is in `song.metadata["continuation"]`. It runs locally, so it also extends audio that a hosted extend route refuses (Suno’s `upload_extend` rejects uploads that match a catalogued composition).
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 longer = arioso.generate(
     "warm piano trio",
@@ -109,19 +109,13 @@ longer = arioso.generate(
 )
 ```
 
-`enhance(audio, prompt='', *, platform='stable_audio', strength=None, as_='auto')`
-routes your audio into the platform’s audio-conditioning affordance
-(`audio_input`, `melody`, or `reference_audio`) and generates. Input audio is
-accepted in any form a `Song`/`AudioResult`/`bytes`/path/`(array, sample_rate)`/
-numpy-waveform can take (normalized internally). Note that `stable_audio` via
-diffusers uses the input as an initial waveform (continuation/init) and has no
-`strength` knob (a value passed there is ignored with a warning); for a
-strength-controlled transform use `stable_audio_25`.
+`enhance(audio, prompt='', *, platform='stable_audio', strength=None, as_='auto')` routes your audio into the platform’s audio-conditioning affordance (`audio_input`, `melody`, or `reference_audio`) and generates. Input audio is accepted in any form a `Song`/`AudioResult`/`bytes`/path/`(array, sample_rate)`/ numpy-waveform can take (normalized internally). Note that `stable_audio` via diffusers uses the input as an initial waveform (continuation/init) and has no `strength` knob (a value passed there is ignored with a warning); for a strength-controlled transform use `stable_audio_25`.
 
 ## Seeds: a melody over a drone
 
 To make a generator keep a known melody with no harmony (a Suno upload-cover, MusicGen-melody), give it the melody alone over a drone: a cover keeps its source’s harmony static, so a source with no harmony gives takes that hold the drone. `arioso.seeds` builds that source from a recording or a score (`pip install 'arioso[seeds]'`; separating a voice from a mix goes through `denote`, which also needs `torch` and `torchaudio`).
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 from arioso.seeds import melody_contour, melody_over_drone
 from arioso.analysis import drone_report, melody_match
@@ -171,6 +165,7 @@ For a source in a generator’s own phrasing, `musicgen_variation(voice, "C#", p
 | **Stable Audio 2.5**       | fal.ai                                            | `FAL_KEY`                            | `pip install arioso[stable-audio-25]` |
 | **ACE-Step**               | fal.ai, or local ACE-Step 1.5 (`runtime="local"`) | `FAL_KEY` (fal only)                 | `pip install arioso[ace-step]`        |
 | **Udio**                   | Unofficial wrapper                                | `UDIO_AUTH_COOKIE`                   | `pip install arioso[udio]`            |
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 # See what's available
 arioso.list_platforms()
@@ -198,6 +193,7 @@ Runs on your machine, with one of three libraries:
 
 Melody-following and continuation always use audiocraft or transformers. `ARIOSO_MUSICGEN_BACKEND=mlx|audiocraft|transformers` forces one (`mlx` for text takes only).
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 song = arioso.generate(
     "chill lofi beats",
@@ -213,6 +209,7 @@ song = arioso.generate(
 
 Some local models pin library versions (MLX, torch) that cannot share an environment with each other, so arioso runs them in their own: each platform names a runtime directory and the commands that install it, and a missing one raises `RuntimeNotInstalled` with those commands. Runtimes live under `~/.local/share/arioso/runtimes/<name>` unless `$ARIOSO_RUNTIMES_DIR` or the platform’s own variable (`$ARIOSO_SA3_DIR`, `$ARIOSO_MAGENTA_RT_DIR`, `$ARIOSO_ACE_STEP_DIR`, `$ARIOSO_MLX_EXAMPLES_DIR` for MusicGen on MLX) points elsewhere. Magenta RealTime, ACE-Step and MusicGen on MLX keep one worker process alive, so the model loads once per session.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 import arioso
 
@@ -251,6 +248,7 @@ song = arioso.generate(
 
 stable-audio-tools pins its own torch and Python 3.10, so arioso builds an environment for it with `uv` on first use (once, under `~/.local/share/arioso/envs/foundation-1`, or `$ARIOSO_ENVS_DIR`; `$ARIOSO_FOUNDATION_1_ENV` names an existing one instead) from pinned requirements resolved with `--exclude-newer`, and runs the model in one worker process there. Each checkpoint (2.4 GB) and the T5-base text encoder download once to the Hugging Face cache, at pinned revisions, and are read from it without network calls afterwards. On a Mac it needs Apple Silicon (torch 2.7 has no Intel macOS wheels). It runs on CUDA, Apple MPS or the CPU (`device=` to choose). On MPS it samples with plain classifier-free guidance, as Stable Audio Open does: stable-audio-tools’ default adaptive projected guidance computes in float64, which MPS does not support, so it is turned off, and `PYTORCH_ENABLE_MPS_FALLBACK=1` lets any operator MPS lacks run on the CPU.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 import arioso
 
@@ -284,6 +282,7 @@ Playable sampler instruments from the keybeds checkpoint: `arioso.keybed.keybed_
 
 Needs `ELEVENLABS_API_KEY` environment variable.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 song = arioso.generate(
     "dramatic film score",
@@ -306,6 +305,7 @@ song = arioso.generate(
 
 Needs `SUNO_API_KEY` environment variable.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 songs = arioso.generate_many(
     "summer reggae vibes",
@@ -320,9 +320,9 @@ for song in songs:
 
 ## Parameters
 
-All platforms share a common vocabulary of parameter names. Use any that
-the platform supports — unsupported ones are warned about and ignored.
+All platforms share a common vocabulary of parameter names. Use any that the platform supports — unsupported ones are warned about and ignored.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 song = arioso.generate(
     "ambient soundscape",  # prompt (required)
@@ -357,14 +357,13 @@ The full set of unified parameter names (42):
 | `output_format` | str    | Desired output format               |
 | …               |        | See `arioso.AFFORDANCES` for all 40 |
 
-Each platform maps these to its native parameter names automatically.
-For example, `instrumental=True` becomes `make_instrumental=True` for Suno
-and `force_instrumental=True` for ElevenLabs.
+Each platform maps these to its native parameter names automatically. For example, `instrumental=True` becomes `make_instrumental=True` for Suno and `force_instrumental=True` for ElevenLabs.
 
 ### Parameter schemas (for forms, agents and validators)
 
 `arioso.param_schema(platform)` returns the parameters a platform accepts as JSON Schema: each one’s type, bounds or choices, a title and a description. Unified names are marked `"x-arioso": {"group": "common"}`; parameters only that platform has (Suno’s `weirdness`, `style_weight`, `vocal_gender`, …) are marked `"extra"`. A front end can render the common part once and reveal a platform’s extras when it is selected.
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 schema = arioso.param_schema("sunoapi")
 schema["properties"][
@@ -380,6 +379,7 @@ From a shell: `arioso schema sunoapi`.
 
 Every call returns a `Song` object:
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 song = arioso.generate("jazz piano", platform="musicgen")
 
@@ -403,6 +403,7 @@ song.sample_rate  # same as song.audio.sample_rate
 
 Use `generate_many()` when you want all results (some platforms return multiple):
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 songs = arioso.generate_many("pop song", platform="sunoapi")
 # Returns list[Song]
@@ -410,8 +411,7 @@ songs = arioso.generate_many("pop song", platform="sunoapi")
 
 ## Adding a new platform
 
-Arioso uses a plugin architecture. Each platform is a subfolder under
-`arioso/platforms/` with two files:
+Arioso uses a plugin architecture. Each platform is a subfolder under `arioso/platforms/` with two files:
 
 ```default
 arioso/platforms/myplatform/
@@ -424,6 +424,7 @@ arioso/platforms/myplatform/
 
 For a REST API, you may only need `config.py`:
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 # arioso/platforms/myplatform/config.py
 
@@ -461,6 +462,7 @@ The platform is auto-discovered on the next `arioso.list_platforms()` call.
 
 For platforms that are Python libraries rather than REST APIs, add an `adapter.py`:
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 # arioso/platforms/myplatform/adapter.py
 
@@ -488,6 +490,7 @@ class Adapter:
 
 Third-party packages can register platforms at runtime:
 
+<!-- wads-docs: skip calls generation backends: needs API keys and may cost money -->
 ```python
 from arioso.registry import register_platform
 
@@ -496,9 +499,7 @@ register_platform("custom", my_config_dict, my_adapter_instance)
 
 ## Platforms Without Public APIs
 
-The following platforms were considered during the design of arioso’s unified
-parameter vocabulary and affordance system, but do not have public APIs (nor a
-reliable third-party API wrapper). They are listed here for completeness.
+The following platforms were considered during the design of arioso’s unified parameter vocabulary and affordance system, but do not have public APIs (nor a reliable third-party API wrapper). They are listed here for completeness.
 
 | Platform       | Website                                  | What It Does                                                                                           | Affordances Considered                 |
 |----------------|------------------------------------------|--------------------------------------------------------------------------------------------------------|----------------------------------------|
@@ -511,50 +512,31 @@ reliable third-party API wrapper). They are listed here for completeness.
 
 ## Research & Background
 
-Arioso’s design is informed by extensive research into the AI music generation
-landscape. Two reference documents in [`misc/docs/`]() provide the
-full background:
+Arioso’s design is informed by extensive research into the AI music generation landscape. Two reference documents in [`misc/docs/`]() provide the full background:
 
 ### Platform comparison and API landscape
 
-[**AI Music Generation Tools: A Unified API Reference for 21 Platforms**]()
-maps the full union of capabilities across every tool we investigated. Highlights:
+[**AI Music Generation Tools: A Unified API Reference for 21 Platforms**]() maps the full union of capabilities across every tool we investigated. Highlights:
 
-- [General characteristics comparison]() —
-  pricing, API availability, max length, sample rate, vocal support, and quality tier for 18 tools
-- [Documentation and integration links]() —
-  docs URLs, OpenAPI specs, Python/JS SDKs, and MCP servers per platform
-- [Feature affordance matrix]() —
-  which platforms support text prompts, negative prompts, lyrics, audio conditioning, melody conditioning, duration, BPM, key, genre tags, energy, instruments, and more
-- [Unified affordance mapping]() —
-  the 40 common parameter names that arioso exposes, with native parameter names per platform
-- [Complete API parameter catalogs]() —
-  full endpoint and parameter documentation for Suno, ElevenLabs, MusicGen, Lyria RealTime, Stable Audio Open, and YuE
+- [General characteristics comparison]() — pricing, API availability, max length, sample rate, vocal support, and quality tier for 18 tools
+- [Documentation and integration links]() — docs URLs, OpenAPI specs, Python/JS SDKs, and MCP servers per platform
+- [Feature affordance matrix]() — which platforms support text prompts, negative prompts, lyrics, audio conditioning, melody conditioning, duration, BPM, key, genre tags, energy, instruments, and more
+- [Unified affordance mapping]() — the 40 common parameter names that arioso exposes, with native parameter names per platform
+- [Complete API parameter catalogs]() — full endpoint and parameter documentation for Suno, ElevenLabs, MusicGen, Lyria RealTime, Stable Audio Open, and YuE
 
 ### Prompt engineering across platforms
 
-[**Prompt Engineering for Music AI Generation: A Resource Guide**]()
-compiles 78 resources (papers, datasets, tools, taxonomies, and guides) covering
-how to write effective prompts for text-to-music systems. Key sections:
+[**Prompt Engineering for Music AI Generation: A Resource Guide**]() compiles 78 resources (papers, datasets, tools, taxonomies, and guides) covering how to write effective prompts for text-to-music systems. Key sections:
 
-- [Papers on prompt engineering techniques]() —
-  chain-of-thought prompting, prompt tuning, user studies, and structured prompting strategies
-- [Model architecture and text encoders]() —
-  how T5, CLAP, FLAN-T5, and MuLan encoders determine which prompt styles work best
-- [Text-audio alignment models]() —
-  CLAP, MuLan, LAION-CLAP, and how they shape the vocabulary space
-- [CFG and parameter interactions]() —
-  how guidance scale, temperature, and other parameters interact with text prompts
-- [Captioning datasets defining vocabulary]() —
-  MusicCaps, LP-MusicCaps, MusicBench, and 11 other datasets that trained these models
-- [Vocabulary and taxonomy resources]() —
-  AudioSet ontology, Music Ontology, Cyanite AI taxonomy
-- [Platform-specific prompt guides]() —
-  official and community guides for Stable Audio, Udio, Lyria, Suno, ElevenLabs, and more
+- [Papers on prompt engineering techniques]() — chain-of-thought prompting, prompt tuning, user studies, and structured prompting strategies
+- [Model architecture and text encoders]() — how T5, CLAP, FLAN-T5, and MuLan encoders determine which prompt styles work best
+- [Text-audio alignment models]() — CLAP, MuLan, LAION-CLAP, and how they shape the vocabulary space
+- [CFG and parameter interactions]() — how guidance scale, temperature, and other parameters interact with text prompts
+- [Captioning datasets defining vocabulary]() — MusicCaps, LP-MusicCaps, MusicBench, and 11 other datasets that trained these models
+- [Vocabulary and taxonomy resources]() — AudioSet ontology, Music Ontology, Cyanite AI taxonomy
+- [Platform-specific prompt guides]() — official and community guides for Stable Audio, Udio, Lyria, Suno, ElevenLabs, and more
 
-Each platform also has a `<PLATFORM>_REFERENCE.md` in its directory under
-`arioso/platforms/` with platform-specific prompt engineering guidance, API
-details, and links to further reading.
+Each platform also has a `<PLATFORM>_REFERENCE.md` in its directory under `arioso/platforms/` with platform-specific prompt engineering guidance, API details, and links to further reading.
 
 ## Architecture
 
@@ -588,19 +570,9 @@ arioso/
 
 Key design choices:
 
-- **Zero required dependencies.** The core package imports nothing outside stdlib.
-  Platform dependencies are lazy-imported when you first call `generate()`.
-- **Config-driven plugins.** Each platform declares a `PLATFORM_CONFIG` dict with
-  parameter mappings, auth scheme, endpoints, and output format. Adding a platform
-  is mostly configuration.
-- **Automatic parameter translation.** The translation layer renames unified
-  affordance names to native platform names and applies type coercions
-  (e.g. `duration` seconds to `music_length_ms` milliseconds for ElevenLabs)
-  for platforms served by the config-generated REST adapter. A platform with its
-  own `adapter.py` takes unified names directly, on every path
-  (`arioso.generate` and `arioso.services.<platform>.generate` alike).
-- **Leverages existing libraries.** Uses
-  [ho](https://github.com/i2mint/ho) for OpenAPI-to-Python-function generation,
-  [i2](https://github.com/i2mint/i2) for signature manipulation and function wrapping.
+- **Zero required dependencies.** The core package imports nothing outside stdlib. Platform dependencies are lazy-imported when you first call `generate()`.
+- **Config-driven plugins.** Each platform declares a `PLATFORM_CONFIG` dict with parameter mappings, auth scheme, endpoints, and output format. Adding a platform is mostly configuration.
+- **Automatic parameter translation.** The translation layer renames unified affordance names to native platform names and applies type coercions (e.g. `duration` seconds to `music_length_ms` milliseconds for ElevenLabs) for platforms served by the config-generated REST adapter. A platform with its own `adapter.py` takes unified names directly, on every path (`arioso.generate` and `arioso.services.<platform>.generate` alike).
+- **Leverages existing libraries.** Uses [ho](https://github.com/i2mint/ho) for OpenAPI-to-Python-function generation, [i2](https://github.com/i2mint/i2) for signature manipulation and function wrapping.
 
 <p class="epythet-aggregates">This documentation as a single file: <a href="arioso.md">arioso.md</a> (Markdown, for agents).</p>

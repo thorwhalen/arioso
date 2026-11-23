@@ -144,3 +144,22 @@ def test_cli_schema_prints_json():
     assert json.loads(schema("sunoapi"))["x-arioso"]["platform"] == "sunoapi"
     with pytest.raises(ValueError, match="Unknown platform"):
         schema("nope")
+
+
+def test_lyrics_and_prompt_are_multiline_on_every_platform():
+    """Line breaks in lyrics matter, so every platform's schema says ``multiline``
+    for them (from the affordance, not a per-platform opt-in): a form that drew a
+    one-line input for them would glue the lines together."""
+    from arioso.base import AFFORDANCES
+    from arioso.registry import list_platforms
+
+    multiline = {n for n, a in AFFORDANCES.items() if a.multiline}
+    assert {"lyrics", "prompt"} <= multiline
+    seen = 0
+    for name in list_platforms():
+        props = param_schema(name)["properties"]
+        for field in multiline & props.keys():
+            assert props[field]["x-arioso"].get("multiline") is True, (name, field)
+            seen += 1
+    assert seen
+    assert "multiline" not in param_schema("sunoapi")["properties"]["title"]["x-arioso"]

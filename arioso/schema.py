@@ -148,6 +148,8 @@ def _common_property(name: str, mapping: dict) -> dict:
         value = getattr(affordance, attr)
         if value is not None:
             prop[attr] = value
+    if affordance.multiline and kind == "value":
+        prop.setdefault("x-arioso", {})["multiline"] = True
     prop = _apply_spec(prop, mapping)
     xa = prop.setdefault("x-arioso", {})
     xa.update(group="common", kind=kind)

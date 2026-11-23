@@ -5,19 +5,21 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-23 11:26 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/3338200b29c731fb1f5fd33640bd3a049255ab38"><code>3338200</code></a> on branch <code>main</code>, for **arioso 0.0.64** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 12:06 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/2a5bcbdad6b94e0fc90b5332be8d459234731650"><code>2a5bcbd</code></a> on branch <code>main</code>, for **arioso 0.0.65** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.65) is ahead of the latest release on PyPI (0.0.64): these docs describe unreleased code.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/arioso/commit/3338200b29c731fb1f5fd33640bd3a049255ab38"><code>3338200b29c731fb1f5fd33640bd3a049255ab38</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/arioso/commit/2a5bcbdad6b94e0fc90b5332be8d459234731650"><code>2a5bcbdad6b94e0fc90b5332be8d459234731650</code></a> |
 | Branch | <code>main</code> |
-| Tags at this commit | <code>0.0.64</code> |
+| Tags at this commit | <code>0.0.65</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/thorwhalen/arioso</code> |
 
@@ -26,9 +28,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/arioso</code> |
-| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/45164771622">45164771622</a> |
+| Run | <a href="https://github.com/thorwhalen/arioso/actions/runs/45170553989">45170553989</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>13d589e0c6edb48bfa256f7cbab2fcfa7c5fc7b2</code> (in the history of the built commit) |
+| Event commit | <code>19fbbcc5429f627a40eca9845ee94d6299cb4b18</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +55,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.64/">0.0.64</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.64/">0.0.64</a>, older than the documented version (0.0.65).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 3338200b29c731fb1f5fd33640bd3a049255ab38
+git checkout 2a5bcbdad6b94e0fc90b5332be8d459234731650
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -163,3 +163,11 @@ def test_lyrics_and_prompt_are_multiline_on_every_platform():
             seen += 1
     assert seen
     assert "multiline" not in param_schema("sunoapi")["properties"]["title"]["x-arioso"]
+
+
+def test_required_prompt_is_satisfied_by_genre_on_ace_step():
+    """ACE-Step's style tags come from genre, else prompt: the schema says so, so a
+    form need not demand a prompt when Styles is filled."""
+    schema = param_schema("ace_step")
+    assert "prompt" in schema["required"]
+    assert schema["properties"]["prompt"]["x-arioso"]["optional_with"] == ["genre"]

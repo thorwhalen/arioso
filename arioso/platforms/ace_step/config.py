@@ -34,7 +34,13 @@ PLATFORM_CONFIG = {
     },
     "worker": "ace_step",  # arioso/_workers/ace_step_worker.py
     "param_map": {
-        "prompt": {"native_name": "tags", "required": True, "adapter_handled": True},
+        # Style tags are required: Styles (genre) first, else the prompt.
+        "prompt": {
+            "native_name": "tags",
+            "required": True,
+            "optional_with": ["genre"],
+            "adapter_handled": True,
+        },
         "genre": {"native_name": "tags", "adapter_handled": True},
         "lyrics": {
             "native_name": "lyrics",

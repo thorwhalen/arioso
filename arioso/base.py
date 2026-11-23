@@ -132,6 +132,10 @@ class Affordance:
         title: Short display name (empty: derived from ``name``). A platform's
             ``param_map`` entry may give its own (Suno calls
             ``audio_input_strength`` "Audio Influence").
+        multiline: The value is free text whose line breaks matter (lyrics, a
+            description), so a form must offer a multi-line field and keep its
+            newlines. Emitted as the ``x-arioso.multiline`` schema hint for every
+            platform; a ``param_map`` entry may still override it.
     """
 
     name: str
@@ -141,12 +145,15 @@ class Affordance:
     minimum: Optional[float] = None
     maximum: Optional[float] = None
     title: str = ""
+    multiline: bool = False
 
 
 AFFORDANCES: dict[str, Affordance] = {
-    "prompt": Affordance("prompt", str, "Text description of desired music"),
+    "prompt": Affordance(
+        "prompt", str, "Text description of desired music", multiline=True
+    ),
     "negative_prompt": Affordance("negative_prompt", str, "Elements to avoid"),
-    "lyrics": Affordance("lyrics", str, "Custom lyrics text"),
+    "lyrics": Affordance("lyrics", str, "Custom lyrics text", multiline=True),
     "duration": Affordance("duration", float, "Output length in seconds"),
     "bpm": Affordance("bpm", int, "Beats per minute"),
     "key": Affordance("key", str, 'Musical key (e.g. "C major")'),

@@ -127,8 +127,11 @@ class Adapter:
             seed: Seed; a fresh one is drawn and recorded when None.
             negative_prompt: What to steer away from (needs ``guidance`` above 1).
             audio_input: Audio to vary (audio-to-audio) or, with ``inpaint_range``, to inpaint.
-            audio_input_strength: Noise level 0-1 applied to ``audio_input`` (higher = freer);
-                default 0.7 for a variation, 1.0 for inpainting (which starts from noise).
+            audio_input_strength: How much ``audio_input`` shapes the output, 0-1
+                (1 = follow it closely, 0 = ignore it), as for every platform. It is
+                sent as the native noise level ``1 - audio_input_strength``. When not
+                given, the noise level is 0.7 for a variation and 1.0 for inpainting
+                (which starts from noise).
             inpaint_range: ``(start, end)`` seconds of ``audio_input`` to regenerate.
             timeout: Seconds before the process is killed.
 
@@ -141,7 +144,9 @@ class Adapter:
         work = Path(tempfile.mkdtemp(prefix="arioso_sa3_"))
         out = work / "out.wav"
         if audio_input_strength is None:
-            audio_input_strength = 1.0 if inpaint_range is not None else DFLT_A2A_NOISE
+            noise_level = 1.0 if inpaint_range is not None else DFLT_A2A_NOISE
+        else:
+            noise_level = 1 - float(audio_input_strength)
         ref = to_audio_ref(audio_input) if audio_input is not None else None
         try:
             cmd = self._command(
@@ -154,7 +159,7 @@ class Adapter:
                 seed=seed,
                 negative_prompt=negative_prompt,
                 init_audio=ref.as_path(suffix=".wav") if ref else None,
-                strength=float(audio_input_strength),
+                strength=noise_level,
                 inpaint_range=inpaint_range,
             )
             code, log = self._run(

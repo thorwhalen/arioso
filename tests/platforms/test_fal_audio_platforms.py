@@ -52,7 +52,8 @@ def test_stable_audio_25_audio_to_audio_strength(capture):
     )
     args = capture["arguments"]
     assert capture["endpoint"].endswith("audio-to-audio")
-    assert args["strength"] == 0.3 and args["audio_url"].endswith("in.wav")
+    assert args["strength"] == pytest.approx(0.7)  # 1 - influence (#74)
+    assert args["audio_url"].endswith("in.wav")
     assert "seconds_total" not in args  # defaults to the input's length
 
 
@@ -65,7 +66,7 @@ def test_enhance_routes_strength_to_stable_audio_25(capture, monkeypatch):
     arioso.enhance(
         "in.wav", "strings", platform="stable_audio_25", strength=0.25, fetch=False
     )
-    assert capture["arguments"]["strength"] == 0.25
+    assert capture["arguments"]["strength"] == pytest.approx(0.75)  # 1 - influence (#74)
 
 
 def test_ace_step_text_to_music_is_instrumental_by_default(capture):
@@ -119,7 +120,7 @@ def test_services_path_keeps_unified_params(capture):
     )
     args = capture["arguments"]
     assert (args["strength"], args["num_inference_steps"], args["guidance_scale"]) == (
-        0.2,
+        pytest.approx(0.8),  # fal strength = 1 - audio influence (#74)
         50,
         3.0,
     )

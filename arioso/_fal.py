@@ -202,6 +202,12 @@ class FalAdapter:
             given = rule["join"].join(str(v).strip() for v in present)
         else:
             given = present[0] if present else None
+        if rule.get("invert") and given is not None:
+            # The affordance runs the other way from the native control
+            # (e.g. "how much the input shapes the output" vs the native
+            # "how far to depart from it"): map a given value, never the
+            # native default, and before any ``force``.
+            given = 1 - float(given)
         force = rule.get("force")
         if force and params.get(force["when"]):
             given = force["value"]

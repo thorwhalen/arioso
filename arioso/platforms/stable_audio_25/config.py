@@ -98,6 +98,9 @@ PLATFORM_CONFIG = {
                     "audio_url": {"from": ["audio_input"], "upload": True},
                     "strength": {
                         "from": ["audio_input_strength"],
+                        # fal's strength is "how far to depart" (higher = freer);
+                        # audio_input_strength is "how much the input shapes it".
+                        "invert": True,
                         "default": 0.8,
                         "range": [0, 1],
                     },

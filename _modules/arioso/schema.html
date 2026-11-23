@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=7ada5fdd"></script>
+    <script src="../../_static/documentation_options.js?v=b153cf10"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.63" />
+  <meta name="docsearch:version" content="0.0.64" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -865,6 +865,8 @@ window.runMermaid = runMermaid;</script>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">affordance</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">prop</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="n">affordance</span><span class="o">.</span><span class="n">multiline</span> <span class="ow">and</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"value"</span><span class="p">:</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"x-arioso"</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"multiline"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">prop</span> <span class="o">=</span> <span class="n">_apply_spec</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">mapping</span><span class="p">)</span>
     <span class="n">xa</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"x-arioso"</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">xa</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"common"</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>

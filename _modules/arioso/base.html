@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../_static/documentation_options.js?v=7ada5fdd"></script>
+    <script src="../../_static/documentation_options.js?v=b153cf10"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.63" />
+  <meta name="docsearch:version" content="0.0.64" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -860,6 +860,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        title: Short display name (empty: derived from ``name``). A platform's</span>
 <span class="sd">            ``param_map`` entry may give its own (Suno calls</span>
 <span class="sd">            ``audio_input_strength`` "Audio Influence").</span>
+<span class="sd">        multiline: The value is free text whose line breaks matter (lyrics, a</span>
+<span class="sd">            description), so a form must offer a multi-line field and keep its</span>
+<span class="sd">            newlines. Emitted as the ``x-arioso.multiline`` schema hint for every</span>
+<span class="sd">            platform; a ``param_map`` entry may still override it.</span>
 <span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -868,14 +872,17 @@ window.runMermaid = runMermaid;</script>
     <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">minimum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">maximum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span></div>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">multiline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
 
 <span class="n">AFFORDANCES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Affordance</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Text description of desired music"</span><span class="p">),</span>
+    <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span>
+        <span class="s2">"prompt"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Text description of desired music"</span><span class="p">,</span> <span class="n">multiline</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">),</span>
     <span class="s2">"negative_prompt"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"negative_prompt"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Elements to avoid"</span><span class="p">),</span>
-    <span class="s2">"lyrics"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"lyrics"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Custom lyrics text"</span><span class="p">),</span>
+    <span class="s2">"lyrics"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"lyrics"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">"Custom lyrics text"</span><span class="p">,</span> <span class="n">multiline</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
     <span class="s2">"duration"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"duration"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">"Output length in seconds"</span><span class="p">),</span>
     <span class="s2">"bpm"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"bpm"</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">"Beats per minute"</span><span class="p">),</span>
     <span class="s2">"key"</span><span class="p">:</span> <span class="n">Affordance</span><span class="p">(</span><span class="s2">"key"</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">'Musical key (e.g. "C major")'</span><span class="p">),</span>

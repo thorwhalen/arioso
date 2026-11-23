@@ -22,7 +22,7 @@ set of affordance names that all platform adapters map to.
 | [`CatalogMatchError`](#arioso.base.CatalogMatchError)(message, \*[, task_id, code])   | A platform refused the input audio because it matches a catalogued recording.   |
 |----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 
-### *class* arioso.base.Affordance(name, type, description, default=None, minimum=None, maximum=None, title='')
+### *class* arioso.base.Affordance(name, type, description, default=None, minimum=None, maximum=None, title='', multiline=False)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -78,6 +78,16 @@ Short display name (empty: derived from `name`). A platform’s
 
 * **Type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### multiline
+
+The value is free text whose line breaks matter (lyrics, a
+description), so a form must offer a multi-line field and keep its
+newlines. Emitted as the `x-arioso.multiline` schema hint for every
+platform; a `param_map` entry may still override it.
+
+* **Type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### *class* arioso.base.AudioResult(audio_bytes=None, audio_url='', audio_array=None, sample_rate=0, format='', duration_seconds=0.0)
 

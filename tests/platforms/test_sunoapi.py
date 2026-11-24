@@ -569,7 +569,13 @@ def test_sunoapi_catalog_match_raises_typed_error(mock_make_session):
 
 
 @patch("arioso.platforms._base_adapter.make_session")
-def test_sunoapi_custom_controls_reach_payload(mock_make_session):
+def test_sunoapi_custom_controls_reach_payload(mock_make_session, monkeypatch):
+    # The registry caches the loaded adapter (and its session); an earlier test that
+    # loaded it would bypass the patched make_session, so force a fresh instance.
+    from arioso import registry
+
+    registry.get_config("sunoapi")  # make sure the platform is discovered
+    monkeypatch.setitem(registry._registry["sunoapi"], "adapter", None)
     mock_session = MagicMock()
     mock_response = MagicMock()
     mock_response.json.return_value = {"code": 200, "data": {"taskId": "t1"}}

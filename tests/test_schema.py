@@ -165,9 +165,11 @@ def test_lyrics_and_prompt_are_multiline_on_every_platform():
     assert "multiline" not in param_schema("sunoapi")["properties"]["title"]["x-arioso"]
 
 
-def test_required_prompt_is_satisfied_by_genre_on_ace_step():
-    """ACE-Step's style tags come from genre, else prompt: the schema says so, so a
-    form need not demand a prompt when Styles is filled."""
+def test_ace_step_asks_for_no_prompt_and_says_what_an_empty_one_does():
+    """ACE-Step's style tags come from genre, else prompt, else a default style: nothing is
+    required, and the schema carries the default so a form can show what an empty field does."""
+    from arioso.platforms.ace_step.config import DFLT_STYLE
+
     schema = param_schema("ace_step")
-    assert "prompt" in schema["required"]
-    assert schema["properties"]["prompt"]["x-arioso"]["optional_with"] == ["genre"]
+    assert "prompt" not in schema.get("required", [])
+    assert schema["properties"]["prompt"]["default"] == DFLT_STYLE

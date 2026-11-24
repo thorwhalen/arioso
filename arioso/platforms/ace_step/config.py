@@ -8,6 +8,12 @@ https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api. Local runtime: the
 
 from arioso._isolated import GitSource
 
+#: The style ACE-Step is given when the caller names none (no Styles, no prompt). It asks
+#: for a well-made recording and names no genre, which is left to the lyrics, the source
+#: audio and ACE-Step's own planner. A schema shows it as the prompt's ``default``, so a
+#: form can say what an empty field does instead of demanding text.
+DFLT_STYLE = "melodic, natural instruments, steady groove, warm, balanced mix, well produced"
+
 PLATFORM_CONFIG = {
     "name": "ace_step",
     "display_name": "ACE-Step (fal.ai, or local ACE-Step 1.5)",
@@ -34,11 +40,10 @@ PLATFORM_CONFIG = {
     },
     "worker": "ace_step",  # arioso/_workers/ace_step_worker.py
     "param_map": {
-        # Style tags are required: Styles (genre) first, else the prompt.
+        # The style tags: Styles (genre) first, else the prompt, else DFLT_STYLE.
         "prompt": {
             "native_name": "tags",
-            "required": True,
-            "optional_with": ["genre"],
+            "default": DFLT_STYLE,
             "adapter_handled": True,
         },
         "genre": {"native_name": "tags", "adapter_handled": True},
@@ -110,14 +115,14 @@ PLATFORM_CONFIG = {
         "audio_to_audio_endpoint": "fal-ai/ace-step/audio-to-audio",
     },
     # How unified affordances become fal arguments (see arioso._fal.FalAdapter).
-    # ACE-Step is steered by style tags, so `genre` (else `prompt`) is `tags`; empty
-    # lyrics or instrumental=True send "[inst]".
+    # ACE-Step is steered by style tags, so `genre` (else `prompt`, else DFLT_STYLE) is
+    # `tags`; empty lyrics or instrumental=True send "[inst]".
     "fal": {
         "platform": "ace_step",
         "shared": {
             "tags": {
                 "from": ["genre", "prompt"],
-                "required": "ace_step requires style tags (prompt or genre)",
+                "default": DFLT_STYLE,
             },
             "lyrics": {
                 "from": ["lyrics"],

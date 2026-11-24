@@ -257,6 +257,17 @@ def test_ace_step_local_warns_on_fal_only_options(installed):
         local.generate("jazz", edit_mode="remix")
 
 
+def test_ace_step_local_without_a_style_uses_the_default_one(installed):
+    """No Styles and no prompt: the caption is the platform's default style, not an error."""
+    from arioso.platforms.ace_step.config import DFLT_STYLE
+
+    installed(ACE_CONFIG)
+    local = ace_mod.LocalAceStep(ACE_CONFIG, make_worker=_FakeWorker)
+    local.generate(lyrics="la la")
+    local.generate("", genre="bossa nova")
+    assert [r["caption"] for r in local._worker.requests] == [DFLT_STYLE, "bossa nova"]
+
+
 def test_local_only_keywords_are_read_by_the_local_runtime():
     import inspect
 

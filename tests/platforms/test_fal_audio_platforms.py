@@ -84,9 +84,14 @@ def test_ace_step_remix_defaults_original_tags(capture):
     assert "duration" not in args
 
 
-def test_ace_step_needs_tags(capture):
-    with pytest.raises(ValueError):
-        ace_mod.Adapter({}).generate("")
+def test_ace_step_without_a_style_uses_the_default_one(capture):
+    """No Styles and no prompt is not an error: the platform's default style is sent."""
+    from arioso.platforms.ace_step.config import DFLT_STYLE
+
+    ace_mod.Adapter({}).generate("", fetch=False)
+    assert capture["arguments"]["tags"] == DFLT_STYLE
+    ace_mod.Adapter({}).generate("", genre="bossa nova", fetch=False)
+    assert capture["arguments"]["tags"] == "bossa nova"
 
 
 def test_services_path_keeps_unified_params(capture):

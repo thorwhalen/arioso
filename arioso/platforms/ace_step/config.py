@@ -45,11 +45,18 @@ PLATFORM_CONFIG = {
         # The style tags: Styles (genre) first, else the prompt, else DFLT_STYLE.
         "prompt": {
             "native_name": "tags",
+            "title": "Song description",
+            "description": "What the music should sound like, in words or tags. Used when Styles is empty.",
             "default": DFLT_STYLE,
             "optional_with": ["genre"],  # Styles stands in for it (and for its default)
             "adapter_handled": True,
         },
-        "genre": {"native_name": "tags", "adapter_handled": True},
+        "genre": {
+            "native_name": "tags",
+            "title": "Styles",
+            "description": "Style tags, comma-separated. Used instead of the description when given.",
+            "adapter_handled": True,
+        },
         "lyrics": {
             "native_name": "lyrics",
             "native_default": "[inst]",

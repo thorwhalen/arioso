@@ -6,7 +6,7 @@ Endpoints (verified 2026-10-03): `fal-ai/ace-step` (tags + lyrics to music) and 
 
 | arioso | native | notes |
 |---|---|---|
-| `prompt` / `genre` | `tags` | comma-separated style tags; required |
+| `prompt` / `genre` | `tags` | comma-separated style tags; `DFLT_STYLE` (a genre-neutral, well-produced sound) when neither is given |
 | `lyrics` | `lyrics` | `[inst]` (also sent for empty lyrics or `instrumental=True`) = instrumental |
 | `duration` | `duration` | text-to-music only, default 60 s |
 | `num_steps` | `number_of_steps` | default 27 |

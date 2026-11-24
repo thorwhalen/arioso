@@ -1,7 +1,7 @@
 """ACE-Step 1.5 run locally: a worker in the ACE-Step-1.5 checkout's own environment.
 
 The unified affordances map onto ACE-Step's ``GenerationParams``: ``prompt``/``genre`` is the
-caption, ``bpm``/``key`` are explicit controls, ``audio_input`` is the source of a cover
+caption (``DFLT_STYLE`` when neither is given), ``bpm``/``key`` are explicit controls, ``audio_input`` is the source of a cover
 (``audio_input_strength`` its cover strength) and ``reference_audio`` a style reference.
 """
 
@@ -12,6 +12,7 @@ import warnings
 
 from arioso._audio import to_audio_ref
 from arioso._isolated import Runtime, Worker, draw_seed, song_from_wav, worker_file
+from arioso.platforms.ace_step.config import DFLT_STYLE
 
 #: The checkout's own bundle ships the turbo DiT and the 1.7B LM; other LMs download on use.
 DFLT_DIT = "acestep-v15-turbo"
@@ -70,11 +71,9 @@ class LocalAceStep:
                 "(those are fal.ai endpoint options)",
                 stacklevel=3,
             )
-        caption = (
-            genre or prompt
-        )  # the same precedence as the fal mapping (tags: genre, else prompt)
-        if not caption:
-            raise ValueError("ace_step requires a style prompt (prompt or genre)")
+        # the same precedence as the fal mapping (tags: genre, else prompt, else the default)
+        # (a blank one is not given)
+        caption = (genre or "").strip() or (prompt or "").strip() or DFLT_STYLE
         if instrumental is None:
             instrumental = not lyrics
         seed = draw_seed() if seed is None else int(seed)

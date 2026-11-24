@@ -127,6 +127,11 @@ def fal_audio_song(
 #: Values that count as "not given" for a unified parameter.
 _ABSENT = (None, "")
 
+
+def _absent(value) -> bool:
+    """Not given: ``None``, or text that is empty or only spaces (a blank form field)."""
+    return value in _ABSENT or (isinstance(value, str) and not value.strip())
+
 _COERCE = {"int": lambda v: int(round(float(v))), "float": float, "str": str}
 
 
@@ -139,7 +144,7 @@ class FalAdapter:
     given. Each native argument is a spec::
 
         "native_name": {
-            "from": ["unified", "names"],      # first one given (not None/"") wins
+            "from": ["unified", "names"],      # first one given (not None, not blank) wins
             "default": 8,                      # used when none is given (omitted if absent)
             "default_from": "other_native",    # ...or copy another native argument's value
             "required": True | "message",      # ValueError when nothing is given
@@ -190,7 +195,7 @@ class FalAdapter:
             (
                 params[name]
                 for name in rule.get("from", ())
-                if params.get(name) not in _ABSENT
+                if not _absent(params.get(name))
             ),
             None,
         )

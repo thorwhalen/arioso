@@ -175,3 +175,6 @@ def test_ace_step_asks_for_no_prompt_and_says_what_an_empty_one_does():
     prompt = schema["properties"]["prompt"]
     assert prompt["default"] == DFLT_STYLE
     assert prompt["x-arioso"]["optional_with"] == ["genre"]  # Styles stands in for it
+    # the same names as on Suno, since a form keeps the values when the platform changes
+    assert prompt["title"] == "Song description"
+    assert schema["properties"]["genre"]["title"] == "Styles"

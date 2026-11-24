@@ -172,4 +172,6 @@ def test_ace_step_asks_for_no_prompt_and_says_what_an_empty_one_does():
 
     schema = param_schema("ace_step")
     assert "prompt" not in schema.get("required", [])
-    assert schema["properties"]["prompt"]["default"] == DFLT_STYLE
+    prompt = schema["properties"]["prompt"]
+    assert prompt["default"] == DFLT_STYLE
+    assert prompt["x-arioso"]["optional_with"] == ["genre"]  # Styles stands in for it

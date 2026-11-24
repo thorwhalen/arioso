@@ -78,8 +78,9 @@ _SPEC_KEYS = {
 # ``requires`` (every one of these must be given too), ``requires_any`` (at
 # least one), ``requires_any_for`` (the operations ``requires_any`` holds for;
 # all when absent), ``optional_for`` (operations for which a required field is
-# not), ``optional_with`` (a required field is satisfied when any of these is
-# given instead, e.g. ACE-Step's style tags come from Styles or the prompt),
+# not), ``optional_with`` (any of these stands in for the field: a required one is
+# satisfied, and a ``default`` is not used, when one of them is given, e.g. ACE-Step's
+# style tags come from Styles, else the prompt, else the prompt's default),
 # ``operations`` (only for these operations), ``unset`` (the value that means
 # "not given"), ``examples``.
 _HINT_KEYS = (

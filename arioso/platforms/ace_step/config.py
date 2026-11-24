@@ -44,6 +44,7 @@ PLATFORM_CONFIG = {
         "prompt": {
             "native_name": "tags",
             "default": DFLT_STYLE,
+            "optional_with": ["genre"],  # Styles stands in for it (and for its default)
             "adapter_handled": True,
         },
         "genre": {"native_name": "tags", "adapter_handled": True},

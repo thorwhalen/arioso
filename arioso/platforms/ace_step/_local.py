@@ -72,7 +72,8 @@ class LocalAceStep:
                 stacklevel=3,
             )
         # the same precedence as the fal mapping (tags: genre, else prompt, else the default)
-        caption = genre or prompt or DFLT_STYLE
+        # (a blank one is not given)
+        caption = (genre or "").strip() or (prompt or "").strip() or DFLT_STYLE
         if instrumental is None:
             instrumental = not lyrics
         seed = draw_seed() if seed is None else int(seed)

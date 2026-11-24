@@ -265,7 +265,12 @@ def test_ace_step_local_without_a_style_uses_the_default_one(installed):
     local = ace_mod.LocalAceStep(ACE_CONFIG, make_worker=_FakeWorker)
     local.generate(lyrics="la la")
     local.generate("", genre="bossa nova")
-    assert [r["caption"] for r in local._worker.requests] == [DFLT_STYLE, "bossa nova"]
+    local.generate("  ", genre=" ")  # blank is not given
+    assert [r["caption"] for r in local._worker.requests] == [
+        DFLT_STYLE,
+        "bossa nova",
+        DFLT_STYLE,
+    ]
 
 
 def test_local_only_keywords_are_read_by_the_local_runtime():

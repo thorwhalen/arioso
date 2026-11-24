@@ -160,6 +160,12 @@ PLATFORM_CONFIG = {
                 "endpoint": "fal-ai/ace-step/audio-to-audio",
                 "arguments": {
                     "audio_url": {"from": ["audio_input"], "upload": True},
+                    # An edit that names no new style keeps the original's (a lyrics-only
+                    # edit must not restyle the track with the default).
+                    "tags": {
+                        "from": ["genre", "prompt", "original_tags"],
+                        "default": DFLT_STYLE,
+                    },
                     "original_tags": {
                         "from": ["original_tags"],
                         "default_from": "tags",

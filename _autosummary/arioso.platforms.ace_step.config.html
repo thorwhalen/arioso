@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=22d3c163"></script>
+    <script src="../_static/documentation_options.js?v=86ab457a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.66" />
+  <meta name="docsearch:version" content="0.0.67" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -431,6 +431,24 @@
 <a class="reference external" href="https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api">https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api</a>. Local runtime: the
 <code class="docutils literal notranslate"><span class="pre">ACE-Step/ACE-Step-1.5</span></code> checkout (MIT code and weights), verified against its
 <code class="docutils literal notranslate"><span class="pre">docs/en/INFERENCE.md</span></code> and <code class="docutils literal notranslate"><span class="pre">acestep.inference.GenerationParams</span></code> on 2026-11-10.</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#arioso.platforms.ace_step.config.DFLT_STYLE" title="arioso.platforms.ace_step.config.DFLT_STYLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_STYLE</span></code></a></p></td>
+<td><p>The style ACE-Step is given when the caller names none (no Styles, no prompt).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="arioso.platforms.ace_step.config.DFLT_STYLE">
+<span class="sig-prename descclassname"><span class="pre">arioso.platforms.ace_step.config.</span></span><span class="sig-name descname"><span class="pre">DFLT_STYLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'melodic,</span> <span class="pre">natural</span> <span class="pre">instruments,</span> <span class="pre">steady</span> <span class="pre">groove,</span> <span class="pre">warm,</span> <span class="pre">balanced</span> <span class="pre">mix,</span> <span class="pre">well</span> <span class="pre">produced'</span></span><a class="headerlink" href="#arioso.platforms.ace_step.config.DFLT_STYLE" title="Link to this definition">#</a></dt>
+<dd><p>The style ACE-Step is given when the caller names none (no Styles, no prompt). It asks
+for a well-made recording and names no genre, which is left to the lyrics, the source
+audio and ACE-Step’s own planner. A schema shows it as the prompt’s <code class="docutils literal notranslate"><span class="pre">default</span></code>, so a
+form can say what an empty field does instead of demanding text.</p>
+</dd></dl>
+
 </section>
 
 
@@ -471,6 +489,18 @@
                 <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arioso.platforms.ace_step.config.DFLT_STYLE"><code class="docutils literal notranslate"><span class="pre">DFLT_STYLE</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

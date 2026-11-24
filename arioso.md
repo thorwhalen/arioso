@@ -1,4 +1,4 @@
-> built 2026-11-24 00:53 UTC from c50089b (main) · arioso 0.0.66. Details: build_info.json
+> built 2026-11-24 12:44 UTC from c1ad8c8 (main) · arioso 0.0.67. Details: build_info.json
 
 # index.html.md
 
@@ -1961,6 +1961,18 @@ Live docs (verified 2026-10-03): [https://fal.ai/models/fal-ai/ace-step/api](htt
 [https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api](https://fal.ai/models/fal-ai/ace-step/audio-to-audio/api). Local runtime: the
 `ACE-Step/ACE-Step-1.5` checkout (MIT code and weights), verified against its
 `docs/en/INFERENCE.md` and `acestep.inference.GenerationParams` on 2026-11-10.
+
+### Module Attributes
+
+| [`DFLT_STYLE`](_autosummary/arioso.platforms.ace_step.config.html.md#arioso.platforms.ace_step.config.DFLT_STYLE)   | The style ACE-Step is given when the caller names none (no Styles, no prompt).   |
+|---------------------------------------------------------------|----------------------------------------------------------------------------------|
+
+### arioso.platforms.ace_step.config.DFLT_STYLE *= 'melodic, natural instruments, steady groove, warm, balanced mix, well produced'*
+
+The style ACE-Step is given when the caller names none (no Styles, no prompt). It asks
+for a well-made recording and names no genre, which is left to the lyrics, the source
+audio and ACE-Step’s own planner. A schema shows it as the prompt’s `default`, so a
+form can say what an empty field does instead of demanding text.
 
 
 # _autosummary/arioso.platforms.ace_step.html.md
@@ -4356,18 +4368,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-24 00:53 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/c50089bfbd4bd81c98639d2529a71b47b659a1fe"><code>c50089b</code></a> on branch <code>main</code>, for **arioso 0.0.66** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-24 12:44 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/c1ad8c810fc473f24085bddd34fe7592019c4649"><code>c1ad8c8</code></a> on branch <code>main</code>, for **arioso 0.0.67** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.67) is ahead of the latest release on PyPI (0.0.66): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/c50089bfbd4bd81c98639d2529a71b47b659a1fe"><code>c50089bfbd4bd81c98639d2529a71b47b659a1fe</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/c1ad8c810fc473f24085bddd34fe7592019c4649"><code>c1ad8c810fc473f24085bddd34fe7592019c4649</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.66</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.67</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4376,9 +4390,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45300374226">45300374226</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45395793419">45395793419</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>eb94942eb786ccc927880a28eb81039ff925469d</code> (in the history of the built commit) |
+| Event commit | <code>186244c520fefb7f8339fdf1d006732ad7b676cd</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4403,13 +4417,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.66/">0.0.66</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.66/">0.0.66</a>, older than the documented version (0.0.67).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout c50089bfbd4bd81c98639d2529a71b47b659a1fe
+git checkout c1ad8c810fc473f24085bddd34fe7592019c4649
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

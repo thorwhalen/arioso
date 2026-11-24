@@ -132,6 +132,7 @@ def _absent(value) -> bool:
     """Not given: ``None``, or text that is empty or only spaces (a blank form field)."""
     return value in _ABSENT or (isinstance(value, str) and not value.strip())
 
+
 _COERCE = {"int": lambda v: int(round(float(v))), "float": float, "str": str}
 
 

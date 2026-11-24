@@ -12,7 +12,9 @@ from arioso._isolated import GitSource
 #: for a well-made recording and names no genre, which is left to the lyrics, the source
 #: audio and ACE-Step's own planner. A schema shows it as the prompt's ``default``, so a
 #: form can say what an empty field does instead of demanding text.
-DFLT_STYLE = "melodic, natural instruments, steady groove, warm, balanced mix, well produced"
+DFLT_STYLE = (
+    "melodic, natural instruments, steady groove, warm, balanced mix, well produced"
+)
 
 PLATFORM_CONFIG = {
     "name": "ace_step",

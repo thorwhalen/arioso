@@ -90,6 +90,8 @@ def test_ace_step_without_a_style_uses_the_default_one(capture):
 
     ace_mod.Adapter({}).generate("", fetch=False)
     assert capture["arguments"]["tags"] == DFLT_STYLE
+    ace_mod.Adapter({}).generate("a slow waltz", genre="jazz trio", fetch=False)
+    assert capture["arguments"]["tags"] == "jazz trio, a slow waltz"  # #96: neither is dropped
     ace_mod.Adapter({}).generate("", genre="bossa nova", fetch=False)
     assert capture["arguments"]["tags"] == "bossa nova"
     ace_mod.Adapter({}).generate("   ", genre=" ", fetch=False)  # blank is not given

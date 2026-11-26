@@ -146,6 +146,7 @@ class FalAdapter:
 
         "native_name": {
             "from": ["unified", "names"],      # first one given (not None, not blank) wins
+            "join": ", ",                      # ...or: all those given, joined with this
             "default": 8,                      # used when none is given (omitted if absent)
             "default_from": "other_native",    # ...or copy another native argument's value
             "required": True | "message",      # ValueError when nothing is given
@@ -192,14 +193,13 @@ class FalAdapter:
         return kind, endpoint
 
     def _value(self, native: str, rule: dict, params: dict, built: dict):
-        given = next(
-            (
-                params[name]
-                for name in rule.get("from", ())
-                if not _absent(params.get(name))
-            ),
-            None,
-        )
+        present = [
+            params[name] for name in rule.get("from", ()) if not _absent(params.get(name))
+        ]
+        if "join" in rule and present:
+            given = rule["join"].join(str(v).strip() for v in present)
+        else:
+            given = present[0] if present else None
         force = rule.get("force")
         if force and params.get(force["when"]):
             given = force["value"]

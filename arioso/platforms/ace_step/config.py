@@ -42,11 +42,11 @@ PLATFORM_CONFIG = {
     },
     "worker": "ace_step",  # arioso/_workers/ace_step_worker.py
     "param_map": {
-        # The style tags: Styles (genre) first, else the prompt, else DFLT_STYLE.
+        # The style tags: Styles (genre) then the prompt, else DFLT_STYLE.
         "prompt": {
             "native_name": "tags",
             "title": "Song description",
-            "description": "What the music should sound like, in words or tags. Used when Styles is empty.",
+            "description": "What the music should sound like, in words. Sent after Styles when both are given.",
             "default": DFLT_STYLE,
             "optional_with": ["genre"],  # Styles stands in for it (and for its default)
             "adapter_handled": True,
@@ -54,7 +54,7 @@ PLATFORM_CONFIG = {
         "genre": {
             "native_name": "tags",
             "title": "Styles",
-            "description": "Style tags, comma-separated. Used instead of the description when given.",
+            "description": "Style tags, comma-separated. Sent before the description when both are given.",
             "adapter_handled": True,
         },
         "lyrics": {
@@ -132,6 +132,7 @@ PLATFORM_CONFIG = {
         "shared": {
             "tags": {
                 "from": ["genre", "prompt"],
+                "join": ", ",  # both are kept: Styles, then the description
                 "default": DFLT_STYLE,
             },
             "lyrics": {

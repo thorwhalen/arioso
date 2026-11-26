@@ -71,9 +71,9 @@ class LocalAceStep:
                 "(those are fal.ai endpoint options)",
                 stacklevel=3,
             )
-        # the same precedence as the fal mapping (tags: genre, else prompt, else the default)
+        # the same as the fal mapping: Styles then the prompt, else the default
         # (a blank one is not given)
-        caption = (genre or "").strip() or (prompt or "").strip() or DFLT_STYLE
+        caption = ". ".join(t for t in ((genre or "").strip(), (prompt or "").strip()) if t) or DFLT_STYLE
         if instrumental is None:
             instrumental = not lyrics
         seed = draw_seed() if seed is None else int(seed)

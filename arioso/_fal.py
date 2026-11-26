@@ -194,7 +194,9 @@ class FalAdapter:
 
     def _value(self, native: str, rule: dict, params: dict, built: dict):
         present = [
-            params[name] for name in rule.get("from", ()) if not _absent(params.get(name))
+            params[name]
+            for name in rule.get("from", ())
+            if not _absent(params.get(name))
         ]
         if "join" in rule and present:
             given = rule["join"].join(str(v).strip() for v in present)

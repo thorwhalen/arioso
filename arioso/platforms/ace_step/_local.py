@@ -73,7 +73,10 @@ class LocalAceStep:
             )
         # the same as the fal mapping: Styles then the prompt, else the default
         # (a blank one is not given)
-        caption = ". ".join(t for t in ((genre or "").strip(), (prompt or "").strip()) if t) or DFLT_STYLE
+        caption = (
+            ". ".join(t for t in ((genre or "").strip(), (prompt or "").strip()) if t)
+            or DFLT_STYLE
+        )
         if instrumental is None:
             instrumental = not lyrics
         seed = draw_seed() if seed is None else int(seed)

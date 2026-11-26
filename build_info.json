@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-24T12:50:22Z",
+  "built_at": "2026-11-26T14:17:39Z",
   "package": {
     "name": "arioso",
-    "version": "0.0.68",
+    "version": "0.0.69",
     "display_name": "arioso",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "ac792e02bfe2de7442b989730b8943810b72ddcc",
-    "short_commit": "ac792e0",
+    "commit": "374a293081267ebfc24a2d98bff5df6009013b91",
+    "short_commit": "374a293",
     "branch": "main",
     "tags": [
-      "0.0.68"
+      "0.0.69"
     ],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/arioso",
-    "commit_url": "https://github.com/thorwhalen/arioso/commit/ac792e02bfe2de7442b989730b8943810b72ddcc",
+    "commit_url": "https://github.com/thorwhalen/arioso/commit/374a293081267ebfc24a2d98bff5df6009013b91",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/arioso",
-    "sha": "e60dc16609a4f336ab5964711e4ecaf980501cd5",
+    "sha": "d19081f9059c4e769e77faf8c6932182e9a8efef",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45396843140",
-    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/45396843140",
+    "run_id": "45836901486",
+    "run_url": "https://github.com/thorwhalen/arioso/actions/runs/45836901486",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -62,16 +62,14 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.67",
-    "relation": "ahead",
+    "latest": "0.0.69",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout ac792e02bfe2de7442b989730b8943810b72ddcc\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/arioso && cd arioso\ngit checkout 374a293081267ebfc24a2d98bff5df6009013b91\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.68) is ahead of the latest release on PyPI (0.0.67): these docs describe unreleased code."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

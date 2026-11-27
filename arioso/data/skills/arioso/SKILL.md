@@ -232,7 +232,7 @@ arioso.supports_audio_input("stable_audio")  # can it take audio IN? -> True
 | Background bed / loop / instrumental, free | `musicgen` |
 | Free, texture / sound-design rather than a tune | `stable_audio` |
 | Transform audio the user already has | `arioso.enhance(audio, prompt)` — see below |
-| The same piece, subtly changed (a strength knob) | `enhance(..., platform="stable_audio_25", strength=0.2-0.5)` (paid, fal) |
+| The same piece, subtly changed (a strength knob) | `enhance(..., platform="stable_audio_25", strength=0.5-0.8)` (paid, fal) |
 | Remix existing audio toward style tags | `enhance(..., platform="ace_step")` (paid, fal) |
 
 `arioso.enhance(audio, "warm analog studio band")` routes existing audio into
@@ -242,7 +242,7 @@ or a waveform. Only some platforms take input audio — check
 `supports_audio_input` first.
 
 Audio-in platforms: `stable_audio` (local, no strength knob), `stable_audio_25`
-(fal; `strength` 0-1, lower keeps more of the input), `ace_step` (fal remix),
+(fal; `strength` 0-1, higher keeps more of the input), `ace_step` (fal remix),
 `musicgen` (melody, or continuation via `continue_from`; local, 30 s window), `sunoapi` (`upload_cover` /
 `upload_extend`), `yue` (vocal prompt), `udio`.
 

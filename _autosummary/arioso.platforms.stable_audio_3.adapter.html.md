@@ -38,8 +38,11 @@ Generate `duration` seconds for `prompt`.
   * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Seed; a fresh one is drawn and recorded when None.
   * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to steer away from (needs `guidance` above 1).
   * **audio_input** – Audio to vary (audio-to-audio) or, with `inpaint_range`, to inpaint.
-  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Noise level 0-1 applied to `audio_input` (higher = freer);
-    default 0.7 for a variation, 1.0 for inpainting (which starts from noise).
+  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much `audio_input` shapes the output, 0-1
+    (1 = follow it closely, 0 = ignore it), as for every platform. It is
+    sent as the native noise level `1 - audio_input_strength`. When not
+    given, the noise level is 0.7 for a variation and 1.0 for inpainting
+    (which starts from noise).
   * **inpaint_range** – `(start, end)` seconds of `audio_input` to regenerate.
   * **timeout** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Seconds before the process is killed.
 * **Returns:**

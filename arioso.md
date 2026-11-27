@@ -1,4 +1,4 @@
-> built 2026-11-26 14:17 UTC from 374a293 (main) · arioso 0.0.69. Details: build_info.json
+> built 2026-11-27 12:07 UTC from f5f3aa2 (main) · arioso 0.0.70. Details: build_info.json
 
 # index.html.md
 
@@ -81,10 +81,10 @@ rendered = (
 # Audio-to-audio: continue/transform the input (Stable Audio Open, local)
 better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
 
-# Subtle variation: low strength keeps the input, high lets the prompt take over
+# Subtle variation: high strength keeps the input, low lets the prompt take over
 # (Stable Audio 2.5 on fal.ai; needs FAL_KEY)
 close = arioso.enhance(
-    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.3
+    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.7
 )
 
 # Remix toward style tags (ACE-Step on fal.ai)
@@ -1631,8 +1631,9 @@ point for the “rendered MIDI audio -> AI-enhanced audio” step.
   * **prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Optional text guiding the transformation.
   * **platform** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – An audio-capable platform (default `'stable_audio'`); verify
     with [`supports_audio_input()`](_autosummary/arioso.html.md#arioso.supports_audio_input).
-  * **strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much the input audio influences the output (0-1), where the
-    platform supports it. (Note: `stable_audio` via diffusers has no
+  * **strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much the input audio influences the output (0-1: 0 leaves it
+    to the prompt, 1 follows the audio closely), where the platform
+    supports it. The direction is the same on every platform. (Note: `stable_audio` via diffusers has no
     strength knob and will warn if one is passed.)
   * **as_** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Which affordance to route *audio* into – `'auto'` (default; picks
     `audio_input` > `melody` > `reference_audio`) or an explicit
@@ -3611,8 +3612,11 @@ Generate `duration` seconds for `prompt`.
   * **seed** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – Seed; a fresh one is drawn and recorded when None.
   * **negative_prompt** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – What to steer away from (needs `guidance` above 1).
   * **audio_input** – Audio to vary (audio-to-audio) or, with `inpaint_range`, to inpaint.
-  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Noise level 0-1 applied to `audio_input` (higher = freer);
-    default 0.7 for a variation, 1.0 for inpainting (which starts from noise).
+  * **audio_input_strength** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – How much `audio_input` shapes the output, 0-1
+    (1 = follow it closely, 0 = ignore it), as for every platform. It is
+    sent as the native noise level `1 - audio_input_strength`. When not
+    given, the noise level is 0.7 for a variation and 1.0 for inpainting
+    (which starts from noise).
   * **inpaint_range** – `(start, end)` seconds of `audio_input` to regenerate.
   * **timeout** ([`float`](https://docs.python.org/3/builtins/functions.html#float)) – Seconds before the process is killed.
 * **Returns:**
@@ -4368,18 +4372,20 @@ The returned function transforms:
 
 # About this build
 
-This documentation was built on **2026-11-26 14:17 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/374a293081267ebfc24a2d98bff5df6009013b91"><code>374a293</code></a> on branch <code>main</code>, for **arioso 0.0.69** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-27 12:07 UTC** from commit <a href="https://github.com/thorwhalen/arioso/commit/f5f3aa23c2e3b66856d161509ee1637d839f1623"><code>f5f3aa2</code></a> on branch <code>main</code>, for **arioso 0.0.70** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.70) is ahead of the latest release on PyPI (0.0.69): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/374a293081267ebfc24a2d98bff5df6009013b91"><code>374a293081267ebfc24a2d98bff5df6009013b91</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/arioso/commit/f5f3aa23c2e3b66856d161509ee1637d839f1623"><code>f5f3aa23c2e3b66856d161509ee1637d839f1623</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
-| Tags at this commit | <code>0.0.69</code>                                                                                                                                      |
+| Tags at this commit | <code>0.0.70</code>                                                                                                                                      |
 | Working tree        | clean                                                                                                                                                    |
 | Remote              | <code>https://github.com/thorwhalen/arioso</code>                                                                                                        |
 
@@ -4388,9 +4394,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/arioso</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45836901486">45836901486</a>    |
+| Run          | <a href="https://github.com/thorwhalen/arioso/actions/runs/45995551265">45995551265</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d19081f9059c4e769e77faf8c6932182e9a8efef</code> (in the history of the built commit) |
+| Event commit | <code>d0939e7c4201721ffce0116b336edb430289f4e1</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4415,13 +4421,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/arioso/0.0.69/">0.0.69</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/arioso/0.0.69/">0.0.69</a>, older than the documented version (0.0.70).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/arioso && cd arioso
-git checkout 374a293081267ebfc24a2d98bff5df6009013b91
+git checkout f5f3aa23c2e3b66856d161509ee1637d839f1623
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=cac962a1"></script>
+    <script src="../../../../_static/documentation_options.js?v=29ed05f3"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.69" />
+  <meta name="docsearch:version" content="0.0.70" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -848,8 +848,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            seed: Seed; a fresh one is drawn and recorded when None.</span>
 <span class="sd">            negative_prompt: What to steer away from (needs ``guidance`` above 1).</span>
 <span class="sd">            audio_input: Audio to vary (audio-to-audio) or, with ``inpaint_range``, to inpaint.</span>
-<span class="sd">            audio_input_strength: Noise level 0-1 applied to ``audio_input`` (higher = freer);</span>
-<span class="sd">                default 0.7 for a variation, 1.0 for inpainting (which starts from noise).</span>
+<span class="sd">            audio_input_strength: How much ``audio_input`` shapes the output, 0-1</span>
+<span class="sd">                (1 = follow it closely, 0 = ignore it), as for every platform. It is</span>
+<span class="sd">                sent as the native noise level ``1 - audio_input_strength``. When not</span>
+<span class="sd">                given, the noise level is 0.7 for a variation and 1.0 for inpainting</span>
+<span class="sd">                (which starts from noise).</span>
 <span class="sd">            inpaint_range: ``(start, end)`` seconds of ``audio_input`` to regenerate.</span>
 <span class="sd">            timeout: Seconds before the process is killed.</span>
 
@@ -862,7 +865,9 @@ window.runMermaid = runMermaid;</script>
         <span class="n">work</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"arioso_sa3_"</span><span class="p">))</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">work</span> <span class="o">/</span> <span class="s2">"out.wav"</span>
         <span class="k">if</span> <span class="n">audio_input_strength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">audio_input_strength</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">inpaint_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">DFLT_A2A_NOISE</span>
+            <span class="n">noise_level</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">inpaint_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">DFLT_A2A_NOISE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">noise_level</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">audio_input_strength</span><span class="p">)</span>
         <span class="n">ref</span> <span class="o">=</span> <span class="n">to_audio_ref</span><span class="p">(</span><span class="n">audio_input</span><span class="p">)</span> <span class="k">if</span> <span class="n">audio_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_command</span><span class="p">(</span>
@@ -875,7 +880,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
                 <span class="n">negative_prompt</span><span class="o">=</span><span class="n">negative_prompt</span><span class="p">,</span>
                 <span class="n">init_audio</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">as_path</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">".wav"</span><span class="p">)</span> <span class="k">if</span> <span class="n">ref</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">strength</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">audio_input_strength</span><span class="p">),</span>
+                <span class="n">strength</span><span class="o">=</span><span class="n">noise_level</span><span class="p">,</span>
                 <span class="n">inpaint_range</span><span class="o">=</span><span class="n">inpaint_range</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">code</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span>

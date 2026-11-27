@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=cac962a1"></script>
+    <script src="../_static/documentation_options.js?v=29ed05f3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -411,7 +411,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.69" />
+  <meta name="docsearch:version" content="0.0.70" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -924,8 +924,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        prompt: Optional text guiding the transformation.</span>
 <span class="sd">        platform: An audio-capable platform (default ``'stable_audio'``); verify</span>
 <span class="sd">            with :func:`supports_audio_input`.</span>
-<span class="sd">        strength: How much the input audio influences the output (0-1), where the</span>
-<span class="sd">            platform supports it. (Note: ``stable_audio`` via diffusers has no</span>
+<span class="sd">        strength: How much the input audio influences the output (0-1: 0 leaves it</span>
+<span class="sd">            to the prompt, 1 follows the audio closely), where the platform</span>
+<span class="sd">            supports it. The direction is the same on every platform. (Note: ``stable_audio`` via diffusers has no</span>
 <span class="sd">            strength knob and will warn if one is passed.)</span>
 <span class="sd">        as_: Which affordance to route *audio* into -- ``'auto'`` (default; picks</span>
 <span class="sd">            ``audio_input`` &gt; ``melody`` &gt; ``reference_audio``) or an explicit</span>

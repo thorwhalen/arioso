@@ -77,10 +77,10 @@ rendered = (
 # Audio-to-audio: continue/transform the input (Stable Audio Open, local)
 better = arioso.enhance(rendered, "warm analog studio band", platform="stable_audio")
 
-# Subtle variation: low strength keeps the input, high lets the prompt take over
+# Subtle variation: high strength keeps the input, low lets the prompt take over
 # (Stable Audio 2.5 on fal.ai; needs FAL_KEY)
 close = arioso.enhance(
-    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.3
+    rendered, "full symphony orchestra", platform="stable_audio_25", strength=0.7
 )
 
 # Remix toward style tags (ACE-Step on fal.ai)

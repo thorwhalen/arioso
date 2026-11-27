@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=cac962a1"></script>
+    <script src="_static/documentation_options.js?v=29ed05f3"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.69" />
+  <meta name="docsearch:version" content="0.0.70" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -399,10 +399,10 @@
 <span class="c1"># Audio-to-audio: continue/transform the input (Stable Audio Open, local)</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="s2">"warm analog studio band"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"stable_audio"</span><span class="p">)</span>
 
-<span class="c1"># Subtle variation: low strength keeps the input, high lets the prompt take over</span>
+<span class="c1"># Subtle variation: high strength keeps the input, low lets the prompt take over</span>
 <span class="c1"># (Stable Audio 2.5 on fal.ai; needs FAL_KEY)</span>
 <span class="n">close</span> <span class="o">=</span> <span class="n">arioso</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span>
-    <span class="n">rendered</span><span class="p">,</span> <span class="s2">"full symphony orchestra"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"stable_audio_25"</span><span class="p">,</span> <span class="n">strength</span><span class="o">=</span><span class="mf">0.3</span>
+    <span class="n">rendered</span><span class="p">,</span> <span class="s2">"full symphony orchestra"</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">"stable_audio_25"</span><span class="p">,</span> <span class="n">strength</span><span class="o">=</span><span class="mf">0.7</span>
 <span class="p">)</span>
 
 <span class="c1"># Remix toward style tags (ACE-Step on fal.ai)</span>
@@ -1073,7 +1073,7 @@
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-26 14:17 UTC from <a href="https://github.com/thorwhalen/arioso/commit/374a293081267ebfc24a2d98bff5df6009013b91">374a293</a> (main) · arioso 0.0.69 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-27 12:07 UTC from <a href="https://github.com/thorwhalen/arioso/commit/f5f3aa23c2e3b66856d161509ee1637d839f1623">f5f3aa2</a> (main) · arioso 0.0.70 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=cac962a1"></script>
+    <script src="../_static/documentation_options.js?v=29ed05f3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.69" />
+  <meta name="docsearch:version" content="0.0.70" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -473,8 +473,11 @@ is given). <code class="docutils literal notranslate"><span class="pre">runner=<
 <li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Seed; a fresh one is drawn and recorded when None.</p></li>
 <li><p><strong>negative_prompt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – What to steer away from (needs <code class="docutils literal notranslate"><span class="pre">guidance</span></code> above 1).</p></li>
 <li><p><strong>audio_input</strong> – Audio to vary (audio-to-audio) or, with <code class="docutils literal notranslate"><span class="pre">inpaint_range</span></code>, to inpaint.</p></li>
-<li><p><strong>audio_input_strength</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Noise level 0-1 applied to <code class="docutils literal notranslate"><span class="pre">audio_input</span></code> (higher = freer);
-default 0.7 for a variation, 1.0 for inpainting (which starts from noise).</p></li>
+<li><p><strong>audio_input_strength</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – How much <code class="docutils literal notranslate"><span class="pre">audio_input</span></code> shapes the output, 0-1
+(1 = follow it closely, 0 = ignore it), as for every platform. It is
+sent as the native noise level <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">audio_input_strength</span></code>. When not
+given, the noise level is 0.7 for a variation and 1.0 for inpainting
+(which starts from noise).</p></li>
 <li><p><strong>inpaint_range</strong> – <code class="docutils literal notranslate"><span class="pre">(start,</span> <span class="pre">end)</span></code> seconds of <code class="docutils literal notranslate"><span class="pre">audio_input</span></code> to regenerate.</p></li>
 <li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Seconds before the process is killed.</p></li>
 </ul>

@@ -179,9 +179,9 @@ AFFORDANCES: dict[str, Affordance] = {
         "audio_input_strength",
         float,
         "How much the input audio shapes the output, 0-1: 0 leaves it to the text, "
-        "1 follows the audio closely. Some platforms' native control runs the other "
-        "way (a noise level, Stable Audio's strength) and is not inverted yet: see "
-        "thorwhalen/arioso#74",
+        "1 follows the audio closely, on every platform. Where the native control "
+        "runs the other way (a noise level, Stable Audio's strength), the adapter "
+        "sends ``1 - audio_input_strength``.",
         minimum=0,
         maximum=1,
         title="Audio influence",

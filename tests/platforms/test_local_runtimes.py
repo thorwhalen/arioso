@@ -97,7 +97,7 @@ def test_sa3_passes_audio_to_audio_and_inpainting(installed, tmp_path):
     )
     cmd = runner.calls[0]["cmd"]
     assert (
-        _flag(cmd, "--init-noise-level") == "0.4"
+        float(_flag(cmd, "--init-noise-level")) == pytest.approx(0.6)  # 1 - influence (#74)
         and _flag(cmd, "--inpaint-range") == "1,2"
     )
     assert _flag(cmd, "--seed") == "7"

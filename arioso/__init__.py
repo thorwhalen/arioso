@@ -199,8 +199,9 @@ def enhance(
         prompt: Optional text guiding the transformation.
         platform: An audio-capable platform (default ``'stable_audio'``); verify
             with :func:`supports_audio_input`.
-        strength: How much the input audio influences the output (0-1), where the
-            platform supports it. (Note: ``stable_audio`` via diffusers has no
+        strength: How much the input audio influences the output (0-1: 0 leaves it
+            to the prompt, 1 follows the audio closely), where the platform
+            supports it. The direction is the same on every platform. (Note: ``stable_audio`` via diffusers has no
             strength knob and will warn if one is passed.)
         as_: Which affordance to route *audio* into -- ``'auto'`` (default; picks
             ``audio_input`` > ``melody`` > ``reference_audio``) or an explicit
